@@ -1132,7 +1132,7 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::load_from_stack(
   u32 off = frame_off;
   auto addr_base = AsmReg{AsmReg::FP};
   if (off >= 0x1000 * size) [[unlikely]] {
-    // need to calculate this explicitely
+    // need to calculate this explicitly
     addr_base = dst.id() <= AsmReg::R30 ? dst : permanent_scratch_reg;
     ASM(ADDxi, addr_base, DA_GP(29), off & ~0xfff);
     off &= 0xfff;
@@ -1625,7 +1625,7 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::generate_raw_jump(
           ASMNC(CBZx, jmp.cmp_reg, 2);
         }
       }
-      // + 4 since we alrady wrote the cb(n)z instruction
+      // + 4 since we already wrote the cb(n)z instruction
       ASMNC(B, -static_cast<ptrdiff_t>(off + 4) / 4);
     }
     return;
@@ -1667,7 +1667,7 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::generate_raw_jump(
       } else {
         ASMNC(TBZ, jmp.cmp_reg, jmp.test_bit, 2);
       }
-      // + 4 since we alrady wrote the tb(n)z instruction
+      // + 4 since we already wrote the tb(n)z instruction
       ASMNC(B, -static_cast<ptrdiff_t>(off + 4) / 4);
     }
     return;
@@ -1761,7 +1761,7 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::generate_raw_jump(
 
     // 2 to skip over the branch following
     ASMNC(BCOND, cond_compl, 2);
-    // + 4 since we alrady wrote the branch instruction
+    // + 4 since we already wrote the branch instruction
     ASMNC(B, -static_cast<ptrdiff_t>(off + 4) / 4);
   }
 }

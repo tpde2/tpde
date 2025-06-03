@@ -64,7 +64,7 @@ int main(int argc, char *argv[]) {
   args::Flag no_fixed_assignments(
       parser,
       "no_fixed_assignments",
-      "Prevent fixed assignments from occuring unless they are forced",
+      "Prevent fixed assignments from occurring unless they are forced",
       {"no-fixed-assignments"});
 
   std::unordered_map<std::string_view, RunTestUntil> run_map{

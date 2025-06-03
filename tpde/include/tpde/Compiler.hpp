@@ -78,7 +78,7 @@ concept Compiler = CompilerConfig<Config> && requires(T a) {
   } -> std::same_as<typename Config::AsmReg>;
 
 
-  // mostly implementor stuff
+  // mostly implementer stuff
 
   { a.cur_func_may_emit_calls() } -> std::convertible_to<bool>;
 

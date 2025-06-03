@@ -909,7 +909,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::
   };
 
   // create the symbols first so that later relocations don't try to look up
-  // non-existant symbols
+  // non-existent symbols
   for (const llvm::GlobalVariable &gv : llvm_mod.globals()) {
     if (!declare_global(gv)) {
       return false;
@@ -1077,12 +1077,12 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::global_init_to_data(
   }
 
   if (auto *CI = llvm::dyn_cast<llvm::ConstantInt>(constant); CI) {
-    // TODO: endianess?
+    // TODO: endianness?
     llvm::StoreIntToMemory(CI->getValue(), data.data() + off, alloc_size);
     return true;
   }
   if (auto *CF = llvm::dyn_cast<llvm::ConstantFP>(constant); CF) {
-    // TODO: endianess?
+    // TODO: endianness?
     llvm::StoreIntToMemory(
         CF->getValue().bitcastToAPInt(), data.data() + off, alloc_size);
     return true;
@@ -1142,7 +1142,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::global_init_to_data(
     case llvm::Instruction::IntToPtr:
       if (auto *CI = llvm::dyn_cast<llvm::ConstantInt>(expr->getOperand(0))) {
         auto alloc_size = layout.getTypeAllocSize(expr->getType());
-        // TODO: endianess?
+        // TODO: endianness?
         llvm::StoreIntToMemory(CI->getValue(), data.data() + off, alloc_size);
         return true;
       }
@@ -2909,7 +2909,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_shuffle_vector(
   // register here, that will fail because the value is uninitialized.
   res_ref.alloc_reg();
   // But, as the value is uninitialized, the stack slot is also valid. This
-  // avoids spilling an unitialized register in insert_element.
+  // avoids spilling an uninitialized register in insert_element.
   this->allocate_spill_slot(res_ref.assignment());
   res_ref.assignment().set_stack_valid();
 

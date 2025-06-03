@@ -634,7 +634,7 @@ void EncodingTargetX64::get_inst_candidates(
   handle_rm("MAXSDrr", "MAXSDrm", 2, "SSE_MAXSDrr", "SSE_MAXSDrm");
   handle_rm("MAXPSrr", "MAXPSrm", 2, "SSE_MAXPSrr", "SSE_MAXPSrm", 16);
   handle_rm("MAXPDrr", "MAXPDrm", 2, "SSE_MAXPDrr", "SSE_MAXPDrm", 16);
-  // commutive variants of MIN/MAX
+  // commutative variants of MIN/MAX
   handle_rm("MINCSSrr", "MINCSSrm", 2, "SSE_MINSSrr", "SSE_MINSSrm");
   handle_rm("MINCSDrr", "MINCSDrm", 2, "SSE_MINSDrr", "SSE_MINSDrm");
   handle_rm("MINCPSrr", "MINCPSrm", 2, "SSE_MINPSrr", "SSE_MINPSrm", 16);
@@ -831,15 +831,15 @@ void EncodingTargetX64::get_inst_candidates(
     // TODO(ts): need check for imm8
     handle_default("BT64rr");
   } else if (Name == "IMUL16rr") {
-    // TODO: for imm replacment, use rri encoding
+    // TODO: for imm replacement, use rri encoding
     handle_memrepl("IMUL16rm", 2);
     handle_default("IMUL16rr");
   } else if (Name == "IMUL32rr") {
-    // TODO: for imm replacment, use rri encoding
+    // TODO: for imm replacement, use rri encoding
     handle_memrepl("IMUL32rm", 2);
     handle_default("IMUL32rr");
   } else if (Name == "IMUL64rr") {
-    // TODO: for imm replacment, use rri encoding
+    // TODO: for imm replacement, use rri encoding
     handle_memrepl("IMUL64rm", 2);
     handle_default("IMUL64rr");
   } else if (Name == "IMUL32rri") {

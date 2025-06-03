@@ -342,7 +342,7 @@ concept IRAdaptor = requires(T a) {
   /// compiling this function is not supported.
   { a.switch_func(ARG(typename T::IRFuncRef)) } -> std::convertible_to<bool>;
 
-  /// The compiler is being resetted. If there is any data remaining that
+  /// The compiler is being reset. If there is any data remaining that
   /// would cause problems with recompiling it should be cleared
   { a.reset() };
 };

@@ -398,10 +398,10 @@ void Analyzer<Adaptor>::build_loop_tree_and_block_layout(
 
   assert(static_cast<u32>(loops[0].end) == block_rpo.size());
 
-  // TODO(ts): this is currently disabled as it wants to enfore that loop
-  // childs directly follow their parent which the algorithm above does not
+  // TODO(ts): this is currently disabled as it wants to enforce that loop
+  // children directly follow their parent which the algorithm above does not
   // guarantee. But I don't think any code actually relies on this being true,
-  // just that childs have to follow their parent
+  // just that children have to follow their parent
 #if defined(TPDE_ASSERTS) && 0
   struct Constraint {
     u32 begin, end;
