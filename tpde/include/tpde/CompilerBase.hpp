@@ -284,7 +284,7 @@ public:
   /// Compile the functions returned by Adaptor::funcs
   ///
   /// \warning If you intend to call this multiple times, you must call reset
-  ///   inbetween the calls.
+  ///   in between the calls.
   ///
   /// \returns Whether the compilation was successful
   bool compile();
@@ -1228,7 +1228,7 @@ typename CompilerBase<Adaptor, Derived, Config>::RegisterFile::RegBitSet
   //
   // This leads to worse codegen but saves a significant overhead to
   // store/manage the register assignment for each block (256 bytes/block for
-  // x64) and possible compiletime as there might be additional logic to move
+  // x64) and possible compile time as there might be additional logic to move
   // values around
 
   // First, we consider the case that the current block only has one successor

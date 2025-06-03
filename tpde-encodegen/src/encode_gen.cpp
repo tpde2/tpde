@@ -110,12 +110,12 @@ bool const_to_bytes(const llvm::DataLayout &dl,
   //}
 
   if (auto *CI = llvm::dyn_cast<llvm::ConstantInt>(constant); CI) {
-    // TODO: endianess?
+    // TODO: endianness?
     llvm::StoreIntToMemory(CI->getValue(), bytes.data() + off, alloc_size);
     return true;
   }
   if (auto *CF = llvm::dyn_cast<llvm::ConstantFP>(constant); CF) {
-    // TODO: endianess?
+    // TODO: endianness?
     llvm::StoreIntToMemory(
         CF->getValue().bitcastToAPInt(), bytes.data() + off, alloc_size);
     return true;

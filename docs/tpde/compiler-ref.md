@@ -250,7 +250,7 @@ bool compile_add64(IRInstRef inst) {
 ```
 
 ### reusing operand registers
-- previouse encoding inefficient
+- previous encoding inefficient
 - if lhs is not used after the instruction, we could reuse register ("salvage" the register)
 - to do this if possible we will use the [into_temporary](@ref ValuePartRef::into_temporary) function
 - will give use an owning reference to the register if the value is dead after this instruction or make a copy into a new register
@@ -291,7 +291,7 @@ bool compile_add64(IRInstRef inst) {
 - allocated and free'd using [ScratchReg](@ref ScratchReg)
 - allocate using [alloc](@ref ScratchReg::alloc), [alloc_gp](@ref ScratchReg::alloc_gp) or a specific register using [alloc_specific](@ref ScratchReg::alloc_specific)
 - use the `AsmReg` as desired
-- register is free'd on desctruction of the `ScratchReg` or when calling [reset](@ref ScratchReg::reset)
+- register is free'd on destruction of the `ScratchReg` or when calling [reset](@ref ScratchReg::reset)
 
 ## Constants using ValRefSpecial
 - constants relatively common feature
@@ -423,7 +423,7 @@ bool compile_loadi8(IRInstRef inst, InstRange remaining) {
 - ValueParts may be used if you need to do some processing before returning them, e.g. zero-/sign-extension with non-power-of-two bitwidths
 - afterwards, call [RetBuilder::ret](@ref CompilerBase::RetBuilder::ret) to generate the return
 - this will internally move the results into the return registers and then call `gen_func_epilog` and `release_regs_after_return`
-- if you do not need to return anything, you can skipp the RetBuilder and call these two functions yourself
+- if you do not need to return anything, you can skip the RetBuilder and call these two functions yourself
 
 > [!warning]
 > you *always* need to call `release_regs_after_return` if you compile an instruction that terminates a basic block and does not branch to another block
@@ -686,7 +686,7 @@ this->free_stack_slot(slot, /* size_bytes = */ 8);
 - handles generating an object file and unwind information
 - configured using the compiler config, instance stored in CompilerBase
 - currently only x86-64 and AArch64 Linux ELF supported
-- unwind info is synchroneous
+- unwind info is synchronous
 - supports generating C++ exception information
 
 ### Sections
@@ -725,7 +725,7 @@ for function or TLS objects and using [sym_def_predef_data](@ref AssemblerElf::s
 ```cpp
 void sym_def_predef_data(SecRef sec, SymRef sym, std::span<const u8> data, u32 align, u32 *off) noexcept;
 ```
-Defines a data object refered to by `sym` in the section `sec` with the specified data and alignment.
+Defines a data object referred to by `sym` in the section `sec` with the specified data and alignment.
 If `off` is not a `nullptr`, the offset of the data in the section is written to the `u32` pointed to by `off`.
 
 #### sym_def_data
@@ -846,7 +846,7 @@ void write_jump_table(Label jump_table, std::span<Label> cases) {
     // offsets are 32 bit in size
     this->text_writer.align(4);
 
-    // we want the jump table to be continous
+    // we want the jump table to be continuous
     this->text_writer.ensure_space(4 + 4 * labels.size());
 
     this->label_place(jump_table);

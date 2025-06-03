@@ -163,7 +163,7 @@ Framework divides back-end into 7 components:
 	  ```
 	  which is completely architecture-independent without any regards to the actual instructions
 	  being generated
-	- extremely usefule for fast porting to other architectures and when
+	- extremely useful for fast porting to other architectures and when
 	  the necessary instruction sequences are long (e.g. float/double to/from int conversions)
   - currently no support for branching to other basic blocks in the function
 	  or function calls
