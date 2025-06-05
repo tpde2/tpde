@@ -14,7 +14,7 @@ jobs:
       with:
         submodules: recursive
     - name: Configure
-      run: CC=clang-19 CXX=clang++-19 cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DTPDE_BUILD_DOCS=ON -DLIT=/usr/bin/lit -DLLVM_DIR=/usr/lib64/llvm-19
+      run: CC=clang-19 CXX=clang++-19 cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DTPDE_BUILD_DOCS=ON -DLIT=/usr/bin/lit 
     - name: Build
       run: ninja -v -C build
     - name: Test
