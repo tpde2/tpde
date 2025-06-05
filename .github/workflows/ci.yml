@@ -8,14 +8,13 @@ on: [push]
 jobs:
   build-llvm19:
     runs-on: ubuntu-latest
+    container: t0b1fox/tpde
     steps:
     - uses: actions/checkout@v4
       with:
         submodules: recursive
-    - name: Install dependencies
-      run: sudo apt install -y ninja-build cmake clang-19 llvm-19-dev doxygen
     - name: Configure
-      run: CC=clang CXX=clang++ cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DTPDE_BUILD_DOCS=ON -DLIT=/usr/lib/llvm-19/build/utils/lit/lit.py
+      run: CC=clang CXX=clang++ cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DTPDE_BUILD_DOCS=ON -DLIT=/usr/bin/lit
     - name: Build
       run: ninja -v -C build
     - name: Test
