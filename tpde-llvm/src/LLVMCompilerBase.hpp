@@ -578,6 +578,7 @@ std::optional<typename LLVMCompilerBase<Adaptor, Derived, Config>::ValuePartRef>
 
     // Iterate over complex data type to find the struct/array indices that
     // belong to part.
+    sub_part = 0;
     tpde::util::SmallVector<unsigned, 16> indices;
     for (unsigned i = 0; i < part; i++) {
       indices.resize(indices.size() + part_descs[i].part.nest_inc -
@@ -654,6 +655,7 @@ std::optional<typename LLVMCompilerBase<Adaptor, Derived, Config>::ValuePartRef>
 
   if (const auto *const_int = llvm::dyn_cast<llvm::ConstantInt>(const_val);
       const_int != nullptr) {
+    assert(sub_part < (ty == LLVMBasicValType::i128 ? 2 : 1));
     const u64 *data = const_int->getValue().getRawData();
     switch (ty) {
       using enum LLVMBasicValType;
