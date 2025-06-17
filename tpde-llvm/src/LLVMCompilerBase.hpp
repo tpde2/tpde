@@ -610,6 +610,9 @@ std::optional<typename LLVMCompilerBase<Adaptor, Derived, Config>::ValuePartRef>
     }
 
     ty = part_descs[part].part.type;
+    assert(ty != LLVMBasicValType::invalid);
+  } else if (ty == LLVMBasicValType::invalid) [[unlikely]] {
+    TPDE_FATAL("cannot handle constant of illegal/unsupported type");
   }
 
   // At this point, ty is the basic type of the element and sub_part the part
@@ -653,21 +656,13 @@ std::optional<typename LLVMCompilerBase<Adaptor, Derived, Config>::ValuePartRef>
     TPDE_FATAL("non-sequential vector constants should not be legal");
   }
 
-  if (const auto *const_int = llvm::dyn_cast<llvm::ConstantInt>(const_val);
-      const_int != nullptr) {
+  if (const auto *const_int = llvm::dyn_cast<llvm::ConstantInt>(const_val)) {
     assert(sub_part < (ty == LLVMBasicValType::i128 ? 2 : 1));
+    u32 size = this->adaptor->basic_ty_part_size(ty);
+    tpde::RegBank bank = this->adaptor->basic_ty_part_bank(ty);
+    assert(size <= 8 && "multi-word integer as single part?");
     const u64 *data = const_int->getValue().getRawData();
-    switch (ty) {
-      using enum LLVMBasicValType;
-    case i1:
-    case i8: return ValuePartRef(this, data[0], 1, Config::GP_BANK);
-    case i16: return ValuePartRef(this, data[0], 2, Config::GP_BANK);
-    case i32: return ValuePartRef(this, data[0], 4, Config::GP_BANK);
-    case i64:
-    case ptr: return ValuePartRef(this, data[0], 8, Config::GP_BANK);
-    case i128: return ValuePartRef(this, data[sub_part], 8, Config::GP_BANK);
-    default: TPDE_FATAL("illegal integer constant");
-    }
+    return ValuePartRef(this, data[sub_part], size, bank);
   }
 
   if (const auto *const_fp = llvm::dyn_cast<llvm::ConstantFP>(const_val);
