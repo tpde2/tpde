@@ -577,6 +577,61 @@ std::pair<unsigned, unsigned>
 
   size_t start = complex_part_types.size();
   switch (type->getTypeID()) {
+  case llvm::Type::FixedVectorTyID: {
+    auto *el_ty = llvm::cast<llvm::FixedVectorType>(type)->getElementType();
+    auto nelem = llvm::cast<llvm::FixedVectorType>(type)->getNumElements();
+    assert(nelem > 0 && "vectors with zero elements are invalid");
+
+    // We can only handle types where the compact bitwise representation is the
+    // same as the array representation. Otherwise, load/store would need to
+    // decompress/compress vectors.
+
+    LLVMBasicValType scalar_ty;
+    switch (el_ty->getTypeID()) {
+    case llvm::Type::IntegerTyID: {
+      unsigned el_width = el_ty->getIntegerBitWidth();
+      if (el_width < 8 || el_width > 64 || (el_width & (el_width - 1))) {
+        goto unhandled;
+      }
+      constexpr unsigned base = static_cast<unsigned>(LLVMBasicValType::i8);
+      static_assert(base + 1 == static_cast<unsigned>(LLVMBasicValType::i16));
+      static_assert(base + 2 == static_cast<unsigned>(LLVMBasicValType::i32));
+      static_assert(base + 3 == static_cast<unsigned>(LLVMBasicValType::i64));
+
+      unsigned off = 31 - tpde::util::cnt_lz((el_width - 1) >> 2 | 1);
+      scalar_ty = static_cast<LLVMBasicValType>(base + off);
+      break;
+    }
+    case llvm::Type::PointerTyID:
+      if (el_ty->getPointerAddressSpace() != 0) {
+        goto unhandled;
+      }
+      scalar_ty = LLVMBasicValType::ptr;
+      break;
+    case llvm::Type::FloatTyID: scalar_ty = LLVMBasicValType::f32; break;
+    case llvm::Type::DoubleTyID: scalar_ty = LLVMBasicValType::f64; break;
+    default: goto unhandled;
+    }
+
+    // We scalarize the type, which is often not the same as LLVM would do.
+    // LLVM's vector type legalization rules are highly complex, depend on the
+    // target, and are rather inconsistent. There's no real point in modeling
+    // the exact semantics here. This is only relevant at function boundaries.
+    // Also note that our scalarized types has an incompatible ABI and we might
+    // not be able to return the scalarized type at all: e.g., a <31 x i8> could
+    // be returned in two vector registers (which is typically what LLVM would
+    // do), but we'd need 31 integer registers.
+    complex_part_types[desc_idx].desc.incompatible_layout = true;
+
+    complex_part_types.reserve(start + nelem);
+    unsigned elem_size = basic_ty_part_size(scalar_ty);
+    for (unsigned i = 0; i < nelem; i++) {
+      complex_part_types.emplace_back(scalar_ty, elem_size, i == nelem - 1);
+    }
+    complex_part_types[start].part.nest_inc++;
+    complex_part_types[start + nelem - 1].part.nest_dec++;
+    return std::make_pair(nelem * elem_size, basic_ty_part_align(scalar_ty));
+  }
   case llvm::Type::ArrayTyID: {
     auto [sz, algn] =
         complex_types_append(type->getArrayElementType(), desc_idx);
@@ -635,6 +690,7 @@ std::pair<unsigned, unsigned>
   default: break;
   }
 
+unhandled:
   complex_part_types[desc_idx].desc.invalid = true;
   return std::make_pair(0, 1);
 }

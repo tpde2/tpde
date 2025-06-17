@@ -641,14 +641,17 @@ std::optional<typename LLVMCompilerBase<Adaptor, Derived, Config>::ValuePartRef>
   }
 
   if (auto *cdv = llvm::dyn_cast<llvm::ConstantDataVector>(const_val)) {
-    if (ty == LLVMBasicValType::invalid) {
-      TPDE_FATAL("illegal vector constant of unsupported type");
-    }
-    assert(part == 0 && "multi-part vector constants not implemented");
+    u32 size = this->adaptor->basic_ty_part_size(ty);
+    tpde::RegBank bank = this->adaptor->basic_ty_part_bank(ty);
     llvm::StringRef data = cdv->getRawDataValues();
-    // TODO: this cast is actually invalid.
-    const u64 *data_ptr = reinterpret_cast<const u64 *>(data.data());
-    return ValuePartRef(this, data_ptr, data.size(), Config::FP_BANK);
+    assert((sub_part + 1) * size <= data.size());
+    // TODO: use data.data() to avoid copying if possible?
+    u64 *copy = new (const_allocator) u64[(size + 7) / 8];
+    if (size < 8) {
+      *copy = 0; // zero-initialize
+    }
+    std::memcpy(copy, data.data() + sub_part * size, size);
+    return ValuePartRef(this, copy, size, bank);
   }
 
   if (llvm::isa<llvm::ConstantVector>(const_val)) {
@@ -2236,7 +2239,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_float_binary_op(
       }
     }
     break;
-  default: TPDE_UNREACHABLE("invalid basic type for float binary op");
+  default: return false;
   }
 
   auto [res_vr, res] = this->result_ref_single(inst);
