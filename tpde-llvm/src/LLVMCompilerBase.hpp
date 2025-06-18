@@ -26,6 +26,7 @@
 
 #include "tpde/CompilerBase.hpp"
 #include "tpde/ValLocalIdx.hpp"
+#include "tpde/ValueAssignment.hpp"
 #include "tpde/base.hpp"
 #include "tpde/util/BumpAllocator.hpp"
 #include "tpde/util/SmallVector.hpp"
@@ -460,7 +461,7 @@ public:
                             const ValInfo &,
                             u64) noexcept;
 
-  void extract_element(IRValueRef vec,
+  void extract_element(ValueRef &vec_vr,
                        unsigned idx,
                        LLVMBasicValType ty,
                        ScratchReg &out) noexcept;
@@ -2685,20 +2686,36 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_insert_value(
 
 template <typename Adaptor, typename Derived, typename Config>
 void LLVMCompilerBase<Adaptor, Derived, Config>::extract_element(
-    IRValueRef vec,
+    ValueRef &vec_vr,
     unsigned idx,
     LLVMBasicValType ty,
     ScratchReg &out_reg) noexcept {
-  assert(this->adaptor->val_part_count(vec) == 1);
+  tpde::ValueAssignment *va = vec_vr.assignment();
+  u32 elem_sz = this->adaptor->basic_ty_part_size(ty);
 
-  auto vec_vr = this->val_ref(vec);
-  vec_vr.disown();
-  auto vec_ref = vec_vr.part(0);
-  this->spill(vec_ref.assignment());
+  if (elem_sz == va->max_part_size) {
+    // Scalarized vector: simply take part idx.
+    tpde::RegBank bank = this->adaptor->basic_ty_part_bank(ty);
+    assert(bank == tpde::AssignmentPartRef(va, idx).bank());
+    ValuePartRef vpr = vec_vr.part(idx);
+    if (vpr.can_salvage()) {
+      out_reg.alloc_specific(vpr.salvage());
+    } else {
+      vpr.reload_into_specific_fixed(out_reg.alloc(bank));
+    }
+    return;
+  }
 
-  GenericValuePart addr = derived()->val_spill_slot(vec_ref);
+  // Offset inside whole vector
+  u32 vector_off = idx * elem_sz;
+  // A vector can consist of multiple, equally sized parts.
+  u32 part = vector_off / va->max_part_size;
+  u32 off_in_part = vector_off % va->max_part_size;
+
+  this->spill({va, part});
+  GenericValuePart addr = derived()->val_spill_slot({va, part});
   auto &expr = std::get<typename GenericValuePart::Expr>(addr.state);
-  expr.disp += idx * this->adaptor->basic_ty_part_size(ty);
+  expr.disp += off_in_part;
 
   switch (ty) {
     using enum LLVMBasicValType;
@@ -2725,7 +2742,7 @@ void LLVMCompilerBase<Adaptor, Derived, Config>::insert_element(
     this->evict(vec_ref.assignment());
   }
 
-  GenericValuePart addr = derived()->val_spill_slot(vec_ref);
+  GenericValuePart addr = derived()->val_spill_slot(vec_ref.assignment());
   auto &expr = std::get<typename GenericValuePart::Expr>(addr.state);
   expr.disp += idx * this->adaptor->basic_ty_part_size(ty);
 
@@ -2748,38 +2765,47 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_extract_element(
   llvm::Value *src = inst->getOperand(0);
   llvm::Value *index = inst->getOperand(1);
 
+  // TODO: support extractelement from constant vectors.
+  if (llvm::isa<llvm::Constant>(src)) {
+    return false;
+  }
+
   auto *vec_ty = llvm::cast<llvm::FixedVectorType>(src->getType());
   unsigned nelem = vec_ty->getNumElements();
-  assert((nelem & (nelem - 1)) == 0 && "vector nelem must be power of two");
   assert(index->getType()->getIntegerBitWidth() >= 8);
 
   auto [res_vr, result] = this->result_ref_single(inst);
   LLVMBasicValType bvt = val_info.type;
 
   ScratchReg scratch_res{this};
+  ValueRef vec_vr = this->val_ref(src);
   if (auto *ci = llvm::dyn_cast<llvm::ConstantInt>(index)) {
     unsigned cidx = ci->getZExtValue();
-    derived()->extract_element(src, cidx, bvt, scratch_res);
-
-    (void)this->val_ref(src).part(0); // ref-counting
+    derived()->extract_element(vec_vr, cidx, bvt, scratch_res);
     this->set_value(result, scratch_res);
     return true;
   }
 
   // TODO: deduplicate with code above somehow?
   // First, copy value into the spill slot.
-  auto [_, vec_ref] = this->val_ref_single(src);
-  this->spill(vec_ref.assignment());
-  vec_ref.unlock();
+  for (unsigned i = 0; i < vec_vr.assignment()->part_count; ++i) {
+    this->spill(tpde::AssignmentPartRef{vec_vr.assignment(), i});
+  }
 
   // Second, create address. Mask index, out-of-bounds access are just poison.
   ScratchReg idx_scratch{this};
-  GenericValuePart addr = derived()->val_spill_slot(vec_ref);
+  GenericValuePart addr = derived()->val_spill_slot({vec_vr.assignment(), 0});
   auto &expr = std::get<typename GenericValuePart::Expr>(addr.state);
-  u64 mask = nelem - 1;
-  derived()->encode_landi64(this->val_ref(index).part(0),
-                            ValuePartRef{this, mask, 8, Config::GP_BANK},
-                            idx_scratch);
+  if ((nelem & (nelem - 1)) == 0) {
+    u64 mask = nelem - 1;
+    derived()->encode_landi64(this->val_ref(index).part(0),
+                              ValuePartRef{this, mask, 8, Config::GP_BANK},
+                              idx_scratch);
+  } else {
+    derived()->encode_uremi64(this->val_ref(index).part(0),
+                              ValuePartRef{this, nelem, 8, Config::GP_BANK},
+                              idx_scratch);
+  }
   assert(expr.scale == 0);
   expr.scale = this->adaptor->basic_ty_part_size(bvt);
   expr.index = std::move(idx_scratch);
@@ -2838,7 +2864,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_insert_element(
 
   // Second, create address. Mask index, out-of-bounds access are just poison.
   ScratchReg idx_scratch{this};
-  GenericValuePart addr = derived()->val_spill_slot(result);
+  GenericValuePart addr = derived()->val_spill_slot(result.assignment());
   auto &expr = std::get<typename GenericValuePart::Expr>(addr.state);
   u64 mask = nelem - 1;
   derived()->encode_landi64(this->val_ref(index).part(0),
@@ -2898,6 +2924,9 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_shuffle_vector(
     TPDE_UNREACHABLE("invalid element type for shufflevector");
   }
 
+  ValueRef lhs_vr = this->val_ref(lhs);
+  ValueRef rhs_vr = this->val_ref(rhs);
+
   auto [res_vr, res_ref] = this->result_ref_single(inst);
   // Make sure the results has an allocated register. insert_element will use
   // load_to_reg to lock the value into a register, but if we don't allocate a
@@ -2914,8 +2943,8 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_shuffle_vector(
     if (mask[i] == llvm::PoisonMaskElem) {
       continue;
     }
-    IRValueRef src = unsigned(mask[i]) < src_nelem ? lhs : rhs;
-    if (auto *cst = llvm::dyn_cast<llvm::Constant>(src)) {
+    bool src_is_lhs = unsigned(mask[i]) < src_nelem;
+    if (auto *cst = llvm::dyn_cast<llvm::Constant>(src_is_lhs ? lhs : rhs)) {
       auto *cst_elem = cst->getAggregateElement(i);
       u64 const_elem;
       if (llvm::isa<llvm::PoisonValue>(cst_elem)) {
@@ -2932,12 +2961,12 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_shuffle_vector(
       ValuePartRef const_ref{this, &const_elem, size, bank};
       const_ref.reload_into_specific_fixed(tmp.alloc(bank));
     } else {
-      derived()->extract_element(src, mask[i] & (src_nelem - 1), bvt, tmp);
+      ValueRef src_vr{derived(), (src_is_lhs ? lhs_vr : rhs_vr).local_idx()};
+      src_vr.disown();
+      derived()->extract_element(src_vr, mask[i] & (src_nelem - 1), bvt, tmp);
     }
     derived()->insert_element(res_ref, i, bvt, std::move(tmp));
   }
-  (void)this->val_ref(lhs).part(0); // ref-counting
-  (void)this->val_ref(rhs).part(0); // ref-counting
   return true;
 }
 

@@ -4,6 +4,7 @@
 #pragma once
 
 #include "AssemblerElfX64.hpp"
+#include "tpde/AssignmentPartRef.hpp"
 #include "tpde/CompilerBase.hpp"
 #include "tpde/ValLocalIdx.hpp"
 #include "tpde/ValueAssignment.hpp"
@@ -417,8 +418,7 @@ struct CompilerX64 : BaseTy<Adaptor, Derived, Config> {
 
   void mov(AsmReg dst, AsmReg src, u32 size) noexcept;
 
-  GenericValuePart val_spill_slot(ValuePart &val_ref) noexcept {
-    const auto ap = val_ref.assignment();
+  GenericValuePart val_spill_slot(AssignmentPartRef ap) noexcept {
     assert(ap.stack_valid() && !ap.variable_ref());
     return typename GenericValuePart::Expr(AsmReg::BP, ap.frame_off());
   }

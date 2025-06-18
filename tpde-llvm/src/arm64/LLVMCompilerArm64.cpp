@@ -87,7 +87,7 @@ struct LLVMCompilerArm64 : tpde::a64::CompilerA64<LLVMAdaptor,
   std::optional<CallBuilder>
       create_call_builder(const llvm::CallBase * = nullptr) noexcept;
 
-  void extract_element(IRValueRef vec,
+  void extract_element(ValueRef &vec_vr,
                        unsigned idx,
                        LLVMBasicValType ty,
                        ScratchReg &out) noexcept;
@@ -201,27 +201,37 @@ std::optional<LLVMCompilerArm64::CallBuilder>
   }
 }
 
-void LLVMCompilerArm64::extract_element(IRValueRef vec,
+void LLVMCompilerArm64::extract_element(ValueRef &vec_vr,
                                         unsigned idx,
                                         LLVMBasicValType ty,
                                         ScratchReg &out_reg) noexcept {
-  assert(this->adaptor->val_part_count(vec) == 1);
+  tpde::ValueAssignment *va = vec_vr.assignment();
+  u32 elem_sz = this->adaptor->basic_ty_part_size(ty);
+  if (elem_sz == va->max_part_size) {
+    // We can't handle the scalarized case better than the generic impl.
+    return LLVMCompilerBase::extract_element(vec_vr, idx, ty, out_reg);
+  }
 
-  auto vec_vr = this->val_ref(vec);
-  vec_vr.disown();
-  auto vec_ref = vec_vr.part(0);
+  assert(va->max_part_size % elem_sz == 0);
+  u32 elems_per_part = va->max_part_size / elem_sz;
+  // A vector can consist of multiple, equally sized parts.
+  u32 part = idx / elems_per_part;
+  u32 part_idx = idx % elems_per_part;
+
+  auto vec_ref = vec_vr.part(part);
+  assert(vec_ref.bank() == CompilerConfig::FP_BANK);
   AsmReg vec_reg = vec_ref.load_to_reg();
   // TODO: reuse vec_reg if possible
   AsmReg dst_reg = out_reg.alloc(this->adaptor->basic_ty_part_bank(ty));
   switch (ty) {
     using enum LLVMBasicValType;
-  case i8: ASM(UMOVwb, dst_reg, vec_reg, idx); break;
-  case i16: ASM(UMOVwh, dst_reg, vec_reg, idx); break;
-  case i32: ASM(UMOVws, dst_reg, vec_reg, idx); break;
+  case i8: ASM(UMOVwb, dst_reg, vec_reg, part_idx); break;
+  case i16: ASM(UMOVwh, dst_reg, vec_reg, part_idx); break;
+  case i32: ASM(UMOVws, dst_reg, vec_reg, part_idx); break;
   case i64:
-  case ptr: ASM(UMOVxd, dst_reg, vec_reg, idx); break;
-  case f32: ASM(DUPs, dst_reg, vec_reg, idx); break;
-  case f64: ASM(DUPd, dst_reg, vec_reg, idx); break;
+  case ptr: ASM(UMOVxd, dst_reg, vec_reg, part_idx); break;
+  case f32: ASM(DUPs, dst_reg, vec_reg, part_idx); break;
+  case f64: ASM(DUPd, dst_reg, vec_reg, part_idx); break;
   default: TPDE_UNREACHABLE("unexpected vector element type");
   }
 }
