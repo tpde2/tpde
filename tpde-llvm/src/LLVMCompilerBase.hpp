@@ -465,7 +465,7 @@ public:
                        unsigned idx,
                        LLVMBasicValType ty,
                        ScratchReg &out) noexcept;
-  void insert_element(ValuePart &vec_ref,
+  void insert_element(ValueRef &vec_vr,
                       unsigned idx,
                       LLVMBasicValType ty,
                       GenericValuePart el) noexcept;
@@ -2711,6 +2711,7 @@ void LLVMCompilerBase<Adaptor, Derived, Config>::extract_element(
   // A vector can consist of multiple, equally sized parts.
   u32 part = vector_off / va->max_part_size;
   u32 off_in_part = vector_off % va->max_part_size;
+  assert(part < va->part_count);
 
   this->spill({va, part});
   GenericValuePart addr = derived()->val_spill_slot({va, part});
@@ -2732,19 +2733,34 @@ void LLVMCompilerBase<Adaptor, Derived, Config>::extract_element(
 
 template <typename Adaptor, typename Derived, typename Config>
 void LLVMCompilerBase<Adaptor, Derived, Config>::insert_element(
-    ValuePart &vec_ref,
+    ValueRef &vec_vr,
     unsigned idx,
     LLVMBasicValType ty,
     GenericValuePart el) noexcept {
-  assert(vec_ref.has_assignment());
-  vec_ref.unlock(this);
-  if (vec_ref.assignment().register_valid()) {
-    this->evict(vec_ref.assignment());
+  tpde::ValueAssignment *va = vec_vr.assignment();
+  u32 elem_sz = this->adaptor->basic_ty_part_size(ty);
+
+  // TODO: optimize for scalarized vectors, reuse el as new value part.
+
+  // Offset inside whole vector
+  u32 vector_off = idx * elem_sz;
+  // A vector can consist of multiple, equally sized parts.
+  u32 part = vector_off / va->max_part_size;
+  u32 off_in_part = vector_off % va->max_part_size;
+  assert(part < va->part_count);
+
+  tpde::AssignmentPartRef ap{va, part};
+  if (ap.register_valid()) {
+    this->evict(ap);
+  } else if (!ap.stack_valid()) {
+    // Value part is uninitialized
+    this->allocate_spill_slot(ap);
+    ap.set_stack_valid();
   }
 
-  GenericValuePart addr = derived()->val_spill_slot(vec_ref.assignment());
+  GenericValuePart addr = derived()->val_spill_slot(ap);
   auto &expr = std::get<typename GenericValuePart::Expr>(addr.state);
-  expr.disp += idx * this->adaptor->basic_ty_part_size(ty);
+  expr.disp += off_in_part;
 
   switch (ty) {
     using enum LLVMBasicValType;
@@ -2781,6 +2797,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_extract_element(
   ValueRef vec_vr = this->val_ref(src);
   if (auto *ci = llvm::dyn_cast<llvm::ConstantInt>(index)) {
     unsigned cidx = ci->getZExtValue();
+    cidx = cidx < nelem ? cidx : 0;
     derived()->extract_element(vec_vr, cidx, bvt, scratch_res);
     this->set_value(result, scratch_res);
     return true;
@@ -2834,13 +2851,12 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_insert_element(
 
   auto *vec_ty = llvm::cast<llvm::FixedVectorType>(inst->getType());
   unsigned nelem = vec_ty->getNumElements();
-  assert((nelem & (nelem - 1)) == 0 && "vector nelem must be power of two");
   assert(index->getType()->getIntegerBitWidth() >= 8);
 
   auto ins = inst->getOperand(1);
   auto [val_ref, val] = this->val_ref_single(ins);
 
-  auto [res_vr, result] = this->result_ref_single(inst);
+  ValueRef res_vr = this->result_ref(inst);
   auto [bvt, _] = this->adaptor->lower_type(ins->getType());
   assert(bvt != LLVMBasicValType::complex);
 
@@ -2849,27 +2865,44 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_insert_element(
 
   // First, copy value into the result. We must also do this for constant
   // indices, because the value reference must always be initialized.
-  result.set_value(this->val_ref(inst->getOperand(0)).part(0));
+  {
+    ValueRef src_vr = this->val_ref(inst->getOperand(0));
+    for (u32 i = 0; i < res_vr.assignment()->part_count; ++i) {
+      // TODO: skip overwritten part in scalarized case.
+      res_vr.part(i).set_value(src_vr.part(i));
+    }
+  }
 
   if (auto *ci = llvm::dyn_cast<llvm::ConstantInt>(index)) {
     unsigned cidx = ci->getZExtValue();
-    derived()->insert_element(result, cidx, bvt, std::move(val));
+    cidx = cidx < nelem ? cidx : 0;
+    derived()->insert_element(res_vr, cidx, bvt, std::move(val));
     // No need for ref counting: all operands and results were ValuePartRefs.
     return true;
   }
 
-  result.unlock();
   // Evict, because we will overwrite the value in the stack slot.
-  this->evict(result.assignment());
+  for (unsigned i = 0; i < res_vr.assignment()->part_count; ++i) {
+    tpde::AssignmentPartRef ap{res_vr.assignment(), i};
+    if (ap.register_valid()) {
+      this->evict(ap);
+    }
+  }
 
   // Second, create address. Mask index, out-of-bounds access are just poison.
   ScratchReg idx_scratch{this};
-  GenericValuePart addr = derived()->val_spill_slot(result.assignment());
+  GenericValuePart addr = derived()->val_spill_slot({res_vr.assignment(), 0});
   auto &expr = std::get<typename GenericValuePart::Expr>(addr.state);
-  u64 mask = nelem - 1;
-  derived()->encode_landi64(this->val_ref(index).part(0),
-                            ValuePartRef{this, mask, 8, Config::GP_BANK},
-                            idx_scratch);
+  if ((nelem & (nelem - 1)) == 0) {
+    u64 mask = nelem - 1;
+    derived()->encode_landi64(this->val_ref(index).part(0),
+                              ValuePartRef{this, mask, 8, Config::GP_BANK},
+                              idx_scratch);
+  } else {
+    derived()->encode_uremi64(this->val_ref(index).part(0),
+                              ValuePartRef{this, nelem, 8, Config::GP_BANK},
+                              idx_scratch);
+  }
   assert(expr.scale == 0);
   expr.scale = val.part_size();
   expr.index = std::move(idx_scratch);
@@ -2926,16 +2959,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_shuffle_vector(
 
   ValueRef lhs_vr = this->val_ref(lhs);
   ValueRef rhs_vr = this->val_ref(rhs);
-
-  auto [res_vr, res_ref] = this->result_ref_single(inst);
-  // Make sure the results has an allocated register. insert_element will use
-  // load_to_reg to lock the value into a register, but if we don't allocate a
-  // register here, that will fail because the value is uninitialized.
-  res_ref.alloc_reg();
-  // But, as the value is uninitialized, the stack slot is also valid. This
-  // avoids spilling an uninitialized register in insert_element.
-  this->allocate_spill_slot(res_ref.assignment());
-  res_ref.assignment().set_stack_valid();
+  ValueRef res_vr = this->result_ref(inst);
 
   ScratchReg tmp{this};
   llvm::ArrayRef<int> mask = shuffle->getShuffleMask();
@@ -2965,7 +2989,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_shuffle_vector(
       src_vr.disown();
       derived()->extract_element(src_vr, mask[i] & (src_nelem - 1), bvt, tmp);
     }
-    derived()->insert_element(res_ref, i, bvt, std::move(tmp));
+    derived()->insert_element(res_vr, i, bvt, std::move(tmp));
   }
   return true;
 }

@@ -511,15 +511,11 @@ public:
       }
       return ValueParts{ty, nullptr};
     }
-    assert((llvm::isa<llvm::Instruction, llvm::Argument>(value)) &&
-           "val_parts called on non-instruction/argument");
-    size_t idx;
-    if (auto *inst = llvm::dyn_cast<llvm::Instruction>(value)) {
-      idx = inst_lookup_idx(inst);
-    } else {
-      idx = arg_lookup_idx(llvm::cast<llvm::Argument>(value));
-    }
-    const ValInfo &info = values[idx];
+    return val_parts(val_local_idx(value));
+  }
+
+  ValueParts val_parts(tpde::ValLocalIdx local_idx) {
+    const ValInfo &info = values[u32(local_idx)];
     if (info.type == LLVMBasicValType::complex) {
       unsigned ty_idx = info.complex_part_tys_idx;
       return ValueParts{info.type, &complex_part_types[ty_idx]};

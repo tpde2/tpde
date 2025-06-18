@@ -91,7 +91,7 @@ struct LLVMCompilerArm64 : tpde::a64::CompilerA64<LLVMAdaptor,
                        unsigned idx,
                        LLVMBasicValType ty,
                        ScratchReg &out) noexcept;
-  void insert_element(ValuePart &vec_ref,
+  void insert_element(ValueRef &vec_vr,
                       unsigned idx,
                       LLVMBasicValType ty,
                       GenericValuePart el) noexcept;
@@ -217,6 +217,7 @@ void LLVMCompilerArm64::extract_element(ValueRef &vec_vr,
   // A vector can consist of multiple, equally sized parts.
   u32 part = idx / elems_per_part;
   u32 part_idx = idx % elems_per_part;
+  assert(part < va->part_count);
 
   auto vec_ref = vec_vr.part(part);
   assert(vec_ref.bank() == CompilerConfig::FP_BANK);
@@ -236,24 +237,43 @@ void LLVMCompilerArm64::extract_element(ValueRef &vec_vr,
   }
 }
 
-void LLVMCompilerArm64::insert_element(ValuePart &vec_ref,
+void LLVMCompilerArm64::insert_element(ValueRef &vec_vr,
                                        unsigned idx,
                                        LLVMBasicValType ty,
                                        GenericValuePart el) noexcept {
-  if (!vec_ref.has_reg()) {
-    vec_ref.load_to_reg(this);
+  tpde::ValueAssignment *va = vec_vr.assignment();
+  u32 elem_sz = this->adaptor->basic_ty_part_size(ty);
+  if (elem_sz == va->max_part_size) {
+    // We can't handle the scalarized case better than the generic impl.
+    return LLVMCompilerBase::insert_element(vec_vr, idx, ty, std::move(el));
+  }
+
+  assert(va->max_part_size % elem_sz == 0);
+  u32 elems_per_part = va->max_part_size / elem_sz;
+  // A vector can consist of multiple, equally sized parts.
+  u32 part = idx / elems_per_part;
+  u32 part_idx = idx % elems_per_part;
+  assert(part < va->part_count);
+
+  auto vec_ref = vec_vr.part(part);
+  assert(vec_ref.bank() == CompilerConfig::FP_BANK);
+  if (vec_ref.assignment().stack_valid() ||
+      vec_ref.assignment().register_valid()) {
+    vec_ref.load_to_reg();
+  } else {
+    vec_ref.alloc_reg(); // Uninitialized
   }
   AsmReg vec_reg = vec_ref.cur_reg();
   AsmReg src_reg = this->gval_as_reg(el);
   switch (ty) {
     using enum LLVMBasicValType;
-  case i8: ASM(INSbw, vec_reg, idx, src_reg); break;
-  case i16: ASM(INShw, vec_reg, idx, src_reg); break;
-  case i32: ASM(INSsw, vec_reg, idx, src_reg); break;
+  case i8: ASM(INSbw, vec_reg, part_idx, src_reg); break;
+  case i16: ASM(INShw, vec_reg, part_idx, src_reg); break;
+  case i32: ASM(INSsw, vec_reg, part_idx, src_reg); break;
   case i64:
-  case ptr: ASM(INSdx, vec_reg, idx, src_reg); break;
-  case f32: ASM(INSs, vec_reg, idx, src_reg, 0); break;
-  case f64: ASM(INSd, vec_reg, idx, src_reg, 0); break;
+  case ptr: ASM(INSdx, vec_reg, part_idx, src_reg); break;
+  case f32: ASM(INSs, vec_reg, part_idx, src_reg, 0); break;
+  case f64: ASM(INSd, vec_reg, part_idx, src_reg, 0); break;
   default: TPDE_UNREACHABLE("unexpected vector element type");
   }
 
