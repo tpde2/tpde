@@ -2934,8 +2934,6 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_shuffle_vector(
   auto *src_ty = llvm::cast<llvm::FixedVectorType>(lhs->getType());
   unsigned dst_nelem = dst_ty->getNumElements();
   unsigned src_nelem = src_ty->getNumElements();
-  assert((dst_nelem & (dst_nelem - 1)) == 0 && "invalid dst vector size");
-  assert((src_nelem & (src_nelem - 1)) == 0 && "invalid src vector size");
 
   // TODO: deduplicate with adaptor
   LLVMBasicValType bvt;
@@ -2987,7 +2985,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_shuffle_vector(
     } else {
       ValueRef src_vr{derived(), (src_is_lhs ? lhs_vr : rhs_vr).local_idx()};
       src_vr.disown();
-      derived()->extract_element(src_vr, mask[i] & (src_nelem - 1), bvt, tmp);
+      derived()->extract_element(src_vr, mask[i] % src_nelem, bvt, tmp);
     }
     derived()->insert_element(res_vr, i, bvt, std::move(tmp));
   }
