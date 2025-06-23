@@ -435,10 +435,13 @@ v2u64 TARGET_V1 lshrv2u64(v2u64 a, v2u64 b) { return (a >> b); }
 v2i64 TARGET_V1 ashrv2i64(v2i64 a, v2i64 b) { return (a >> b); }
 
 #define ICMP_VEC(pred, cmp, sign, resty, nelem, bits)                          \
-    resty TARGET_V1 icmp_##pred##v##nelem##sign##bits(v##nelem##sign##bits a, v##nelem##sign##bits b) {      \
+    resty TARGET_V1 icmp_##pred##v##nelem##sign##bits(v##nelem##sign##bits a, v##nelem##sign##bits b) { \
       union u { v##nelem##i1 v; resty r; };                                    \
       union u res = { .v = __builtin_convertvector(a cmp b, v##nelem##i1) };   \
       return res.r;                                                            \
+    }                                                                          \
+    v##nelem##sign##bits TARGET_V1 icmpmask_##pred##v##nelem##sign##bits(v##nelem##sign##bits a, v##nelem##sign##bits b) { \
+      return a cmp b;                                                          \
     }
 #define ICMP_ALL(fn, ...) \
     fn(eq, ==, u, __VA_ARGS__) \

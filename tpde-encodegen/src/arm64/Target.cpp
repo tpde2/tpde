@@ -703,6 +703,13 @@ void EncodingTargetArm64::get_inst_candidates(
   case_default("NEGv2i32", "NEG2s");
   case_default("NEGv4i32", "NEG4s");
   case_default("NEGv2i64", "NEG2d");
+  case_default("NOTv8i8", "NOT8b");
+  case_default("NOTv16i8", "NOT16b");
+  case_default("NOTv4i16", "NOT4h");
+  case_default("NOTv8i16", "NOT8h");
+  case_default("NOTv2i32", "NOT2s");
+  case_default("NOTv4i32", "NOT4s");
+  case_default("NOTv2i64", "NOT2d");
   case_default("ABSv8i8", "ABS8b");
   case_default("ABSv16i8", "ABS16b");
   case_default("ABSv4i16", "ABS4h");
