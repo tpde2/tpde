@@ -2438,8 +2438,11 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_int_to_float(
     const llvm::Instruction *inst, const ValInfo &, u64 sign) noexcept {
   const llvm::Value *src_val = inst->getOperand(0);
   auto *dst_ty = inst->getType();
-  auto bit_width = src_val->getType()->getIntegerBitWidth();
+  if (dst_ty->isVectorTy()) {
+    return false;
+  }
 
+  auto bit_width = src_val->getType()->getIntegerBitWidth();
   if (bit_width > 64) {
     return false;
   }
