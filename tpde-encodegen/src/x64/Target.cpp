@@ -678,6 +678,10 @@ void EncodingTargetX64::get_inst_candidates(
   handle_rm("PSUBWrr", "PSUBWrm", 2, "SSE_PSUBWrr", "SSE_PSUBWrm");
   handle_rm("PSUBDrr", "PSUBDrm", 2, "SSE_PSUBDrr", "SSE_PSUBDrm");
   handle_rm("PSUBQrr", "PSUBQrm", 2, "SSE_PSUBQrr", "SSE_PSUBQrm");
+  handle_rm("PSUBSBrr", "PSUBSBrm", 2, "SSE_PSUBSBrr", "SSE_PSUBSBrm");
+  handle_rm("PSUBSWrr", "PSUBSWrm", 2, "SSE_PSUBSWrr", "SSE_PSUBSWrm");
+  handle_rm("PSUBUSBrr", "PSUBUSBrm", 2, "SSE_PSUBUSBrr", "SSE_PSUBUSBrm");
+  handle_rm("PSUBUSWrr", "PSUBUSWrm", 2, "SSE_PSUBUSWrr", "SSE_PSUBUSWrm");
   handle_rm("PMULLWrr", "PMULLWrm", 2, "SSE_PMULLWrr", "SSE_PMULLWrm");
   handle_rm("PMULLDrr", "PMULLDrm", 2, "SSE_PMULLDrr", "SSE_PMULLDrm");
   handle_rm("PMULDQrr", "PMULDQrm", 2, "SSE_PMULDQrr", "SSE_PMULDQrm");
@@ -691,6 +695,23 @@ void EncodingTargetX64::get_inst_candidates(
   handle_rm("PCMPGTWrr", "PCMPGTWrm", 2, "SSE_PCMPGTWrr", "SSE_PCMPGTWrm");
   handle_rm("PCMPGTDrr", "PCMPGTDrm", 2, "SSE_PCMPGTDrr", "SSE_PCMPGTDrm");
   handle_rm("PCMPGTQrr", "PCMPGTQrm", 2, "SSE_PCMPGTQrr", "SSE_PCMPGTQrm");
+
+  handle_rm("PMINUBrr", "PMINUBrm", 2, "SSE_PMINUBrr", "SSE_PMINUBrm");
+  handle_rm("PMINUWrr", "PMINUWrm", 2, "SSE_PMINUWrr", "SSE_PMINUWrm");
+  handle_rm("PMINUDrr", "PMINUDrm", 2, "SSE_PMINUDrr", "SSE_PMINUDrm");
+  handle_rm("PMINUQrr", "PMINUQrm", 2, "SSE_PMINUQrr", "SSE_PMINUQrm");
+  handle_rm("PMINSBrr", "PMINSBrm", 2, "SSE_PMINSBrr", "SSE_PMINSBrm");
+  handle_rm("PMINSWrr", "PMINSWrm", 2, "SSE_PMINSWrr", "SSE_PMINSWrm");
+  handle_rm("PMINSDrr", "PMINSDrm", 2, "SSE_PMINSDrr", "SSE_PMINSDrm");
+  handle_rm("PMINSQrr", "PMINSQrm", 2, "SSE_PMINSQrr", "SSE_PMINSQrm");
+  handle_rm("PMAXUBrr", "PMAXUBrm", 2, "SSE_PMAXUBrr", "SSE_PMAXUBrm");
+  handle_rm("PMAXUWrr", "PMAXUWrm", 2, "SSE_PMAXUWrr", "SSE_PMAXUWrm");
+  handle_rm("PMAXUDrr", "PMAXUDrm", 2, "SSE_PMAXUDrr", "SSE_PMAXUDrm");
+  handle_rm("PMAXUQrr", "PMAXUQrm", 2, "SSE_PMAXUQrr", "SSE_PMAXUQrm");
+  handle_rm("PMAXSBrr", "PMAXSBrm", 2, "SSE_PMAXSBrr", "SSE_PMAXSBrm");
+  handle_rm("PMAXSWrr", "PMAXSWrm", 2, "SSE_PMAXSWrr", "SSE_PMAXSWrm");
+  handle_rm("PMAXSDrr", "PMAXSDrm", 2, "SSE_PMAXSDrr", "SSE_PMAXSDrm");
+  handle_rm("PMAXSQrr", "PMAXSQrm", 2, "SSE_PMAXSQrr", "SSE_PMAXSQrm");
 
   handle_rm("PSLLWrr", "PSLLWrm", 2, "SSE_PSLLWrr", "SSE_PSLLWrm");
   handle_rm("PSLLDrr", "PSLLDrm", 2, "SSE_PSLLDrr", "SSE_PSLLDrm");
@@ -728,6 +749,10 @@ void EncodingTargetX64::get_inst_candidates(
   handle_rm("PUNPCKHWDrr", "PUNPCKHWDrm", 2, "SSE_PUNPCKHWDrr", "SSE_PUNPCKHWDrm");
   handle_rm("PUNPCKHDQrr", "PUNPCKHDQrm", 2, "SSE_PUNPCKHDQrr", "SSE_PUNPCKHDQrm");
   handle_rm("PUNPCKHQDQrr", "PUNPCKHQDQrm", 2, "SSE_PUNPCKHQDQrr", "SSE_PUNPCKHQDQrm");
+
+  case_default("PMOVMSKBrr", -1, "SSE_PMOVMSKBrr");
+  case_default("MOVMSKPSrr", -1, "SSE_MOVMSKPSrr");
+  case_default("MOVMSKPDrr", -1, "SSE_MOVMSKPDrr");
 
   case_default("MFENCE", -1, "MFENCE");
   // clang-format on

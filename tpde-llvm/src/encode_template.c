@@ -61,6 +61,11 @@ typedef u64 v2u64 __attribute__((vector_size(16)));
 typedef float v4f32 __attribute__((vector_size(16)));
 typedef double v2f64 __attribute__((vector_size(16)));
 
+typedef bool v2i1 __attribute__((ext_vector_type(2)));
+typedef bool v4i1 __attribute__((ext_vector_type(4)));
+typedef bool v8i1 __attribute__((ext_vector_type(8)));
+typedef bool v16i1 __attribute__((ext_vector_type(16)));
+
 // clang-format off
 
 // --------------------------
@@ -428,6 +433,32 @@ v2u64 TARGET_V1 orv2u64(v2u64 a, v2u64 b) { return (a | b); }
 v2u64 TARGET_V1 shlv2u64(v2u64 a, v2u64 b) { return (a << b); }
 v2u64 TARGET_V1 lshrv2u64(v2u64 a, v2u64 b) { return (a >> b); }
 v2i64 TARGET_V1 ashrv2i64(v2i64 a, v2i64 b) { return (a >> b); }
+
+#define ICMP_VEC(pred, cmp, sign, resty, nelem, bits)                          \
+    resty TARGET_V1 icmp_##pred##v##nelem##sign##bits(v##nelem##sign##bits a, v##nelem##sign##bits b) {      \
+      union u { v##nelem##i1 v; resty r; };                                    \
+      union u res = { .v = __builtin_convertvector(a cmp b, v##nelem##i1) };   \
+      return res.r;                                                            \
+    }
+#define ICMP_ALL(fn, ...) \
+    fn(eq, ==, u, __VA_ARGS__) \
+    fn(ne, !=, u, __VA_ARGS__) \
+    fn(ugt, >, u, __VA_ARGS__) \
+    fn(uge, >=, u, __VA_ARGS__) \
+    fn(ult, <, u, __VA_ARGS__) \
+    fn(ule, <=, u, __VA_ARGS__) \
+    fn(sgt, >, i, __VA_ARGS__) \
+    fn(sge, >=, i, __VA_ARGS__) \
+    fn(slt, <, i, __VA_ARGS__) \
+    fn(sle, <=, i, __VA_ARGS__)
+
+ICMP_ALL(ICMP_VEC, u8, 8, 8)
+ICMP_ALL(ICMP_VEC, u8, 4, 16)
+ICMP_ALL(ICMP_VEC, u8, 2, 32)
+ICMP_ALL(ICMP_VEC, u16, 16, 8)
+ICMP_ALL(ICMP_VEC, u8, 8, 16)
+ICMP_ALL(ICMP_VEC, u8, 4, 32)
+ICMP_ALL(ICMP_VEC, u8, 2, 64)
 
 // --------------------------
 // float arithmetic

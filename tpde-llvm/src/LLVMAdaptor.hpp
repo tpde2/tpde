@@ -739,6 +739,14 @@ public:
     return std::make_pair(ty, u32(num));
   }
 
+  std::pair<LLVMBasicValType, u32> lower_type(llvm::Value *value) noexcept {
+    if (!llvm::isa<llvm::Instruction, llvm::Argument>(value)) {
+      return lower_type(value->getType());
+    }
+    const ValInfo &info = values[u32(val_local_idx(value))];
+    return {info.type, info.complex_part_tys_idx};
+  }
+
   /// Map insertvalue/extractvalue indices to parts. Returns (first part,
   /// last part (inclusive)).
   std::pair<unsigned, unsigned>

@@ -74,25 +74,27 @@ void EncodingTargetArm64::get_inst_candidates(
   const auto handle_mem_imm = [&](std::string_view mnem,
                                   std::string_view mnemu,
                                   unsigned shift) {
-    auto cond1 =
-        std::format("{:#x}, {}", mi.getOperand(2).getImm() << shift, shift);
-    candidates.emplace_back(1,
-                            "encodeable_with_mem_uoff12",
-                            cond1,
-                            [mnem](llvm::raw_ostream &os,
-                                   const llvm::MachineInstr &mi,
-                                   std::span<const std::string> ops) {
-                              os << "    ASMD(" << mnem << ", ";
-                              if (mi.getOperand(0).isImm()) {
-                                os << "(Da64PrfOp)"
-                                   << mi.getOperand(0).getImm();
-                              } else {
-                                os << format_reg(mi.getOperand(0), ops[0]);
-                              }
-                              const auto &mem_op = ops[ops.size() - 1];
-                              os << ", " << mem_op << ".first, " << mem_op
-                                 << ".second);\n";
-                            });
+    if (mi.getOperand(2).isImm()) {
+      auto cond1 =
+          std::format("{:#x}, {}", mi.getOperand(2).getImm() << shift, shift);
+      candidates.emplace_back(1,
+                              "encodeable_with_mem_uoff12",
+                              cond1,
+                              [mnem](llvm::raw_ostream &os,
+                                     const llvm::MachineInstr &mi,
+                                     std::span<const std::string> ops) {
+                                os << "    ASMD(" << mnem << ", ";
+                                if (mi.getOperand(0).isImm()) {
+                                  os << "(Da64PrfOp)"
+                                     << mi.getOperand(0).getImm();
+                                } else {
+                                  os << format_reg(mi.getOperand(0), ops[0]);
+                                }
+                                const auto &mem_op = ops[ops.size() - 1];
+                                os << ", " << mem_op << ".first, " << mem_op
+                                   << ".second);\n";
+                              });
+    }
     (void)mnemu;
     candidates.emplace_back([mnem, shift](llvm::raw_ostream &os,
                                           const llvm::MachineInstr &mi,
@@ -106,7 +108,15 @@ void EncodingTargetArm64::get_inst_candidates(
         op_idx += 1;
       }
       os << ", " << format_reg(mi.getOperand(1), ops[op_idx]);
-      os << ", " << (mi.getOperand(2).getImm() << shift) << ");\n";
+      if (mi.getOperand(2).isImm()) {
+        os << ", " << (mi.getOperand(2).getImm() << shift) << ");\n";
+      } else if (mi.getOperand(2).isCPI()) {
+        os << ", 0);\n";
+        os << "    derived()->reloc_text(" << ops[2] << ", R_AARCH64_LDST"
+           << (8 << shift)
+           << "_ABS_LO12_NC, "
+              "derived()->text_writer.offset() - 4);\n";
+      }
     });
   };
   const auto handle_mem_simm = [&](std::string_view mnem, bool with_update) {
@@ -199,6 +209,18 @@ void EncodingTargetArm64::get_inst_candidates(
                                  << src << ", " << ops[1] << ");\n";
                             });
   };
+  const auto handle_adrp = [&](std::string_view mnem) {
+    candidates.emplace_back([mnem](llvm::raw_ostream &os,
+                                   const llvm::MachineInstr &mi,
+                                   std::span<const std::string> ops) {
+      assert(mi.getOperand(1).isCPI() && "ADRP expect constant pool imm");
+      auto dst = format_reg(mi.getOperand(0), ops[0]);
+      os << "    ASMD(" << mnem << ", " << dst << ", 0, 0);";
+      os << "    derived()->reloc_text(" << ops[1]
+         << ", R_AARCH64_ADR_PREL_PG_HI21, "
+         << "derived()->text_writer.offset() - 4);\n";
+    });
+  };
   const auto handle_default = [&](std::string_view mnem,
                                   std::string extra_ops = "") {
     candidates.emplace_back(
@@ -277,6 +299,10 @@ void EncodingTargetArm64::get_inst_candidates(
   };
 
   case_default("DMB", "DMB");
+
+  if (Name == "ADRP") {
+    handle_adrp("ADRP");
+  }
 
   const auto case_mov_shift = [&](std::string_view mnem_llvm,
                                   std::string_view mnem_disarm) {
@@ -614,7 +640,41 @@ void EncodingTargetArm64::get_inst_candidates(
   case_default("FDIVv2f32", "FDIV2s");
   case_default("FDIVv4f32", "FDIV4s");
   case_default("FDIVv2f64", "FDIV2d");
+  case_default("CMEQv8i8", "CMEQ8b");
   case_default("CMEQv16i8", "CMEQ16b");
+  case_default("CMEQv4i16", "CMEQ4h");
+  case_default("CMEQv8i16", "CMEQ8h");
+  case_default("CMEQv2i32", "CMEQ2s");
+  case_default("CMEQv4i32", "CMEQ4s");
+  case_default("CMEQv2i64", "CMEQ2d");
+  case_default("CMHIv8i8", "CMHI8b");
+  case_default("CMHIv16i8", "CMHI16b");
+  case_default("CMHIv4i16", "CMHI4h");
+  case_default("CMHIv8i16", "CMHI8h");
+  case_default("CMHIv2i32", "CMHI2s");
+  case_default("CMHIv4i32", "CMHI4s");
+  case_default("CMHIv2i64", "CMHI2d");
+  case_default("CMHSv8i8", "CMHS8b");
+  case_default("CMHSv16i8", "CMHS16b");
+  case_default("CMHSv4i16", "CMHS4h");
+  case_default("CMHSv8i16", "CMHS8h");
+  case_default("CMHSv2i32", "CMHS2s");
+  case_default("CMHSv4i32", "CMHS4s");
+  case_default("CMHSv2i64", "CMHS2d");
+  case_default("CMGTv8i8", "CMGT8b");
+  case_default("CMGTv16i8", "CMGT16b");
+  case_default("CMGTv4i16", "CMGT4h");
+  case_default("CMGTv8i16", "CMGT8h");
+  case_default("CMGTv2i32", "CMGT2s");
+  case_default("CMGTv4i32", "CMGT4s");
+  case_default("CMGTv2i64", "CMGT2d");
+  case_default("CMGEv8i8", "CMGE8b");
+  case_default("CMGEv16i8", "CMGE16b");
+  case_default("CMGEv4i16", "CMGE4h");
+  case_default("CMGEv8i16", "CMGE8h");
+  case_default("CMGEv2i32", "CMGE2s");
+  case_default("CMGEv4i32", "CMGE4s");
+  case_default("CMGEv2i64", "CMGE2d");
   case_default("DUPv16i8lane", "DUP16b");
   case_default("ADDv8i8", "ADD8b");
   case_default("ADDv16i8", "ADD16b");
@@ -658,6 +718,18 @@ void EncodingTargetArm64::get_inst_candidates(
   case_default("SMAXVv8i8v", "SMAXV8b");
   case_default("UMAXVv8i8v", "UMAXV8b");
   case_default("ADDVv8i8v", "ADDV8b");
+  case_default("ADDVv16i8v", "ADDV16b");
+  case_default("ADDVv4i16v", "ADDV4h");
+  case_default("ADDVv8i16v", "ADDV8h");
+  case_default("ADDVv4i32v", "ADDV4s");
+  case_default("ADDPv8i8", "ADDP8b");
+  case_default("ADDPv16i8", "ADDP16b");
+  case_default("ADDPv4i16", "ADDP4h");
+  case_default("ADDPv8i16", "ADDP8h");
+  case_default("ADDPv2i32", "ADDP2s");
+  case_default("ADDPv4i32", "ADDP4s");
+  case_default("ADDPv2i64", "ADDP2d");
+  case_default("ADDPv2i64p", "ADDPd");
   case_default("ANDv8i8", "AND8b");
   case_default("ANDv16i8", "AND16b");
   case_default("BICv8i8", "BIC8b");
@@ -674,6 +746,15 @@ void EncodingTargetArm64::get_inst_candidates(
   case_default("BITv16i8", "BIT16b");
   case_default("BIFv8i8", "BIF8b");
   case_default("BIFv16i8", "BIF16b");
+  case_default("EXTv8i8", "EXT8b");
+  case_default("EXTv16i8", "EXT16b");
+  case_default("ZIP1v8i8", "ZIP1_8b");
+  case_default("ZIP1v16i8", "ZIP1_16b");
+  case_default("ZIP1v4i16", "ZIP1_4h");
+  case_default("ZIP1v8i16", "ZIP1_8h");
+  case_default("ZIP1v2i32", "ZIP1_2s");
+  case_default("ZIP1v4i32", "ZIP1_4s");
+  case_default("ZIP1v2i64", "ZIP1_2d");
   case_default("USHLv8i8", "USHL8b");
   case_default("USHLv16i8", "USHL16b");
   case_default("USHLv4i16", "USHL4h");

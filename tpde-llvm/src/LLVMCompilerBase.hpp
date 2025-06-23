@@ -478,6 +478,9 @@ public:
   bool compile_shuffle_vector(const llvm::Instruction *,
                               const ValInfo &,
                               u64) noexcept;
+  bool compile_icmp_vector(const llvm::Instruction *,
+                           const ValInfo &,
+                           u64) noexcept;
 
   bool
       compile_cmpxchg(const llvm::Instruction *, const ValInfo &, u64) noexcept;
@@ -3027,6 +3030,90 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_shuffle_vector(
     }
     derived()->insert_element(res_vr, i, bvt, std::move(tmp));
   }
+  return true;
+}
+
+template <typename Adaptor, typename Derived, typename Config>
+bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_icmp_vector(
+    const llvm::Instruction *inst, const ValInfo &, u64) noexcept {
+  const auto *icmp = llvm::cast<llvm::ICmpInst>(inst);
+
+  using EncodeFnTy =
+      bool (Derived::*)(GenericValuePart &&, GenericValuePart &&, ScratchReg &);
+  // fns[pred][v64=0/v128=1][8=0/16=1/32=2/64=3]
+  static constexpr auto fns = []() constexpr {
+    constexpr unsigned NumPreds = llvm::ICmpInst::LAST_ICMP_PREDICATE -
+                                  llvm::ICmpInst::FIRST_ICMP_PREDICATE + 1;
+    std::array<EncodeFnTy[2][4], NumPreds> res{};
+    auto entry = [&res](llvm::ICmpInst::Predicate pred) {
+      return res[pred - llvm::ICmpInst::FIRST_ICMP_PREDICATE];
+    };
+
+    // TODO: more consistent naming of encode functions
+#define FN_ENTRY(predval, predname, sign)                                      \
+  entry(predval)[0][0] = &Derived::encode_icmp_##predname##v8##sign##8;        \
+  entry(predval)[0][1] = &Derived::encode_icmp_##predname##v4##sign##16;       \
+  entry(predval)[0][2] = &Derived::encode_icmp_##predname##v2##sign##32;       \
+  entry(predval)[1][0] = &Derived::encode_icmp_##predname##v16##sign##8;       \
+  entry(predval)[1][1] = &Derived::encode_icmp_##predname##v8##sign##16;       \
+  entry(predval)[1][2] = &Derived::encode_icmp_##predname##v4##sign##32;       \
+  entry(predval)[1][3] = &Derived::encode_icmp_##predname##v2##sign##64;
+
+    FN_ENTRY(llvm::ICmpInst::ICMP_EQ, eq, u)
+    FN_ENTRY(llvm::ICmpInst::ICMP_NE, ne, u)
+    FN_ENTRY(llvm::ICmpInst::ICMP_UGT, ugt, u)
+    FN_ENTRY(llvm::ICmpInst::ICMP_UGE, uge, u)
+    FN_ENTRY(llvm::ICmpInst::ICMP_ULT, ult, u)
+    FN_ENTRY(llvm::ICmpInst::ICMP_ULE, ule, u)
+    FN_ENTRY(llvm::ICmpInst::ICMP_SGT, sgt, i)
+    FN_ENTRY(llvm::ICmpInst::ICMP_SGE, sge, i)
+    FN_ENTRY(llvm::ICmpInst::ICMP_SLT, slt, i)
+    FN_ENTRY(llvm::ICmpInst::ICMP_SLE, sle, i)
+#undef FN_ENTRY
+
+    return res;
+  }();
+
+  llvm::Value *lhs = icmp->getOperand(0);
+  llvm::Value *rhs = icmp->getOperand(1);
+  auto [ty, _] = this->adaptor->lower_type(lhs);
+
+  unsigned int_width = 64;
+  if (auto *el_ty = lhs->getType()->getScalarType(); el_ty->isIntegerTy()) {
+    int_width = el_ty->getIntegerBitWidth();
+  }
+  unsigned width_idx;
+  switch (int_width) {
+  case 8: width_idx = 0; break;
+  case 16: width_idx = 1; break;
+  case 32: width_idx = 2; break;
+  case 64: width_idx = 3; break;
+  default: return false;
+  }
+
+  unsigned ty_idx;
+  // TODO: support illegal types and possibly i1 vectors.
+  switch (ty) {
+    using enum LLVMBasicValType;
+  case v64: ty_idx = 0; break;
+  case v128: ty_idx = 1; break;
+  default: return false;
+  }
+
+  u32 pred_idx = icmp->getPredicate() - llvm::ICmpInst::FIRST_ICMP_PREDICATE;
+  EncodeFnTy encode_fn = fns[pred_idx][ty_idx][width_idx];
+  if (!encode_fn) {
+    return false;
+  }
+
+  auto lhs_vr = this->val_ref(lhs);
+  auto rhs_vr = this->val_ref(rhs);
+  auto [res_vr, res_ref] = this->result_ref_single(inst);
+  ScratchReg res{this};
+  if (!(derived()->*encode_fn)(lhs_vr.part(0), rhs_vr.part(0), res)) {
+    return false;
+  }
+  this->set_value(res_ref, res);
   return true;
 }
 

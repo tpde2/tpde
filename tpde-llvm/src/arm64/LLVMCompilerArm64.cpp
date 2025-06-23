@@ -457,10 +457,13 @@ bool LLVMCompilerArm64::compile_inline_asm(
 }
 
 bool LLVMCompilerArm64::compile_icmp(const llvm::Instruction *inst,
-                                     const ValInfo &,
+                                     const ValInfo &val_info,
                                      u64) noexcept {
   const auto *cmp = llvm::cast<llvm::ICmpInst>(inst);
   auto *cmp_ty = cmp->getOperand(0)->getType();
+  if (cmp_ty->isVectorTy()) {
+    return LLVMCompilerBase::compile_icmp_vector(inst, val_info, 0);
+  }
   assert(cmp_ty->isIntegerTy() || cmp_ty->isPointerTy());
   u32 int_width = 64;
   if (cmp_ty->isIntegerTy()) {
