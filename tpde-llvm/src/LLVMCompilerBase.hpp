@@ -2967,7 +2967,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_shuffle_vector(
     }
     bool src_is_lhs = unsigned(mask[i]) < src_nelem;
     if (auto *cst = llvm::dyn_cast<llvm::Constant>(src_is_lhs ? lhs : rhs)) {
-      auto *cst_elem = cst->getAggregateElement(i);
+      auto *cst_elem = cst->getAggregateElement(mask[i] % src_nelem);
       u64 const_elem;
       if (llvm::isa<llvm::PoisonValue>(cst_elem)) {
         continue;
