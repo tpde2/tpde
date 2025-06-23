@@ -646,11 +646,13 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::CallBuilder::call_impl(
         *sym, R_AARCH64_CALL26, this->compiler.text_writer.offset() - 4);
   } else {
     ValuePart &tvp = std::get<ValuePart>(target);
-    AsmReg reg = tvp.cur_reg_unlocked();
-    if (!reg.valid()) {
-      reg = tvp.reload_into_specific_fixed(&this->compiler, AsmReg::R16);
+    if (tvp.can_salvage()) {
+      ASMC(&this->compiler, BLR, tvp.salvage(&this->compiler));
+    } else {
+      AsmReg reg = this->compiler.permanent_scratch_reg;
+      tvp.reload_into_specific_fixed(&this->compiler, reg);
+      ASMC(&this->compiler, BLR, reg);
     }
-    ASMC(&this->compiler, BLR, reg);
     tvp.reset(&this->compiler);
   }
 

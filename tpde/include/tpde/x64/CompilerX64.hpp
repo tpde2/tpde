@@ -1739,11 +1739,12 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::CallBuilder::call_impl(
         *sym, R_X86_64_PLT32, this->compiler.text_writer.offset() - 4, -4);
   } else {
     ValuePart &tvp = std::get<ValuePart>(target);
-    if (AsmReg reg = tvp.cur_reg_unlocked(); reg.valid()) {
-      ASMC(&this->compiler, CALLr, reg);
-    } else if (tvp.has_assignment() && tvp.assignment().stack_valid()) {
+    if (tvp.has_assignment() && !tvp.assignment().register_valid()) {
+      assert(tvp.assignment().stack_valid());
       auto off = tvp.assignment().frame_off();
       ASMC(&this->compiler, CALLm, FE_MEM(FE_BP, 0, FE_NOREG, off));
+    } else if (tvp.can_salvage()) {
+      ASMC(&this->compiler, CALLr, tvp.salvage(&this->compiler));
     } else {
       assert(!this->compiler.register_file.is_used(Reg{AsmReg::R10}));
       AsmReg reg = tvp.reload_into_specific_fixed(&this->compiler, AsmReg::R10);
