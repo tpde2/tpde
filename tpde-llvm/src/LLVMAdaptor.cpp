@@ -483,13 +483,6 @@ std::pair<LLVMBasicValType, unsigned long>
   case llvm::Type::FixedVectorTyID: {
     auto *el_ty = llvm::cast<llvm::FixedVectorType>(type)->getElementType();
     auto num_elts = llvm::cast<llvm::FixedVectorType>(type)->getNumElements();
-    if (num_elts == 1) {
-      // Single-element vectors tend to get scalarized. On x86, however, if the
-      // element type is a small integer, it gets assigned to GP regs; on
-      // AArch64, it stays in a vector register.
-      // TODO: handle this case.
-      return {LLVMBasicValType::invalid, 0};
-    }
 
     // LLVM vectors have two different representations, the in-memory/bitcast
     // representation and the in-register representation. For types that are not
@@ -531,7 +524,20 @@ std::pair<LLVMBasicValType, unsigned long>
     switch (el_ty->getTypeID()) {
     case llvm::Type::IntegerTyID: {
       unsigned el_width = el_ty->getIntegerBitWidth();
-      if (el_width < 8 || el_width > 64 || (el_width & (el_width - 1))) {
+      if (el_width == 1) {
+        if (num_elts > 64) {
+          return {LLVMBasicValType::invalid, 0};
+        }
+        constexpr unsigned base = unsigned(LLVMBasicValType::v8i1);
+        static_assert(base + 1 == unsigned(LLVMBasicValType::v16i1));
+        static_assert(base + 2 == unsigned(LLVMBasicValType::v32i1));
+        static_assert(base + 3 == unsigned(LLVMBasicValType::v64i1));
+
+        unsigned off = 31 - tpde::util::cnt_lz((num_elts - 1) >> 2 | 1);
+        return {static_cast<LLVMBasicValType>(base + off), 1};
+      }
+      if (num_elts == 1 || el_width < 8 || el_width > 64 ||
+          (el_width & (el_width - 1))) {
         return {LLVMBasicValType::invalid, 0};
       }
       if (el_width * num_elts == 64) {

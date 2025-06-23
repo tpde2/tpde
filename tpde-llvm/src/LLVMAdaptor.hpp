@@ -72,7 +72,14 @@ enum class LLVMBasicValType : u8 {
   v128,
   v256,
   v512,
-  complex,
+
+  // i1 vectors are special. We always represent them in their bit-compact form.
+  v8i1,  ///< <N x i1> for 0 < N <= 8; stored like an i8
+  v16i1, ///< <N x i1> for 8 < N <= 16; stored like an i16
+  v32i1, ///< <N x i1> for 16 < N <= 32; stored like an i32
+  v64i1, ///< <N x i1> for 32 < N <= 64; stored like an i64
+
+  complex, ///< Complex escape type
 };
 
 union LLVMComplexPart {
@@ -559,10 +566,14 @@ public:
     switch (ty) {
       using enum LLVMBasicValType;
     case i1:
-    case i8: return 1;
-    case i16: return 2;
-    case i32: return 4;
+    case i8:
+    case v8i1: return 1;
+    case i16:
+    case v16i1: return 2;
+    case i32:
+    case v32i1: return 4;
     case i64:
+    case v64i1:
     case ptr:
     case i128: return 8;
     case f32: return 4;
@@ -589,7 +600,11 @@ public:
     case i32:
     case i64:
     case i128:
-    case ptr: return tpde::RegBank{0};
+    case ptr:
+    case v8i1:
+    case v16i1:
+    case v32i1:
+    case v64i1: return tpde::RegBank{0};
     case f32:
     case f64:
     case f128:
@@ -610,10 +625,14 @@ private:
     switch (ty) {
       using enum LLVMBasicValType;
     case i1:
-    case i8: return 1;
-    case i16: return 2;
-    case i32: return 4;
+    case i8:
+    case v8i1: return 1;
+    case i16:
+    case v16i1: return 2;
+    case i32:
+    case v32i1: return 4;
     case i64:
+    case v64i1:
     case ptr: return 8;
     case i128: return 16;
     case f32: return 4;
@@ -643,6 +662,10 @@ private:
     case f32:
     case f64:
     case f128:
+    case v8i1:
+    case v16i1:
+    case v32i1:
+    case v64i1:
     case v32:
     case v64:
     case v128: return 1;
@@ -665,9 +688,26 @@ public:
   void check_type_compatibility(llvm::Type *type,
                                 LLVMBasicValType bvt,
                                 u32 ty_idx) noexcept {
-    if (bvt == LLVMBasicValType::complex &&
-        complex_part_types[ty_idx].desc.incompatible_layout) [[unlikely]] {
+    switch (bvt) {
+      using enum LLVMBasicValType;
+    case complex:
+      if (!complex_part_types[ty_idx].desc.incompatible_layout) {
+        break;
+      }
+      [[fallthrough]];
+    case v8i1:
+    case v16i1:
+    case v32i1:
+    case v64i1:
+      // i1 vectors are incompatible: we use a dense layout in general-purpose
+      // registers while LLVM uses a target-specific promoted and possibly
+      // widened type in vector registers. Also, we never scalarize i1 vectors,
+      // they are always compact (hence, we support at most 64 elements).
+      [[unlikely]];
       report_incompatible_type(type);
+      break;
+    case invalid: TPDE_UNREACHABLE("cannot check layout of invalid type");
+    default: break;
     }
   }
 

@@ -1532,6 +1532,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_load_generic(
     return true;
   }
 
+  unsigned num_bits;
   ScratchReg res_scratch{this};
   switch (this->adaptor->val_info(load).type) {
     using enum LLVMBasicValType;
@@ -1541,8 +1542,9 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_load_generic(
   case i32:
   case i64: {
     assert(load->getType()->isIntegerTy());
-    const auto bit_width = load->getType()->getIntegerBitWidth();
-    switch (bit_width) {
+    num_bits = load->getType()->getIntegerBitWidth();
+  load_single_integer:
+    switch (tpde::util::align_up(num_bits, 8)) {
     case 1:
     case 8: derived()->encode_loadi8(std::move(ptr_op), res_scratch); break;
     case 16: derived()->encode_loadi16(std::move(ptr_op), res_scratch); break;
@@ -1556,6 +1558,15 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_load_generic(
     }
     break;
   }
+  case v8i1:
+  case v16i1:
+  case v32i1:
+  case v64i1:
+    assert(load->getType()->getScalarType()->isIntegerTy(1));
+    num_bits =
+        llvm::cast<llvm::FixedVectorType>(load->getType())->getNumElements();
+    goto load_single_integer;
+
   case ptr: {
     derived()->encode_loadi64(std::move(ptr_op), res_scratch);
     break;
@@ -1601,15 +1612,19 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_load_generic(
       switch (part_ty) {
       case i1:
       case i8:
+      case v8i1:
         derived()->encode_loadi8(std::move(part_addr), res_scratch);
         break;
       case i16:
+      case v16i1:
         derived()->encode_loadi16(std::move(part_addr), res_scratch);
         break;
       case i32:
+      case v32i1:
         derived()->encode_loadi32(std::move(part_addr), res_scratch);
         break;
       case i64:
+      case v64i1:
       case ptr:
         derived()->encode_loadi64(std::move(part_addr), res_scratch);
         break;
@@ -1725,6 +1740,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_store_generic(
   // TODO: don't recompute this, this is currently computed for every val part
   auto [ty, ty_idx] = this->adaptor->lower_type(op_val->getType());
 
+  unsigned num_bits;
   switch (ty) {
     using enum LLVMBasicValType;
   case i1:
@@ -1733,8 +1749,9 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_store_generic(
   case i32:
   case i64: {
     assert(op_val->getType()->isIntegerTy());
-    const auto bit_width = op_val->getType()->getIntegerBitWidth();
-    switch (bit_width) {
+    num_bits = op_val->getType()->getIntegerBitWidth();
+  store_single_integer:
+    switch (tpde::util::align_up(num_bits, 8)) {
     case 1:
     case 8: derived()->encode_storei8(std::move(ptr_op), op_ref.part(0)); break;
     case 16:
@@ -1762,6 +1779,15 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_store_generic(
     }
     break;
   }
+  case v8i1:
+  case v16i1:
+  case v32i1:
+  case v64i1:
+    assert(op_val->getType()->getScalarType()->isIntegerTy(1));
+    num_bits =
+        llvm::cast<llvm::FixedVectorType>(op_val->getType())->getNumElements();
+    goto store_single_integer;
+
   case ptr:
     derived()->encode_storei64(std::move(ptr_op), op_ref.part(0));
     break;
@@ -1803,15 +1829,19 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_store_generic(
       switch (part_ty) {
       case i1:
       case i8:
+      case v8i1:
         derived()->encode_storei8(std::move(part_addr), std::move(part_ref));
         break;
       case i16:
+      case v16i1:
         derived()->encode_storei16(std::move(part_addr), std::move(part_ref));
         break;
       case i32:
+      case v32i1:
         derived()->encode_storei32(std::move(part_addr), std::move(part_ref));
         break;
       case i64:
+      case v64i1:
       case ptr:
         derived()->encode_storei64(std::move(part_addr), std::move(part_ref));
         break;
@@ -2786,6 +2816,10 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_extract_element(
     return false;
   }
 
+  if (inst->getType()->isIntegerTy(1)) {
+    return false;
+  }
+
   auto *vec_ty = llvm::cast<llvm::FixedVectorType>(src->getType());
   unsigned nelem = vec_ty->getNumElements();
   assert(index->getType()->getIntegerBitWidth() >= 8);
@@ -2854,6 +2888,9 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_insert_element(
   assert(index->getType()->getIntegerBitWidth() >= 8);
 
   auto ins = inst->getOperand(1);
+  if (ins->getType()->isIntegerTy(1)) {
+    return false;
+  }
   auto [val_ref, val] = this->val_ref_single(ins);
 
   ValueRef res_vr = this->result_ref(inst);
@@ -2952,7 +2989,8 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_shuffle_vector(
   } else if (elem_ty->isIntegerTy(64)) {
     bvt = LLVMBasicValType::i64;
   } else {
-    TPDE_UNREACHABLE("invalid element type for shufflevector");
+    // E.g., i1 vectors.
+    return false;
   }
 
   ValueRef lhs_vr = this->val_ref(lhs);
@@ -3400,12 +3438,16 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_select(
     using enum LLVMBasicValType;
   case i1:
   case i8:
+  case v8i1:
   case i16:
+  case v16i1:
   case i32:
+  case v32i1:
     derived()->encode_select_i32(
         std::move(cond), lhs.part(0), rhs.part(0), res_scratch);
     break;
   case i64:
+  case v64i1:
   case ptr:
     derived()->encode_select_i64(
         std::move(cond), lhs.part(0), rhs.part(0), res_scratch);
