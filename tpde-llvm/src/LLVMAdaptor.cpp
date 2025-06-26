@@ -455,6 +455,106 @@ void LLVMAdaptor::report_unsupported_type(llvm::Type *type) noexcept {
   func_unsupported = true;
 }
 
+static std::tuple<LLVMBasicValType, u32, bool>
+    lower_vector_type(const llvm::FixedVectorType *type) noexcept {
+  auto *el_ty = type->getElementType();
+  auto num_elts = type->getNumElements();
+
+  // LLVM vectors have two different representations, the in-memory/bitcast
+  // representation and the in-register representation. For types that are not
+  // directly legal, these are not equivalent.
+  //
+  // The in-memory type is always dense, i.e. <N x iM> is like an i(N*M),
+  // and only unspecified when N*M is not a multiple of 8.
+  //
+  // The in-register type, which is also used for passing parameters, is
+  // legalized as follows (see TargetLoweringBase::getTypeConversion):
+  // - Target-specific legalization rules are applied.
+  //   - E.g., AArch64: widen v1i16 => v4i16 instead of scalarizing
+  //     (see AArch64TargetLowering::getPreferredVectorAction)
+  // - If single element, scalarize.
+  // - Widen number of elements to next power of two.
+  // - For integer types: increase width until legal type is found.
+  //   - E.g., AArch64: v2i16 => v2i32 (ISA supports 2s) (final result)
+  //   - E.g., x86-64: v2i16 unchanged (ISA supports neither v2i32, v2i64)
+  // - Widen number of elements in powers of two until legal type is found.
+  //   - E.g., x86-64: v2i16 => v8i16 (final result)
+  // - If type still not legal, split in half and repeat.
+  //
+  // This also handles illegal types. E.g., v3i99 would first get widened to
+  // v4i99, then (as no i99 is legal anywhere) split into v2i99, which is
+  // legalized recursively; this gets split into v1i99; this gets scalarized
+  // into i99; this gets promoted into i128 (next power of two); this gets
+  // expanded into two i64 (as i128 is not legal for any register class).
+  //
+  //
+  // To avoid the difficulties of legalizing all kinds of vector types, we
+  // only support types that are directly legal or can be legalized by
+  // just widening (e.g., v2f32 => v4f32) on x86-64 *and* AArch64 for now.
+  //
+  // Therefore, we support:
+  // - Integer elements: v8i8/v16i8, v4i16/v8i16, v2i32/v4i32, v2i64
+  //   (no widened vectors: x86-64 would widen, but AArch64 would promote)
+  // - Floating-point elements: v2f32, v4f32, v2f64
+  //   (single-element vectors would be scalarized; v3f32 would need 12b load)
+  // Other vector types are scalarized.
+  //
+  // We can only handle types where the compact bitwise representation is the
+  // same as the array representation. Otherwise, load/store would need to
+  // decompress/compress vectors.
+  switch (el_ty->getTypeID()) {
+  case llvm::Type::IntegerTyID: {
+    unsigned el_width = el_ty->getIntegerBitWidth();
+    if (el_width == 1) {
+      if (num_elts > 64) {
+        return {LLVMBasicValType::invalid, 0, false};
+      }
+      constexpr unsigned base = unsigned(LLVMBasicValType::v8i1);
+      static_assert(base + 1 == unsigned(LLVMBasicValType::v16i1));
+      static_assert(base + 2 == unsigned(LLVMBasicValType::v32i1));
+      static_assert(base + 3 == unsigned(LLVMBasicValType::v64i1));
+
+      unsigned off = 31 - tpde::util::cnt_lz((num_elts - 1) >> 2 | 1);
+      return {static_cast<LLVMBasicValType>(base + off), 1, false};
+    }
+    if (el_width < 8 || el_width > 64 || (el_width & (el_width - 1))) {
+      return {LLVMBasicValType::invalid, 0, false};
+    }
+    if (num_elts > 1 && el_width * num_elts == 64) {
+      return {LLVMBasicValType::v64, 1, false};
+    } else if (num_elts > 1 && el_width * num_elts == 128) {
+      return {LLVMBasicValType::v128, 1, false};
+    }
+    constexpr unsigned base = static_cast<unsigned>(LLVMBasicValType::i8);
+    static_assert(base + 1 == static_cast<unsigned>(LLVMBasicValType::i16));
+    static_assert(base + 2 == static_cast<unsigned>(LLVMBasicValType::i32));
+    static_assert(base + 3 == static_cast<unsigned>(LLVMBasicValType::i64));
+    unsigned off = 31 - tpde::util::cnt_lz((el_width - 1) >> 2 | 1);
+    LLVMBasicValType scalar_ty = static_cast<LLVMBasicValType>(base + off);
+    return {scalar_ty, num_elts, true};
+  }
+  case llvm::Type::FloatTyID:
+    if (num_elts == 2) {
+      return {LLVMBasicValType::v64, 1, false};
+    } else if (num_elts == 4) {
+      return {LLVMBasicValType::v128, 1, false};
+    }
+    return {LLVMBasicValType::f32, num_elts, true};
+  case llvm::Type::DoubleTyID:
+    if (num_elts == 2) {
+      return {LLVMBasicValType::v128, 1, false};
+    }
+    return {LLVMBasicValType::f64, num_elts, true};
+  case llvm::Type::PointerTyID:
+    if (el_ty->getPointerAddressSpace() == 0) {
+      // TODO: for n=2, this should be {v128, 1, false}?
+      return {LLVMBasicValType::i64, num_elts, true};
+    }
+    return {LLVMBasicValType::invalid, 0, false};
+  default: return {LLVMBasicValType::invalid, 0, false};
+  }
+}
+
 std::pair<LLVMBasicValType, unsigned long>
     LLVMAdaptor::lower_simple_type(const llvm::Type *type) noexcept {
   switch (type->getTypeID()) {
@@ -480,88 +580,6 @@ std::pair<LLVMBasicValType, unsigned long>
     return {LLVMBasicValType::invalid, 0};
   }
   case llvm::Type::PointerTyID: return {LLVMBasicValType::ptr, 1};
-  case llvm::Type::FixedVectorTyID: {
-    auto *el_ty = llvm::cast<llvm::FixedVectorType>(type)->getElementType();
-    auto num_elts = llvm::cast<llvm::FixedVectorType>(type)->getNumElements();
-
-    // LLVM vectors have two different representations, the in-memory/bitcast
-    // representation and the in-register representation. For types that are not
-    // directly legal, these are not equivalent.
-    //
-    // The in-memory type is always dense, i.e. <N x iM> is like an i(N*M),
-    // and only unspecified when N*M is not a multiple of 8.
-    //
-    // The in-register type, which is also used for passing parameters, is
-    // legalized as follows (see TargetLoweringBase::getTypeConversion):
-    // - Target-specific legalization rules are applied.
-    //   - E.g., AArch64: widen v1i16 => v4i16 instead of scalarizing
-    //     (see AArch64TargetLowering::getPreferredVectorAction)
-    // - If single element, scalarize.
-    // - Widen number of elements to next power of two.
-    // - For integer types: increase width until legal type is found.
-    //   - E.g., AArch64: v2i16 => v2i32 (ISA supports 2s) (final result)
-    //   - E.g., x86-64: v2i16 unchanged (ISA supports neither v2i32, v2i64)
-    // - Widen number of elements in powers of two until legal type is found.
-    //   - E.g., x86-64: v2i16 => v8i16 (final result)
-    // - If type still not legal, split in half and repeat.
-    //
-    // This also handles illegal types. E.g., v3i99 would first get widened to
-    // v4i99, then (as no i99 is legal anywhere) split into v2i99, which is
-    // legalized recursively; this gets split into v1i99; this gets scalarized
-    // into i99; this gets promoted into i128 (next power of two); this gets
-    // expanded into two i64 (as i128 is not legal for any register class).
-    //
-    //
-    // To avoid the difficulties of legalizing all kinds of vector types, we
-    // only support types that are directly legal or can be legalized by
-    // just widening (e.g., v2f32 => v4f32) on x86-64 *and* AArch64 for now.
-    //
-    // Therefore, we support:
-    // - Integer elements: v8i8/v16i8, v4i16/v8i16, v2i32/v4i32, v2i64
-    //   (no widened vectors: x86-64 would widen, but AArch64 would promote)
-    // - Floating-point elements: v2f32, v4f32, v2f64
-    //   (single-element vectors would be scalarized; v3f32 would need 12b load)
-    switch (el_ty->getTypeID()) {
-    case llvm::Type::IntegerTyID: {
-      unsigned el_width = el_ty->getIntegerBitWidth();
-      if (el_width == 1) {
-        if (num_elts > 64) {
-          return {LLVMBasicValType::invalid, 0};
-        }
-        constexpr unsigned base = unsigned(LLVMBasicValType::v8i1);
-        static_assert(base + 1 == unsigned(LLVMBasicValType::v16i1));
-        static_assert(base + 2 == unsigned(LLVMBasicValType::v32i1));
-        static_assert(base + 3 == unsigned(LLVMBasicValType::v64i1));
-
-        unsigned off = 31 - tpde::util::cnt_lz((num_elts - 1) >> 2 | 1);
-        return {static_cast<LLVMBasicValType>(base + off), 1};
-      }
-      if (num_elts == 1 || el_width < 8 || el_width > 64 ||
-          (el_width & (el_width - 1))) {
-        return {LLVMBasicValType::invalid, 0};
-      }
-      if (el_width * num_elts == 64) {
-        return {LLVMBasicValType::v64, 1};
-      } else if (el_width * num_elts == 128) {
-        return {LLVMBasicValType::v128, 1};
-      }
-      return {LLVMBasicValType::invalid, 0};
-    }
-    case llvm::Type::FloatTyID:
-      if (num_elts == 2) {
-        return {LLVMBasicValType::v64, 1};
-      } else if (num_elts == 4) {
-        return {LLVMBasicValType::v128, 1};
-      }
-      return {LLVMBasicValType::invalid, 0};
-    case llvm::Type::DoubleTyID:
-      if (num_elts == 2) {
-        return {LLVMBasicValType::v128, 1};
-      }
-      return {LLVMBasicValType::invalid, 0};
-    default: return {LLVMBasicValType::invalid, 0};
-    }
-  }
   default: return {LLVMBasicValType::invalid, 0};
   }
 }
@@ -569,8 +587,16 @@ std::pair<LLVMBasicValType, unsigned long>
 std::pair<unsigned, unsigned>
     LLVMAdaptor::complex_types_append(llvm::Type *type,
                                       size_t desc_idx) noexcept {
-  if (auto [ty, num] = lower_simple_type(type);
-      ty != LLVMBasicValType::invalid) {
+  auto [ty, num] = lower_simple_type(type);
+  if (ty == LLVMBasicValType::invalid) {
+    if (auto fvt = llvm::dyn_cast<llvm::FixedVectorType>(type)) {
+      bool scalarized = false;
+      std::tie(ty, num, scalarized) = lower_vector_type(fvt);
+      complex_part_types[desc_idx].desc.incompatible_layout |= scalarized;
+    }
+  }
+
+  if (ty != LLVMBasicValType::invalid) {
     unsigned size = basic_ty_part_size(ty);
     unsigned align = basic_ty_part_align(ty);
     assert(num > 0);
@@ -583,61 +609,6 @@ std::pair<unsigned, unsigned>
 
   size_t start = complex_part_types.size();
   switch (type->getTypeID()) {
-  case llvm::Type::FixedVectorTyID: {
-    auto *el_ty = llvm::cast<llvm::FixedVectorType>(type)->getElementType();
-    auto nelem = llvm::cast<llvm::FixedVectorType>(type)->getNumElements();
-    assert(nelem > 0 && "vectors with zero elements are invalid");
-
-    // We can only handle types where the compact bitwise representation is the
-    // same as the array representation. Otherwise, load/store would need to
-    // decompress/compress vectors.
-
-    LLVMBasicValType scalar_ty;
-    switch (el_ty->getTypeID()) {
-    case llvm::Type::IntegerTyID: {
-      unsigned el_width = el_ty->getIntegerBitWidth();
-      if (el_width < 8 || el_width > 64 || (el_width & (el_width - 1))) {
-        goto unhandled;
-      }
-      constexpr unsigned base = static_cast<unsigned>(LLVMBasicValType::i8);
-      static_assert(base + 1 == static_cast<unsigned>(LLVMBasicValType::i16));
-      static_assert(base + 2 == static_cast<unsigned>(LLVMBasicValType::i32));
-      static_assert(base + 3 == static_cast<unsigned>(LLVMBasicValType::i64));
-
-      unsigned off = 31 - tpde::util::cnt_lz((el_width - 1) >> 2 | 1);
-      scalar_ty = static_cast<LLVMBasicValType>(base + off);
-      break;
-    }
-    case llvm::Type::PointerTyID:
-      if (el_ty->getPointerAddressSpace() != 0) {
-        goto unhandled;
-      }
-      scalar_ty = LLVMBasicValType::ptr;
-      break;
-    case llvm::Type::FloatTyID: scalar_ty = LLVMBasicValType::f32; break;
-    case llvm::Type::DoubleTyID: scalar_ty = LLVMBasicValType::f64; break;
-    default: goto unhandled;
-    }
-
-    // We scalarize the type, which is often not the same as LLVM would do.
-    // LLVM's vector type legalization rules are highly complex, depend on the
-    // target, and are rather inconsistent. There's no real point in modeling
-    // the exact semantics here. This is only relevant at function boundaries.
-    // Also note that our scalarized types has an incompatible ABI and we might
-    // not be able to return the scalarized type at all: e.g., a <31 x i8> could
-    // be returned in two vector registers (which is typically what LLVM would
-    // do), but we'd need 31 integer registers.
-    complex_part_types[desc_idx].desc.incompatible_layout = true;
-
-    complex_part_types.reserve(start + nelem);
-    unsigned elem_size = basic_ty_part_size(scalar_ty);
-    for (unsigned i = 0; i < nelem; i++) {
-      complex_part_types.emplace_back(scalar_ty, elem_size, i == nelem - 1);
-    }
-    complex_part_types[start].part.nest_inc++;
-    complex_part_types[start + nelem - 1].part.nest_dec++;
-    return std::make_pair(nelem * elem_size, basic_ty_part_align(scalar_ty));
-  }
   case llvm::Type::ArrayTyID: {
     auto [sz, algn] =
         complex_types_append(type->getArrayElementType(), desc_idx);
@@ -693,18 +664,27 @@ std::pair<unsigned, unsigned>
     }
     return std::make_pair(size, align);
   }
-  default: break;
+  default:
+    complex_part_types[desc_idx].desc.invalid = true;
+    return std::make_pair(0, 1);
   }
-
-unhandled:
-  complex_part_types[desc_idx].desc.invalid = true;
-  return std::make_pair(0, 1);
 }
 
 [[gnu::noinline]] std::pair<LLVMBasicValType, unsigned long>
     LLVMAdaptor::lower_complex_type(llvm::Type *type) noexcept {
   auto [it, inserted] = complex_type_map.try_emplace(type);
   if (inserted) {
+    // Vector types are rather uncommon and non-trivial to handle, so handle
+    // them here and cache the result. Not all vectors are actually complex.
+    if (auto fvt = llvm::dyn_cast<llvm::FixedVectorType>(type)) {
+      auto [ty, num, scalarized] = lower_vector_type(fvt);
+      if (ty != LLVMBasicValType::invalid && !scalarized) {
+        assert(num == 1 && "multi-part vector with compatible layout?");
+        it->second = std::make_pair(ty, num);
+        return it->second;
+      }
+    }
+
     unsigned start = complex_part_types.size();
     complex_part_types.push_back(LLVMComplexPart{}); // Complex part desc
     // TODO: store size/alignment?
