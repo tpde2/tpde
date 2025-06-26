@@ -555,45 +555,50 @@ static std::tuple<LLVMBasicValType, u32, bool>
   }
 }
 
-std::pair<LLVMBasicValType, unsigned long>
+LLVMBasicValType
     LLVMAdaptor::lower_simple_type(const llvm::Type *type) noexcept {
-  switch (type->getTypeID()) {
-  case llvm::Type::FloatTyID: return {LLVMBasicValType::f32, 1};
-  case llvm::Type::DoubleTyID: return {LLVMBasicValType::f64, 1};
-  case llvm::Type::FP128TyID: return {LLVMBasicValType::f128, 1};
-  case llvm::Type::VoidTyID: return {LLVMBasicValType::none, 1};
+  constexpr size_t LutBeginInt = llvm::Type::TargetExtTyID + 1;
+  static constexpr auto type_lut = []() {
+    std::array<LLVMBasicValType, LutBeginInt + 129> tys{};
+    tys.fill(LLVMBasicValType::invalid);
+    tys[llvm::Type::FloatTyID] = LLVMBasicValType::f32;
+    tys[llvm::Type::DoubleTyID] = LLVMBasicValType::f64;
+    tys[llvm::Type::FP128TyID] = LLVMBasicValType::f128;
+    tys[llvm::Type::VoidTyID] = LLVMBasicValType::none;
+    // TODO: check address space
+    tys[llvm::Type::PointerTyID] = LLVMBasicValType::ptr;
 
-  case llvm::Type::IntegerTyID: {
-    const u32 bit_width = type->getIntegerBitWidth();
-    // round up to the nearest size we support
-    if (bit_width <= 64) [[likely]] {
-      constexpr unsigned base = static_cast<unsigned>(LLVMBasicValType::i8);
-      static_assert(base + 1 == static_cast<unsigned>(LLVMBasicValType::i16));
-      static_assert(base + 2 == static_cast<unsigned>(LLVMBasicValType::i32));
-      static_assert(base + 3 == static_cast<unsigned>(LLVMBasicValType::i64));
-
-      unsigned off = 31 - tpde::util::cnt_lz((bit_width - 1) >> 2 | 1);
-      return {static_cast<LLVMBasicValType>(base + off), 1};
-    } else if (bit_width == 128) {
-      return {LLVMBasicValType::i128, 2};
+    // Integer types
+    for (unsigned i = 1; i <= 64; ++i) {
+      tys[LutBeginInt + i] = i <= 8    ? LLVMBasicValType::i8
+                             : i <= 16 ? LLVMBasicValType::i16
+                             : i <= 32 ? LLVMBasicValType::i32
+                                       : LLVMBasicValType::i64;
     }
-    return {LLVMBasicValType::invalid, 0};
+    tys[LutBeginInt + 128] = LLVMBasicValType::i128;
+    return tys;
+  }();
+
+  unsigned id = type->getTypeID();
+  if (id == llvm::Type::IntegerTyID) {
+    if (unsigned width = type->getIntegerBitWidth(); width <= 128) {
+      id = LutBeginInt + width;
+    }
   }
-  case llvm::Type::PointerTyID: return {LLVMBasicValType::ptr, 1};
-  default: return {LLVMBasicValType::invalid, 0};
-  }
+  return type_lut[id];
 }
 
 std::pair<unsigned, unsigned>
     LLVMAdaptor::complex_types_append(llvm::Type *type,
                                       size_t desc_idx) noexcept {
-  auto [ty, num] = lower_simple_type(type);
-  if (ty == LLVMBasicValType::invalid) {
-    if (auto fvt = llvm::dyn_cast<llvm::FixedVectorType>(type)) {
-      bool scalarized = false;
-      std::tie(ty, num, scalarized) = lower_vector_type(fvt);
-      complex_part_types[desc_idx].desc.incompatible_layout |= scalarized;
-    }
+  auto ty = lower_simple_type(type);
+  unsigned num;
+  if (ty != LLVMBasicValType::invalid) {
+    num = basic_ty_part_count(ty);
+  } else if (auto fvt = llvm::dyn_cast<llvm::FixedVectorType>(type)) {
+    bool scalarized = false;
+    std::tie(ty, num, scalarized) = lower_vector_type(fvt);
+    complex_part_types[desc_idx].desc.incompatible_layout |= scalarized;
   }
 
   if (ty != LLVMBasicValType::invalid) {

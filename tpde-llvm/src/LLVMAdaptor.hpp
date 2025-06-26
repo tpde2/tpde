@@ -729,17 +729,15 @@ private:
   std::pair<unsigned, unsigned> complex_types_append(llvm::Type *type,
                                                      size_t desc_idx) noexcept;
 
-  /// Returns (elem-type, num), with num > 0 and a valid type, or (invalid, 0).
-  static std::pair<LLVMBasicValType, unsigned long>
-      lower_simple_type(const llvm::Type *) noexcept;
+  static LLVMBasicValType lower_simple_type(const llvm::Type *) noexcept;
 
   std::pair<LLVMBasicValType, unsigned long>
       lower_complex_type(llvm::Type *) noexcept;
 
 public:
   std::pair<LLVMBasicValType, u32> lower_type(llvm::Type *type) noexcept {
-    if (auto [ty, num] = lower_simple_type(type); num > 0) [[likely]] {
-      assert(num == 1 || ty == LLVMBasicValType::i128);
+    if (auto ty = lower_simple_type(type); ty != LLVMBasicValType::invalid)
+        [[likely]] {
       return std::make_pair(ty, ~0ul);
     }
     auto [ty, num] = lower_complex_type(type);
