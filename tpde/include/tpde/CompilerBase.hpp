@@ -230,7 +230,10 @@ public:
     CBDerived *derived() noexcept { return static_cast<CBDerived *>(this); }
 
     void add_arg(ValuePart &&vp, CCAssignment cca) noexcept;
-    void add_arg(CallArg &&arg) noexcept;
+    void add_arg(CallArg &&arg, u32 part_count) noexcept;
+    void add_arg(CallArg &&arg) noexcept {
+      add_arg(std::move(arg), compiler.val_parts(arg.value).count());
+    }
 
     // evict registers, do call, reset stack frame
     void call(std::variant<typename Assembler::SymRef, ValuePart>) noexcept;
@@ -510,9 +513,8 @@ void CompilerBase<Adaptor, Derived, Config>::CallBuilderBase<
 template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>
 template <typename CBDerived>
 void CompilerBase<Adaptor, Derived, Config>::CallBuilderBase<
-    CBDerived>::add_arg(CallArg &&arg) noexcept {
+    CBDerived>::add_arg(CallArg &&arg, u32 part_count) noexcept {
   ValueRef vr = compiler.val_ref(arg.value);
-  const u32 part_count = compiler.val_parts(arg.value).count();
 
   if (arg.flag == CallArg::Flag::byval) {
     assert(part_count == 1);

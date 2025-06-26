@@ -535,6 +535,13 @@ public:
     return val_parts(idx).count();
   }
 
+  u32 type_part_count(LLVMBasicValType bvt, u32 complex_part_tys_idx) noexcept {
+    if (bvt != LLVMBasicValType::complex) [[likely]] {
+      return basic_ty_part_count(bvt);
+    }
+    return this->complex_part_types[complex_part_tys_idx].desc.num_parts;
+  }
+
   [[nodiscard]] bool inst_fused(const IRInstRef inst) const noexcept {
     return val_info(inst).fused;
   }

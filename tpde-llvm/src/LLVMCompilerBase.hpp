@@ -3521,7 +3521,11 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_call(
     assert(!call->paramHasAttr(i, llvm::Attribute::AttrKind::InAlloca));
     assert(!call->paramHasAttr(i, llvm::Attribute::AttrKind::Preallocated));
 
-    cb->add_arg(CallArg{op, flag, byval_align, byval_size});
+    auto [ty, ty_idx] = this->adaptor->lower_type(op);
+    this->adaptor->check_type_compatibility(op->getType(), ty, ty_idx);
+    // Explicitly pass part count to avoid duplicate type lowering.
+    u32 part_count = this->adaptor->type_part_count(ty, ty_idx);
+    cb->add_arg(CallArg{op, flag, byval_align, byval_size}, part_count);
   }
 
   llvm::Value *target = call->getCalledOperand();
