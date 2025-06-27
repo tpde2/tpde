@@ -1585,17 +1585,24 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_load_generic(
     this->set_value(res_high, res_scratch_high);
     return true;
   }
-  case v32:
   case f32: {
     derived()->encode_loadf32(std::move(ptr_op), res_scratch);
     break;
   }
-  case v64:
+  case v8i8:
+  case v4i16:
+  case v2i32:
+  case v2f32:
   case f64: {
     derived()->encode_loadf64(std::move(ptr_op), res_scratch);
     break;
   }
-  case v128:
+  case v16i8:
+  case v8i16:
+  case v4i32:
+  case v2i64:
+  case v4f32:
+  case v2f64:
   case f128: derived()->encode_loadv128(std::move(ptr_op), res_scratch); break;
   case complex: {
     auto ty_idx = this->adaptor->val_info(load).complex_part_tys_idx;
@@ -1634,15 +1641,22 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_load_generic(
       case i128:
         derived()->encode_loadi64(std::move(part_addr), res_scratch);
         break;
-      case v32:
       case f32:
         derived()->encode_loadf32(std::move(part_addr), res_scratch);
         break;
-      case v64:
+      case v8i8:
+      case v4i16:
+      case v2i32:
+      case v2f32:
       case f64:
         derived()->encode_loadf64(std::move(part_addr), res_scratch);
         break;
-      case v128:
+      case v16i8:
+      case v8i16:
+      case v4i32:
+      case v2i64:
+      case v4f32:
+      case v2f64:
       case f128:
         derived()->encode_loadv128(std::move(part_addr), res_scratch);
         break;
@@ -1798,15 +1812,22 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_store_generic(
     derived()->encode_storei128(
         std::move(ptr_op), op_ref.part(0), op_ref.part(1));
     break;
-  case v32:
   case f32:
     derived()->encode_storef32(std::move(ptr_op), op_ref.part(0));
     break;
-  case v64:
+  case v8i8:
+  case v4i16:
+  case v2i32:
+  case v2f32:
   case f64:
     derived()->encode_storef64(std::move(ptr_op), op_ref.part(0));
     break;
-  case v128:
+  case v16i8:
+  case v8i16:
+  case v4i32:
+  case v2i64:
+  case v4f32:
+  case v2f64:
   case f128:
     derived()->encode_storev128(std::move(ptr_op), op_ref.part(0));
     break;
@@ -1851,15 +1872,22 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_store_generic(
       case i128:
         derived()->encode_storei64(std::move(part_addr), std::move(part_ref));
         break;
-      case v32:
       case f32:
         derived()->encode_storef32(std::move(part_addr), std::move(part_ref));
         break;
-      case v64:
+      case v8i8:
+      case v4i16:
+      case v2i32:
+      case v2f32:
       case f64:
         derived()->encode_storef64(std::move(part_addr), std::move(part_ref));
         break;
-      case v128:
+      case v16i8:
+      case v8i16:
+      case v4i32:
+      case v2i64:
+      case v4f32:
+      case v2f64:
       case f128:
         derived()->encode_storev128(std::move(part_addr), std::move(part_ref));
         break;
@@ -1897,25 +1925,22 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_int_binary_op(
   IntBinaryOp op = typename IntBinaryOp::Value(op_val);
 
   if (inst_ty->isVectorTy()) [[unlikely]] {
-    auto *scalar_ty = inst_ty->getScalarType();
-    auto int_width = scalar_ty->getIntegerBitWidth();
-
     using EncodeFnTy = bool (Derived::*)(
         GenericValuePart &&, GenericValuePart &&, ScratchReg &);
-    // fns[op.index()][v64=0/v128=1][8=0/16=1/32=2/64=3]
+    // fns[op.index()][idx]
     static constexpr auto fns = []() constexpr {
-      std::array<EncodeFnTy[2][4], IntBinaryOp::num_ops> res{};
+      std::array<EncodeFnTy[7], IntBinaryOp::num_ops> res{};
       auto entry = [&res](IntBinaryOp op) { return res[op.index()]; };
 
       // TODO: more consistent naming of encode functions
 #define FN_ENTRY(opname, fnbase, sign)                                         \
-  entry(opname)[0][0] = &Derived::encode_##fnbase##v8##sign##8;                \
-  entry(opname)[0][1] = &Derived::encode_##fnbase##v4##sign##16;               \
-  entry(opname)[0][2] = &Derived::encode_##fnbase##v2##sign##32;               \
-  entry(opname)[1][0] = &Derived::encode_##fnbase##v16##sign##8;               \
-  entry(opname)[1][1] = &Derived::encode_##fnbase##v8##sign##16;               \
-  entry(opname)[1][2] = &Derived::encode_##fnbase##v4##sign##32;               \
-  entry(opname)[1][3] = &Derived::encode_##fnbase##v2##sign##64;
+  entry(opname)[0] = &Derived::encode_##fnbase##v8##sign##8;                   \
+  entry(opname)[1] = &Derived::encode_##fnbase##v4##sign##16;                  \
+  entry(opname)[2] = &Derived::encode_##fnbase##v2##sign##32;                  \
+  entry(opname)[3] = &Derived::encode_##fnbase##v16##sign##8;                  \
+  entry(opname)[4] = &Derived::encode_##fnbase##v8##sign##16;                  \
+  entry(opname)[5] = &Derived::encode_##fnbase##v4##sign##32;                  \
+  entry(opname)[6] = &Derived::encode_##fnbase##v2##sign##64;
 
       FN_ENTRY(IntBinaryOp::add, add, u)
       FN_ENTRY(IntBinaryOp::sub, sub, u)
@@ -1931,26 +1956,16 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_int_binary_op(
       return res;
     }();
 
-    unsigned width_idx;
-    switch (int_width) {
-    case 8: width_idx = 0; break;
-    case 16: width_idx = 1; break;
-    case 32: width_idx = 2; break;
-    case 64: width_idx = 3; break;
-    default: return false;
-    }
-
-    unsigned ty_idx;
+    EncodeFnTy encode_fn;
     switch (info.type) {
-      using enum LLVMBasicValType;
-    case v64: ty_idx = 0; break;
-    case v128: ty_idx = 1; break;
+    case LLVMBasicValType::v8i8: encode_fn = fns[op.index()][0]; break;
+    case LLVMBasicValType::v4i16: encode_fn = fns[op.index()][1]; break;
+    case LLVMBasicValType::v2i32: encode_fn = fns[op.index()][2]; break;
+    case LLVMBasicValType::v16i8: encode_fn = fns[op.index()][3]; break;
+    case LLVMBasicValType::v8i16: encode_fn = fns[op.index()][4]; break;
+    case LLVMBasicValType::v4i32: encode_fn = fns[op.index()][5]; break;
+    case LLVMBasicValType::v2i64: encode_fn = fns[op.index()][6]; break;
     default: return false;
-    }
-
-    EncodeFnTy encode_fn = fns[op.index()][ty_idx][width_idx];
-    if (!encode_fn) {
-      return false;
     }
 
     auto lhs = this->val_ref(inst->getOperand(0));
@@ -2174,9 +2189,6 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_int_binary_op(
 template <typename Adaptor, typename Derived, typename Config>
 bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_float_binary_op(
     const llvm::Instruction *inst, const ValInfo &val_info, u64 op) noexcept {
-  auto *inst_ty = inst->getType();
-  auto *scalar_ty = inst_ty->getScalarType();
-
   auto lhs = this->val_ref(inst->getOperand(0));
   auto rhs = this->val_ref(inst->getOperand(1));
 
@@ -2199,20 +2211,18 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_float_binary_op(
     return true;
   }
 
-  const bool is_double = scalar_ty->isDoubleTy();
-  if (!scalar_ty->isFloatTy() && !scalar_ty->isDoubleTy()) {
-    return false;
-  }
-
   if (op == FloatBinaryOp::rem) {
-    if (inst_ty->isVectorTy()) {
-      return false;
+    LibFunc lf;
+    switch (val_info.type) {
+    case LLVMBasicValType::f32: lf = LibFunc::fmodf; break;
+    case LLVMBasicValType::f64: lf = LibFunc::fmod; break;
+    default: return false;
     }
 
     auto cb = derived()->create_call_builder();
     cb->add_arg(lhs.part(0), tpde::CCAssignment{});
     cb->add_arg(rhs.part(0), tpde::CCAssignment{});
-    cb->call(get_libfunc_sym(is_double ? LibFunc::fmod : LibFunc::fmodf));
+    cb->call(get_libfunc_sym(lf));
     auto res_vr = this->result_ref(inst);
     cb->add_ret(res_vr);
     return true;
@@ -2225,7 +2235,6 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_float_binary_op(
   switch (val_info.type) {
     using enum LLVMBasicValType;
   case f32:
-    assert(!is_double);
     switch (op) {
     case FloatBinaryOp::add: encode_fn = &Derived::encode_addf32; break;
     case FloatBinaryOp::sub: encode_fn = &Derived::encode_subf32; break;
@@ -2235,7 +2244,6 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_float_binary_op(
     }
     break;
   case f64:
-    assert(is_double);
     switch (op) {
     case FloatBinaryOp::add: encode_fn = &Derived::encode_addf64; break;
     case FloatBinaryOp::sub: encode_fn = &Derived::encode_subf64; break;
@@ -2244,8 +2252,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_float_binary_op(
     default: TPDE_UNREACHABLE("invalid FloatBinaryOp");
     }
     break;
-  case v64:
-    assert(!is_double);
+  case v2f32:
     switch (op) {
     case FloatBinaryOp::add: encode_fn = &Derived::encode_addv2f32; break;
     case FloatBinaryOp::sub: encode_fn = &Derived::encode_subv2f32; break;
@@ -2254,23 +2261,22 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_float_binary_op(
     default: TPDE_UNREACHABLE("invalid FloatBinaryOp");
     }
     break;
-  case v128:
-    if (!is_double) {
-      switch (op) {
-      case FloatBinaryOp::add: encode_fn = &Derived::encode_addv4f32; break;
-      case FloatBinaryOp::sub: encode_fn = &Derived::encode_subv4f32; break;
-      case FloatBinaryOp::mul: encode_fn = &Derived::encode_mulv4f32; break;
-      case FloatBinaryOp::div: encode_fn = &Derived::encode_divv4f32; break;
-      default: TPDE_UNREACHABLE("invalid FloatBinaryOp");
-      }
-    } else {
-      switch (op) {
-      case FloatBinaryOp::add: encode_fn = &Derived::encode_addv2f64; break;
-      case FloatBinaryOp::sub: encode_fn = &Derived::encode_subv2f64; break;
-      case FloatBinaryOp::mul: encode_fn = &Derived::encode_mulv2f64; break;
-      case FloatBinaryOp::div: encode_fn = &Derived::encode_divv2f64; break;
-      default: TPDE_UNREACHABLE("invalid FloatBinaryOp");
-      }
+  case v4f32:
+    switch (op) {
+    case FloatBinaryOp::add: encode_fn = &Derived::encode_addv4f32; break;
+    case FloatBinaryOp::sub: encode_fn = &Derived::encode_subv4f32; break;
+    case FloatBinaryOp::mul: encode_fn = &Derived::encode_mulv4f32; break;
+    case FloatBinaryOp::div: encode_fn = &Derived::encode_divv4f32; break;
+    default: TPDE_UNREACHABLE("invalid FloatBinaryOp");
+    }
+    break;
+  case v2f64:
+    switch (op) {
+    case FloatBinaryOp::add: encode_fn = &Derived::encode_addv2f64; break;
+    case FloatBinaryOp::sub: encode_fn = &Derived::encode_subv2f64; break;
+    case FloatBinaryOp::mul: encode_fn = &Derived::encode_mulv2f64; break;
+    case FloatBinaryOp::div: encode_fn = &Derived::encode_divv2f64; break;
+    default: TPDE_UNREACHABLE("invalid FloatBinaryOp");
     }
     break;
   default: return false;
@@ -2288,8 +2294,6 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_float_binary_op(
 template <typename Adaptor, typename Derived, typename Config>
 bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_fneg(
     const llvm::Instruction *inst, const ValInfo &val_info, u64) noexcept {
-  auto *scalar_ty = inst->getType()->getScalarType();
-
   auto src = this->val_ref(inst->getOperand(0));
   auto [res_vr, res_ref] = this->result_ref_single(inst);
   auto res_scratch = ScratchReg{derived()};
@@ -2298,18 +2302,9 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_fneg(
   case f32: derived()->encode_fnegf32(src.part(0), res_scratch); break;
   case f64: derived()->encode_fnegf64(src.part(0), res_scratch); break;
   case f128: derived()->encode_fnegf128(src.part(0), res_scratch); break;
-  case v64:
-    assert(scalar_ty->isFloatTy());
-    derived()->encode_fnegv2f32(src.part(0), res_scratch);
-    break;
-  case v128:
-    if (scalar_ty->isFloatTy()) {
-      derived()->encode_fnegv4f32(src.part(0), res_scratch);
-    } else {
-      assert(scalar_ty->isDoubleTy());
-      derived()->encode_fnegv2f64(src.part(0), res_scratch);
-    }
-    break;
+  case v2f32: derived()->encode_fnegv2f32(src.part(0), res_scratch); break;
+  case v4f32: derived()->encode_fnegv4f32(src.part(0), res_scratch); break;
+  case v2f64: derived()->encode_fnegv2f64(src.part(0), res_scratch); break;
   default: return false;
   }
 
@@ -2540,29 +2535,18 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_int_trunc(
     // Cast to i1 vector.
     // TODO: support illegal vector types. This is not trivial and requires bit
     // packing of the individual comparison results.
-    auto src_width = src->getType()->getScalarType()->getIntegerBitWidth();
     auto [ty, ty_idx] = this->adaptor->lower_type(src);
 
     using EncodeFnTy = bool (Derived::*)(GenericValuePart &&, ScratchReg &);
-    EncodeFnTy encode_fn = nullptr;
+    EncodeFnTy encode_fn;
     switch (ty) {
-    case v64:
-      switch (src_width) {
-      case 8: encode_fn = &Derived::encode_trunc_v8i8_1; break;
-      case 16: encode_fn = &Derived::encode_trunc_v4i16_1; break;
-      case 32: encode_fn = &Derived::encode_trunc_v2i32_1; break;
-      default: return false;
-      }
-      break;
-    case v128:
-      switch (src_width) {
-      case 8: encode_fn = &Derived::encode_trunc_v16i8_1; break;
-      case 16: encode_fn = &Derived::encode_trunc_v8i16_1; break;
-      case 32: encode_fn = &Derived::encode_trunc_v4i32_1; break;
-      case 64: encode_fn = &Derived::encode_trunc_v2i64_1; break;
-      default: return false;
-      }
-      break;
+    case v8i8: encode_fn = &Derived::encode_trunc_v8i8_1; break;
+    case v4i16: encode_fn = &Derived::encode_trunc_v4i16_1; break;
+    case v2i32: encode_fn = &Derived::encode_trunc_v2i32_1; break;
+    case v16i8: encode_fn = &Derived::encode_trunc_v16i8_1; break;
+    case v8i16: encode_fn = &Derived::encode_trunc_v8i16_1; break;
+    case v4i32: encode_fn = &Derived::encode_trunc_v4i32_1; break;
+    case v2i64: encode_fn = &Derived::encode_trunc_v2i64_1; break;
     default: return false;
     }
 
@@ -2573,7 +2557,9 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_int_trunc(
     this->set_value(res_vr.part(0), res);
     return true;
   }
-  case v64: {
+  case v8i8:
+  case v4i16:
+  case v2i32: {
     auto dst_width = inst->getType()->getScalarType()->getIntegerBitWidth();
     auto src_width = src->getType()->getScalarType()->getIntegerBitWidth();
     // With the currently legal vector types, we only support halving vectors.
@@ -3081,36 +3067,31 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_icmp_vector(
     const llvm::Instruction *inst, const ValInfo &, u64) noexcept {
   using EncodeFnTy =
       bool (Derived::*)(GenericValuePart &&, GenericValuePart &&, ScratchReg &);
-  // fns[pred][v64=0/v128=1][8=0/16=1/32=2/64=3][bitvec=0/mask=1]
+  // fns[pred][type][bitvec=0/mask=1]
   static constexpr auto fns = []() constexpr {
     constexpr unsigned NumPreds = llvm::ICmpInst::LAST_ICMP_PREDICATE -
                                   llvm::ICmpInst::FIRST_ICMP_PREDICATE + 1;
-    std::array<EncodeFnTy[2][4][2], NumPreds> res{};
+    std::array<EncodeFnTy[7][2], NumPreds> res{};
     auto entry = [&res](llvm::ICmpInst::Predicate pred) {
       return res[pred - llvm::ICmpInst::FIRST_ICMP_PREDICATE];
     };
 
     // TODO: more consistent naming of encode functions
 #define FN_ENTRY(predval, predname, sign)                                      \
-  entry(predval)[0][0][0] = &Derived::encode_icmp_##predname##v8##sign##8;     \
-  entry(predval)[0][0][1] = &Derived::encode_icmpmask_##predname##v8##sign##8; \
-  entry(predval)[0][1][0] = &Derived::encode_icmp_##predname##v4##sign##16;    \
-  entry(predval)[0][1][1] =                                                    \
-      &Derived::encode_icmpmask_##predname##v4##sign##16;                      \
-  entry(predval)[0][2][0] = &Derived::encode_icmp_##predname##v2##sign##32;    \
-  entry(predval)[0][2][1] =                                                    \
-      &Derived::encode_icmpmask_##predname##v2##sign##32;                      \
-  entry(predval)[1][0][0] = &Derived::encode_icmp_##predname##v16##sign##8;    \
-  entry(predval)[1][0][1] =                                                    \
-      &Derived::encode_icmpmask_##predname##v16##sign##8;                      \
-  entry(predval)[1][1][0] = &Derived::encode_icmp_##predname##v8##sign##16;    \
-  entry(predval)[1][1][1] =                                                    \
-      &Derived::encode_icmpmask_##predname##v8##sign##16;                      \
-  entry(predval)[1][2][0] = &Derived::encode_icmp_##predname##v4##sign##32;    \
-  entry(predval)[1][2][1] =                                                    \
-      &Derived::encode_icmpmask_##predname##v4##sign##32;                      \
-  entry(predval)[1][3][0] = &Derived::encode_icmp_##predname##v2##sign##64;    \
-  entry(predval)[1][3][1] = &Derived::encode_icmpmask_##predname##v2##sign##64;
+  entry(predval)[0][0] = &Derived::encode_icmp_##predname##v8##sign##8;        \
+  entry(predval)[0][1] = &Derived::encode_icmpmask_##predname##v8##sign##8;    \
+  entry(predval)[1][0] = &Derived::encode_icmp_##predname##v4##sign##16;       \
+  entry(predval)[1][1] = &Derived::encode_icmpmask_##predname##v4##sign##16;   \
+  entry(predval)[2][0] = &Derived::encode_icmp_##predname##v2##sign##32;       \
+  entry(predval)[2][1] = &Derived::encode_icmpmask_##predname##v2##sign##32;   \
+  entry(predval)[3][0] = &Derived::encode_icmp_##predname##v16##sign##8;       \
+  entry(predval)[3][1] = &Derived::encode_icmpmask_##predname##v16##sign##8;   \
+  entry(predval)[4][0] = &Derived::encode_icmp_##predname##v8##sign##16;       \
+  entry(predval)[4][1] = &Derived::encode_icmpmask_##predname##v8##sign##16;   \
+  entry(predval)[5][0] = &Derived::encode_icmp_##predname##v4##sign##32;       \
+  entry(predval)[5][1] = &Derived::encode_icmpmask_##predname##v4##sign##32;   \
+  entry(predval)[6][0] = &Derived::encode_icmp_##predname##v2##sign##64;       \
+  entry(predval)[6][1] = &Derived::encode_icmpmask_##predname##v2##sign##64;
 
     FN_ENTRY(llvm::ICmpInst::ICMP_EQ, eq, u)
     FN_ENTRY(llvm::ICmpInst::ICMP_NE, ne, u)
@@ -3141,32 +3122,21 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_icmp_vector(
   }
 
   auto [ty, _] = this->adaptor->lower_type(lhs);
-
-  unsigned int_width = 64;
-  if (auto *el_ty = lhs->getType()->getScalarType(); el_ty->isIntegerTy()) {
-    int_width = el_ty->getIntegerBitWidth();
-  }
-  unsigned width_idx;
-  switch (int_width) {
-  case 8: width_idx = 0; break;
-  case 16: width_idx = 1; break;
-  case 32: width_idx = 2; break;
-  case 64: width_idx = 3; break;
-  default: return false;
-  }
-
   unsigned ty_idx;
-  // TODO: support illegal types and possibly i1 vectors.
   switch (ty) {
-    using enum LLVMBasicValType;
-  case v64: ty_idx = 0; break;
-  case v128: ty_idx = 1; break;
+  case LLVMBasicValType::v8i8: ty_idx = 0; break;
+  case LLVMBasicValType::v4i16: ty_idx = 1; break;
+  case LLVMBasicValType::v2i32: ty_idx = 2; break;
+  case LLVMBasicValType::v16i8: ty_idx = 3; break;
+  case LLVMBasicValType::v8i16: ty_idx = 4; break;
+  case LLVMBasicValType::v4i32: ty_idx = 5; break;
+  case LLVMBasicValType::v2i64: ty_idx = 6; break;
   default: return false;
   }
 
   u32 pred_idx = icmp->getPredicate() - llvm::ICmpInst::FIRST_ICMP_PREDICATE;
   u32 res_type_idx = fuse_ext ? 1 : 0;
-  EncodeFnTy encode_fn = fns[pred_idx][ty_idx][width_idx][res_type_idx];
+  EncodeFnTy encode_fn = fns[pred_idx][ty_idx][res_type_idx];
   if (!encode_fn) {
     return false;
   }
@@ -3617,17 +3587,24 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_select(
         std::move(cond), lhs.part(0), rhs.part(0), res_scratch);
     break;
   case f32:
-  case v32:
     derived()->encode_select_f32(
         std::move(cond), lhs.part(0), rhs.part(0), res_scratch);
     break;
   case f64:
-  case v64:
+  case v8i8:
+  case v4i16:
+  case v2i32:
+  case v2f32:
     derived()->encode_select_f64(
         std::move(cond), lhs.part(0), rhs.part(0), res_scratch);
     break;
   case f128:
-  case v128:
+  case v16i8:
+  case v8i16:
+  case v4i32:
+  case v2i64:
+  case v4f32:
+  case v2f64:
     derived()->encode_select_v2u64(
         std::move(cond), lhs.part(0), rhs.part(0), res_scratch);
     break;

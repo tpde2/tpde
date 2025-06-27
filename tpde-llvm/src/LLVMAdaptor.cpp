@@ -505,6 +505,9 @@ static std::tuple<LLVMBasicValType, u32, bool>
   switch (el_ty->getTypeID()) {
   case llvm::Type::IntegerTyID: {
     unsigned el_width = el_ty->getIntegerBitWidth();
+    if (el_width & (el_width - 1)) {
+      return {LLVMBasicValType::invalid, 0, false};
+    }
     if (el_width == 1) {
       if (num_elts > 64) {
         return {LLVMBasicValType::invalid, 0, false};
@@ -517,37 +520,53 @@ static std::tuple<LLVMBasicValType, u32, bool>
       unsigned off = 31 - tpde::util::cnt_lz((num_elts - 1) >> 2 | 1);
       return {static_cast<LLVMBasicValType>(base + off), 1, false};
     }
-    if (el_width < 8 || el_width > 64 || (el_width & (el_width - 1))) {
+    switch (tpde::util::cnt_tz(el_width) - 3) {
+    case 0:
+      if (num_elts == 16) {
+        return {LLVMBasicValType::v16i8, 1, false};
+      } else if (num_elts == 8) {
+        return {LLVMBasicValType::v8i8, 1, false};
+      }
+      return {LLVMBasicValType::i8, num_elts, true};
+    case 1:
+      if (num_elts == 8) {
+        return {LLVMBasicValType::v8i16, 1, false};
+      } else if (num_elts == 4) {
+        return {LLVMBasicValType::v4i16, 1, false};
+      }
+      return {LLVMBasicValType::i16, num_elts, true};
+    case 2:
+      if (num_elts == 4) {
+        return {LLVMBasicValType::v4i32, 1, false};
+      } else if (num_elts == 2) {
+        return {LLVMBasicValType::v2i32, 1, false};
+      }
+      return {LLVMBasicValType::i32, num_elts, true};
+    case 3:
+      if (num_elts == 2) {
+        return {LLVMBasicValType::v2i64, 1, false};
+      }
+      return {LLVMBasicValType::i64, num_elts, true};
+    default:
+      // iN with N<8 or N>64.
       return {LLVMBasicValType::invalid, 0, false};
     }
-    if (num_elts > 1 && el_width * num_elts == 64) {
-      return {LLVMBasicValType::v64, 1, false};
-    } else if (num_elts > 1 && el_width * num_elts == 128) {
-      return {LLVMBasicValType::v128, 1, false};
-    }
-    constexpr unsigned base = static_cast<unsigned>(LLVMBasicValType::i8);
-    static_assert(base + 1 == static_cast<unsigned>(LLVMBasicValType::i16));
-    static_assert(base + 2 == static_cast<unsigned>(LLVMBasicValType::i32));
-    static_assert(base + 3 == static_cast<unsigned>(LLVMBasicValType::i64));
-    unsigned off = 31 - tpde::util::cnt_lz((el_width - 1) >> 2 | 1);
-    LLVMBasicValType scalar_ty = static_cast<LLVMBasicValType>(base + off);
-    return {scalar_ty, num_elts, true};
   }
   case llvm::Type::FloatTyID:
-    if (num_elts == 2) {
-      return {LLVMBasicValType::v64, 1, false};
-    } else if (num_elts == 4) {
-      return {LLVMBasicValType::v128, 1, false};
+    if (num_elts == 4) {
+      return {LLVMBasicValType::v4f32, 1, false};
+    } else if (num_elts == 2) {
+      return {LLVMBasicValType::v2f32, 1, false};
     }
     return {LLVMBasicValType::f32, num_elts, true};
   case llvm::Type::DoubleTyID:
     if (num_elts == 2) {
-      return {LLVMBasicValType::v128, 1, false};
+      return {LLVMBasicValType::v2f64, 1, false};
     }
     return {LLVMBasicValType::f64, num_elts, true};
   case llvm::Type::PointerTyID:
     if (el_ty->getPointerAddressSpace() == 0) {
-      // TODO: for n=2, this should be {v128, 1, false}?
+      // TODO: for n=2, this should be {v2i64, 1, false}?
       return {LLVMBasicValType::i64, num_elts, true};
     }
     return {LLVMBasicValType::invalid, 0, false};

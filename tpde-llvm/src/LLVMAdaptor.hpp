@@ -67,11 +67,17 @@ enum class LLVMBasicValType : u8 {
   f32,
   f64,
   f128,
-  v32,
-  v64,
-  v128,
-  v256,
-  v512,
+
+  v8i8,
+  v16i8,
+  v4i16,
+  v8i16,
+  v2i32,
+  v4i32,
+  v2i64,
+  v2f32,
+  v4f32,
+  v2f64,
 
   // i1 vectors are special. We always represent them in their bit-compact form.
   v8i1,  ///< <N x i1> for 0 < N <= 8; stored like an i8
@@ -586,11 +592,16 @@ public:
     case f32: return 4;
     case f64: return 8;
     case f128: return 16;
-    case v32: return 4;
-    case v64: return 8;
-    case v128: return 16;
-    case v256:
-    case v512:
+    case v8i8: return 8;
+    case v16i8: return 16;
+    case v4i16: return 8;
+    case v8i16: return 16;
+    case v2i32: return 8;
+    case v4i32: return 16;
+    case v2i64: return 16;
+    case v2f32: return 8;
+    case v4f32: return 16;
+    case v2f64: return 16;
     case complex:
     case invalid:
     case none:
@@ -615,11 +626,16 @@ public:
     case f32:
     case f64:
     case f128:
-    case v32:
-    case v64:
-    case v128:
-    case v256:
-    case v512: return tpde::RegBank{1};
+    case v8i8:
+    case v16i8:
+    case v4i16:
+    case v8i16:
+    case v2i32:
+    case v4i32:
+    case v2i64:
+    case v2f32:
+    case v4f32:
+    case v2f64: return tpde::RegBank{1};
     case none:
     case invalid:
     case complex:
@@ -645,11 +661,16 @@ private:
     case f32: return 4;
     case f64: return 8;
     case f128: return 16;
-    case v32: return 4;
-    case v64: return 8;
-    case v128: return 16;
-    case v256:
-    case v512:
+    case v8i8: return 8;
+    case v16i8: return 16;
+    case v4i16: return 8;
+    case v8i16: return 16;
+    case v2i32: return 8;
+    case v4i32: return 16;
+    case v2i64: return 16;
+    case v2f32: return 8;
+    case v4f32: return 16;
+    case v2f64: return 16;
     case complex:
     case invalid:
     case none:
@@ -669,17 +690,22 @@ private:
     case f32:
     case f64:
     case f128:
+    case v8i8:
+    case v16i8:
+    case v4i16:
+    case v8i16:
+    case v2i32:
+    case v4i32:
+    case v2i64:
+    case v2f32:
+    case v4f32:
+    case v2f64:
     case v8i1:
     case v16i1:
     case v32i1:
-    case v64i1:
-    case v32:
-    case v64:
-    case v128: return 1;
+    case v64i1: return 1;
     case i128: return 2;
     case complex:
-    case v256:
-    case v512:
     case none:
     case invalid:
     default: TPDE_UNREACHABLE("invalid basic type");
