@@ -60,7 +60,7 @@ inline u32 block_embedded_idx(const llvm::BasicBlock *block) noexcept {
 enum class LLVMBasicValType : u8 {
   invalid,
   none,
-  i1,
+  i1, ///< Pseudo-type for i1, not used for values, only as vector element type.
   i8,
   i16,
   i32,
@@ -90,6 +90,29 @@ enum class LLVMBasicValType : u8 {
 
   complex, ///< Complex escape type
 };
+
+/// Decompose vector type into element count and element type.
+static constexpr std::pair<unsigned, LLVMBasicValType>
+    basic_ty_vector_info(LLVMBasicValType bvt) {
+  switch (bvt) {
+    using enum LLVMBasicValType;
+  case v8i8: return {8, i8};
+  case v16i8: return {16, i8};
+  case v4i16: return {4, i16};
+  case v8i16: return {8, i16};
+  case v2i32: return {2, i32};
+  case v4i32: return {4, i32};
+  case v2i64: return {2, i64};
+  case v2f32: return {2, f32};
+  case v4f32: return {4, f32};
+  case v2f64: return {2, f64};
+  case v8i1: return {8, i1};
+  case v16i1: return {16, i1};
+  case v32i1: return {32, i1};
+  case v64i1: return {64, i1};
+  default: TPDE_UNREACHABLE("cannot get vector element count of scalar type");
+  }
+}
 
 union LLVMComplexPart {
   static constexpr u16 MaxLength = UINT16_MAX;

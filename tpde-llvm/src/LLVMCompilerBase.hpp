@@ -2127,7 +2127,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_int_binary_op(
   auto handle_part = [this, int_width, op](LLVMBasicValType bvt,
                                            ValuePartRef &&lhs_op,
                                            ValuePartRef &&rhs_op,
-                                           ValuePartRef &&res_op) {
+                                           ValuePartRef &res_op) {
     unsigned ty_idx;
     switch (bvt) {
     case LLVMBasicValType::i8:
@@ -2171,14 +2171,35 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_int_binary_op(
 
     ScratchReg res_scratch{derived()};
     (derived()->*encode_fn)(std::move(lhs_op), std::move(rhs_op), res_scratch);
-    this->set_value(res_op, res_scratch);
+    res_op.set_value_reg(res_scratch.release());
     return true;
   };
 
   auto parts = this->adaptor->val_parts(inst);
   for (u32 i = 0, n = parts.count(); i != n; ++i) {
-    if (!handle_part(parts.type(i), lhs.part(i), rhs.part(i), res.part(i))) {
-      return false;
+    ValuePartRef res_part = res.part(i);
+    if (!handle_part(parts.type(i), lhs.part(i), rhs.part(i), res_part)) {
+      if (!inst->getType()->isVectorTy() || int_width == 1) {
+        return false;
+      }
+      auto [elem_cnt, elem_ty] = basic_ty_vector_info(parts.type(i));
+      tpde::RegBank bank = this->adaptor->basic_ty_part_bank(elem_ty);
+      for (u32 j = 0; j != elem_cnt; ++j) {
+        u32 elem_idx = i * elem_cnt + j;
+        ValuePartRef e_res{this, bank};
+        ValuePartRef e_lhs{this, bank};
+        ValuePartRef e_rhs{this, bank};
+        // TODO: we might pass the last element as owned. But this code is
+        // fallback only, so don't bother optimizing.
+        ValueRef lhs_unowned = lhs.disowned();
+        ValueRef rhs_unowned = rhs.disowned();
+        derived()->extract_element(lhs_unowned, elem_idx, elem_ty, e_lhs);
+        derived()->extract_element(rhs_unowned, elem_idx, elem_ty, e_rhs);
+        if (!handle_part(elem_ty, std::move(e_lhs), std::move(e_rhs), e_res)) {
+          return false;
+        }
+        derived()->insert_element(res, elem_idx, elem_ty, std::move(e_res));
+      }
     }
   }
   return true;
@@ -2750,6 +2771,15 @@ void LLVMCompilerBase<Adaptor, Derived, Config>::extract_element(
     unsigned idx,
     LLVMBasicValType ty,
     ValuePart &out) noexcept {
+  if (!vec_vr.has_assignment()) {
+    // Constant.
+    auto *cst = llvm::cast<llvm::Constant>(vec_vr.state.s.value);
+    assert(cst->getType()->isVectorTy());
+    auto *elem = cst->getAggregateElement(idx);
+    out.set_value(this, *val_ref_constant(elem, 0));
+    return;
+  }
+
   tpde::ValueAssignment *va = vec_vr.assignment();
   u32 elem_sz = this->adaptor->basic_ty_part_size(ty);
 
@@ -3046,8 +3076,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_shuffle_vector(
       ValuePartRef const_ref{this, &const_elem, size, bank};
       derived()->insert_element(res_vr, i, bvt, std::move(const_ref));
     } else {
-      ValueRef src_vr{derived(), (src_is_lhs ? lhs_vr : rhs_vr).local_idx()};
-      src_vr.disown();
+      ValueRef src_vr = (src_is_lhs ? lhs_vr : rhs_vr).disowned();
       derived()->extract_element(src_vr, mask[i] % src_nelem, bvt, tmp);
       derived()->insert_element(res_vr, i, bvt, std::move(tmp));
     }

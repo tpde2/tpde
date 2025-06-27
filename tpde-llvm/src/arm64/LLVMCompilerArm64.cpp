@@ -205,6 +205,11 @@ void LLVMCompilerArm64::extract_element(ValueRef &vec_vr,
                                         unsigned idx,
                                         LLVMBasicValType ty,
                                         ValuePart &out) noexcept {
+  if (!vec_vr.has_assignment()) {
+    // Constant handling is target-independent.
+    return LLVMCompilerBase::extract_element(vec_vr, idx, ty, out);
+  }
+
   tpde::ValueAssignment *va = vec_vr.assignment();
   u32 elem_sz = this->adaptor->basic_ty_part_size(ty);
   if (elem_sz == va->max_part_size) {
@@ -255,7 +260,7 @@ void LLVMCompilerArm64::insert_element(ValueRef &vec_vr,
   u32 part_idx = idx % elems_per_part;
   assert(part < va->part_count);
 
-  auto vec_ref = vec_vr.part(part);
+  auto vec_ref = vec_vr.part_unowned(part);
   assert(vec_ref.bank() == CompilerConfig::FP_BANK);
   if (vec_ref.assignment().stack_valid() ||
       vec_ref.assignment().register_valid()) {

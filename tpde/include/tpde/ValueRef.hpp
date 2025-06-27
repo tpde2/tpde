@@ -68,8 +68,11 @@ struct CompilerBase<Adaptor, Derived, Config>::ValueRef {
     assert(state.a.mode >= 4);
   }
 
-  explicit ValueRef(const ValueRef &) = delete;
+private:
+  // Private copy constructor.
+  ValueRef(const ValueRef &other) = default;
 
+public:
   ValueRef(ValueRef &&other) noexcept
       : state{other.state}, compiler(other.compiler) {
     other.state.a = AssignmentData{};
@@ -106,6 +109,14 @@ struct CompilerBase<Adaptor, Derived, Config>::ValueRef {
     }
   }
 
+  /// Get an unowned reference to this value. Previously accessed parts might
+  /// already have been destroyed if the value is in its last use.
+  ValueRef disowned() noexcept {
+    ValueRef res = *this;
+    res.disown();
+    return res;
+  }
+
   ValLocalIdx local_idx() const noexcept {
     assert(has_assignment());
     return state.a.local_idx;
@@ -115,6 +126,16 @@ struct CompilerBase<Adaptor, Derived, Config>::ValueRef {
     if (has_assignment()) {
       return ValuePartRef{
           compiler, local_idx(), state.a.assignment, part, state.a.mode == 2};
+    }
+    return compiler->derived()->val_part_ref_special(state.s, part);
+  }
+
+  /// Like part(), but the returned part is always unowned and will not release
+  /// registers of the value assignment when reset.
+  ValuePartRef part_unowned(unsigned part) noexcept TPDE_LIFETIMEBOUND {
+    if (has_assignment()) {
+      return ValuePartRef{
+          compiler, local_idx(), state.a.assignment, part, false};
     }
     return compiler->derived()->val_part_ref_special(state.s, part);
   }
