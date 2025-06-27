@@ -490,7 +490,8 @@ private:
   /// Replace constant expressions with instructions. Returns pair of replaced
   /// value and first inserted instruction.
   std::pair<llvm::Value *, llvm::Instruction *>
-      fixup_constant(llvm::Constant *cst, llvm::Instruction *ins_before);
+      fixup_constant(llvm::Constant *cst,
+                     llvm::BasicBlock::iterator ins_before);
 
   /// Handle instruction during switch_func.
   /// retval = restart from instruction, or nullptr to continue

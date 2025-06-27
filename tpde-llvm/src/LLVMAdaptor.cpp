@@ -82,7 +82,7 @@ static bool value_might_need_fixup(const llvm::Value *v) {
 
 std::pair<llvm::Value *, llvm::Instruction *>
     LLVMAdaptor::fixup_constant(llvm::Constant *cst,
-                                llvm::Instruction *ins_before) {
+                                llvm::BasicBlock::iterator ins_before) {
   if (auto *cexpr = llvm::dyn_cast<llvm::ConstantExpr>(cst)) [[unlikely]] {
     // clang creates these and we don't want to handle them so
     // we split them up into their own values
@@ -188,8 +188,8 @@ llvm::Instruction *LLVMAdaptor::handle_inst_in_block(llvm::Instruction *inst) {
       }
 
       auto *cst = llvm::cast<llvm::Constant>(use.get());
-      if (auto [repl, ins_begin] = fixup_constant(cst, inst); repl)
-          [[unlikely]] {
+      auto [repl, ins_begin] = fixup_constant(cst, inst->getIterator());
+      if (repl) [[unlikely]] {
         use = repl;
         if (!restart_from) {
           restart_from = ins_begin;
@@ -356,12 +356,13 @@ bool LLVMAdaptor::switch_func(const IRFuncRef function) noexcept {
         llvm::Value *val = values[i];
         llvm::BasicBlock *block = blocks[i];
         if (value_might_need_fixup(val)) {
-          auto *ins_before = block->getTerminator();
-          if (block->begin().getNodePtr() != ins_before) {
+          auto ins_before = block->getTerminator()->getIterator();
+          if (block->begin() != ins_before) {
+            // ins_before.getP
             auto *prev_inst = ins_before->getPrevNonDebugInstruction();
             if (prev_inst && llvm::isa<llvm::CmpInst>(prev_inst)) {
               // make sure fusing can still happen
-              ins_before = prev_inst;
+              ins_before = prev_inst->getIterator();
             }
           }
 
