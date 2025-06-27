@@ -5,6 +5,110 @@
 ; RUN: tpde-llc --target=x86_64 %s | %objdump | FileCheck %s -check-prefixes=X64
 ; RUN: tpde-llc --target=aarch64 %s | %objdump | FileCheck %s -check-prefixes=ARM64
 
+define void @add_v1i8(ptr %p, ptr %q) {
+; X64-LABEL: <add_v1i8>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    movzx eax, byte ptr [rdi]
+; X64-NEXT:    movzx ecx, byte ptr [rsi]
+; X64-NEXT:    lea eax, [rax + rcx]
+; X64-NEXT:    mov byte ptr [rdi], al
+; X64-NEXT:    add rsp, 0x30
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <add_v1i8>:
+; ARM64:         sub sp, sp, #0xa0
+; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
+; ARM64-NEXT:    ldrb w2, [x0]
+; ARM64-NEXT:    ldrb w3, [x1]
+; ARM64-NEXT:    add w3, w3, w2
+; ARM64-NEXT:    strb w3, [x0]
+; ARM64-NEXT:    ldp x29, x30, [sp]
+; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ret
+  %a = load <1 x i8>, ptr %p
+  %b = load <1 x i8>, ptr %q
+  %r = add <1 x i8> %a, %b
+  store <1 x i8> %r, ptr %p
+  ret void
+}
+
+define void @add_v5i8(ptr %p, ptr %q) {
+; X64-LABEL: <add_v5i8>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    push rbx
+; X64-NEXT:    push r12
+; X64-NEXT:    push r13
+; X64-NEXT:    nop dword ptr [rax]
+; X64-NEXT:    sub rsp, 0x18
+; X64-NEXT:    movzx eax, byte ptr [rdi]
+; X64-NEXT:    movzx ecx, byte ptr [rdi + 0x1]
+; X64-NEXT:    movzx edx, byte ptr [rdi + 0x2]
+; X64-NEXT:    movzx ebx, byte ptr [rdi + 0x3]
+; X64-NEXT:    movzx r8d, byte ptr [rdi + 0x4]
+; X64-NEXT:    movzx r9d, byte ptr [rsi]
+; X64-NEXT:    movzx r10d, byte ptr [rsi + 0x1]
+; X64-NEXT:    movzx r11d, byte ptr [rsi + 0x2]
+; X64-NEXT:    movzx r12d, byte ptr [rsi + 0x3]
+; X64-NEXT:    movzx r13d, byte ptr [rsi + 0x4]
+; X64-NEXT:    lea eax, [rax + r9]
+; X64-NEXT:    lea ecx, [rcx + r10]
+; X64-NEXT:    lea edx, [rdx + r11]
+; X64-NEXT:    lea ebx, [rbx + r12]
+; X64-NEXT:    lea r8d, [r8 + r13]
+; X64-NEXT:    mov byte ptr [rdi], al
+; X64-NEXT:    mov byte ptr [rdi + 0x1], cl
+; X64-NEXT:    mov byte ptr [rdi + 0x2], dl
+; X64-NEXT:    mov byte ptr [rdi + 0x3], bl
+; X64-NEXT:    mov byte ptr [rdi + 0x4], r8b
+; X64-NEXT:    add rsp, 0x18
+; X64-NEXT:    pop r13
+; X64-NEXT:    pop r12
+; X64-NEXT:    pop rbx
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <add_v5i8>:
+; ARM64:         sub sp, sp, #0xa0
+; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
+; ARM64-NEXT:    ldrb w2, [x0]
+; ARM64-NEXT:    ldrb w3, [x0, #0x1]
+; ARM64-NEXT:    ldrb w4, [x0, #0x2]
+; ARM64-NEXT:    ldrb w5, [x0, #0x3]
+; ARM64-NEXT:    ldrb w6, [x0, #0x4]
+; ARM64-NEXT:    ldrb w7, [x1]
+; ARM64-NEXT:    ldrb w8, [x1, #0x1]
+; ARM64-NEXT:    ldrb w9, [x1, #0x2]
+; ARM64-NEXT:    ldrb w10, [x1, #0x3]
+; ARM64-NEXT:    ldrb w11, [x1, #0x4]
+; ARM64-NEXT:    add w7, w7, w2
+; ARM64-NEXT:    add w8, w8, w3
+; ARM64-NEXT:    add w9, w9, w4
+; ARM64-NEXT:    add w10, w10, w5
+; ARM64-NEXT:    add w11, w11, w6
+; ARM64-NEXT:    strb w7, [x0]
+; ARM64-NEXT:    strb w8, [x0, #0x1]
+; ARM64-NEXT:    strb w9, [x0, #0x2]
+; ARM64-NEXT:    strb w10, [x0, #0x3]
+; ARM64-NEXT:    strb w11, [x0, #0x4]
+; ARM64-NEXT:    ldp x29, x30, [sp]
+; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ret
+  %a = load <5 x i8>, ptr %p
+  %b = load <5 x i8>, ptr %q
+  %r = add <5 x i8> %a, %b
+  store <5 x i8> %r, ptr %p
+  ret void
+}
+
 define <8 x i8> @add_v8i8(<8 x i8> %a, <8 x i8> %b) {
 ; X64-LABEL: <add_v8i8>:
 ; X64:         push rbp
@@ -53,6 +157,47 @@ define <16 x i8> @add_v16i8(<16 x i8> %a, <16 x i8> %b) {
 ; ARM64-NEXT:    ret
   %r = add <16 x i8> %a, %b
   ret <16 x i8> %r
+}
+
+define void @add_v32i8(ptr %p, ptr %q) {
+; X64-LABEL: <add_v32i8>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    movaps xmm0, xmmword ptr [rdi]
+; X64-NEXT:    movaps xmm1, xmmword ptr [rdi + 0x10]
+; X64-NEXT:    movaps xmm2, xmmword ptr [rsi]
+; X64-NEXT:    movaps xmm3, xmmword ptr [rsi + 0x10]
+; X64-NEXT:    paddb xmm0, xmm2
+; X64-NEXT:    paddb xmm1, xmm3
+; X64-NEXT:    movaps xmmword ptr [rdi], xmm0
+; X64-NEXT:    movaps xmmword ptr [rdi + 0x10], xmm1
+; X64-NEXT:    add rsp, 0x30
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <add_v32i8>:
+; ARM64:         sub sp, sp, #0xa0
+; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
+; ARM64-NEXT:    ldr q0, [x0]
+; ARM64-NEXT:    ldr q1, [x0, #0x10]
+; ARM64-NEXT:    ldr q2, [x1]
+; ARM64-NEXT:    ldr q3, [x1, #0x10]
+; ARM64-NEXT:    add v2.16b, v2.16b, v0.16b
+; ARM64-NEXT:    add v3.16b, v3.16b, v1.16b
+; ARM64-NEXT:    str q2, [x0]
+; ARM64-NEXT:    str q3, [x0, #0x10]
+; ARM64-NEXT:    ldp x29, x30, [sp]
+; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ret
+  %a = load <32 x i8>, ptr %p
+  %b = load <32 x i8>, ptr %q
+  %r = add <32 x i8> %a, %b
+  store <32 x i8> %r, ptr %p
+  ret void
 }
 
 define <4 x i16> @add_v4i16(<4 x i16> %a, <4 x i16> %b) {

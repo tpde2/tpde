@@ -2118,59 +2118,69 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_int_binary_op(
     return res;
   }();
 
-  unsigned ty_idx;
-  switch (info.type) {
-  case LLVMBasicValType::i8:
-  case LLVMBasicValType::i16:
-  case LLVMBasicValType::i32: ty_idx = 0; break;
-  case LLVMBasicValType::i64: ty_idx = 1; break;
-  case LLVMBasicValType::v8i8: ty_idx = 2; break;
-  case LLVMBasicValType::v4i16: ty_idx = 3; break;
-  case LLVMBasicValType::v2i32: ty_idx = 4; break;
-  case LLVMBasicValType::v16i8: ty_idx = 5; break;
-  case LLVMBasicValType::v8i16: ty_idx = 6; break;
-  case LLVMBasicValType::v4i32: ty_idx = 7; break;
-  case LLVMBasicValType::v2i64: ty_idx = 8; break;
-  default: return false;
-  }
-  EncodeFnTy encode_fn = fns[op.index()][ty_idx];
-  bool is_scalar = ty_idx < 2;
-  if (!encode_fn) {
-    return false;
-  }
-
   unsigned int_width = inst->getType()->getScalarType()->getIntegerBitWidth();
   assert(int_width <= 64);
   ValueRef lhs = this->val_ref(inst->getOperand(0));
   ValueRef rhs = this->val_ref(inst->getOperand(1));
   ValueRef res = this->result_ref(inst);
 
-  ValuePartRef lhs_op = lhs.part(0);
-  ValuePartRef rhs_op = rhs.part(0);
-  if (is_scalar) {
-    if (op.is_symmetric() && lhs_op.is_const() && !rhs_op.is_const()) {
-      // TODO(ts): this is a hack since the encoder can currently not do
-      // commutable operations so we reorder immediates manually here
-      std::swap(lhs_op, rhs_op);
+  auto handle_part = [this, int_width, op](LLVMBasicValType bvt,
+                                           ValuePartRef &&lhs_op,
+                                           ValuePartRef &&rhs_op,
+                                           ValuePartRef &&res_op) {
+    unsigned ty_idx;
+    switch (bvt) {
+    case LLVMBasicValType::i8:
+    case LLVMBasicValType::i16:
+    case LLVMBasicValType::i32: ty_idx = 0; break;
+    case LLVMBasicValType::i64: ty_idx = 1; break;
+    case LLVMBasicValType::v8i8: ty_idx = 2; break;
+    case LLVMBasicValType::v4i16: ty_idx = 3; break;
+    case LLVMBasicValType::v2i32: ty_idx = 4; break;
+    case LLVMBasicValType::v16i8: ty_idx = 5; break;
+    case LLVMBasicValType::v8i16: ty_idx = 6; break;
+    case LLVMBasicValType::v4i32: ty_idx = 7; break;
+    case LLVMBasicValType::v2i64: ty_idx = 8; break;
+    default: return false;
+    }
+    EncodeFnTy encode_fn = fns[op.index()][ty_idx];
+    bool is_scalar = ty_idx < 2;
+    if (!encode_fn) {
+      return false;
     }
 
-    // TODO(ts): optimize div/rem by constant to a shift?
-    unsigned ext_width = tpde::util::align_up(int_width, 32);
-    if (ext_width != int_width) {
-      bool sext = op.is_signed();
-      if (op.needs_lhs_ext()) {
-        lhs_op = std::move(lhs_op).into_extended(sext, int_width, ext_width);
+    if (is_scalar) {
+      if (op.is_symmetric() && lhs_op.is_const() && !rhs_op.is_const()) {
+        // TODO(ts): this is a hack since the encoder can currently not do
+        // commutable operations so we reorder immediates manually here
+        std::swap(lhs_op, rhs_op);
       }
-      if (op.needs_rhs_ext()) {
-        rhs_op = std::move(rhs_op).into_extended(sext, int_width, ext_width);
+
+      // TODO(ts): optimize div/rem by constant to a shift?
+      unsigned ext_width = tpde::util::align_up(int_width, 32);
+      if (ext_width != int_width) {
+        bool sext = op.is_signed();
+        if (op.needs_lhs_ext()) {
+          lhs_op = std::move(lhs_op).into_extended(sext, int_width, ext_width);
+        }
+        if (op.needs_rhs_ext()) {
+          rhs_op = std::move(rhs_op).into_extended(sext, int_width, ext_width);
+        }
       }
+    }
+
+    ScratchReg res_scratch{derived()};
+    (derived()->*encode_fn)(std::move(lhs_op), std::move(rhs_op), res_scratch);
+    this->set_value(res_op, res_scratch);
+    return true;
+  };
+
+  auto parts = this->adaptor->val_parts(inst);
+  for (u32 i = 0, n = parts.count(); i != n; ++i) {
+    if (!handle_part(parts.type(i), lhs.part(i), rhs.part(i), res.part(i))) {
+      return false;
     }
   }
-
-  ScratchReg res_scratch{derived()};
-  (derived()->*encode_fn)(std::move(lhs_op), std::move(rhs_op), res_scratch);
-  this->set_value(res.part(0), res_scratch);
-
   return true;
 }
 
