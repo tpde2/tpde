@@ -633,7 +633,7 @@ std::pair<unsigned, unsigned>
 
   if (ty != LLVMBasicValType::invalid) {
     unsigned size = basic_ty_part_size(ty);
-    unsigned align = basic_ty_part_align(ty);
+    unsigned align = size * basic_ty_part_count(ty); // essentially just i128.
     assert(num > 0);
     // TODO: support types with different part types/sizes?
     for (unsigned i = 0; i < num; i++) {

@@ -651,72 +651,8 @@ public:
   }
 
 private:
-  static unsigned basic_ty_part_align(const LLVMBasicValType ty) noexcept {
-    switch (ty) {
-      using enum LLVMBasicValType;
-    case i1:
-    case i8:
-    case v8i1: return 1;
-    case i16:
-    case v16i1: return 2;
-    case i32:
-    case v32i1: return 4;
-    case i64:
-    case v64i1:
-    case ptr: return 8;
-    case i128: return 16;
-    case f32: return 4;
-    case f64: return 8;
-    case f128: return 16;
-    case v8i8: return 8;
-    case v16i8: return 16;
-    case v4i16: return 8;
-    case v8i16: return 16;
-    case v2i32: return 8;
-    case v4i32: return 16;
-    case v2i64: return 16;
-    case v2f32: return 8;
-    case v4f32: return 16;
-    case v2f64: return 16;
-    case complex:
-    case invalid:
-    case none:
-    default: TPDE_UNREACHABLE("invalid basic type");
-    }
-  }
-
   static unsigned basic_ty_part_count(const LLVMBasicValType ty) noexcept {
-    switch (ty) {
-      using enum LLVMBasicValType;
-    case i1:
-    case i8:
-    case i16:
-    case i32:
-    case i64:
-    case ptr:
-    case f32:
-    case f64:
-    case f128:
-    case v8i8:
-    case v16i8:
-    case v4i16:
-    case v8i16:
-    case v2i32:
-    case v4i32:
-    case v2i64:
-    case v2f32:
-    case v4f32:
-    case v2f64:
-    case v8i1:
-    case v16i1:
-    case v32i1:
-    case v64i1: return 1;
-    case i128: return 2;
-    case complex:
-    case none:
-    case invalid:
-    default: TPDE_UNREACHABLE("invalid basic type");
-    }
+    return ty == LLVMBasicValType::i128 ? 2 : 1;
   }
 
 public:
