@@ -11,10 +11,8 @@ define void @shufflevector_unused() {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x40
-; X64-NEXT:    mov eax, 0x0
-; X64-NEXT:    mov qword ptr [rbp - 0x40], rax
-; X64-NEXT:    mov eax, 0x0
-; X64-NEXT:    mov qword ptr [rbp - 0x38], rax
+; X64-NEXT:    mov qword ptr [rbp - 0x40], 0x0
+; X64-NEXT:    mov qword ptr [rbp - 0x38], 0x0
 ; X64-NEXT:    add rsp, 0x40
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -466,12 +464,10 @@ define <4 x i32> @shufflevector_v4i32_v4i32_mix_zero(<4 x i32> %a) {
 ; X64-NEXT:    movapd xmmword ptr [rbp - 0x40], xmm0
 ; X64-NEXT:    mov eax, dword ptr [rbp - 0x40]
 ; X64-NEXT:    mov dword ptr [rbp - 0x50], eax
-; X64-NEXT:    mov eax, 0x0
-; X64-NEXT:    mov dword ptr [rbp - 0x4c], eax
+; X64-NEXT:    mov dword ptr [rbp - 0x4c], 0x0
 ; X64-NEXT:    mov eax, dword ptr [rbp - 0x38]
 ; X64-NEXT:    mov dword ptr [rbp - 0x48], eax
-; X64-NEXT:    mov eax, 0x0
-; X64-NEXT:    mov dword ptr [rbp - 0x44], eax
+; X64-NEXT:    mov dword ptr [rbp - 0x44], 0x0
 ; X64-NEXT:    movapd xmm0, xmmword ptr [rbp - 0x50]
 ; X64-NEXT:    add rsp, 0x50
 ; X64-NEXT:    pop rbp
@@ -540,10 +536,8 @@ define <4 x i32> @shufflevector_v4i32_v4i32_mixconst(<4 x i32> %a) {
 ; X64-NEXT:    movapd xmmword ptr [rbp - 0x40], xmm0
 ; X64-NEXT:    mov eax, dword ptr [rbp - 0x40]
 ; X64-NEXT:    mov dword ptr [rbp - 0x50], eax
-; X64-NEXT:    mov eax, 0x1
-; X64-NEXT:    mov dword ptr [rbp - 0x4c], eax
-; X64-NEXT:    mov eax, 0x1
-; X64-NEXT:    mov dword ptr [rbp - 0x48], eax
+; X64-NEXT:    mov dword ptr [rbp - 0x4c], 0x1
+; X64-NEXT:    mov dword ptr [rbp - 0x48], 0x1
 ; X64-NEXT:    mov eax, dword ptr [rbp - 0x3c]
 ; X64-NEXT:    mov dword ptr [rbp - 0x44], eax
 ; X64-NEXT:    movapd xmm0, xmmword ptr [rbp - 0x50]

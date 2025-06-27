@@ -90,7 +90,7 @@ struct LLVMCompilerArm64 : tpde::a64::CompilerA64<LLVMAdaptor,
   void extract_element(ValueRef &vec_vr,
                        unsigned idx,
                        LLVMBasicValType ty,
-                       ScratchReg &out) noexcept;
+                       ValuePart &out) noexcept;
   void insert_element(ValueRef &vec_vr,
                       unsigned idx,
                       LLVMBasicValType ty,
@@ -204,12 +204,12 @@ std::optional<LLVMCompilerArm64::CallBuilder>
 void LLVMCompilerArm64::extract_element(ValueRef &vec_vr,
                                         unsigned idx,
                                         LLVMBasicValType ty,
-                                        ScratchReg &out_reg) noexcept {
+                                        ValuePart &out) noexcept {
   tpde::ValueAssignment *va = vec_vr.assignment();
   u32 elem_sz = this->adaptor->basic_ty_part_size(ty);
   if (elem_sz == va->max_part_size) {
     // We can't handle the scalarized case better than the generic impl.
-    return LLVMCompilerBase::extract_element(vec_vr, idx, ty, out_reg);
+    return LLVMCompilerBase::extract_element(vec_vr, idx, ty, out);
   }
 
   assert(va->max_part_size % elem_sz == 0);
@@ -223,7 +223,7 @@ void LLVMCompilerArm64::extract_element(ValueRef &vec_vr,
   assert(vec_ref.bank() == CompilerConfig::FP_BANK);
   AsmReg vec_reg = vec_ref.load_to_reg();
   // TODO: reuse vec_reg if possible
-  AsmReg dst_reg = out_reg.alloc(this->adaptor->basic_ty_part_bank(ty));
+  AsmReg dst_reg = out.alloc_reg(this);
   switch (ty) {
     using enum LLVMBasicValType;
   case i8: ASM(UMOVwb, dst_reg, vec_reg, part_idx); break;

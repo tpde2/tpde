@@ -467,7 +467,7 @@ public:
   void extract_element(ValueRef &vec_vr,
                        unsigned idx,
                        LLVMBasicValType ty,
-                       ScratchReg &out) noexcept;
+                       ValuePart &out) noexcept;
   void insert_element(ValueRef &vec_vr,
                       unsigned idx,
                       LLVMBasicValType ty,
@@ -2749,20 +2749,13 @@ void LLVMCompilerBase<Adaptor, Derived, Config>::extract_element(
     ValueRef &vec_vr,
     unsigned idx,
     LLVMBasicValType ty,
-    ScratchReg &out_reg) noexcept {
+    ValuePart &out) noexcept {
   tpde::ValueAssignment *va = vec_vr.assignment();
   u32 elem_sz = this->adaptor->basic_ty_part_size(ty);
 
   if (elem_sz == va->max_part_size) {
     // Scalarized vector: simply take part idx.
-    tpde::RegBank bank = this->adaptor->basic_ty_part_bank(ty);
-    assert(bank == tpde::AssignmentPartRef(va, idx).bank());
-    ValuePartRef vpr = vec_vr.part(idx);
-    if (vpr.can_salvage()) {
-      out_reg.alloc_specific(vpr.salvage());
-    } else {
-      vpr.reload_into_specific_fixed(out_reg.alloc(bank));
-    }
+    out.set_value(this, vec_vr.part(idx));
     return;
   }
 
@@ -2778,6 +2771,7 @@ void LLVMCompilerBase<Adaptor, Derived, Config>::extract_element(
   auto &expr = std::get<typename GenericValuePart::Expr>(addr.state);
   expr.disp += off_in_part;
 
+  ScratchReg out_reg{this};
   switch (ty) {
     using enum LLVMBasicValType;
   case i8: derived()->encode_loadi8(std::move(addr), out_reg); break;
@@ -2789,6 +2783,7 @@ void LLVMCompilerBase<Adaptor, Derived, Config>::extract_element(
   case f64: derived()->encode_loadf64(std::move(addr), out_reg); break;
   default: TPDE_UNREACHABLE("unexpected vector element type");
   }
+  out.set_value_reg(this, out_reg.release());
 }
 
 template <typename Adaptor, typename Derived, typename Config>
@@ -2862,8 +2857,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_extract_element(
   if (auto *ci = llvm::dyn_cast<llvm::ConstantInt>(index)) {
     unsigned cidx = ci->getZExtValue();
     cidx = cidx < nelem ? cidx : 0;
-    derived()->extract_element(vec_vr, cidx, bvt, scratch_res);
-    this->set_value(result, scratch_res);
+    derived()->extract_element(vec_vr, cidx, bvt, result);
     return true;
   }
 
@@ -3023,11 +3017,14 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_shuffle_vector(
     return false;
   }
 
+  auto bank = this->adaptor->basic_ty_part_bank(bvt);
+  auto size = this->adaptor->basic_ty_part_size(bvt);
+
   ValueRef lhs_vr = this->val_ref(lhs);
   ValueRef rhs_vr = this->val_ref(rhs);
   ValueRef res_vr = this->result_ref(inst);
 
-  ScratchReg tmp{this};
+  ValuePartRef tmp{this, bank};
   llvm::ArrayRef<int> mask = shuffle->getShuffleMask();
   for (unsigned i = 0; i < dst_nelem; i++) {
     if (mask[i] == llvm::PoisonMaskElem) {
@@ -3046,16 +3043,14 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_shuffle_vector(
       } else {
         TPDE_UNREACHABLE("invalid constant element type");
       }
-      auto bank = this->adaptor->basic_ty_part_bank(bvt);
-      auto size = this->adaptor->basic_ty_part_size(bvt);
       ValuePartRef const_ref{this, &const_elem, size, bank};
-      const_ref.reload_into_specific_fixed(tmp.alloc(bank));
+      derived()->insert_element(res_vr, i, bvt, std::move(const_ref));
     } else {
       ValueRef src_vr{derived(), (src_is_lhs ? lhs_vr : rhs_vr).local_idx()};
       src_vr.disown();
       derived()->extract_element(src_vr, mask[i] % src_nelem, bvt, tmp);
+      derived()->insert_element(res_vr, i, bvt, std::move(tmp));
     }
-    derived()->insert_element(res_vr, i, bvt, std::move(tmp));
   }
 
   // Make sure that all parts are initialized.

@@ -95,7 +95,7 @@ public:
   explicit ValuePart(const ValuePart &) = delete;
 
   ValuePart(ValuePart &&other) noexcept : state{other.state} {
-    other.state.c = ConstantData{};
+    other.state.c = ConstantData{.is_const = false, .bank = bank()};
   }
 
   ~ValuePart() noexcept {
@@ -110,7 +110,7 @@ public:
     }
     assert(!state.c.reg.valid() && "must call reset() on ValuePart explicitly");
     this->state = other.state;
-    other.state.c = ConstantData{};
+    other.state.c = ConstantData{.is_const = false, .bank = bank()};
     return *this;
   }
 

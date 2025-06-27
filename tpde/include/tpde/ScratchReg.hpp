@@ -38,6 +38,12 @@ public:
   /// recursion; if spilling is disabled, the allocation can fail.
   AsmReg alloc(RegBank bank) noexcept;
 
+  AsmReg release() noexcept {
+    AsmReg res = reg;
+    reset();
+    return res;
+  }
+
   void reset() noexcept;
 
   /// Forcefully change register without updating register file. Avoid.
