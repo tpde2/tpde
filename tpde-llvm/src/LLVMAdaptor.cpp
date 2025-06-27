@@ -67,6 +67,19 @@ static void sort_phi_entries(llvm::PHINode *phi) {
   assert(std::is_sorted(blocks, blocks + count));
 }
 
+static bool value_might_need_fixup(const llvm::Value *v) {
+  // Actually, just ConstantAggregate and ConstantExpr. But adding the whole
+  // range typically avoid an extra branch and makes the remaining branch much
+  // more predictable. See llvm/include/llvm/IR/Value.def.
+  return llvm::isa<llvm::ConstantExpr,
+                   llvm::DSOLocalEquivalent,
+                   llvm::NoCFIValue,
+                   llvm::ConstantPtrAuth,
+                   llvm::ConstantArray,
+                   llvm::ConstantStruct,
+                   llvm::ConstantVector>(v);
+}
+
 std::pair<llvm::Value *, llvm::Instruction *>
     LLVMAdaptor::fixup_constant(llvm::Constant *cst,
                                 llvm::Instruction *ins_before) {
@@ -170,7 +183,7 @@ llvm::Instruction *LLVMAdaptor::handle_inst_in_block(llvm::Instruction *inst) {
   // Check operands for constants; PHI nodes are handled by predecessors.
   if (!llvm::isa<llvm::PHINode>(inst)) {
     for (llvm::Use &use : inst->operands()) {
-      if (!llvm::isa<llvm::ConstantAggregate, llvm::ConstantExpr>(use.get())) {
+      if (!value_might_need_fixup(use.get())) {
         continue;
       }
 
@@ -342,7 +355,7 @@ bool LLVMAdaptor::switch_func(const IRFuncRef function) noexcept {
       for (unsigned i = 0; i < num_incoming; ++i) {
         llvm::Value *val = values[i];
         llvm::BasicBlock *block = blocks[i];
-        if (llvm::isa<llvm::ConstantAggregate, llvm::ConstantExpr>(val)) {
+        if (value_might_need_fixup(val)) {
           auto *ins_before = block->getTerminator();
           if (block->begin().getNodePtr() != ins_before) {
             auto *prev_inst = ins_before->getPrevNonDebugInstruction();
