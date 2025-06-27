@@ -425,6 +425,9 @@ public:
   bool compile_store_generic(const llvm::StoreInst *,
                              GenericValuePart &&) noexcept;
   bool compile_store(const llvm::Instruction *, const ValInfo &, u64) noexcept;
+  bool compile_int_binary_op_i128(const llvm::Instruction *,
+                                  const ValInfo &,
+                                  IntBinaryOp op) noexcept;
   bool compile_int_binary_op(const llvm::Instruction *,
                              const ValInfo &,
                              u64) noexcept;
@@ -1919,269 +1922,254 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_store(
 }
 
 template <typename Adaptor, typename Derived, typename Config>
-bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_int_binary_op(
-    const llvm::Instruction *inst, const ValInfo &info, u64 op_val) noexcept {
-  auto *inst_ty = inst->getType();
-  IntBinaryOp op = typename IntBinaryOp::Value(op_val);
+bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_int_binary_op_i128(
+    const llvm::Instruction *inst, const ValInfo &, IntBinaryOp op) noexcept {
+  assert(inst->getType()->getIntegerBitWidth() == 128 &&
+         "non-i128 multi-word integer should not be legal");
+  llvm::Value *lhs_op = inst->getOperand(0);
+  llvm::Value *rhs_op = inst->getOperand(1);
 
-  if (inst_ty->isVectorTy()) [[unlikely]] {
-    using EncodeFnTy = bool (Derived::*)(
-        GenericValuePart &&, GenericValuePart &&, ScratchReg &);
-    // fns[op.index()][idx]
-    static constexpr auto fns = []() constexpr {
-      std::array<EncodeFnTy[7], IntBinaryOp::num_ops> res{};
-      auto entry = [&res](IntBinaryOp op) { return res[op.index()]; };
+  auto res = this->result_ref(inst);
 
-      // TODO: more consistent naming of encode functions
-#define FN_ENTRY(opname, fnbase, sign)                                         \
-  entry(opname)[0] = &Derived::encode_##fnbase##v8##sign##8;                   \
-  entry(opname)[1] = &Derived::encode_##fnbase##v4##sign##16;                  \
-  entry(opname)[2] = &Derived::encode_##fnbase##v2##sign##32;                  \
-  entry(opname)[3] = &Derived::encode_##fnbase##v16##sign##8;                  \
-  entry(opname)[4] = &Derived::encode_##fnbase##v8##sign##16;                  \
-  entry(opname)[5] = &Derived::encode_##fnbase##v4##sign##32;                  \
-  entry(opname)[6] = &Derived::encode_##fnbase##v2##sign##64;
-
-      FN_ENTRY(IntBinaryOp::add, add, u)
-      FN_ENTRY(IntBinaryOp::sub, sub, u)
-      FN_ENTRY(IntBinaryOp::mul, mul, u)
-      FN_ENTRY(IntBinaryOp::land, and, u)
-      FN_ENTRY(IntBinaryOp::lxor, xor, u)
-      FN_ENTRY(IntBinaryOp::lor, or, u)
-      FN_ENTRY(IntBinaryOp::shl, shl, u)
-      FN_ENTRY(IntBinaryOp::shr, lshr, u)
-      FN_ENTRY(IntBinaryOp::ashr, ashr, i)
-#undef FN_ENTRY
-
-      return res;
-    }();
-
-    EncodeFnTy encode_fn;
-    switch (info.type) {
-    case LLVMBasicValType::v8i8: encode_fn = fns[op.index()][0]; break;
-    case LLVMBasicValType::v4i16: encode_fn = fns[op.index()][1]; break;
-    case LLVMBasicValType::v2i32: encode_fn = fns[op.index()][2]; break;
-    case LLVMBasicValType::v16i8: encode_fn = fns[op.index()][3]; break;
-    case LLVMBasicValType::v8i16: encode_fn = fns[op.index()][4]; break;
-    case LLVMBasicValType::v4i32: encode_fn = fns[op.index()][5]; break;
-    case LLVMBasicValType::v2i64: encode_fn = fns[op.index()][6]; break;
-    default: return false;
+  if (op.is_div() || op.is_rem()) {
+    LibFunc lf;
+    if (op.is_div()) {
+      lf = op.is_signed() ? LibFunc::divti3 : LibFunc::udivti3;
+    } else {
+      lf = op.is_signed() ? LibFunc::modti3 : LibFunc::umodti3;
     }
 
-    auto lhs = this->val_ref(inst->getOperand(0));
-    auto rhs = this->val_ref(inst->getOperand(1));
-    auto [res_vr, res_ref] = this->result_ref_single(inst);
-    ScratchReg res{this};
-    if (!(derived()->*encode_fn)(lhs.part(0), rhs.part(0), res)) {
-      return false;
-    }
-    this->set_value(res_ref, res);
+    std::array<IRValueRef, 2> args{lhs_op, rhs_op};
+    derived()->create_helper_call(args, &res, get_libfunc_sym(lf));
     return true;
   }
 
-  assert(inst_ty->isIntegerTy());
+  auto lhs = this->val_ref(lhs_op);
+  auto rhs = this->val_ref(rhs_op);
 
-  const auto int_width = inst_ty->getIntegerBitWidth();
-  // Storage for encode immediates
-  u64 imm1, imm2;
-  if (int_width == 128) {
-    llvm::Value *lhs_op = inst->getOperand(0);
-    llvm::Value *rhs_op = inst->getOperand(1);
+  // Use has_assignment as proxy for not being a constant.
+  if (op.is_symmetric() && !lhs.has_assignment() && rhs.has_assignment()) {
+    // TODO(ts): this is a hack since the encoder can currently not do
+    // commutable operations so we reorder immediates manually here
+    std::swap(lhs, rhs);
+  }
 
-    auto res = this->result_ref(inst);
+  ScratchReg scratch_low{derived()}, scratch_high{derived()};
 
-    if (op.is_div() || op.is_rem()) {
-      LibFunc lf;
-      if (op.is_div()) {
-        lf = op.is_signed() ? LibFunc::divti3 : LibFunc::udivti3;
-      } else {
-        lf = op.is_signed() ? LibFunc::modti3 : LibFunc::umodti3;
-      }
-
-      std::array<IRValueRef, 2> args{lhs_op, rhs_op};
-      derived()->create_helper_call(args, &res, get_libfunc_sym(lf));
-      return true;
-    }
-
-    auto lhs = this->val_ref(lhs_op);
-    auto rhs = this->val_ref(rhs_op);
-
-    // Use has_assignment as proxy for not being a constant.
-    if (op.is_symmetric() && !lhs.has_assignment() && rhs.has_assignment()) {
-      // TODO(ts): this is a hack since the encoder can currently not do
-      // commutable operations so we reorder immediates manually here
-      std::swap(lhs, rhs);
-    }
-
-    ScratchReg scratch_low{derived()}, scratch_high{derived()};
-
-    if (op.is_shift()) {
-      ValuePartRef shift_amt = rhs.part(0);
-      if (shift_amt.is_const()) {
-        imm1 = shift_amt.const_data()[0] & 0b111'1111; // amt
-        if (imm1 < 64) {
-          imm2 = (64 - imm1) & 0b11'1111; // iamt
-          if (op == IntBinaryOp::shl) {
-            derived()->encode_shli128_lt64(
-                lhs.part(0),
-                lhs.part(1),
-                ValuePartRef(this, imm1, 1, Config::GP_BANK),
-                ValuePartRef(this, imm2, 1, Config::GP_BANK),
-                scratch_low,
-                scratch_high);
-          } else if (op == IntBinaryOp::shr) {
-            derived()->encode_shri128_lt64(
-                lhs.part(0),
-                lhs.part(1),
-                ValuePartRef(this, imm1, 1, Config::GP_BANK),
-                ValuePartRef(this, imm2, 1, Config::GP_BANK),
-                scratch_low,
-                scratch_high);
-          } else {
-            assert(op == IntBinaryOp::ashr);
-            derived()->encode_ashri128_lt64(
-                lhs.part(0),
-                lhs.part(1),
-                ValuePartRef(this, imm1, 1, Config::GP_BANK),
-                ValuePartRef(this, imm2, 1, Config::GP_BANK),
-                scratch_low,
-                scratch_high);
-          }
-        } else {
-          imm1 -= 64;
-          if (op == IntBinaryOp::shl) {
-            derived()->encode_shli128_ge64(
-                lhs.part(0),
-                ValuePartRef(this, imm1, 1, Config::GP_BANK),
-                scratch_low,
-                scratch_high);
-          } else if (op == IntBinaryOp::shr) {
-            derived()->encode_shri128_ge64(
-                lhs.part(1),
-                ValuePartRef(this, imm1, 1, Config::GP_BANK),
-                scratch_low,
-                scratch_high);
-          } else {
-            assert(op == IntBinaryOp::ashr);
-            derived()->encode_ashri128_ge64(
-                lhs.part(1),
-                ValuePartRef(this, imm1, 1, Config::GP_BANK),
-                scratch_low,
-                scratch_high);
-          }
-        }
-      } else {
+  if (op.is_shift()) {
+    ValuePartRef shift_amt = rhs.part(0);
+    if (shift_amt.is_const()) {
+      u64 imm1 = shift_amt.const_data()[0] & 0b111'1111; // amt
+      if (imm1 < 64) {
+        u64 imm2 = (64 - imm1) & 0b11'1111; // iamt
         if (op == IntBinaryOp::shl) {
-          derived()->encode_shli128(lhs.part(0),
-                                    lhs.part(1),
-                                    std::move(shift_amt),
-                                    scratch_low,
-                                    scratch_high);
+          derived()->encode_shli128_lt64(
+              lhs.part(0),
+              lhs.part(1),
+              ValuePartRef(this, imm1, 1, Config::GP_BANK),
+              ValuePartRef(this, imm2, 1, Config::GP_BANK),
+              scratch_low,
+              scratch_high);
         } else if (op == IntBinaryOp::shr) {
-          derived()->encode_shri128(lhs.part(0),
-                                    lhs.part(1),
-                                    std::move(shift_amt),
-                                    scratch_low,
-                                    scratch_high);
+          derived()->encode_shri128_lt64(
+              lhs.part(0),
+              lhs.part(1),
+              ValuePartRef(this, imm1, 1, Config::GP_BANK),
+              ValuePartRef(this, imm2, 1, Config::GP_BANK),
+              scratch_low,
+              scratch_high);
         } else {
           assert(op == IntBinaryOp::ashr);
-          derived()->encode_ashri128(lhs.part(0),
-                                     lhs.part(1),
-                                     std::move(shift_amt),
-                                     scratch_low,
-                                     scratch_high);
+          derived()->encode_ashri128_lt64(
+              lhs.part(0),
+              lhs.part(1),
+              ValuePartRef(this, imm1, 1, Config::GP_BANK),
+              ValuePartRef(this, imm2, 1, Config::GP_BANK),
+              scratch_low,
+              scratch_high);
+        }
+      } else {
+        imm1 -= 64;
+        if (op == IntBinaryOp::shl) {
+          derived()->encode_shli128_ge64(
+              lhs.part(0),
+              ValuePartRef(this, imm1, 1, Config::GP_BANK),
+              scratch_low,
+              scratch_high);
+        } else if (op == IntBinaryOp::shr) {
+          derived()->encode_shri128_ge64(
+              lhs.part(1),
+              ValuePartRef(this, imm1, 1, Config::GP_BANK),
+              scratch_low,
+              scratch_high);
+        } else {
+          assert(op == IntBinaryOp::ashr);
+          derived()->encode_ashri128_ge64(
+              lhs.part(1),
+              ValuePartRef(this, imm1, 1, Config::GP_BANK),
+              scratch_low,
+              scratch_high);
         }
       }
     } else {
-      using EncodeFnTy = bool (Derived::*)(GenericValuePart &&,
-                                           GenericValuePart &&,
-                                           GenericValuePart &&,
-                                           GenericValuePart &&,
-                                           ScratchReg &,
-                                           ScratchReg &);
-      static const std::array<EncodeFnTy, 10> encode_ptrs = {
-          {
-           &Derived::encode_addi128,
-           &Derived::encode_subi128,
-           &Derived::encode_muli128,
-           nullptr, // division/remainder is a libcall
-              nullptr, // division/remainder is a libcall
-              nullptr, // division/remainder is a libcall
-              nullptr, // division/remainder is a libcall
-              &Derived::encode_landi128,
-           &Derived::encode_lori128,
-           &Derived::encode_lxori128,
-           }
-      };
-
-      (derived()->*(encode_ptrs[op.index()]))(lhs.part(0),
-                                              lhs.part(1),
-                                              rhs.part(0),
-                                              rhs.part(1),
-                                              scratch_low,
-                                              scratch_high);
+      if (op == IntBinaryOp::shl) {
+        derived()->encode_shli128(lhs.part(0),
+                                  lhs.part(1),
+                                  std::move(shift_amt),
+                                  scratch_low,
+                                  scratch_high);
+      } else if (op == IntBinaryOp::shr) {
+        derived()->encode_shri128(lhs.part(0),
+                                  lhs.part(1),
+                                  std::move(shift_amt),
+                                  scratch_low,
+                                  scratch_high);
+      } else {
+        assert(op == IntBinaryOp::ashr);
+        derived()->encode_ashri128(lhs.part(0),
+                                   lhs.part(1),
+                                   std::move(shift_amt),
+                                   scratch_low,
+                                   scratch_high);
+      }
     }
+  } else {
+    using EncodeFnTy = bool (Derived::*)(GenericValuePart &&,
+                                         GenericValuePart &&,
+                                         GenericValuePart &&,
+                                         GenericValuePart &&,
+                                         ScratchReg &,
+                                         ScratchReg &);
+    static const std::array<EncodeFnTy, 10> encode_ptrs = {
+        {
+         &Derived::encode_addi128,
+         &Derived::encode_subi128,
+         &Derived::encode_muli128,
+         nullptr, // division/remainder is a libcall
+            nullptr, // division/remainder is a libcall
+            nullptr, // division/remainder is a libcall
+            nullptr, // division/remainder is a libcall
+            &Derived::encode_landi128,
+         &Derived::encode_lori128,
+         &Derived::encode_lxori128,
+         }
+    };
 
-    this->set_value(res.part(0), scratch_low);
-    this->set_value(res.part(1), scratch_high);
-
-    return true;
+    (derived()->*(encode_ptrs[op.index()]))(lhs.part(0),
+                                            lhs.part(1),
+                                            rhs.part(0),
+                                            rhs.part(1),
+                                            scratch_low,
+                                            scratch_high);
   }
-  assert(int_width <= 64);
 
-  // encode functions for 32/64 bit operations
+  this->set_value(res.part(0), scratch_low);
+  this->set_value(res.part(1), scratch_high);
+
+  return true;
+}
+
+template <typename Adaptor, typename Derived, typename Config>
+bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_int_binary_op(
+    const llvm::Instruction *inst, const ValInfo &info, u64 op_val) noexcept {
+  IntBinaryOp op = typename IntBinaryOp::Value(op_val);
+  if (info.type == LLVMBasicValType::i128) {
+    return compile_int_binary_op_i128(inst, info, op);
+  }
+
   using EncodeFnTy =
       bool (Derived::*)(GenericValuePart &&, GenericValuePart &&, ScratchReg &);
-  static const std::array<std::array<EncodeFnTy, 2>, 13> encode_ptrs{
-      {
-       {&Derived::encode_addi32, &Derived::encode_addi64},
-       {&Derived::encode_subi32, &Derived::encode_subi64},
-       {&Derived::encode_muli32, &Derived::encode_muli64},
-       {&Derived::encode_udivi32, &Derived::encode_udivi64},
-       {&Derived::encode_sdivi32, &Derived::encode_sdivi64},
-       {&Derived::encode_uremi32, &Derived::encode_uremi64},
-       {&Derived::encode_sremi32, &Derived::encode_sremi64},
-       {&Derived::encode_landi32, &Derived::encode_landi64},
-       {&Derived::encode_lori32, &Derived::encode_lori64},
-       {&Derived::encode_lxori32, &Derived::encode_lxori64},
-       {&Derived::encode_shli32, &Derived::encode_shli64},
-       {&Derived::encode_shri32, &Derived::encode_shri64},
-       {&Derived::encode_ashri32, &Derived::encode_ashri64},
-       }
-  };
+  // fns[op.index()][idx]
+  static constexpr auto fns = []() constexpr {
+    std::array<EncodeFnTy[9], IntBinaryOp::num_ops> res{};
+    auto entry = [&res](IntBinaryOp op) { return res[op.index()]; };
 
-  auto lhs = this->val_ref(inst->getOperand(0));
-  auto rhs = this->val_ref(inst->getOperand(1));
+    // TODO: more consistent naming of encode functions
+#define FN_ENTRY_INT(op, fn)                                                   \
+  entry(op)[0] = &Derived::encode_##fn##i##32;                                 \
+  entry(op)[1] = &Derived::encode_##fn##i##64;
+#define FN_ENTRY_VEC(op, fn, sign)                                             \
+  entry(op)[2] = &Derived::encode_##fn##v8##sign##8;                           \
+  entry(op)[3] = &Derived::encode_##fn##v4##sign##16;                          \
+  entry(op)[4] = &Derived::encode_##fn##v2##sign##32;                          \
+  entry(op)[5] = &Derived::encode_##fn##v16##sign##8;                          \
+  entry(op)[6] = &Derived::encode_##fn##v8##sign##16;                          \
+  entry(op)[7] = &Derived::encode_##fn##v4##sign##32;                          \
+  entry(op)[8] = &Derived::encode_##fn##v2##sign##64;
+#define FN_ENTRY(op, fn, sign) FN_ENTRY_INT(op, fn) FN_ENTRY_VEC(op, fn, sign)
+
+    FN_ENTRY(IntBinaryOp::add, add, u)
+    FN_ENTRY(IntBinaryOp::sub, sub, u)
+    FN_ENTRY(IntBinaryOp::mul, mul, u)
+    FN_ENTRY_INT(IntBinaryOp::udiv, udiv)
+    FN_ENTRY_INT(IntBinaryOp::sdiv, sdiv)
+    FN_ENTRY_INT(IntBinaryOp::urem, urem)
+    FN_ENTRY_INT(IntBinaryOp::srem, srem)
+    FN_ENTRY(IntBinaryOp::land, land, u)
+    FN_ENTRY(IntBinaryOp::lxor, lxor, u)
+    FN_ENTRY(IntBinaryOp::lor, lor, u)
+    FN_ENTRY(IntBinaryOp::shl, shl, u)
+    FN_ENTRY(IntBinaryOp::shr, shr, u)
+    FN_ENTRY(IntBinaryOp::ashr, ashr, i)
+#undef FN_ENTRY
+#undef FN_ENTRY_VEC
+#undef FN_ENTRY_INT
+
+    return res;
+  }();
+
+  unsigned ty_idx;
+  switch (info.type) {
+  case LLVMBasicValType::i8:
+  case LLVMBasicValType::i16:
+  case LLVMBasicValType::i32: ty_idx = 0; break;
+  case LLVMBasicValType::i64: ty_idx = 1; break;
+  case LLVMBasicValType::v8i8: ty_idx = 2; break;
+  case LLVMBasicValType::v4i16: ty_idx = 3; break;
+  case LLVMBasicValType::v2i32: ty_idx = 4; break;
+  case LLVMBasicValType::v16i8: ty_idx = 5; break;
+  case LLVMBasicValType::v8i16: ty_idx = 6; break;
+  case LLVMBasicValType::v4i32: ty_idx = 7; break;
+  case LLVMBasicValType::v2i64: ty_idx = 8; break;
+  default: return false;
+  }
+  EncodeFnTy encode_fn = fns[op.index()][ty_idx];
+  bool is_scalar = ty_idx < 2;
+  if (!encode_fn) {
+    return false;
+  }
+
+  unsigned int_width = inst->getType()->getScalarType()->getIntegerBitWidth();
+  assert(int_width <= 64);
+  ValueRef lhs = this->val_ref(inst->getOperand(0));
+  ValueRef rhs = this->val_ref(inst->getOperand(1));
+  ValueRef res = this->result_ref(inst);
+
   ValuePartRef lhs_op = lhs.part(0);
   ValuePartRef rhs_op = rhs.part(0);
+  if (is_scalar) {
+    if (op.is_symmetric() && lhs_op.is_const() && !rhs_op.is_const()) {
+      // TODO(ts): this is a hack since the encoder can currently not do
+      // commutable operations so we reorder immediates manually here
+      std::swap(lhs_op, rhs_op);
+    }
 
-  if (op.is_symmetric() && lhs_op.is_const() && !rhs_op.is_const()) {
-    // TODO(ts): this is a hack since the encoder can currently not do
-    // commutable operations so we reorder immediates manually here
-    std::swap(lhs_op, rhs_op);
+    // TODO(ts): optimize div/rem by constant to a shift?
+    unsigned ext_width = tpde::util::align_up(int_width, 32);
+    if (ext_width != int_width) {
+      bool sext = op.is_signed();
+      if (op.needs_lhs_ext()) {
+        lhs_op = std::move(lhs_op).into_extended(sext, int_width, ext_width);
+      }
+      if (op.needs_rhs_ext()) {
+        rhs_op = std::move(rhs_op).into_extended(sext, int_width, ext_width);
+      }
+    }
   }
 
-  // TODO(ts): optimize div/rem by constant to a shift?
-
-  unsigned ext_width = tpde::util::align_up(int_width, 32);
-  if (ext_width != int_width) {
-    bool sext = op.is_signed();
-    if (op.needs_lhs_ext()) {
-      lhs_op = std::move(lhs_op).into_extended(sext, int_width, ext_width);
-    }
-    if (op.needs_rhs_ext()) {
-      rhs_op = std::move(rhs_op).into_extended(sext, int_width, ext_width);
-    }
-  }
-
-  auto [res_vr, res] = this->result_ref_single(inst);
-
-  auto res_scratch = ScratchReg{derived()};
-
-  (derived()->*(encode_ptrs[op.index()][ext_width / 32 - 1]))(
-      std::move(lhs_op), std::move(rhs_op), res_scratch);
-
-  this->set_value(res, res_scratch);
+  ScratchReg res_scratch{derived()};
+  (derived()->*encode_fn)(std::move(lhs_op), std::move(rhs_op), res_scratch);
+  this->set_value(res.part(0), res_scratch);
 
   return true;
 }
