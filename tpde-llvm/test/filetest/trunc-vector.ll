@@ -4,6 +4,7 @@
 
 ; RUN: tpde-llc --target=x86_64 %s | %objdump | FileCheck %s -check-prefixes=X64
 ; RUN: tpde-llc --target=aarch64 %s | %objdump | FileCheck %s -check-prefixes=ARM64
+; XFAIL: llvm19.1
 
 define <8 x i8> @trunc_v8i16_8(<8 x i16> %v) {
 ; X64-LABEL: <trunc_v8i16_8>:
@@ -77,4 +78,277 @@ define <2 x i32> @trunc_v2i64_32(<2 x i64> %v) {
 ; ARM64-NEXT:    ret
   %r = trunc <2 x i64> %v to <2 x i32>
   ret <2 x i32> %r
+}
+
+define void @trunc_v8i8_1(ptr %p, <8 x i8> %a) {
+; X64-LABEL: <trunc_v8i8_1>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    punpcklbw {{.*#+}} xmm0 = xmm0[0,0,1,1,2,2,3,3,4,4,5,5,6,6,7,7]
+; X64-NEXT:    psllw xmm0, 0xf
+; X64-NEXT:    packsswb xmm0, xmm0
+; X64-NEXT:    pmovmskb eax, xmm0
+; X64-NEXT:    mov byte ptr [rdi], al
+; X64-NEXT:    add rsp, 0x30
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <trunc_v8i8_1>:
+; ARM64:         sub sp, sp, #0xa0
+; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
+; ARM64-NEXT:    shl v0.8b, v0.8b, #0x7
+; ARM64-NEXT:    adrp x1, 0x0 <.text>
+; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
+; ARM64-NEXT:    ldr d1, [x1]
+; ARM64-NEXT:     R_AARCH64_LDST64_ABS_LO12_NC
+; ARM64-NEXT:    cmlt v0.8b, v0.8b, #0
+; ARM64-NEXT:    and v0.8b, v0.8b, v1.8b
+; ARM64-NEXT:    addv b0, v0.8b
+; ARM64-NEXT:    fmov w2, s0
+; ARM64-NEXT:    strb w2, [x0]
+; ARM64-NEXT:    ldp x29, x30, [sp]
+; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ret
+  %r = trunc <8 x i8> %a to <8 x i1>
+  store <8 x i1> %r, ptr %p
+  ret void
+}
+
+define void @trunc_v16i8_1(ptr %p, <16 x i8> %a) {
+; X64-LABEL: <trunc_v16i8_1>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    psllw xmm0, 0x7
+; X64-NEXT:    pmovmskb eax, xmm0
+; X64-NEXT:    mov word ptr [rdi], ax
+; X64-NEXT:    add rsp, 0x30
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <trunc_v16i8_1>:
+; ARM64:         sub sp, sp, #0xa0
+; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
+; ARM64-NEXT:    shl v0.16b, v0.16b, #0x7
+; ARM64-NEXT:    adrp x1, 0x0 <.text>
+; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
+; ARM64-NEXT:    ldr q1, [x1]
+; ARM64-NEXT:     R_AARCH64_LDST128_ABS_LO12_NC
+; ARM64-NEXT:    cmlt v0.16b, v0.16b, #0
+; ARM64-NEXT:    and v0.16b, v0.16b, v1.16b
+; ARM64-NEXT:    ext v1.16b, v0.16b, v0.16b, #0x8
+; ARM64-NEXT:    zip1 v0.16b, v0.16b, v1.16b
+; ARM64-NEXT:    addv h0, v0.8h
+; ARM64-NEXT:    fmov w2, s0
+; ARM64-NEXT:    strh w2, [x0]
+; ARM64-NEXT:    ldp x29, x30, [sp]
+; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ret
+  %r = trunc <16 x i8> %a to <16 x i1>
+  store <16 x i1> %r, ptr %p
+  ret void
+}
+
+define void @trunc_v4i16_1(ptr %p, <4 x i16> %a) {
+; X64-LABEL: <trunc_v4i16_1>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    psllw xmm0, 0xf
+; X64-NEXT:    pand xmm0, xmmword ptr <trunc_v4i16_1+0x19>
+; X64-NEXT:     R_X86_64_PC32 -0x4
+; X64-NEXT:    packsswb xmm0, xmm0
+; X64-NEXT:    pmovmskb eax, xmm0
+; X64-NEXT:    mov byte ptr [rdi], al
+; X64-NEXT:    add rsp, 0x30
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <trunc_v4i16_1>:
+; ARM64:         sub sp, sp, #0xa0
+; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
+; ARM64-NEXT:    shl v0.4h, v0.4h, #0xf
+; ARM64-NEXT:    adrp x1, 0x0 <.text>
+; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
+; ARM64-NEXT:    ldr d1, [x1]
+; ARM64-NEXT:     R_AARCH64_LDST64_ABS_LO12_NC
+; ARM64-NEXT:    cmlt v0.4h, v0.4h, #0
+; ARM64-NEXT:    and v0.8b, v0.8b, v1.8b
+; ARM64-NEXT:    addv h0, v0.4h
+; ARM64-NEXT:    fmov w2, s0
+; ARM64-NEXT:    strb w2, [x0]
+; ARM64-NEXT:    ldp x29, x30, [sp]
+; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ret
+  %r = trunc <4 x i16> %a to <4 x i1>
+  store <4 x i1> %r, ptr %p
+  ret void
+}
+
+define void @trunc_v8i16_1(ptr %p, <8 x i16> %a) {
+; X64-LABEL: <trunc_v8i16_1>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    psllw xmm0, 0xf
+; X64-NEXT:    packsswb xmm0, xmm0
+; X64-NEXT:    pmovmskb eax, xmm0
+; X64-NEXT:    mov byte ptr [rdi], al
+; X64-NEXT:    add rsp, 0x30
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <trunc_v8i16_1>:
+; ARM64:         sub sp, sp, #0xa0
+; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
+; ARM64-NEXT:    shl v0.8h, v0.8h, #0xf
+; ARM64-NEXT:    adrp x1, 0x0 <.text>
+; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
+; ARM64-NEXT:    ldr q1, [x1]
+; ARM64-NEXT:     R_AARCH64_LDST128_ABS_LO12_NC
+; ARM64-NEXT:    cmlt v0.8h, v0.8h, #0
+; ARM64-NEXT:    and v0.16b, v0.16b, v1.16b
+; ARM64-NEXT:    addv h0, v0.8h
+; ARM64-NEXT:    fmov w2, s0
+; ARM64-NEXT:    strb w2, [x0]
+; ARM64-NEXT:    ldp x29, x30, [sp]
+; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ret
+  %r = trunc <8 x i16> %a to <8 x i1>
+  store <8 x i1> %r, ptr %p
+  ret void
+}
+
+define void @trunc_v2i32_1(ptr %p, <2 x i32> %a) {
+; X64-LABEL: <trunc_v2i32_1>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    punpckldq {{.*#+}} xmm0 = xmm0[0,0,1,1]
+; X64-NEXT:    pand xmm0, xmmword ptr <trunc_v2i32_1+0x18>
+; X64-NEXT:     R_X86_64_PC32 -0x4
+; X64-NEXT:    packssdw xmm0, xmm0
+; X64-NEXT:    packssdw xmm0, xmm0
+; X64-NEXT:    psllw xmm0, 0xf
+; X64-NEXT:    packsswb xmm0, xmm0
+; X64-NEXT:    pmovmskb eax, xmm0
+; X64-NEXT:    mov byte ptr [rdi], al
+; X64-NEXT:    add rsp, 0x30
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <trunc_v2i32_1>:
+; ARM64:         sub sp, sp, #0xa0
+; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
+; ARM64-NEXT:    shl v0.2s, v0.2s, #0x1f
+; ARM64-NEXT:    adrp x1, 0x0 <.text>
+; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
+; ARM64-NEXT:    ldr d1, [x1]
+; ARM64-NEXT:     R_AARCH64_LDST64_ABS_LO12_NC
+; ARM64-NEXT:    cmlt v0.2s, v0.2s, #0
+; ARM64-NEXT:    and v0.8b, v0.8b, v1.8b
+; ARM64-NEXT:    addp v0.2s, v0.2s, v0.2s
+; ARM64-NEXT:    fmov w2, s0
+; ARM64-NEXT:    strb w2, [x0]
+; ARM64-NEXT:    ldp x29, x30, [sp]
+; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ret
+  %r = trunc <2 x i32> %a to <2 x i1>
+  store <2 x i1> %r, ptr %p
+  ret void
+}
+
+define void @trunc_v4i32_1(ptr %p, <4 x i32> %a) {
+; X64-LABEL: <trunc_v4i32_1>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    pshuflw {{.*#+}} xmm0 = xmm0[0,2,2,3,4,5,6,7]
+; X64-NEXT:    pshufhw {{.*#+}} xmm0 = xmm0[0,1,2,3,4,6,6,7]
+; X64-NEXT:    pshufd {{.*#+}} xmm0 = xmm0[0,2,2,3]
+; X64-NEXT:    psllw xmm0, 0xf
+; X64-NEXT:    packsswb xmm0, xmm0
+; X64-NEXT:    pmovmskb eax, xmm0
+; X64-NEXT:    mov byte ptr [rdi], al
+; X64-NEXT:    add rsp, 0x30
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <trunc_v4i32_1>:
+; ARM64:         sub sp, sp, #0xa0
+; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
+; ARM64-NEXT:    shl v0.4s, v0.4s, #0x1f
+; ARM64-NEXT:    adrp x1, 0x0 <.text>
+; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
+; ARM64-NEXT:    ldr q1, [x1]
+; ARM64-NEXT:     R_AARCH64_LDST128_ABS_LO12_NC
+; ARM64-NEXT:    cmlt v0.4s, v0.4s, #0
+; ARM64-NEXT:    and v0.16b, v0.16b, v1.16b
+; ARM64-NEXT:    addv s0, v0.4s
+; ARM64-NEXT:    fmov w2, s0
+; ARM64-NEXT:    strb w2, [x0]
+; ARM64-NEXT:    ldp x29, x30, [sp]
+; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ret
+  %r = trunc <4 x i32> %a to <4 x i1>
+  store <4 x i1> %r, ptr %p
+  ret void
+}
+
+define void @trunc_v2i64_1(ptr %p, <2 x i64> %a) {
+; X64-LABEL: <trunc_v2i64_1>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    pshufd {{.*#+}} xmm0 = xmm0[0,2,2,3]
+; X64-NEXT:    pshuflw {{.*#+}} xmm0 = xmm0[0,2,2,3,4,5,6,7]
+; X64-NEXT:    psllw xmm0, 0xf
+; X64-NEXT:    packsswb xmm0, xmm0
+; X64-NEXT:    pmovmskb eax, xmm0
+; X64-NEXT:    mov byte ptr [rdi], al
+; X64-NEXT:    add rsp, 0x30
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <trunc_v2i64_1>:
+; ARM64:         sub sp, sp, #0xa0
+; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
+; ARM64-NEXT:    shl v0.2d, v0.2d, #0x3f
+; ARM64-NEXT:    adrp x1, 0x0 <.text>
+; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
+; ARM64-NEXT:    ldr q1, [x1]
+; ARM64-NEXT:     R_AARCH64_LDST128_ABS_LO12_NC
+; ARM64-NEXT:    cmlt v0.2d, v0.2d, #0
+; ARM64-NEXT:    and v0.16b, v0.16b, v1.16b
+; ARM64-NEXT:    addp d0, v0.2d
+; ARM64-NEXT:    fmov w2, s0
+; ARM64-NEXT:    strb w2, [x0]
+; ARM64-NEXT:    ldp x29, x30, [sp]
+; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ret
+  %r = trunc <2 x i64> %a to <2 x i1>
+  store <2 x i1> %r, ptr %p
+  ret void
 }

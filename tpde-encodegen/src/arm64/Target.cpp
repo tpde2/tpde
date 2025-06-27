@@ -640,6 +640,13 @@ void EncodingTargetArm64::get_inst_candidates(
   case_default("FDIVv2f32", "FDIV2s");
   case_default("FDIVv4f32", "FDIV4s");
   case_default("FDIVv2f64", "FDIV2d");
+  case_default("CMLTv8i8rz", "CMLT8b_zero");
+  case_default("CMLTv16i8rz", "CMLT16b_zero");
+  case_default("CMLTv4i16rz", "CMLT4h_zero");
+  case_default("CMLTv8i16rz", "CMLT8h_zero");
+  case_default("CMLTv2i32rz", "CMLT2s_zero");
+  case_default("CMLTv4i32rz", "CMLT4s_zero");
+  case_default("CMLTv2i64rz", "CMLT2d_zero");
   case_default("CMEQv8i8", "CMEQ8b");
   case_default("CMEQv16i8", "CMEQ16b");
   case_default("CMEQv4i16", "CMEQ4h");
@@ -776,6 +783,13 @@ void EncodingTargetArm64::get_inst_candidates(
   case_default("SSHLv2i32", "SSHL2s");
   case_default("SSHLv4i32", "SSHL4s");
   case_default("SSHLv2i64", "SSHL2d");
+  case_default("SHLv8i8_shift", "SHL8bi");
+  case_default("SHLv16i8_shift", "SHL16bi");
+  case_default("SHLv4i16_shift", "SHL4hi");
+  case_default("SHLv8i16_shift", "SHL8hi");
+  case_default("SHLv2i32_shift", "SHL2si");
+  case_default("SHLv4i32_shift", "SHL4si");
+  case_default("SHLv2i64_shift", "SHL2di");
   case_default("XTNv8i8", "XTN_8b");
   case_default("XTNv4i16", "XTN_4h");
   case_default("XTNv2i32", "XTN_2s");

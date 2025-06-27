@@ -366,6 +366,14 @@ v8i8 TARGET_V1 trunc_v8i16_8(v8i16 v) { return __builtin_convertvector(v, v8i8);
 v4i16 TARGET_V1 trunc_v4i32_16(v4i32 v) { return __builtin_convertvector(v, v4i16); }
 v2i32 TARGET_V1 trunc_v2i64_32(v2i64 v) { return __builtin_convertvector(v, v2i32); }
 
+u8 TARGET_V1 trunc_v8i8_1(v8i8 a) { return (union { v8i1 v; u8 r; }) {.v = __builtin_convertvector((a & 1) != 0, v8i1)}.r; }
+u8 TARGET_V1 trunc_v4i16_1(v4i16 a) { return (union { v4i1 v; u8 r; }) {.v = __builtin_convertvector((a & 1) != 0, v4i1)}.r; }
+u8 TARGET_V1 trunc_v2i32_1(v2i32 a) { return (union { v2i1 v; u8 r; }) {.v = __builtin_convertvector((a & 1) != 0, v2i1)}.r; }
+u16 TARGET_V1 trunc_v16i8_1(v16i8 a) { return (union { v16i1 v; u16 r; }) {.v = __builtin_convertvector((a & 1) != 0, v16i1)}.r; }
+u8 TARGET_V1 trunc_v8i16_1(v8i16 a) { return (union { v8i1 v; u8 r; }) {.v = __builtin_convertvector((a & 1) != 0, v8i1)}.r; }
+u8 TARGET_V1 trunc_v4i32_1(v4i32 a) { return (union { v4i1 v; u8 r; }) {.v = __builtin_convertvector((a & 1) != 0, v4i1)}.r; }
+u8 TARGET_V1 trunc_v2i64_1(v2i64 a) { return (union { v2i1 v; u8 r; }) {.v = __builtin_convertvector((a & 1) != 0, v2i1)}.r; }
+
 // --------------------------
 // vector integer arithmetic
 // --------------------------
@@ -436,9 +444,7 @@ v2i64 TARGET_V1 ashrv2i64(v2i64 a, v2i64 b) { return (a >> b); }
 
 #define ICMP_VEC(pred, cmp, sign, resty, nelem, bits)                          \
     resty TARGET_V1 icmp_##pred##v##nelem##sign##bits(v##nelem##sign##bits a, v##nelem##sign##bits b) { \
-      union u { v##nelem##i1 v; resty r; };                                    \
-      union u res = { .v = __builtin_convertvector(a cmp b, v##nelem##i1) };   \
-      return res.r;                                                            \
+      return trunc_##v##nelem##i##bits##_1(a cmp b);                           \
     }                                                                          \
     v##nelem##sign##bits TARGET_V1 icmpmask_##pred##v##nelem##sign##bits(v##nelem##sign##bits a, v##nelem##sign##bits b) { \
       return a cmp b;                                                          \

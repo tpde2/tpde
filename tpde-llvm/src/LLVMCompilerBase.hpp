@@ -2518,8 +2518,9 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_int_to_float(
 template <typename Adaptor, typename Derived, typename Config>
 bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_int_trunc(
     const llvm::Instruction *inst, const ValInfo &val_info, u64) noexcept {
+  llvm::Value *src = inst->getOperand(0);
   ValueRef res_vr = this->result_ref(inst);
-  ValueRef src_vr = this->val_ref(inst->getOperand(0));
+  ValueRef src_vr = this->val_ref(src);
 
   LLVMBasicValType bvt = val_info.type;
   switch (bvt) {
@@ -2532,10 +2533,49 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_int_trunc(
     // contains the lowest bits.
     res_vr.part(0).set_value(src_vr.part(0));
     return true;
+  case v8i1:
+  case v16i1:
+  case v32i1:
+  case v64i1: {
+    // Cast to i1 vector.
+    // TODO: support illegal vector types. This is not trivial and requires bit
+    // packing of the individual comparison results.
+    auto src_width = src->getType()->getScalarType()->getIntegerBitWidth();
+    auto [ty, ty_idx] = this->adaptor->lower_type(src);
+
+    using EncodeFnTy = bool (Derived::*)(GenericValuePart &&, ScratchReg &);
+    EncodeFnTy encode_fn = nullptr;
+    switch (ty) {
+    case v64:
+      switch (src_width) {
+      case 8: encode_fn = &Derived::encode_trunc_v8i8_1; break;
+      case 16: encode_fn = &Derived::encode_trunc_v4i16_1; break;
+      case 32: encode_fn = &Derived::encode_trunc_v2i32_1; break;
+      default: return false;
+      }
+      break;
+    case v128:
+      switch (src_width) {
+      case 8: encode_fn = &Derived::encode_trunc_v16i8_1; break;
+      case 16: encode_fn = &Derived::encode_trunc_v8i16_1; break;
+      case 32: encode_fn = &Derived::encode_trunc_v4i32_1; break;
+      case 64: encode_fn = &Derived::encode_trunc_v2i64_1; break;
+      default: return false;
+      }
+      break;
+    default: return false;
+    }
+
+    ScratchReg res{derived()};
+    if (!(derived()->*encode_fn)(src_vr.part(0), res)) {
+      return false;
+    }
+    this->set_value(res_vr.part(0), res);
+    return true;
+  }
   case v64: {
     auto dst_width = inst->getType()->getScalarType()->getIntegerBitWidth();
-    auto src_width =
-        inst->getOperand(0)->getType()->getScalarType()->getIntegerBitWidth();
+    auto src_width = src->getType()->getScalarType()->getIntegerBitWidth();
     // With the currently legal vector types, we only support halving vectors.
     if (dst_width * 2 != src_width) {
       return false;
