@@ -263,10 +263,10 @@ define i8 @ext_v64i8_0(ptr %p) {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x70
-; X64-NEXT:    movaps xmm0, xmmword ptr [rdi]
-; X64-NEXT:    movaps xmm1, xmmword ptr [rdi + 0x10]
-; X64-NEXT:    movaps xmm2, xmmword ptr [rdi + 0x20]
-; X64-NEXT:    movaps xmm3, xmmword ptr [rdi + 0x30]
+; X64-NEXT:    movups xmm0, xmmword ptr [rdi]
+; X64-NEXT:    movups xmm1, xmmword ptr [rdi + 0x10]
+; X64-NEXT:    movups xmm2, xmmword ptr [rdi + 0x20]
+; X64-NEXT:    movups xmm3, xmmword ptr [rdi + 0x30]
 ; X64-NEXT:    movapd xmmword ptr [rbp - 0x70], xmm0
 ; X64-NEXT:    movzx eax, byte ptr [rbp - 0x70]
 ; X64-NEXT:    add rsp, 0x70
@@ -297,10 +297,10 @@ define i8 @ext_v64i8_43(ptr %p) {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x70
-; X64-NEXT:    movaps xmm0, xmmword ptr [rdi]
-; X64-NEXT:    movaps xmm1, xmmword ptr [rdi + 0x10]
-; X64-NEXT:    movaps xmm2, xmmword ptr [rdi + 0x20]
-; X64-NEXT:    movaps xmm3, xmmword ptr [rdi + 0x30]
+; X64-NEXT:    movups xmm0, xmmword ptr [rdi]
+; X64-NEXT:    movups xmm1, xmmword ptr [rdi + 0x10]
+; X64-NEXT:    movups xmm2, xmmword ptr [rdi + 0x20]
+; X64-NEXT:    movups xmm3, xmmword ptr [rdi + 0x30]
 ; X64-NEXT:    movapd xmmword ptr [rbp - 0x50], xmm2
 ; X64-NEXT:    movzx eax, byte ptr [rbp - 0x45]
 ; X64-NEXT:    add rsp, 0x70
@@ -331,10 +331,10 @@ define i8 @ext_v64i8_43_twice(ptr %p) {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x70
-; X64-NEXT:    movaps xmm0, xmmword ptr [rdi]
-; X64-NEXT:    movaps xmm1, xmmword ptr [rdi + 0x10]
-; X64-NEXT:    movaps xmm2, xmmword ptr [rdi + 0x20]
-; X64-NEXT:    movaps xmm3, xmmword ptr [rdi + 0x30]
+; X64-NEXT:    movups xmm0, xmmword ptr [rdi]
+; X64-NEXT:    movups xmm1, xmmword ptr [rdi + 0x10]
+; X64-NEXT:    movups xmm2, xmmword ptr [rdi + 0x20]
+; X64-NEXT:    movups xmm3, xmmword ptr [rdi + 0x30]
 ; X64-NEXT:    movapd xmmword ptr [rbp - 0x50], xmm2
 ; X64-NEXT:    movzx eax, byte ptr [rbp - 0x45]
 ; X64-NEXT:    movzx ecx, byte ptr [rbp - 0x45]
@@ -372,10 +372,10 @@ define i8 @ext_v64i8_dyn(ptr %p, i32 %i) {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x70
-; X64-NEXT:    movaps xmm0, xmmword ptr [rdi]
-; X64-NEXT:    movaps xmm1, xmmword ptr [rdi + 0x10]
-; X64-NEXT:    movaps xmm2, xmmword ptr [rdi + 0x20]
-; X64-NEXT:    movaps xmm3, xmmword ptr [rdi + 0x30]
+; X64-NEXT:    movups xmm0, xmmword ptr [rdi]
+; X64-NEXT:    movups xmm1, xmmword ptr [rdi + 0x10]
+; X64-NEXT:    movups xmm2, xmmword ptr [rdi + 0x20]
+; X64-NEXT:    movups xmm3, xmmword ptr [rdi + 0x30]
 ; X64-NEXT:    movapd xmmword ptr [rbp - 0x70], xmm0
 ; X64-NEXT:    movapd xmmword ptr [rbp - 0x60], xmm1
 ; X64-NEXT:    movapd xmmword ptr [rbp - 0x50], xmm2

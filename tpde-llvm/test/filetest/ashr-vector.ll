@@ -502,10 +502,10 @@ define void @ashr_v32i8(ptr %p, ptr %q) {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:    movaps xmm0, xmmword ptr [rdi]
-; X64-NEXT:    movaps xmm1, xmmword ptr [rdi + 0x10]
-; X64-NEXT:    movaps xmm2, xmmword ptr [rsi]
-; X64-NEXT:    movaps xmm3, xmmword ptr [rsi + 0x10]
+; X64-NEXT:    movups xmm0, xmmword ptr [rdi]
+; X64-NEXT:    movups xmm1, xmmword ptr [rdi + 0x10]
+; X64-NEXT:    movups xmm2, xmmword ptr [rsi]
+; X64-NEXT:    movups xmm3, xmmword ptr [rsi + 0x10]
 ; X64-NEXT:    punpckhbw {{.*#+}} xmm4 = xmm4[8],xmm0[8],xmm4[9],xmm0[9],xmm4[10],xmm0[10],xmm4[11],xmm0[11],xmm4[12],xmm0[12],xmm4[13],xmm0[13],xmm4[14],xmm0[14],xmm4[15],xmm0[15]
 ; X64-NEXT:    psllw xmm2, 0x5
 ; X64-NEXT:    punpckhbw {{.*#+}} xmm5 = xmm5[8],xmm2[8],xmm5[9],xmm2[9],xmm5[10],xmm2[10],xmm5[11],xmm2[11],xmm5[12],xmm2[12],xmm5[13],xmm2[13],xmm5[14],xmm2[14],xmm5[15],xmm2[15]
@@ -614,8 +614,8 @@ define void @ashr_v32i8(ptr %p, ptr %q) {
 ; X64-NEXT:    por xmm1, xmm3
 ; X64-NEXT:    psrlw xmm1, 0x8
 ; X64-NEXT:    packuswb xmm1, xmm2
-; X64-NEXT:    movaps xmmword ptr [rdi], xmm0
-; X64-NEXT:    movaps xmmword ptr [rdi + 0x10], xmm1
+; X64-NEXT:    movups xmmword ptr [rdi], xmm0
+; X64-NEXT:    movups xmmword ptr [rdi + 0x10], xmm1
 ; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -651,8 +651,8 @@ define void @ashr_v32i8_3(ptr %p) {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:    movaps xmm0, xmmword ptr [rdi]
-; X64-NEXT:    movaps xmm1, xmmword ptr [rdi + 0x10]
+; X64-NEXT:    movups xmm0, xmmword ptr [rdi]
+; X64-NEXT:    movups xmm1, xmmword ptr [rdi + 0x10]
 ; X64-NEXT:    punpckhbw {{.*#+}} xmm2 = xmm2[8],xmm0[8],xmm2[9],xmm0[9],xmm2[10],xmm0[10],xmm2[11],xmm0[11],xmm2[12],xmm0[12],xmm2[13],xmm0[13],xmm2[14],xmm0[14],xmm2[15],xmm0[15]
 ; X64-NEXT:    movaps xmm3, xmmword ptr <ashr_v32i8_3+0x1e>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
@@ -765,8 +765,8 @@ define void @ashr_v32i8_3(ptr %p) {
 ; X64-NEXT:    por xmm1, xmm3
 ; X64-NEXT:    psrlw xmm1, 0x8
 ; X64-NEXT:    packuswb xmm1, xmm2
-; X64-NEXT:    movaps xmmword ptr [rdi], xmm0
-; X64-NEXT:    movaps xmmword ptr [rdi + 0x10], xmm1
+; X64-NEXT:    movups xmmword ptr [rdi], xmm0
+; X64-NEXT:    movups xmmword ptr [rdi + 0x10], xmm1
 ; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret

@@ -764,6 +764,10 @@ void EncodingTargetX64::get_inst_candidates(
     handle_default("VMOVAPS256rm", 1);
   } else if (Name == "VMOVAPSZrm") {
     handle_default("VMOVAPS512rm", 1);
+  } else if (Name == "VMOVUPSYrm") {
+    handle_default("VMOVUPS256rm", 1);
+  } else if (Name == "VMOVUPSZrm") {
+    handle_default("VMOVUPS512rm", 1);
   } else if (Name == "MOVSSmr") {
     handle_default("SSE_MOVSSmr", 0);
   } else if (Name == "MOVSDmr") {
@@ -774,6 +778,12 @@ void EncodingTargetX64::get_inst_candidates(
     handle_default("VMOVAPS256mr", 0);
   } else if (Name == "VMOVAPSZmr") {
     handle_default("VMOVAPS512mr", 0);
+  } else if (Name == "MOVUPSmr") {
+    handle_default("SSE_MOVUPSmr", 0);
+  } else if (Name == "VMOVUPSYmr") {
+    handle_default("VMOVUPS256mr", 0);
+  } else if (Name == "VMOVUPSZmr") {
+    handle_default("VMOVUPS512mr", 0);
 
   } else if (Name == "CVTSD2SSrr") {
     handle_memrepl("SSE_CVTSD2SSrm", 1);

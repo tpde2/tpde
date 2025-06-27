@@ -93,9 +93,9 @@ float TARGET_V1 loadf32(float* ptr) { return *ptr; }
 double TARGET_V1 loadf64(double* ptr) { return *ptr; }
 
 #ifdef __x86_64__
-__m128 TARGET_V1 loadv128(__m128* ptr) { return *ptr; }
-__m256 TARGET_V3 loadv256(__m256* ptr) { return *ptr; }
-__m512 TARGET_V4 loadv512(__m512* ptr) { return *ptr; }
+__m128 TARGET_V1 loadv128(__m128_u* ptr) { return *ptr; }
+__m256 TARGET_V3 loadv256(__m256_u* ptr) { return *ptr; }
+__m512 TARGET_V4 loadv512(__m512_u* ptr) { return *ptr; }
 #endif
 
 #ifdef __aarch64__
@@ -125,9 +125,9 @@ void TARGET_V1 storef32(float* ptr, float value) { *ptr = value; }
 void TARGET_V1 storef64(double* ptr, double value) { *ptr = value; }
 
 #ifdef __x86_64__
-void TARGET_V1 storev128(__m128* ptr, __m128 value) { *ptr = value; }
-void TARGET_V3 storev256(__m256* ptr, __m256 value) { *ptr = value; }
-void TARGET_V4 storev512(__m512* ptr, __m512 value) { *ptr = value; }
+void TARGET_V1 storev128(__m128_u* ptr, __m128 value) { *ptr = value; }
+void TARGET_V3 storev256(__m256_u* ptr, __m256 value) { *ptr = value; }
+void TARGET_V4 storev512(__m512_u* ptr, __m512 value) { *ptr = value; }
 #endif
 
 #ifdef __aarch64__

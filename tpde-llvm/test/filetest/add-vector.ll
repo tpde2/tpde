@@ -165,14 +165,14 @@ define void @add_v32i8(ptr %p, ptr %q) {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:    movaps xmm0, xmmword ptr [rdi]
-; X64-NEXT:    movaps xmm1, xmmword ptr [rdi + 0x10]
-; X64-NEXT:    movaps xmm2, xmmword ptr [rsi]
-; X64-NEXT:    movaps xmm3, xmmword ptr [rsi + 0x10]
+; X64-NEXT:    movups xmm0, xmmword ptr [rdi]
+; X64-NEXT:    movups xmm1, xmmword ptr [rdi + 0x10]
+; X64-NEXT:    movups xmm2, xmmword ptr [rsi]
+; X64-NEXT:    movups xmm3, xmmword ptr [rsi + 0x10]
 ; X64-NEXT:    paddb xmm0, xmm2
 ; X64-NEXT:    paddb xmm1, xmm3
-; X64-NEXT:    movaps xmmword ptr [rdi], xmm0
-; X64-NEXT:    movaps xmmword ptr [rdi + 0x10], xmm1
+; X64-NEXT:    movups xmmword ptr [rdi], xmm0
+; X64-NEXT:    movups xmmword ptr [rdi + 0x10], xmm1
 ; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret

@@ -638,10 +638,10 @@ define void @srem_v32i8(ptr %p, ptr %q) {
 ; X64-NEXT:    push rbx
 ; X64-NEXT:    nop dword ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x88
-; X64-NEXT:    movaps xmm0, xmmword ptr [rdi]
-; X64-NEXT:    movaps xmm1, xmmword ptr [rdi + 0x10]
-; X64-NEXT:    movaps xmm2, xmmword ptr [rsi]
-; X64-NEXT:    movaps xmm3, xmmword ptr [rsi + 0x10]
+; X64-NEXT:    movups xmm0, xmmword ptr [rdi]
+; X64-NEXT:    movups xmm1, xmmword ptr [rdi + 0x10]
+; X64-NEXT:    movups xmm2, xmmword ptr [rsi]
+; X64-NEXT:    movups xmm3, xmmword ptr [rsi + 0x10]
 ; X64-NEXT:    movapd xmmword ptr [rbp - 0x50], xmm0
 ; X64-NEXT:    movzx eax, byte ptr [rbp - 0x50]
 ; X64-NEXT:    movapd xmmword ptr [rbp - 0x70], xmm2
@@ -967,9 +967,9 @@ define void @srem_v32i8(ptr %p, ptr %q) {
 ; X64-NEXT:    idiv ecx
 ; X64-NEXT:    mov byte ptr [rbp - 0x71], dl
 ; X64-NEXT:    movapd xmm0, xmmword ptr [rbp - 0x90]
-; X64-NEXT:    movaps xmmword ptr [rdi], xmm0
+; X64-NEXT:    movups xmmword ptr [rdi], xmm0
 ; X64-NEXT:    movapd xmm0, xmmword ptr [rbp - 0x80]
-; X64-NEXT:    movaps xmmword ptr [rdi + 0x10], xmm0
+; X64-NEXT:    movups xmmword ptr [rdi + 0x10], xmm0
 ; X64-NEXT:    add rsp, 0x88
 ; X64-NEXT:    pop rbx
 ; X64-NEXT:    pop rbp
