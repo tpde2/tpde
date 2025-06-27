@@ -3047,6 +3047,17 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_shuffle_vector(
     }
     derived()->insert_element(res_vr, i, bvt, std::move(tmp));
   }
+
+  // Make sure that all parts are initialized.
+  // TODO: maybe remove assertion that no value is uninitialized?
+  for (u32 i = 0, n = res_vr.assignment()->part_count; i != n; ++i) {
+    tpde::AssignmentPartRef ap{res_vr.assignment(), i};
+    if (!ap.register_valid() && !ap.stack_valid()) {
+      // Value part is uninitialized
+      this->allocate_spill_slot(ap);
+      ap.set_stack_valid();
+    }
+  }
   return true;
 }
 
