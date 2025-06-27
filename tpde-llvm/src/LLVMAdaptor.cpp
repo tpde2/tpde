@@ -522,29 +522,29 @@ static std::tuple<LLVMBasicValType, u32, bool>
     }
     switch (tpde::util::cnt_tz(el_width) - 3) {
     case 0:
-      if (num_elts == 16) {
-        return {LLVMBasicValType::v16i8, 1, false};
-      } else if (num_elts == 8) {
-        return {LLVMBasicValType::v8i8, 1, false};
+      if (num_elts % 16 == 0) {
+        return {LLVMBasicValType::v16i8, num_elts / 16, num_elts != 16};
+      } else if (num_elts % 8 == 0) {
+        return {LLVMBasicValType::v8i8, num_elts / 8, num_elts != 8};
       }
       return {LLVMBasicValType::i8, num_elts, true};
     case 1:
-      if (num_elts == 8) {
-        return {LLVMBasicValType::v8i16, 1, false};
-      } else if (num_elts == 4) {
-        return {LLVMBasicValType::v4i16, 1, false};
+      if (num_elts % 8 == 0) {
+        return {LLVMBasicValType::v8i16, num_elts / 8, num_elts != 8};
+      } else if (num_elts % 4 == 0) {
+        return {LLVMBasicValType::v4i16, num_elts / 4, num_elts != 4};
       }
       return {LLVMBasicValType::i16, num_elts, true};
     case 2:
-      if (num_elts == 4) {
-        return {LLVMBasicValType::v4i32, 1, false};
-      } else if (num_elts == 2) {
-        return {LLVMBasicValType::v2i32, 1, false};
+      if (num_elts % 4 == 0) {
+        return {LLVMBasicValType::v4i32, num_elts / 4, num_elts != 4};
+      } else if (num_elts % 2 == 0) {
+        return {LLVMBasicValType::v2i32, num_elts / 2, num_elts != 2};
       }
       return {LLVMBasicValType::i32, num_elts, true};
     case 3:
-      if (num_elts == 2) {
-        return {LLVMBasicValType::v2i64, 1, false};
+      if (num_elts % 2 == 0) {
+        return {LLVMBasicValType::v2i64, num_elts / 2, num_elts != 2};
       }
       return {LLVMBasicValType::i64, num_elts, true};
     default:
@@ -553,15 +553,15 @@ static std::tuple<LLVMBasicValType, u32, bool>
     }
   }
   case llvm::Type::FloatTyID:
-    if (num_elts == 4) {
-      return {LLVMBasicValType::v4f32, 1, false};
-    } else if (num_elts == 2) {
-      return {LLVMBasicValType::v2f32, 1, false};
+    if (num_elts % 4 == 0) {
+      return {LLVMBasicValType::v4f32, num_elts / 4, num_elts != 4};
+    } else if (num_elts % 2 == 0) {
+      return {LLVMBasicValType::v2f32, num_elts / 2, num_elts != 2};
     }
     return {LLVMBasicValType::f32, num_elts, true};
   case llvm::Type::DoubleTyID:
-    if (num_elts == 2) {
-      return {LLVMBasicValType::v2f64, 1, false};
+    if (num_elts % 2 == 0) {
+      return {LLVMBasicValType::v2f64, num_elts / 2, num_elts != 2};
     }
     return {LLVMBasicValType::f64, num_elts, true};
   case llvm::Type::PointerTyID:
