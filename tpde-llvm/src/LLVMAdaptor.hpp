@@ -41,6 +41,8 @@ inline u32 val_idx_for_inst(const llvm::Instruction *inst) noexcept {
   // static_assert(sizeof(llvm::Instruction) == 64);
 }
 
+#if LLVM_VERSION_MAJOR < 20
+// LLVM 20+ has BasicBlock::getNumber()
 inline u32 &block_embedded_idx(llvm::BasicBlock *block) noexcept {
   return *reinterpret_cast<u32 *>(
       reinterpret_cast<u8 *>(block) +
@@ -50,6 +52,7 @@ inline u32 &block_embedded_idx(llvm::BasicBlock *block) noexcept {
 inline u32 block_embedded_idx(const llvm::BasicBlock *block) noexcept {
   return block_embedded_idx(const_cast<llvm::BasicBlock *>(block));
 }
+#endif
 
 #pragma GCC diagnostic pop
 
@@ -183,7 +186,9 @@ struct LLVMAdaptor {
   llvm::SmallVector<const llvm::GlobalValue *, 0> global_list;
 #ifndef NDEBUG
   llvm::DenseMap<const llvm::Value *, u32> value_lookup;
+  #if LLVM_VERSION_MAJOR < 20
   llvm::DenseMap<const llvm::BasicBlock *, u32> block_lookup;
+  #endif
 #endif
   tpde::util::SmallVector<LLVMComplexPart, 32> complex_part_types;
   /// Map from complex type to the lowered type.
@@ -273,12 +278,16 @@ struct LLVMAdaptor {
 
   [[nodiscard]] IRBlockRef
       block_lookup_idx(const llvm::BasicBlock *block) const noexcept {
+#if LLVM_VERSION_MAJOR >= 20
+    return block->getNumber();
+#else
     auto idx = block_embedded_idx(block);
-#ifndef NDEBUG
+  #ifndef NDEBUG
     auto it = block_lookup.find(block);
     assert(it != block_lookup.end() && it->second == idx);
-#endif
+  #endif
     return idx;
+#endif
   }
 
   [[nodiscard]] auto block_succs(const IRBlockRef block) const noexcept {

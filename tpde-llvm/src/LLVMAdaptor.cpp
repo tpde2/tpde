@@ -226,10 +226,11 @@ bool LLVMAdaptor::switch_func(const IRFuncRef function) noexcept {
   TPDE_LOG_DBG("Compiling func: {}",
                static_cast<std::string_view>(function->getName()));
 
-  // assign local ids
 #ifndef NDEBUG
   value_lookup.clear();
+  #if LLVM_VERSION_MAJOR < 20
   block_lookup.clear();
+  #endif
 #endif
   blocks.clear();
   block_succ_indices.clear();
@@ -323,6 +324,12 @@ bool LLVMAdaptor::switch_func(const IRFuncRef function) noexcept {
   // Check that the return type is layout-compatible to LLVM.
   check_type_compatibility(function->getReturnType());
 
+#if LLVM_VERSION_MAJOR >= 20
+  // Renumber blocks in the order they occur in the function.
+  function->renumberBlocks();
+  blocks.reserve(function->getMaxBlockNumber());
+#endif
+
   for (llvm::BasicBlock &block : *function) {
     auto it = block.begin(), end = block.end();
     // In the first pass, fixup all constants in phis. This might insert
@@ -360,8 +367,6 @@ bool LLVMAdaptor::switch_func(const IRFuncRef function) noexcept {
       ++it;
     }
 
-    const auto block_idx = blocks.size();
-
     // Here, store iterator of last phi (if any). We cannot store an iterator of
     // the next instruction, as another block's phi node might cause
     // instructions to be inserted immediately after the last phi node.
@@ -371,13 +376,17 @@ bool LLVMAdaptor::switch_func(const IRFuncRef function) noexcept {
       it = block.end();
     }
 
+#if LLVM_VERSION_MAJOR >= 20
+    assert(block.getNumber() == blocks.size());
+#else
+  #ifndef NDEBUG
+    block_lookup[&block] = blocks.size();
+  #endif
+    block_embedded_idx(&block) = blocks.size();
+#endif
+
     blocks.push_back(
         BlockInfo{.block = &block, .aux = BlockAux{.phi_end = it}});
-
-#ifndef NDEBUG
-    block_lookup[&block] = block_idx;
-#endif
-    block_embedded_idx(&block) = block_idx;
   }
 
   for (BlockInfo &info : blocks) {
@@ -402,7 +411,7 @@ bool LLVMAdaptor::switch_func(const IRFuncRef function) noexcept {
 
     const u32 start_idx = block_succ_indices.size();
     for (auto *succ : llvm::successors(info.block)) {
-      block_succ_indices.push_back(block_embedded_idx(succ));
+      block_succ_indices.push_back(block_lookup_idx(succ));
     }
     block_succ_ranges.push_back(
         std::make_pair(start_idx, block_succ_indices.size()));
@@ -428,7 +437,9 @@ void LLVMAdaptor::reset() noexcept {
   global_list.clear();
 #ifndef NDEBUG
   value_lookup.clear();
+  #if LLVM_VERSION_MAJOR < 20
   block_lookup.clear();
+  #endif
 #endif
   complex_part_types.clear();
   complex_type_map.clear();
