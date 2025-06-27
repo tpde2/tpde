@@ -528,17 +528,15 @@ public:
   }
 
   ValueParts val_parts(tpde::ValLocalIdx local_idx) {
-    const ValInfo &info = values[u32(local_idx)];
+    return val_parts(values[u32(local_idx)]);
+  }
+
+  ValueParts val_parts(const ValInfo &info) const noexcept {
     if (info.type == LLVMBasicValType::complex) {
       unsigned ty_idx = info.complex_part_tys_idx;
       return ValueParts{info.type, &complex_part_types[ty_idx]};
     }
     return ValueParts{info.type, nullptr};
-  }
-
-  // other public stuff for the compiler impl
-  u32 val_part_count(const IRValueRef idx) noexcept {
-    return val_parts(idx).count();
   }
 
   u32 type_part_count(LLVMBasicValType bvt, u32 complex_part_tys_idx) noexcept {

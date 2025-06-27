@@ -2673,14 +2673,14 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_int_to_ptr(
 
 template <typename Adaptor, typename Derived, typename Config>
 bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_bitcast(
-    const llvm::Instruction *inst, const ValInfo &, u64) noexcept {
+    const llvm::Instruction *inst, const ValInfo &val_info, u64) noexcept {
   // at most this should be fine to implement as a copy operation
   // as the values cannot be aggregates
   // TODO: this is not necessarily a no-op for vectors
   const auto src = inst->getOperand(0);
 
   const auto src_parts = this->adaptor->val_parts(src);
-  const auto dst_parts = this->adaptor->val_parts(inst);
+  const auto dst_parts = this->adaptor->val_parts(val_info);
   // TODO(ts): support 128bit values
   if (src_parts.count() != 1 || dst_parts.count() != 1) {
     return false;
@@ -2721,12 +2721,12 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_extract_value(
 
 template <typename Adaptor, typename Derived, typename Config>
 bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_insert_value(
-    const llvm::Instruction *inst, const ValInfo &, u64) noexcept {
+    const llvm::Instruction *inst, const ValInfo &val_info, u64) noexcept {
   const auto *insert = llvm::cast<llvm::InsertValueInst>(inst);
   auto agg = insert->getAggregateOperand();
   auto ins = insert->getInsertedValueOperand();
 
-  unsigned part_count = this->adaptor->val_part_count(agg);
+  unsigned part_count = this->adaptor->val_parts(val_info).count();
   auto [first_part, last_part] =
       this->adaptor->complex_part_for_index(insert, insert->getIndices());
 
@@ -3611,7 +3611,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_select(
   case complex: {
     // Handle case of complex with two i64 as i128, this is extremely hacky...
     // TODO(ts): support full complex types using branches
-    const auto parts = this->adaptor->val_parts(inst);
+    const auto parts = this->adaptor->val_parts(val_info);
     if (parts.count() != 2 || parts.reg_bank(0) != Config::GP_BANK ||
         parts.reg_bank(1) != Config::GP_BANK) {
       return false;
