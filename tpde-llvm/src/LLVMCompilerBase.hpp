@@ -2662,16 +2662,24 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_int_ext(
 
 template <typename Adaptor, typename Derived, typename Config>
 bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_ptr_to_int(
-    const llvm::Instruction *inst, const ValInfo &, u64) noexcept {
-  if (!inst->getType()->isIntegerTy()) {
-    return false;
+    const llvm::Instruction *inst, const ValInfo &val_info, u64) noexcept {
+  ValueRef src = this->val_ref(inst->getOperand(0));
+  ValueRef res = this->result_ref(inst);
+
+  llvm::Type *dst_ty = inst->getType();
+  if (dst_ty->isIntegerTy() || dst_ty->getScalarType()->isIntegerTy(64)) {
+    // Just copy all parts, this is a no-op. For integers, the upper bits are
+    // undefined, so no actual truncation needs to be done.
+    auto part_count = this->adaptor->val_parts(val_info).count();
+    for (u32 i = 0; i != part_count; ++i) {
+      res.part(i).set_value(src.part(i));
+    }
+    return true;
   }
 
-  // this is a no-op since every operation that depends on it will
-  // zero/sign-extend the value anyways
-  auto [res_vr, res_ref] = this->result_ref_single(inst);
-  res_ref.set_value(this->val_ref(inst->getOperand(0)).part(0));
-  return true;
+  // TODO: implement vector ptrtoint with truncation.
+  // Might simply reuse compile_trunc for this.
+  return false;
 }
 
 template <typename Adaptor, typename Derived, typename Config>
