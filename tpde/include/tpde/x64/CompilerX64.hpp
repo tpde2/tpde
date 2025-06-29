@@ -173,9 +173,9 @@ public:
 
   void assign_arg(CCAssignment &arg) noexcept override {
     if (arg.byval) {
-      stack = util::align_up(stack, arg.byval_align < 8 ? 8 : arg.byval_align);
+      stack = util::align_up(stack, arg.align < 8 ? 8 : arg.align);
       arg.stack_off = stack;
-      stack += arg.byval_size;
+      stack += arg.size;
       return;
     }
 
@@ -611,8 +611,10 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::gen_func_prolog_and_args(
         arg_idx,
         arg,
         [&](ValuePart &&vp, CCAssignment cca) -> std::optional<i32> {
-          cca.bank = vp.bank();
-          cca.size = vp.part_size();
+          if (!cca.byval) {
+            cca.bank = vp.bank();
+            cca.size = vp.part_size();
+          }
 
           cc_assigner->assign_arg(cca);
 
@@ -1602,7 +1604,7 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::CallBuilder::add_arg_byval(
   ScratchReg scratch{&this->compiler};
   AsmReg tmp = scratch.alloc_gp();
 
-  auto size = cca.byval_size;
+  auto size = cca.size;
   set_stack_used();
   i32 off = 0;
   while (size >= 8) {

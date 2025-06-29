@@ -33,7 +33,7 @@ enum class TLSModel {
 };
 
 struct CCAssignment {
-  Reg reg = Reg::make_invalid();
+  Reg reg = Reg::make_invalid(); ///< Assigned register, invalid implies stack.
 
   /// If non-zero, indicates that this and the next N values must be
   /// assigned to consecutive registers, or to the stack. The following
@@ -43,13 +43,21 @@ struct CCAssignment {
   bool sret : 1 = false; ///< Argument is return value pointer.
   bool sext : 1 = false; ///< Sign-extend single integer.
   bool zext : 1 = false; ///< Zero-extend single integer.
+
+  /// The argument is passed by value on the stack. The provided argument is a
+  /// pointer; for the call, size bytes will be copied into the corresponding
+  /// stack slot. Behaves like LLVM's byval.
+  ///
+  /// Note: On x86-64 SysV, this is used to pass larger structs in memory. Note
+  /// that AArch64 AAPCS doesn't use byval for structs, instead, the pointer is
+  /// passed without byval and it is the responsibility of the caller to
+  /// explicitly copy the value.
   bool byval : 1 = false;
-  u8 align = 0;
-  u8 size = 0;
-  RegBank bank = RegBank{};
-  u32 byval_align = 0;
-  u32 byval_size = 0; // only used if byval is set
-  u32 stack_off = 0;  // only used if reg is invalid
+
+  u8 align = 0;             ///< Argument alignment
+  RegBank bank = RegBank{}; ///< Register bank to assign the value to.
+  u32 size = 0;             ///< Argument size, for byval the stack slot size.
+  u32 stack_off = 0; ///< Assigned stack slot, only valid if reg is invalid.
 };
 
 struct CCInfo {
@@ -198,7 +206,7 @@ public:
 
     explicit CallArg(IRValueRef value,
                      Flag flags = Flag::none,
-                     u32 byval_align = 0,
+                     u8 byval_align = 0,
                      u32 byval_size = 0)
         : value(value),
           flag(flags),
@@ -207,7 +215,7 @@ public:
 
     IRValueRef value;
     Flag flag;
-    u32 byval_align;
+    u8 byval_align;
     u32 byval_size;
   };
 
@@ -459,8 +467,10 @@ template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>
 template <typename CBDerived>
 void CompilerBase<Adaptor, Derived, Config>::CallBuilderBase<
     CBDerived>::add_arg(ValuePart &&vp, CCAssignment cca) noexcept {
-  cca.bank = vp.bank();
-  cca.size = vp.part_size();
+  if (!cca.byval) {
+    cca.bank = vp.bank();
+    cca.size = vp.part_size();
+  }
 
   assigner.assign_arg(cca);
 
@@ -521,8 +531,8 @@ void CompilerBase<Adaptor, Derived, Config>::CallBuilderBase<
     add_arg(vr.part(0),
             CCAssignment{
                 .byval = true,
-                .byval_align = arg.byval_align,
-                .byval_size = arg.byval_size,
+                .align = arg.byval_align,
+                .size = arg.byval_size,
             });
     return;
   }
@@ -982,8 +992,8 @@ void CompilerBase<Adaptor, Derived, Config>::handle_func_arg(
         add_arg(vr.part(0),
                 CCAssignment{
                     .byval = true,
-                    .byval_align = adaptor->cur_arg_byval_align(arg_idx),
-                    .byval_size = adaptor->cur_arg_byval_size(arg_idx),
+                    .align = u8(adaptor->cur_arg_byval_align(arg_idx)),
+                    .size = adaptor->cur_arg_byval_size(arg_idx),
                 });
 
     if (byval_frame_off) {

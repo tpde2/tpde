@@ -223,9 +223,9 @@ public:
 
   void assign_arg(CCAssignment &arg) noexcept override {
     if (arg.byval) [[unlikely]] {
-      nsaa = util::align_up(nsaa, arg.byval_align < 8 ? 8 : arg.byval_align);
+      nsaa = util::align_up(nsaa, arg.align < 8 ? 8 : arg.align);
       arg.stack_off = nsaa;
-      nsaa += arg.byval_size;
+      nsaa += arg.size;
       return;
     }
 
@@ -569,7 +569,7 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::CallBuilder::add_arg_byval(
   AsmReg ptr_reg = vp.load_to_reg(&this->compiler);
   AsmReg tmp_reg = AsmReg::R16;
 
-  auto size = cca.byval_size;
+  auto size = cca.size;
   set_stack_used();
   for (u32 off = 0; off < size;) {
     if (size - off >= 8) {
@@ -758,8 +758,10 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::gen_func_prolog_and_args(
         arg_idx,
         arg,
         [&](ValuePart &&vp, CCAssignment cca) -> std::optional<i32> {
-          cca.bank = vp.bank();
-          cca.size = vp.part_size();
+          if (!cca.byval) {
+            cca.bank = vp.bank();
+            cca.size = vp.part_size();
+          }
 
           cc_assigner->assign_arg(cca);
 
