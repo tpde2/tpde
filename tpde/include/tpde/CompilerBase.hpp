@@ -41,8 +41,6 @@ struct CCAssignment {
   /// no architecture has more than 255 parameter registers in a single bank.
   u8 consecutive = 0;
   bool sret : 1 = false; ///< Argument is return value pointer.
-  bool sext : 1 = false; ///< Sign-extend single integer.
-  bool zext : 1 = false; ///< Zero-extend single integer.
 
   /// The argument is passed by value on the stack. The provided argument is a
   /// pointer; for the call, size bytes will be copied into the corresponding
@@ -53,6 +51,10 @@ struct CCAssignment {
   /// passed without byval and it is the responsibility of the caller to
   /// explicitly copy the value.
   bool byval : 1 = false;
+
+  /// Extend integer argument. Highest bit indicates signed-ness, lower bits
+  /// indicate the source width from which the argument should be extended.
+  u8 int_ext = 0;
 
   u8 align = 0;             ///< Argument alignment
   RegBank bank = RegBank{}; ///< Register bank to assign the value to.
@@ -216,6 +218,7 @@ public:
     IRValueRef value;
     Flag flag;
     u8 byval_align;
+    u8 ext_bits = 0;
     u32 byval_size;
   };
 
@@ -238,8 +241,8 @@ public:
     CBDerived *derived() noexcept { return static_cast<CBDerived *>(this); }
 
     void add_arg(ValuePart &&vp, CCAssignment cca) noexcept;
-    void add_arg(CallArg &&arg, u32 part_count) noexcept;
-    void add_arg(CallArg &&arg) noexcept {
+    void add_arg(const CallArg &arg, u32 part_count) noexcept;
+    void add_arg(const CallArg &arg) noexcept {
       add_arg(std::move(arg), compiler.val_parts(arg.value).count());
     }
 
@@ -266,7 +269,7 @@ public:
     }
 
     void add(ValuePart &&vp, CCAssignment cca) noexcept;
-    void add(IRValueRef val, CallArg::Flag flag = CallArg::Flag::none) noexcept;
+    void add(IRValueRef val) noexcept;
 
     void ret() noexcept;
   };
@@ -481,6 +484,10 @@ void CompilerBase<Adaptor, Derived, Config>::CallBuilderBase<
     derived()->add_arg_stack(vp, cca);
     vp.reset(&compiler);
   } else {
+    bool needs_ext = cca.int_ext != 0;
+    bool ext_sign = cca.int_ext >> 7;
+    unsigned ext_bits = cca.int_ext & 0x3f;
+
     u32 size = vp.part_size();
     if (vp.is_in_reg(cca.reg)) {
       if (!vp.can_salvage()) {
@@ -488,8 +495,8 @@ void CompilerBase<Adaptor, Derived, Config>::CallBuilderBase<
       } else {
         vp.salvage(&compiler);
       }
-      if (cca.sext || cca.zext) {
-        compiler.generate_raw_intext(cca.reg, cca.reg, cca.sext, 8 * size, 64);
+      if (needs_ext) {
+        compiler.generate_raw_intext(cca.reg, cca.reg, ext_sign, ext_bits, 64);
       }
     } else {
       if (compiler.register_file.is_used(cca.reg)) {
@@ -497,16 +504,16 @@ void CompilerBase<Adaptor, Derived, Config>::CallBuilderBase<
       }
       if (vp.can_salvage()) {
         AsmReg vp_reg = vp.salvage(&compiler);
-        if (cca.sext || cca.zext) {
-          compiler.generate_raw_intext(cca.reg, vp_reg, cca.sext, 8 * size, 64);
+        if (needs_ext) {
+          compiler.generate_raw_intext(cca.reg, vp_reg, ext_sign, ext_bits, 64);
         } else {
           compiler.mov(cca.reg, vp_reg, size);
         }
       } else {
         vp.reload_into_specific_fixed(&compiler, cca.reg);
-        if (cca.sext || cca.zext) {
+        if (needs_ext) {
           compiler.generate_raw_intext(
-              cca.reg, cca.reg, cca.sext, 8 * size, 64);
+              cca.reg, cca.reg, ext_sign, ext_bits, 64);
         }
       }
     }
@@ -523,7 +530,7 @@ void CompilerBase<Adaptor, Derived, Config>::CallBuilderBase<
 template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>
 template <typename CBDerived>
 void CompilerBase<Adaptor, Derived, Config>::CallBuilderBase<
-    CBDerived>::add_arg(CallArg &&arg, u32 part_count) noexcept {
+    CBDerived>::add_arg(const CallArg &arg, u32 part_count) noexcept {
   ValueRef vr = compiler.val_ref(arg.value);
 
   if (arg.flag == CallArg::Flag::byval) {
@@ -555,14 +562,18 @@ void CompilerBase<Adaptor, Derived, Config>::CallBuilderBase<
   }
 
   for (u32 part_idx = 0; part_idx < part_count; ++part_idx) {
+    u8 int_ext = 0;
+    if (arg.flag == CallArg::Flag::sext || arg.flag == CallArg::Flag::zext) {
+      assert(arg.ext_bits != 0 && "cannot extend zero-bit integer");
+      int_ext = arg.ext_bits | (arg.flag == CallArg::Flag::sext ? 0x80 : 0);
+    }
     derived()->add_arg(
         vr.part(part_idx),
         CCAssignment{
             .consecutive =
                 u8(consecutive ? part_count - part_idx - 1 : consec_def),
             .sret = arg.flag == CallArg::Flag::sret,
-            .sext = arg.flag == CallArg::Flag::sext,
-            .zext = arg.flag == CallArg::Flag::zext,
+            .int_ext = int_ext,
             .align = u8(part_idx == 0 ? align : 1),
         });
   }
@@ -625,14 +636,18 @@ void CompilerBase<Adaptor, Derived, Config>::RetBuilder::add(
   assigner.assign_ret(cca);
   assert(cca.reg.valid() && "indirect return value must use sret argument");
 
+  bool needs_ext = cca.int_ext != 0;
+  bool ext_sign = cca.int_ext >> 7;
+  unsigned ext_bits = cca.int_ext & 0x3f;
+
   if (vp.is_in_reg(cca.reg)) {
     if (!vp.can_salvage()) {
       compiler.evict_reg(cca.reg);
     } else {
       vp.salvage(&compiler);
     }
-    if (cca.sext || cca.zext) {
-      compiler.generate_raw_intext(cca.reg, cca.reg, cca.sext, 8 * size, 64);
+    if (needs_ext) {
+      compiler.generate_raw_intext(cca.reg, cca.reg, ext_sign, ext_bits, 64);
     }
   } else {
     if (compiler.register_file.is_used(cca.reg)) {
@@ -640,15 +655,15 @@ void CompilerBase<Adaptor, Derived, Config>::RetBuilder::add(
     }
     if (vp.can_salvage()) {
       AsmReg vp_reg = vp.salvage(&compiler);
-      if (cca.sext || cca.zext) {
-        compiler.generate_raw_intext(cca.reg, vp_reg, cca.sext, 8 * size, 64);
+      if (needs_ext) {
+        compiler.generate_raw_intext(cca.reg, vp_reg, ext_sign, ext_bits, 64);
       } else {
         compiler.mov(cca.reg, vp_reg, size);
       }
     } else {
       vp.reload_into_specific_fixed(&compiler, cca.reg);
-      if (cca.sext || cca.zext) {
-        compiler.generate_raw_intext(cca.reg, cca.reg, cca.sext, 8 * size, 64);
+      if (needs_ext) {
+        compiler.generate_raw_intext(cca.reg, cca.reg, ext_sign, ext_bits, 64);
       }
     }
   }
@@ -663,15 +678,11 @@ void CompilerBase<Adaptor, Derived, Config>::RetBuilder::add(
 
 template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>
 void CompilerBase<Adaptor, Derived, Config>::RetBuilder::add(
-    IRValueRef val, CallArg::Flag flag) noexcept {
+    IRValueRef val) noexcept {
   u32 part_count = compiler.val_parts(val).count();
   ValueRef vr = compiler.val_ref(val);
   for (u32 part_idx = 0; part_idx < part_count; ++part_idx) {
-    add(vr.part(part_idx),
-        CCAssignment{
-            .sext = flag == CallArg::Flag::sext,
-            .zext = flag == CallArg::Flag::zext,
-        });
+    add(vr.part(part_idx), CCAssignment{});
   }
 }
 

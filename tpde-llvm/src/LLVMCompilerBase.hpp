@@ -3558,31 +3558,29 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_call(
     using CallArg = typename Derived::CallArg;
 
     auto *op = call->getArgOperand(i);
-    auto flag = CallArg::Flag::none;
-    u32 byval_align = 0, byval_size = 0;
+    CallArg arg{op};
 
     if (call->paramHasAttr(i, llvm::Attribute::AttrKind::ZExt)) {
-      flag = CallArg::Flag::zext;
+      arg.flag = CallArg::Flag::zext;
+      arg.ext_bits = op->getType()->getIntegerBitWidth();
     } else if (call->paramHasAttr(i, llvm::Attribute::AttrKind::SExt)) {
-      flag = CallArg::Flag::sext;
+      arg.flag = CallArg::Flag::sext;
+      arg.ext_bits = op->getType()->getIntegerBitWidth();
     } else if (call->paramHasAttr(i, llvm::Attribute::AttrKind::ByVal)) {
-      flag = CallArg::Flag::byval;
+      arg.flag = CallArg::Flag::byval;
       auto &data_layout = this->adaptor->mod->getDataLayout();
       llvm::Type *byval_ty = call->getParamByValType(i);
-      byval_size = data_layout.getTypeAllocSize(byval_ty);
+      arg.byval_size = data_layout.getTypeAllocSize(byval_ty);
 
       if (auto param_align = call->getParamStackAlign(i)) {
-        byval_align = param_align->value();
+        arg.byval_align = param_align->value();
       } else if (auto param_align = call->getParamAlign(i)) {
-        byval_align = param_align->value();
+        arg.byval_align = param_align->value();
       } else {
-        byval_align = data_layout.getABITypeAlign(byval_ty).value();
-      }
-      if (u8(byval_align) != byval_align) {
-        return false;
+        arg.byval_align = data_layout.getABITypeAlign(byval_ty).value();
       }
     } else if (call->paramHasAttr(i, llvm::Attribute::AttrKind::StructRet)) {
-      flag = CallArg::Flag::sret;
+      arg.flag = CallArg::Flag::sret;
     }
     assert(!call->paramHasAttr(i, llvm::Attribute::AttrKind::InAlloca));
     assert(!call->paramHasAttr(i, llvm::Attribute::AttrKind::Preallocated));
@@ -3590,8 +3588,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_call(
     auto [ty, ty_idx] = this->adaptor->lower_type(op);
     this->adaptor->check_type_compatibility(op->getType(), ty, ty_idx);
     // Explicitly pass part count to avoid duplicate type lowering.
-    u32 part_count = this->adaptor->type_part_count(ty, ty_idx);
-    cb->add_arg(CallArg{op, flag, u8(byval_align), byval_size}, part_count);
+    cb->add_arg(arg, this->adaptor->type_part_count(ty, ty_idx));
   }
 
   llvm::Value *target = call->getCalledOperand();
