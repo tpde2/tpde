@@ -636,20 +636,19 @@ std::optional<typename LLVMCompilerBase<Adaptor, Derived, Config>::ValuePartRef>
     return ValuePartRef{this, local_idx, assignment, 0, /*owned=*/false};
   }
 
+  u32 size = this->adaptor->basic_ty_part_size(ty);
+  tpde::RegBank bank = this->adaptor->basic_ty_part_bank(ty);
+
   if (llvm::isa<llvm::PoisonValue>(const_val) ||
       llvm::isa<llvm::UndefValue>(const_val) ||
       llvm::isa<llvm::ConstantPointerNull>(const_val) ||
       llvm::isa<llvm::ConstantAggregateZero>(const_val)) {
-    u32 size = this->adaptor->basic_ty_part_size(ty);
-    tpde::RegBank bank = this->adaptor->basic_ty_part_bank(ty);
     static const std::array<u64, 8> zero{};
     assert(size <= zero.size() * sizeof(u64));
     return ValuePartRef(this, zero.data(), size, bank);
   }
 
   if (auto *cdv = llvm::dyn_cast<llvm::ConstantDataVector>(const_val)) {
-    u32 size = this->adaptor->basic_ty_part_size(ty);
-    tpde::RegBank bank = this->adaptor->basic_ty_part_bank(ty);
     llvm::StringRef data = cdv->getRawDataValues();
     assert((sub_part + 1) * size <= data.size());
     // TODO: use data.data() to avoid copying if possible?
@@ -662,14 +661,27 @@ std::optional<typename LLVMCompilerBase<Adaptor, Derived, Config>::ValuePartRef>
   }
 
   if (llvm::isa<llvm::ConstantVector>(const_val)) {
+    if (const_val->getType()->getScalarType()->isIntegerTy(1)) {
+      assert(const_val->getNumOperands() <= 64 &&
+             "i1-vector with more than 64 elements should not be legal");
+      u64 val = 0;
+      for (auto it : llvm::enumerate(const_val->operands())) {
+        if (auto *ci = llvm::dyn_cast<llvm::ConstantInt>(it.value())) {
+          val |= u64{ci->isOne()} << it.index();
+        } else {
+          // All other constant types should've been converted to insertelement.
+          assert((llvm::isa<llvm::UndefValue, llvm::PoisonValue>(it.value())));
+        }
+      }
+      return ValuePartRef(this, val, size, bank);
+    }
+
     // TODO(ts): check how to handle this
     TPDE_FATAL("non-sequential vector constants should not be legal");
   }
 
   if (const auto *const_int = llvm::dyn_cast<llvm::ConstantInt>(const_val)) {
     assert(sub_part < (ty == LLVMBasicValType::i128 ? 2 : 1));
-    u32 size = this->adaptor->basic_ty_part_size(ty);
-    tpde::RegBank bank = this->adaptor->basic_ty_part_bank(ty);
     assert(size <= 8 && "multi-word integer as single part?");
     const u64 *data = const_int->getValue().getRawData();
     return ValuePartRef(this, data[sub_part], size, bank);
@@ -684,8 +696,6 @@ std::optional<typename LLVMCompilerBase<Adaptor, Derived, Config>::ValuePartRef>
     std::memcpy(
         data, int_val.getRawData(), int_val.getNumWords() * sizeof(u64));
 
-    u32 size = this->adaptor->basic_ty_part_size(ty);
-    tpde::RegBank bank = this->adaptor->basic_ty_part_bank(ty);
     assert(size <= int_val.getNumWords() * sizeof(u64));
     return ValuePartRef(this, data, size, bank);
   }
