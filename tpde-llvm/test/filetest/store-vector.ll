@@ -307,8 +307,8 @@ define void @store_v2ptr(ptr %p) {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:    mov qword ptr [rdi], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0x8], 0x0
+; X64-NEXT:    pxor xmm0, xmm0
+; X64-NEXT:    movups xmmword ptr [rdi], xmm0
 ; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -318,10 +318,8 @@ define void @store_v2ptr(ptr %p) {
 ; ARM64-NEXT:    stp x29, x30, [sp]
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0x8]
+; ARM64-NEXT:    movi v0.16b, #0x0
+; ARM64-NEXT:    str q0, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp]
 ; ARM64-NEXT:    add sp, sp, #0xa0
 ; ARM64-NEXT:    ret
@@ -733,10 +731,10 @@ define void @store_v4ptr(ptr %p) {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:    mov qword ptr [rdi], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0x8], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0x10], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0x18], 0x0
+; X64-NEXT:    pxor xmm0, xmm0
+; X64-NEXT:    movups xmmword ptr [rdi], xmm0
+; X64-NEXT:    pxor xmm0, xmm0
+; X64-NEXT:    movups xmmword ptr [rdi + 0x10], xmm0
 ; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -746,14 +744,10 @@ define void @store_v4ptr(ptr %p) {
 ; ARM64-NEXT:    stp x29, x30, [sp]
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0x8]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0x10]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0x18]
+; ARM64-NEXT:    movi v0.16b, #0x0
+; ARM64-NEXT:    str q0, [x0]
+; ARM64-NEXT:    movi v0.16b, #0x0
+; ARM64-NEXT:    str q0, [x0, #0x10]
 ; ARM64-NEXT:    ldp x29, x30, [sp]
 ; ARM64-NEXT:    add sp, sp, #0xa0
 ; ARM64-NEXT:    ret
@@ -1151,70 +1145,70 @@ define void @store_v64ptr(ptr %p) {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:    mov qword ptr [rdi], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0x8], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0x10], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0x18], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0x20], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0x28], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0x30], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0x38], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0x40], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0x48], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0x50], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0x58], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0x60], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0x68], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0x70], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0x78], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0x80], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0x88], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0x90], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0x98], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0xa0], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0xa8], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0xb0], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0xb8], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0xc0], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0xc8], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0xd0], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0xd8], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0xe0], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0xe8], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0xf0], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0xf8], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0x100], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0x108], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0x110], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0x118], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0x120], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0x128], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0x130], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0x138], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0x140], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0x148], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0x150], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0x158], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0x160], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0x168], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0x170], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0x178], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0x180], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0x188], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0x190], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0x198], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0x1a0], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0x1a8], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0x1b0], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0x1b8], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0x1c0], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0x1c8], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0x1d0], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0x1d8], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0x1e0], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0x1e8], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0x1f0], 0x0
-; X64-NEXT:    mov qword ptr [rdi + 0x1f8], 0x0
+; X64-NEXT:    pxor xmm0, xmm0
+; X64-NEXT:    movups xmmword ptr [rdi], xmm0
+; X64-NEXT:    pxor xmm0, xmm0
+; X64-NEXT:    movups xmmword ptr [rdi + 0x10], xmm0
+; X64-NEXT:    pxor xmm0, xmm0
+; X64-NEXT:    movups xmmword ptr [rdi + 0x20], xmm0
+; X64-NEXT:    pxor xmm0, xmm0
+; X64-NEXT:    movups xmmword ptr [rdi + 0x30], xmm0
+; X64-NEXT:    pxor xmm0, xmm0
+; X64-NEXT:    movups xmmword ptr [rdi + 0x40], xmm0
+; X64-NEXT:    pxor xmm0, xmm0
+; X64-NEXT:    movups xmmword ptr [rdi + 0x50], xmm0
+; X64-NEXT:    pxor xmm0, xmm0
+; X64-NEXT:    movups xmmword ptr [rdi + 0x60], xmm0
+; X64-NEXT:    pxor xmm0, xmm0
+; X64-NEXT:    movups xmmword ptr [rdi + 0x70], xmm0
+; X64-NEXT:    pxor xmm0, xmm0
+; X64-NEXT:    movups xmmword ptr [rdi + 0x80], xmm0
+; X64-NEXT:    pxor xmm0, xmm0
+; X64-NEXT:    movups xmmword ptr [rdi + 0x90], xmm0
+; X64-NEXT:    pxor xmm0, xmm0
+; X64-NEXT:    movups xmmword ptr [rdi + 0xa0], xmm0
+; X64-NEXT:    pxor xmm0, xmm0
+; X64-NEXT:    movups xmmword ptr [rdi + 0xb0], xmm0
+; X64-NEXT:    pxor xmm0, xmm0
+; X64-NEXT:    movups xmmword ptr [rdi + 0xc0], xmm0
+; X64-NEXT:    pxor xmm0, xmm0
+; X64-NEXT:    movups xmmword ptr [rdi + 0xd0], xmm0
+; X64-NEXT:    pxor xmm0, xmm0
+; X64-NEXT:    movups xmmword ptr [rdi + 0xe0], xmm0
+; X64-NEXT:    pxor xmm0, xmm0
+; X64-NEXT:    movups xmmword ptr [rdi + 0xf0], xmm0
+; X64-NEXT:    pxor xmm0, xmm0
+; X64-NEXT:    movups xmmword ptr [rdi + 0x100], xmm0
+; X64-NEXT:    pxor xmm0, xmm0
+; X64-NEXT:    movups xmmword ptr [rdi + 0x110], xmm0
+; X64-NEXT:    pxor xmm0, xmm0
+; X64-NEXT:    movups xmmword ptr [rdi + 0x120], xmm0
+; X64-NEXT:    pxor xmm0, xmm0
+; X64-NEXT:    movups xmmword ptr [rdi + 0x130], xmm0
+; X64-NEXT:    pxor xmm0, xmm0
+; X64-NEXT:    movups xmmword ptr [rdi + 0x140], xmm0
+; X64-NEXT:    pxor xmm0, xmm0
+; X64-NEXT:    movups xmmword ptr [rdi + 0x150], xmm0
+; X64-NEXT:    pxor xmm0, xmm0
+; X64-NEXT:    movups xmmword ptr [rdi + 0x160], xmm0
+; X64-NEXT:    pxor xmm0, xmm0
+; X64-NEXT:    movups xmmword ptr [rdi + 0x170], xmm0
+; X64-NEXT:    pxor xmm0, xmm0
+; X64-NEXT:    movups xmmword ptr [rdi + 0x180], xmm0
+; X64-NEXT:    pxor xmm0, xmm0
+; X64-NEXT:    movups xmmword ptr [rdi + 0x190], xmm0
+; X64-NEXT:    pxor xmm0, xmm0
+; X64-NEXT:    movups xmmword ptr [rdi + 0x1a0], xmm0
+; X64-NEXT:    pxor xmm0, xmm0
+; X64-NEXT:    movups xmmword ptr [rdi + 0x1b0], xmm0
+; X64-NEXT:    pxor xmm0, xmm0
+; X64-NEXT:    movups xmmword ptr [rdi + 0x1c0], xmm0
+; X64-NEXT:    pxor xmm0, xmm0
+; X64-NEXT:    movups xmmword ptr [rdi + 0x1d0], xmm0
+; X64-NEXT:    pxor xmm0, xmm0
+; X64-NEXT:    movups xmmword ptr [rdi + 0x1e0], xmm0
+; X64-NEXT:    pxor xmm0, xmm0
+; X64-NEXT:    movups xmmword ptr [rdi + 0x1f0], xmm0
 ; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -1224,134 +1218,70 @@ define void @store_v64ptr(ptr %p) {
 ; ARM64-NEXT:    stp x29, x30, [sp]
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0x8]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0x10]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0x18]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0x20]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0x28]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0x30]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0x38]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0x40]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0x48]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0x50]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0x58]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0x60]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0x68]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0x70]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0x78]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0x80]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0x88]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0x90]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0x98]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0xa0]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0xa8]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0xb0]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0xb8]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0xc0]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0xc8]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0xd0]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0xd8]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0xe0]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0xe8]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0xf0]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0xf8]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0x100]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0x108]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0x110]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0x118]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0x120]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0x128]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0x130]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0x138]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0x140]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0x148]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0x150]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0x158]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0x160]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0x168]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0x170]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0x178]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0x180]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0x188]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0x190]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0x198]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0x1a0]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0x1a8]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0x1b0]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0x1b8]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0x1c0]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0x1c8]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0x1d0]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0x1d8]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0x1e0]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0x1e8]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0x1f0]
-; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    str x1, [x0, #0x1f8]
+; ARM64-NEXT:    movi v0.16b, #0x0
+; ARM64-NEXT:    str q0, [x0]
+; ARM64-NEXT:    movi v0.16b, #0x0
+; ARM64-NEXT:    str q0, [x0, #0x10]
+; ARM64-NEXT:    movi v0.16b, #0x0
+; ARM64-NEXT:    str q0, [x0, #0x20]
+; ARM64-NEXT:    movi v0.16b, #0x0
+; ARM64-NEXT:    str q0, [x0, #0x30]
+; ARM64-NEXT:    movi v0.16b, #0x0
+; ARM64-NEXT:    str q0, [x0, #0x40]
+; ARM64-NEXT:    movi v0.16b, #0x0
+; ARM64-NEXT:    str q0, [x0, #0x50]
+; ARM64-NEXT:    movi v0.16b, #0x0
+; ARM64-NEXT:    str q0, [x0, #0x60]
+; ARM64-NEXT:    movi v0.16b, #0x0
+; ARM64-NEXT:    str q0, [x0, #0x70]
+; ARM64-NEXT:    movi v0.16b, #0x0
+; ARM64-NEXT:    str q0, [x0, #0x80]
+; ARM64-NEXT:    movi v0.16b, #0x0
+; ARM64-NEXT:    str q0, [x0, #0x90]
+; ARM64-NEXT:    movi v0.16b, #0x0
+; ARM64-NEXT:    str q0, [x0, #0xa0]
+; ARM64-NEXT:    movi v0.16b, #0x0
+; ARM64-NEXT:    str q0, [x0, #0xb0]
+; ARM64-NEXT:    movi v0.16b, #0x0
+; ARM64-NEXT:    str q0, [x0, #0xc0]
+; ARM64-NEXT:    movi v0.16b, #0x0
+; ARM64-NEXT:    str q0, [x0, #0xd0]
+; ARM64-NEXT:    movi v0.16b, #0x0
+; ARM64-NEXT:    str q0, [x0, #0xe0]
+; ARM64-NEXT:    movi v0.16b, #0x0
+; ARM64-NEXT:    str q0, [x0, #0xf0]
+; ARM64-NEXT:    movi v0.16b, #0x0
+; ARM64-NEXT:    str q0, [x0, #0x100]
+; ARM64-NEXT:    movi v0.16b, #0x0
+; ARM64-NEXT:    str q0, [x0, #0x110]
+; ARM64-NEXT:    movi v0.16b, #0x0
+; ARM64-NEXT:    str q0, [x0, #0x120]
+; ARM64-NEXT:    movi v0.16b, #0x0
+; ARM64-NEXT:    str q0, [x0, #0x130]
+; ARM64-NEXT:    movi v0.16b, #0x0
+; ARM64-NEXT:    str q0, [x0, #0x140]
+; ARM64-NEXT:    movi v0.16b, #0x0
+; ARM64-NEXT:    str q0, [x0, #0x150]
+; ARM64-NEXT:    movi v0.16b, #0x0
+; ARM64-NEXT:    str q0, [x0, #0x160]
+; ARM64-NEXT:    movi v0.16b, #0x0
+; ARM64-NEXT:    str q0, [x0, #0x170]
+; ARM64-NEXT:    movi v0.16b, #0x0
+; ARM64-NEXT:    str q0, [x0, #0x180]
+; ARM64-NEXT:    movi v0.16b, #0x0
+; ARM64-NEXT:    str q0, [x0, #0x190]
+; ARM64-NEXT:    movi v0.16b, #0x0
+; ARM64-NEXT:    str q0, [x0, #0x1a0]
+; ARM64-NEXT:    movi v0.16b, #0x0
+; ARM64-NEXT:    str q0, [x0, #0x1b0]
+; ARM64-NEXT:    movi v0.16b, #0x0
+; ARM64-NEXT:    str q0, [x0, #0x1c0]
+; ARM64-NEXT:    movi v0.16b, #0x0
+; ARM64-NEXT:    str q0, [x0, #0x1d0]
+; ARM64-NEXT:    movi v0.16b, #0x0
+; ARM64-NEXT:    str q0, [x0, #0x1e0]
+; ARM64-NEXT:    movi v0.16b, #0x0
+; ARM64-NEXT:    str q0, [x0, #0x1f0]
 ; ARM64-NEXT:    ldp x29, x30, [sp]
 ; ARM64-NEXT:    add sp, sp, #0xa0
 ; ARM64-NEXT:    ret

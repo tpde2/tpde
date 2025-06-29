@@ -591,7 +591,9 @@ static std::tuple<LLVMBasicValType, u32, bool>
     return {LLVMBasicValType::f64, num_elts, true};
   case llvm::Type::PointerTyID:
     if (el_ty->getPointerAddressSpace() == 0) {
-      // TODO: for n=2, this should be {v2i64, 1, false}?
+      if (num_elts % 2 == 0) {
+        return {LLVMBasicValType::v2i64, num_elts / 2, num_elts != 2};
+      }
       return {LLVMBasicValType::i64, num_elts, true};
     }
     return {LLVMBasicValType::invalid, 0, false};
