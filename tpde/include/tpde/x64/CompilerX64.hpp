@@ -1651,7 +1651,7 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::CallBuilder::add_arg_stack(
     ValuePart &vp, CCAssignment &cca) noexcept {
   set_stack_used();
 
-  auto reg = vp.load_to_reg(&this->compiler);
+  auto reg = vp.has_reg() ? vp.cur_reg() : vp.load_to_reg(&this->compiler);
   if (this->compiler.register_file.reg_bank(reg) == Config::GP_BANK) {
     switch (cca.size) {
     case 1:

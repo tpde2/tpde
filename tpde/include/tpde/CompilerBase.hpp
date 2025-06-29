@@ -476,18 +476,23 @@ void CompilerBase<Adaptor, Derived, Config>::CallBuilderBase<
   }
 
   assigner.assign_arg(cca);
+  bool needs_ext = cca.int_ext != 0;
+  bool ext_sign = cca.int_ext >> 7;
+  unsigned ext_bits = cca.int_ext & 0x3f;
 
   if (cca.byval) {
     derived()->add_arg_byval(vp, cca);
     vp.reset(&compiler);
   } else if (!cca.reg.valid()) {
-    derived()->add_arg_stack(vp, cca);
+    if (needs_ext) {
+      auto ext = std::move(vp).into_extended(&compiler, ext_sign, ext_bits, 64);
+      derived()->add_arg_stack(ext, cca);
+      ext.reset(&compiler);
+    } else {
+      derived()->add_arg_stack(vp, cca);
+    }
     vp.reset(&compiler);
   } else {
-    bool needs_ext = cca.int_ext != 0;
-    bool ext_sign = cca.int_ext >> 7;
-    unsigned ext_bits = cca.int_ext & 0x3f;
-
     u32 size = vp.part_size();
     if (vp.is_in_reg(cca.reg)) {
       if (!vp.can_salvage()) {
