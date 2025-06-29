@@ -3050,7 +3050,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_shuffle_vector(
     bvt = LLVMBasicValType::i16;
   } else if (elem_ty->isIntegerTy(32)) {
     bvt = LLVMBasicValType::i32;
-  } else if (elem_ty->isIntegerTy(64)) {
+  } else if (elem_ty->isIntegerTy(64) || elem_ty->isPointerTy()) {
     bvt = LLVMBasicValType::i64;
   } else {
     // E.g., i1 vectors.
@@ -3080,6 +3080,8 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_shuffle_vector(
         const_elem = ci->getZExtValue();
       } else if (auto *cfp = llvm::dyn_cast<llvm::ConstantFP>(cst_elem)) {
         const_elem = cfp->getValue().bitcastToAPInt().getZExtValue();
+      } else if (llvm::isa<llvm::ConstantPointerNull>(cst_elem)) {
+        const_elem = 0;
       } else {
         TPDE_UNREACHABLE("invalid constant element type");
       }
