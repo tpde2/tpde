@@ -448,6 +448,9 @@ v2i64 TARGET_V1 ashrv2i64(v2i64 a, v2i64 b) { return (a >> b); }
     }                                                                          \
     v##nelem##sign##bits TARGET_V1 icmpmask_##pred##v##nelem##sign##bits(v##nelem##sign##bits a, v##nelem##sign##bits b) { \
       return a cmp b;                                                          \
+    }                                                                          \
+    v##nelem##sign##bits TARGET_V1 icmpset_##pred##v##nelem##sign##bits(v##nelem##sign##bits a, v##nelem##sign##bits b) { \
+      return -(a cmp b);                                                       \
     }
 #define ICMP_ALL(fn, ...) \
     fn(eq, ==, u, __VA_ARGS__) \

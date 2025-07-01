@@ -137,7 +137,7 @@ bool const_to_bytes(const llvm::DataLayout &dl,
     return true;
   }
   if (auto *CA = llvm::dyn_cast<llvm::ConstantAggregate>(constant); CA) {
-    const auto num_elements = CA->getType()->getStructNumElements();
+    const auto num_elements = CA->getNumOperands();
     auto &ctx = constant->getContext();
 
     auto *ty = CA->getType();

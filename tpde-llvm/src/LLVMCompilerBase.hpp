@@ -3124,7 +3124,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_icmp_vector(
   static constexpr auto fns = []() constexpr {
     constexpr unsigned NumPreds = llvm::ICmpInst::LAST_ICMP_PREDICATE -
                                   llvm::ICmpInst::FIRST_ICMP_PREDICATE + 1;
-    std::array<EncodeFnTy[7][2], NumPreds> res{};
+    std::array<EncodeFnTy[7][3], NumPreds> res{};
     auto entry = [&res](llvm::ICmpInst::Predicate pred) {
       return res[pred - llvm::ICmpInst::FIRST_ICMP_PREDICATE];
     };
@@ -3133,18 +3133,25 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_icmp_vector(
 #define FN_ENTRY(predval, predname, sign)                                      \
   entry(predval)[0][0] = &Derived::encode_icmp_##predname##v8##sign##8;        \
   entry(predval)[0][1] = &Derived::encode_icmpmask_##predname##v8##sign##8;    \
+  entry(predval)[0][2] = &Derived::encode_icmpset_##predname##v8##sign##8;     \
   entry(predval)[1][0] = &Derived::encode_icmp_##predname##v4##sign##16;       \
   entry(predval)[1][1] = &Derived::encode_icmpmask_##predname##v4##sign##16;   \
+  entry(predval)[1][2] = &Derived::encode_icmpset_##predname##v4##sign##16;    \
   entry(predval)[2][0] = &Derived::encode_icmp_##predname##v2##sign##32;       \
   entry(predval)[2][1] = &Derived::encode_icmpmask_##predname##v2##sign##32;   \
+  entry(predval)[2][2] = &Derived::encode_icmpset_##predname##v2##sign##32;    \
   entry(predval)[3][0] = &Derived::encode_icmp_##predname##v16##sign##8;       \
   entry(predval)[3][1] = &Derived::encode_icmpmask_##predname##v16##sign##8;   \
+  entry(predval)[3][2] = &Derived::encode_icmpset_##predname##v16##sign##8;    \
   entry(predval)[4][0] = &Derived::encode_icmp_##predname##v8##sign##16;       \
   entry(predval)[4][1] = &Derived::encode_icmpmask_##predname##v8##sign##16;   \
+  entry(predval)[4][2] = &Derived::encode_icmpset_##predname##v8##sign##16;    \
   entry(predval)[5][0] = &Derived::encode_icmp_##predname##v4##sign##32;       \
   entry(predval)[5][1] = &Derived::encode_icmpmask_##predname##v4##sign##32;   \
+  entry(predval)[5][2] = &Derived::encode_icmpset_##predname##v4##sign##32;    \
   entry(predval)[6][0] = &Derived::encode_icmp_##predname##v2##sign##64;       \
-  entry(predval)[6][1] = &Derived::encode_icmpmask_##predname##v2##sign##64;
+  entry(predval)[6][1] = &Derived::encode_icmpmask_##predname##v2##sign##64;   \
+  entry(predval)[6][2] = &Derived::encode_icmpset_##predname##v2##sign##64;
 
     FN_ENTRY(llvm::ICmpInst::ICMP_EQ, eq, u)
     FN_ENTRY(llvm::ICmpInst::ICMP_NE, ne, u)
@@ -3168,7 +3175,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_icmp_vector(
   const llvm::Instruction *fuse_ext = nullptr;
   if (icmp->hasNUses(1) && *icmp->user_begin() == icmp->getNextNode()) {
     auto *fuse_inst = icmp->getNextNode();
-    if (llvm::isa<llvm::SExtInst>(fuse_inst) &&
+    if (llvm::isa<llvm::SExtInst, llvm::ZExtInst>(fuse_inst) &&
         fuse_inst->getType() == lhs->getType()) {
       fuse_ext = fuse_inst;
     }
@@ -3188,7 +3195,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_icmp_vector(
   }
 
   u32 pred_idx = icmp->getPredicate() - llvm::ICmpInst::FIRST_ICMP_PREDICATE;
-  u32 res_type_idx = fuse_ext ? 1 : 0;
+  u32 res_type_idx = fuse_ext ? llvm::isa<llvm::ZExtInst>(fuse_ext) ? 2 : 1 : 0;
   EncodeFnTy encode_fn = fns[pred_idx][ty_idx][res_type_idx];
   if (!encode_fn) {
     return false;

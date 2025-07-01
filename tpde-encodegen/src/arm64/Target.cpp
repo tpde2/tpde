@@ -683,6 +683,7 @@ void EncodingTargetArm64::get_inst_candidates(
   case_default("CMGEv4i32", "CMGE4s");
   case_default("CMGEv2i64", "CMGE2d");
   case_default("DUPv16i8lane", "DUP16b");
+  case_default("DUPv2i64gpr", "DUP2dx");
   case_default("ADDv8i8", "ADD8b");
   case_default("ADDv16i8", "ADD16b");
   case_default("ADDv4i16", "ADD4h");
@@ -804,10 +805,38 @@ void EncodingTargetArm64::get_inst_candidates(
     }
     handle_noimm("MOVI2d", std::format(", {:#x}", imm));
   }
+  if (Name == "MOVIv8b_ns") {
+    unsigned op = mi.getOperand(1).getImm();
+    handle_noimm("MOVId", std::format(", {:#x}", op * 0x0101'0101'0101'0101));
+  }
+  if (Name == "MOVIv16b_ns") {
+    unsigned op = mi.getOperand(1).getImm();
+    handle_noimm("MOVI2d", std::format(", {:#x}", op * 0x0101'0101'0101'0101));
+  }
+  if (Name == "MOVIv4i16") {
+    uint32_t byte = mi.getOperand(1).getImm();
+    uint64_t imm = byte << mi.getOperand(2).getImm();
+    handle_noimm("MOVId", std::format(", {:#x}", imm * 0x0001'0001'0001'0001));
+  }
+  if (Name == "MOVIv8i16") {
+    uint32_t byte = mi.getOperand(1).getImm();
+    uint64_t imm = byte << mi.getOperand(2).getImm();
+    handle_noimm("MOVI2d", std::format(", {:#x}", imm * 0x0001'0001'0001'0001));
+  }
+  if (Name == "MOVIv2i32") {
+    uint32_t byte = mi.getOperand(1).getImm();
+    uint64_t imm = byte << mi.getOperand(2).getImm();
+    handle_noimm("MOVId", std::format(", {:#x}", imm * 0x0000'0001'0000'0001));
+  }
+  if (Name == "MOVIv4i32") {
+    uint32_t byte = mi.getOperand(1).getImm();
+    uint64_t imm = byte << mi.getOperand(2).getImm();
+    handle_noimm("MOVI2d", std::format(", {:#x}", imm * 0x0000'0001'0000'0001));
+  }
   if (Name == "MVNIv4i32") {
     uint32_t byte = mi.getOperand(1).getImm();
     uint64_t imm = ~(byte << mi.getOperand(2).getImm());
-    handle_noimm("MOVI2d", std::format(", {:#x}", imm | imm << 32));
+    handle_noimm("MOVI2d", std::format(", {:#x}", imm * 0x0000'0001'0000'0001));
   }
 
   case_default("FMOVSWr", "FMOVws");
