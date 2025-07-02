@@ -666,19 +666,22 @@ std::pair<unsigned, unsigned>
     size_t len = complex_part_types.size() - start;
 
     unsigned nelem = type->getArrayNumElements();
-    complex_part_types.resize(start + nelem * len);
+    u32 part_count = nelem * len;
+    if (part_count == 0) {
+      return std::make_pair(0, algn);
+    }
+
+    complex_part_types.resize(start + part_count);
     for (unsigned i = 1; i < nelem; i++) {
       std::memcpy(&complex_part_types[start + i * len],
                   &complex_part_types[start],
                   len * sizeof(LLVMComplexPart));
     }
-    if (nelem > 0) {
-      if (nelem * len > LLVMComplexPart::MaxLength) {
-        complex_part_types[desc_idx].desc.invalid = true;
-      }
-      complex_part_types[start].part.nest_inc++;
-      complex_part_types[start + nelem * len - 1].part.nest_dec++;
+    if (part_count > LLVMComplexPart::MaxLength) {
+      complex_part_types[desc_idx].desc.invalid = true;
     }
+    complex_part_types[start].part.nest_inc++;
+    complex_part_types[start + part_count - 1].part.nest_dec++;
     return std::make_pair(nelem * sz, algn);
   }
   case llvm::Type::StructTyID: {

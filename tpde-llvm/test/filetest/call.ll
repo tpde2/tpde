@@ -1868,6 +1868,36 @@ define void @call_fn_v_stack_i1z_i1s_i37z_i37s(i1 %a, i1 %b, i37 %c, i37 %d) {
   ret void
 }
 
+declare void @fn_a2s0_s0_s1s0_i32([2 x {}], {}, {{}}, i32)
+define void @call_fn_a2s0_s0_s1s0_i32() {
+; X64-LABEL: <call_fn_a2s0_s0_s1s0_i32>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    mov edi, 0x1
+; X64-NEXT:  <L0>:
+; X64-NEXT:    call <L0>
+; X64-NEXT:     R_X86_64_PLT32 fn_a2s0_s0_s1s0_i32-0x4
+; X64-NEXT:    add rsp, 0x30
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <call_fn_a2s0_s0_s1s0_i32>:
+; ARM64:         sub sp, sp, #0xa0
+; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
+; ARM64-NEXT:    mov x0, #0x1 // =1
+; ARM64-NEXT:    bl 0x1144 <call_fn_a2s0_s0_s1s0_i32+0x14>
+; ARM64-NEXT:     R_AARCH64_CALL26 fn_a2s0_s0_s1s0_i32
+; ARM64-NEXT:    ldp x29, x30, [sp]
+; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ret
+  call void @fn_a2s0_s0_s1s0_i32([2 x {}] zeroinitializer, {} {}, {{}} {{} {}}, i32 1)
+  ret void
+}
+
 declare ptr @fn_ptr()
 define void @call_vararg_ind(i64 %a) {
 ; X64-LABEL: <call_vararg_ind>:
@@ -1893,7 +1923,7 @@ define void @call_vararg_ind(i64 %a) {
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    str x0, [x29, #0xa0]
-; ARM64-NEXT:    bl 0x1144 <call_vararg_ind+0x14>
+; ARM64-NEXT:    bl 0x1194 <call_vararg_ind+0x14>
 ; ARM64-NEXT:     R_AARCH64_CALL26 fn_ptr
 ; ARM64-NEXT:    str x0, [x29, #0xa8]
 ; ARM64-NEXT:    ldr x0, [x29, #0xa0]
