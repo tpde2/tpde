@@ -32,13 +32,6 @@ if (((TPDE_LOGGING STREQUAL "DebugOnly") AND (CMAKE_BUILD_TYPE STREQUAL "Debug")
     target_link_libraries(tpde PUBLIC spdlog::spdlog)
 endif ()
 
-# gharveymn/small_vector
-add_subdirectory(../deps/small_vector ${CMAKE_CURRENT_BINARY_DIR}/deps/small_vector)
-
-# we don't use exceptions
-target_compile_definitions(tpde PUBLIC GCH_NO_STRONG_EXCEPTION_GUARANTEES)
-target_link_libraries(tpde PUBLIC gch::small_vector)
-
 target_sources(tpde PRIVATE
     src/AssemblerElf.cpp
     src/base.cpp

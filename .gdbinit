@@ -4,8 +4,6 @@
 
 python
 import sys
-sys.path.append('deps/small_vector/source/support/python')
-from gch.gdb.prettyprinters import small_vector
 
 sys.path.append('tpde/gdb')
 import PrettyPrinters
