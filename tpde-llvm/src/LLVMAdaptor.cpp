@@ -642,9 +642,13 @@ std::pair<unsigned, unsigned>
   if (ty != LLVMBasicValType::invalid) {
     num = basic_ty_part_count(ty);
   } else if (auto fvt = llvm::dyn_cast<llvm::FixedVectorType>(type)) {
-    bool scalarized = false;
-    std::tie(ty, num, scalarized) = lower_vector_type(fvt);
-    complex_part_types[desc_idx].desc.incompatible_layout |= scalarized;
+    bool incompatible = false;
+    std::tie(ty, num, incompatible) = lower_vector_type(fvt);
+    if (fvt->getElementType()->isIntegerTy(1)) {
+      // TODO: deduplicate logic with check_type_compatibility
+      incompatible = true;
+    }
+    complex_part_types[desc_idx].desc.incompatible_layout |= incompatible;
   }
 
   if (ty != LLVMBasicValType::invalid) {

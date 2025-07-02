@@ -703,10 +703,12 @@ public:
       // registers while LLVM uses a target-specific promoted and possibly
       // widened type in vector registers. Also, we never scalarize i1 vectors,
       // they are always compact (hence, we support at most 64 elements).
+      [[fallthrough]];
+    case invalid:
+      // invalid types are unsupported and hence incompatible
       [[unlikely]];
       report_incompatible_type(type);
       break;
-    case invalid: TPDE_UNREACHABLE("cannot check layout of invalid type");
     default: break;
     }
   }
