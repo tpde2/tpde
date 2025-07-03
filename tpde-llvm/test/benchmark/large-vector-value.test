@@ -1,0 +1,19 @@
+# NOTE: Do not autogenerate
+# SPDX-FileCopyrightText: 2025 Contributors to TPDE <https://tpde.org>
+# SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+
+# RUN: python3 %s 2000 | tpde-llc --target=x86_64 | %objdump | FileCheck %s
+# RUN: python3 %s 2000 | tpde-llc --target=aarch64 | %objdump | FileCheck %s
+
+# Test for loading/storing a large vector type
+
+# CHECK: <f>:
+
+import sys
+
+n = int(sys.argv[1])
+print("define void @f(ptr %p, ptr %q) {")
+print(f'  %l = load <{n} x i32>, ptr %p')
+print(f'  store <{n} x i32> %l, ptr %q')
+print('  ret void')
+print('}')
