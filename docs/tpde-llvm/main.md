@@ -37,7 +37,7 @@ Unsupported features currently include:
 - Targets other than x86-64-v1/AArch64 (ARMv8.1) (Linux) ELF.
 - Code models other than Small-PIC.
 - Scalar types: integer types larger than `i64` except `i128` (`i128` is supported), pointers with non-zero address space, `half`, `bfloat`, `ppc_fp128`, `x86_fp80`, `x86_amx`. Code with x86-64 `long double` needs to be compiled with `-mlong-double-64`.
-- Vectors: types that are not directly legal on the target (e.g., `<32 x i8>` on x86-64); `icmp`/`fcmp`; pointer element type; `getelementptr` with vector types; `select` with vector predicate, integer extension/truncation,
+- Aggregate types with in total more than 65535 elements.
 - `select` aggregate type other than `{i64, i64}`.
 - `bitcast` larger than 64 bit.
 - Atomic operations might use a stronger consistency than required (e.g., always `seqcst` for `atomicrmw`).
@@ -51,3 +51,31 @@ Unsupported features currently include:
 - Non-empty inline assembly.
 - Full asynchronous unwind info (frame info only correct in prologue and at call sites).
 - Several corner cases that we didn't encounter so far.
+
+## Vector Support
+
+Vector support has some substantial limitations. The main focus is to support constructs that typically occur in unoptimized code that uses intrinsics. Generating high-quality vectorized code would require substantial effort and is therefore a non-goal. Scalar code can perform better than vectorized code that would otherwise be an improvement. For example, `shufflevector` is always a series of scalar extracts/inserts and `icmp` in many cases expensively packs the result into a bit vector.
+
+### Supported Types
+
+The only supported element types are `i1`/`i8`/`i16`/`i32`/`i64`/`ptr`/`float`/`double`. `i1` vectors with more than 64 elements are unsupported. Due to the limit of aggregate types to max. 65535 elements, vectors with more elements are not always supported (see below).
+
+### Type Compatibility
+
+Only certain types (*layout-compatible types*) are lowered to a layout guaranteed to be compatible with LLVM, which are typically the types defined by the ABI (16-byte non-`i1` vectors on x86-64, 8/16-byte non-`i1` vectors on AArch64). For other types, the in-register layout is often incompatible with LLVM. Such types therefore cannot cross function boundaries as argument/return value, even for purely internal functions. TPDE's current lowering rules for non-layout-compatible types are:
+
+- `i1` vectors are represented as compact integer in a single general-purpose register. (LLVM typically promotes these to a larger vector type, e.g. `<16 x i1>` to `<16 x i8>`.)
+- Vectors where the element type is a multiple of a directly supported vector type are lowered as multiple parts of the same type, e.g. `<64 x i8>` behaves like `[4 x <16 x i8>]`. (LLVM typically widens to the next power of two first.)
+- Other vector types are scalarized, e.g. `<63 x i8>` behaves like `[63 x i8]`. (LLVM has very complex and type/target-dependent rules for promoting/widening integers.)
+
+Note that the in-memory representation of vectors always matches the representation of LLVM.
+
+### Operations
+
+Support for arithmetic operations, comparisons, casts, and conversions is generally limited. Some operations are only implemented for layout-compatible types. Some operations are unconditionally scalarized, even if a native vector instruction exists. Additionally, the following operations are currently unsupported:
+
+- `<N x i1>` `insertelement`, `extractelement`, and `shufflevector`.
+- Vector `getelementptr`.
+- Vector-predicated `select`.
+- `extractelement` with a constant source vector.
+- Most vector intrinsics.
