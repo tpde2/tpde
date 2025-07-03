@@ -655,6 +655,9 @@ std::pair<unsigned, unsigned>
     unsigned size = basic_ty_part_size(ty);
     unsigned align = size * basic_ty_part_count(ty); // essentially just i128.
     assert(num > 0);
+    if (num > LLVMComplexPart::MaxLength) {
+      complex_part_types[desc_idx].desc.invalid = true;
+    }
     // TODO: support types with different part types/sizes?
     for (unsigned i = 0; i < num; i++) {
       complex_part_types.emplace_back(ty, size, i == num - 1);
@@ -759,6 +762,7 @@ std::pair<unsigned, unsigned>
       return std::make_pair(LLVMBasicValType::invalid, ~0u);
     }
 
+    assert(len <= LLVMComplexPart::MaxLength && "type exceeds part limit?");
     it->second = std::make_pair(LLVMBasicValType::complex, start);
   }
 
