@@ -193,9 +193,21 @@ struct AssemblerElfBase {
     bool operator==(const SymRef &other) const { return other.val == val; }
   };
 
-  enum class SecRef : u32 {
+  struct SecRef {
+  private:
+    u32 val;
+
+  public:
+    /// Invalid symbol reference
+    constexpr SecRef() : val(0) {}
+
+    explicit constexpr SecRef(u32 id) : val(id) {}
+
+    u32 id() const { return val; }
+    bool valid() const { return val != 0; }
+
+    bool operator==(const SecRef &other) const { return other.val == val; }
   };
-  static constexpr SecRef INVALID_SEC_REF = static_cast<SecRef>(0u);
 
   // TODO: merge Label with SymRef when adding private symbols
   enum class Label : u32 {
@@ -364,7 +376,7 @@ private:
 
 protected:
   struct TempSymbolInfo {
-    /// Section, or INVALID_SEC_REF if pending
+    /// Section, or invalid if pending
     SecRef section;
     /// Offset into section, or index into temp_symbol_fixups if pending
     union {
@@ -390,17 +402,17 @@ private:
   StringTable shstrtab_extra;
 
 protected:
-  SecRef secref_text = INVALID_SEC_REF;
-  SecRef secref_rodata = INVALID_SEC_REF;
-  SecRef secref_relro = INVALID_SEC_REF;
-  SecRef secref_data = INVALID_SEC_REF;
-  SecRef secref_bss = INVALID_SEC_REF;
-  SecRef secref_tdata = INVALID_SEC_REF;
-  SecRef secref_tbss = INVALID_SEC_REF;
+  SecRef secref_text = SecRef();
+  SecRef secref_rodata = SecRef();
+  SecRef secref_relro = SecRef();
+  SecRef secref_data = SecRef();
+  SecRef secref_bss = SecRef();
+  SecRef secref_tdata = SecRef();
+  SecRef secref_tbss = SecRef();
 
   /// Unwind Info
-  SecRef secref_eh_frame = INVALID_SEC_REF;
-  SecRef secref_except_table = INVALID_SEC_REF;
+  SecRef secref_eh_frame = SecRef();
+  SecRef secref_except_table = SecRef();
 
 public:
   util::VectorWriter eh_writer;
@@ -448,29 +460,29 @@ public:
   // Sections
 
   DataSection &get_section(SecRef ref) noexcept {
-    assert(ref != INVALID_SEC_REF);
-    return *sections[static_cast<u32>(ref)];
+    assert(ref.valid());
+    return *sections[ref.id()];
   }
 
   const DataSection &get_section(SecRef ref) const noexcept {
-    assert(ref != INVALID_SEC_REF);
-    return *sections[static_cast<u32>(ref)];
+    assert(ref.valid());
+    return *sections[ref.id()];
   }
 
 private:
   void init_sections() noexcept;
 
   bool has_reloc_section(SecRef ref) const noexcept {
-    assert(ref != INVALID_SEC_REF);
-    if (static_cast<u32>(ref) + 1 < sections.size()) {
-      return sections[static_cast<u32>(ref) + 1]->type == SHT_RELA;
+    assert(ref.valid());
+    if (ref.id() + 1 < sections.size()) {
+      return sections[ref.id() + 1]->type == SHT_RELA;
     }
     return false;
   }
 
   DataSection &get_reloc_section(SecRef ref) noexcept {
     assert(has_reloc_section(ref));
-    DataSection &reloc_sec = *sections[static_cast<u32>(ref) + 1];
+    DataSection &reloc_sec = *sections[ref.id() + 1];
     return reloc_sec;
   }
 
@@ -508,8 +520,7 @@ public:
   SecRef get_bss_section() noexcept;
   SecRef get_tdata_section() noexcept;
   SecRef get_tbss_section() noexcept;
-  SecRef create_structor_section(bool init,
-                                 SecRef group = INVALID_SEC_REF) noexcept;
+  SecRef create_structor_section(bool init, SecRef group = SecRef()) noexcept;
 
   /// Create a new section with the given name, ELF section type, and flags.
   /// Optionally, a corresponding relocation (.rela) section is also created,
@@ -518,7 +529,7 @@ public:
                                       unsigned type,
                                       unsigned flags,
                                       bool with_rela,
-                                      SecRef group = INVALID_SEC_REF) noexcept;
+                                      SecRef group = SecRef()) noexcept;
 
   /// Create a new group section.
   [[nodiscard]] SecRef create_group_section(SymRef signature_sym,
@@ -528,7 +539,7 @@ public:
 
 private:
   bool sec_is_xindex(SecRef ref) const noexcept {
-    return static_cast<u32>(ref) >= SHN_LORESERVE;
+    return ref.id() >= SHN_LORESERVE;
   }
 
 public:
@@ -595,7 +606,7 @@ public:
     sym->st_value = pos;
     sym->st_size = size;
     if (!sec_is_xindex(sec_ref)) [[likely]] {
-      sym->st_shndx = static_cast<Elf64_Section>(sec_ref);
+      sym->st_shndx = sec_ref.id();
     } else {
       sym->st_shndx = SHN_XINDEX;
       sym_def_xindex(sym_ref, sec_ref);
@@ -628,14 +639,14 @@ public:
 
   Label label_create() noexcept {
     const Label label = static_cast<Label>(temp_symbols.size());
-    temp_symbols.push_back(TempSymbolInfo{INVALID_SEC_REF, {.fixup_idx = ~0u}});
+    temp_symbols.push_back(TempSymbolInfo{SecRef(), {.fixup_idx = ~0u}});
     return label;
   }
 
   // TODO: return pair of section, offset
   u32 label_is_pending(Label label) const noexcept {
     const auto &info = temp_symbols[static_cast<u32>(label)];
-    return info.section == INVALID_SEC_REF;
+    return !info.section.valid();
   }
 
   // TODO: return pair of section, offset

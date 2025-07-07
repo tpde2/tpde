@@ -393,7 +393,7 @@ public:
     const_allocator.reset();
 
     SecRef sec = this->select_section(this->func_syms[idx], func, true);
-    if (sec == Assembler::INVALID_SEC_REF) {
+    if (!sec.valid()) [[unlikely]] {
       TPDE_LOG_ERR("unable to determine section for function {}",
                    std::string_view(func->getName()));
       return false;
@@ -722,7 +722,7 @@ LLVMCompilerBase<Adaptor, Derived, Config>::SecRef
         const llvm::GlobalObject *go, SymRef sym_hint) noexcept {
   const llvm::Comdat *comdat = go->getComdat();
   if (!comdat) {
-    return Assembler::INVALID_SEC_REF;
+    return SecRef();
   }
 
   bool is_comdat;
@@ -731,7 +731,7 @@ LLVMCompilerBase<Adaptor, Derived, Config>::SecRef
   case llvm::Comdat::NoDeduplicate: is_comdat = false; break;
   default:
     // ELF only support any/nodeduplicate.
-    return Assembler::INVALID_SEC_REF;
+    return SecRef();
   }
 
   auto [it, inserted] = this->group_secs.try_emplace(comdat);
@@ -775,7 +775,7 @@ LLVMCompilerBase<Adaptor, Derived, Config>::SecRef
 
   // TODO: support ifuncs
   if (llvm::isa<llvm::GlobalIFunc>(go)) {
-    return Assembler::INVALID_SEC_REF;
+    return SecRef();
   }
 
   // I'm certain this simplified section assignment code is buggy...
@@ -978,7 +978,8 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::
         unsigned priority;
 
         bool operator<(const Structor &rhs) const noexcept {
-          return std::tie(group, priority) < std::tie(rhs.group, rhs.priority);
+          return std::pair(group.id(), priority) <
+                 std::pair(rhs.group.id(), rhs.priority);
         }
       };
       tpde::util::SmallVector<Structor, 16> structors;
@@ -989,7 +990,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::
         const auto *str = llvm::cast<llvm::ConstantStruct>(entry);
         auto *prio = llvm::cast<llvm::ConstantInt>(str->getOperand(0));
         auto *ptr = llvm::cast<llvm::GlobalValue>(str->getOperand(1));
-        SecRef group = Assembler::INVALID_SEC_REF;
+        SecRef group = SecRef();
         if (auto *comdat = str->getOperand(2); !comdat->isNullValue()) {
           comdat = comdat->stripPointerCasts();
           if (auto *comdat_gv = llvm::dyn_cast<llvm::GlobalObject>(comdat)) {
@@ -1017,7 +1018,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::
       // Therefore, sort so that structors for the same section are together.
       std::sort(structors.begin(), structors.end());
 
-      SecRef secref = Assembler::INVALID_SEC_REF;
+      SecRef secref = SecRef();
       for (size_t i = 0; i < structors.size(); ++i) {
         const auto &s = structors[i];
         if (i == 0 || structors[i - 1] < s) {
@@ -1045,7 +1046,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::
     }
 
     SecRef sec = this->select_section(sym, gv, !relocs.empty());
-    if (sec == Assembler::INVALID_SEC_REF) {
+    if (!sec.valid()) [[unlikely]] {
       std::string global_str;
       llvm::raw_string_ostream(global_str) << *gv;
       TPDE_LOG_ERR("unable to determine section for global {}", global_str);

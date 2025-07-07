@@ -111,15 +111,15 @@ void AssemblerElfBase::reset() noexcept {
   next_free_tsfixup = ~0u;
   strtab = StringTable();
   shstrtab_extra = StringTable();
-  secref_text = INVALID_SEC_REF;
-  secref_rodata = INVALID_SEC_REF;
-  secref_relro = INVALID_SEC_REF;
-  secref_data = INVALID_SEC_REF;
-  secref_bss = INVALID_SEC_REF;
-  secref_tdata = INVALID_SEC_REF;
-  secref_tbss = INVALID_SEC_REF;
-  secref_eh_frame = INVALID_SEC_REF;
-  secref_except_table = INVALID_SEC_REF;
+  secref_text = SecRef();
+  secref_rodata = SecRef();
+  secref_relro = SecRef();
+  secref_data = SecRef();
+  secref_bss = SecRef();
+  secref_tdata = SecRef();
+  secref_tbss = SecRef();
+  secref_eh_frame = SecRef();
+  secref_except_table = SecRef();
   cur_personality_func_addr = SymRef();
 
   init_sections();
@@ -140,7 +140,7 @@ AssemblerElfBase::SecRef AssemblerElfBase::create_section(
 AssemblerElfBase::SecRef AssemblerElfBase::create_rela_section(
     [[maybe_unused]] SecRef ref, unsigned flags, unsigned rela_name) noexcept {
   SecRef rela = create_section(SHT_RELA, flags | SHF_INFO_LINK, rela_name);
-  assert(u32(ref) == u32(rela) - 1 && "section and rela must be consecutive");
+  assert(ref.id() == rela.id() - 1 && "section and rela must be consecutive");
   DataSection &rela_sec = get_section(rela);
   rela_sec.align = alignof(Elf64_Rela);
   return rela;
@@ -151,7 +151,7 @@ AssemblerElfBase::SymRef
                                             std::string_view name) noexcept {
   const auto str_off = strtab.add(name);
 
-  unsigned shndx = sec_is_xindex(ref) ? SHN_XINDEX : static_cast<uint32_t>(ref);
+  unsigned shndx = sec_is_xindex(ref) ? SHN_XINDEX : ref.id();
 
   SymRef sym = SymRef(local_symbols.size());
   local_symbols.push_back(Elf64_Sym{
@@ -175,7 +175,7 @@ AssemblerElfBase::DataSection &
                                             unsigned flags,
                                             unsigned align,
                                             bool with_rela) noexcept {
-  if (ref == INVALID_SEC_REF) [[unlikely]] {
+  if (!ref.valid()) [[unlikely]] {
     if (with_rela) {
       ref = create_section(type, flags, rela_name + 5);
       (void)create_rela_section(ref, 0, rela_name);
@@ -259,7 +259,7 @@ AssemblerElfBase::SecRef
   assert(!(flags & SHF_GROUP) && "SHF_GROUP is added by assembler");
   DataSection *group_sec = nullptr;
   unsigned group_flag = 0;
-  if (group != INVALID_SEC_REF) {
+  if (group.valid()) {
     group_flag = SHF_GROUP;
     group_sec = &get_section(group);
     assert(group_sec->type == SHT_GROUP);
@@ -270,13 +270,13 @@ AssemblerElfBase::SecRef
     ref = create_section(type, flags | group_flag, rela_name + 5);
     SecRef rela = create_rela_section(ref, group_flag, rela_name);
     if (group_sec) {
-      group_sec->write<u32>(static_cast<u32>(ref));
-      group_sec->write<u32>(static_cast<u32>(rela));
+      group_sec->write<u32>(ref.id());
+      group_sec->write<u32>(rela.id());
     }
   } else {
     ref = create_section(type, flags | group_flag, rela_name);
     if (group_sec) {
-      group_sec->write<u32>(static_cast<u32>(ref));
+      group_sec->write<u32>(ref.id());
     }
   }
 
@@ -395,7 +395,7 @@ void AssemblerElfBase::sym_def_xindex(SymRef sym_ref, SecRef sec_ref) noexcept {
   if (shndx.size() <= sym_idx(sym_ref)) {
     shndx.resize(sym_idx(sym_ref) + 1);
   }
-  shndx[sym_idx(sym_ref)] = static_cast<uint32_t>(sec_ref);
+  shndx[sym_idx(sym_ref)] = sec_ref.id();
 }
 
 void AssemblerElfBase::reloc_sec(const SecRef sec_ref,
