@@ -87,16 +87,16 @@ bool ElfMapper::map(AssemblerElfBase &assembler,
 
   for (size_t i = 0; i < assembler.sections.size(); ++i) {
     const auto &sec = *assembler.sections[i];
-    if (!(sec.hdr.sh_flags & SHF_ALLOC)) {
+    if (!(sec.flags & SHF_ALLOC)) {
       continue;
     }
     u32 sort_key = 0;
     // executable before non-executable
-    sort_key |= sec.hdr.sh_flags & SHF_EXECINSTR ? 0 : (1 << 2);
+    sort_key |= sec.flags & SHF_EXECINSTR ? 0 : (1 << 2);
     // read-only before writable
-    sort_key |= !(sec.hdr.sh_flags & SHF_WRITE) ? 0 : (1 << 1);
+    sort_key |= !(sec.flags & SHF_WRITE) ? 0 : (1 << 1);
     // bss sections after data sections
-    sort_key |= !(sec.hdr.sh_type == SHT_NOBITS) ? 0 : (1 << 0);
+    sort_key |= !(sec.type == SHT_NOBITS) ? 0 : (1 << 0);
 
     alloc_sections.emplace_back(AssemblerElfBase::SecRef(i), sort_key);
   }
@@ -118,19 +118,19 @@ bool ElfMapper::map(AssemblerElfBase &assembler,
   for (const auto &as : alloc_sections) {
     auto &sec = assembler.get_section(as.section);
     // mmap only hands out page-aligned regions.
-    if (sec.hdr.sh_addralign >= page_size) {
+    if (sec.align >= page_size) {
       TPDE_LOG_WARN("alignment ({:#x}) > PAGE_SIZE ({:#x}) will be ignored",
-                    sec.hdr.sh_addralign,
+                    sec.align,
                     page_size);
     }
-    if (prev_flags != sec.hdr.sh_flags) {
+    if (prev_flags != sec.flags) {
       base_off = util::align_up(base_off, page_size);
-      perm_boundaries.emplace_back(base_off, sec.hdr.sh_flags);
-      prev_flags = sec.hdr.sh_flags;
+      perm_boundaries.emplace_back(base_off, sec.flags);
+      prev_flags = sec.flags;
     } else {
-      base_off = util::align_up(base_off, sec.hdr.sh_addralign);
+      base_off = util::align_up(base_off, sec.align);
     }
-    sec.hdr.sh_addr = base_off;
+    sec.addr = base_off;
     size_t sec_size = sec.size();
     if (as.section == assembler.secref_eh_frame) {
       // Add zero-terminator to eh_frame. This is required for libgcc's
@@ -142,7 +142,7 @@ bool ElfMapper::map(AssemblerElfBase &assembler,
     TPDE_LOG_TRACE("allocate section {} size={:#x} to offset={:x}",
                    assembler.sec_name(as.section),
                    sec_size,
-                   sec.hdr.sh_addr);
+                   sec.addr);
   }
   // TODO(ts): align base_off up to page_size?
   perm_boundaries.emplace_back(base_off, 0);
@@ -186,7 +186,7 @@ bool ElfMapper::map(AssemblerElfBase &assembler,
       } else if (elf_sym->st_shndx < SHN_LORESERVE ||
                  elf_sym->st_shndx == SHN_XINDEX) {
         auto sec = assembler.sym_section(sym);
-        auto off = assembler.get_section(sec).hdr.sh_addr;
+        auto off = assembler.get_section(sec).addr;
         sym_addrs[idx] = mapped_addr + off + elf_sym->st_value;
       } else {
         TPDE_LOG_ERR("unhandled section index {:x}", elf_sym->st_shndx);
@@ -363,11 +363,11 @@ bool ElfMapper::map(AssemblerElfBase &assembler,
   for (const auto &as : alloc_sections) {
     auto &sec = assembler.get_section(as.section);
     // No need to zero bss, mmap zero-initializes memory.
-    if (sec.hdr.sh_type != SHT_NOBITS) {
-      std::memcpy(mapped_addr + sec.hdr.sh_addr, sec.data.data(), sec.size());
+    if (sec.type != SHT_NOBITS) {
+      std::memcpy(mapped_addr + sec.addr, sec.data.data(), sec.size());
     }
 
-    u8 *sec_addr = mapped_addr + sec.hdr.sh_addr;
+    u8 *sec_addr = mapped_addr + sec.addr;
     for (auto &reloc : assembler.get_relocs(as.section)) {
       resolve_reloc(sec_addr, reloc);
     }
@@ -396,7 +396,7 @@ bool ElfMapper::map(AssemblerElfBase &assembler,
 
   // Register eh_frame FDEs
   auto &eh_frame = assembler.get_section(assembler.secref_eh_frame);
-  registered_frame_off = eh_frame.hdr.sh_addr + assembler.eh_first_fde_off;
+  registered_frame_off = eh_frame.addr + assembler.eh_first_fde_off;
   __register_frame(mapped_addr + registered_frame_off);
 
   return true;

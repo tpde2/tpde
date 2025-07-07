@@ -211,7 +211,13 @@ struct AssemblerElfBase {
     /// Section data.
     StorageTy data;
 
-    Elf64_Shdr hdr;
+    u64 addr = 0;  ///< Address (file-format-specific).
+    u64 vsize = 0; ///< Size of virtual section, otherwise data.size() is valid.
+    u32 type = 0;  ///< Type (file-format-specific).
+    u32 flags = 0; ///< Flags (file-format-specific).
+    u32 name = 0;  ///< Name (file-format-specific, can also be index, etc.).
+    u32 align = 1; ///< Alignment (bytes).
+
     /// Section symbol, or signature symbol for SHT_GROUP sections.
     SymRef sym;
 
@@ -222,26 +228,25 @@ struct AssemblerElfBase {
     /// Generic field for target-specific data.
     void *target_info = nullptr;
 
+    /// Whether the section is virtual, i.e. has no content.
+    bool is_virtual;
+
 #ifndef NDEBUG
     /// Whether the section is currently in use by a SectionWriter.
     bool locked = false;
 #endif
 
     // DataSection() = default;
-    DataSection(SecRef ref, unsigned type, unsigned flags, unsigned name_off)
-        : hdr{.sh_name = name_off, .sh_type = type, .sh_flags = flags},
-          sec_ref(ref) {}
+    DataSection(SecRef ref) noexcept : sec_ref(ref) {}
 
     SecRef get_ref() const noexcept { return sec_ref; }
 
-    size_t size() const {
-      return (hdr.sh_type == SHT_NOBITS) ? hdr.sh_size : data.size();
-    }
+    size_t size() const { return is_virtual ? vsize : data.size(); }
 
     template <typename T>
     void write(const T &t) noexcept {
       assert(!locked);
-      assert(hdr.sh_type != SHT_NOBITS);
+      assert(!is_virtual);
       size_t off = data.size();
       data.resize_uninitialized(data.size() + sizeof(T));
       memcpy(data.data() + off, &t, sizeof(T));
@@ -343,7 +348,7 @@ struct AssemblerElfBase {
       // permit optimization when align is a constant.
       std::memset(cur_ptr(), 0, align);
       data_cur = data_begin + util::align_up(offset(), align);
-      section->hdr.sh_addralign = std::max(section->hdr.sh_addralign, align);
+      section->align = std::max(section->align, u32(align));
     }
   };
 
@@ -458,7 +463,7 @@ private:
   bool has_reloc_section(SecRef ref) const noexcept {
     assert(ref != INVALID_SEC_REF);
     if (static_cast<u32>(ref) + 1 < sections.size()) {
-      return sections[static_cast<u32>(ref) + 1]->hdr.sh_type == SHT_RELA;
+      return sections[static_cast<u32>(ref) + 1]->type == SHT_RELA;
     }
     return false;
   }
