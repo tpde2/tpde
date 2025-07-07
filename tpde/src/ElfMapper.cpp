@@ -76,7 +76,7 @@ bool ElfMapper::map(AssemblerElfBase &assembler,
 
   // Sort sections by permissions
   struct AllocSection {
-    AssemblerElfBase::SecRef section;
+    SecRef section;
     u32 sort_key;
 
     std::weak_ordering operator<=>(const AllocSection &other) const noexcept {
@@ -98,7 +98,7 @@ bool ElfMapper::map(AssemblerElfBase &assembler,
     // bss sections after data sections
     sort_key |= !(sec.type == SHT_NOBITS) ? 0 : (1 << 0);
 
-    alloc_sections.emplace_back(AssemblerElfBase::SecRef(i), sort_key);
+    alloc_sections.emplace_back(SecRef(i), sort_key);
   }
   std::stable_sort(alloc_sections.begin(), alloc_sections.end());
 
@@ -166,7 +166,7 @@ bool ElfMapper::map(AssemblerElfBase &assembler,
   // Symbol addresses
   local_sym_count = assembler.local_symbols.size();
   sym_addrs.resize(local_sym_count + assembler.global_symbols.size());
-  const auto sym_idx = [&](AssemblerElfBase::SymRef sym) -> size_t {
+  const auto sym_idx = [&](SymRef sym) -> size_t {
     auto idx = AssemblerElfBase::sym_idx(sym);
     if (!AssemblerElfBase::sym_is_local(sym)) {
       idx += local_sym_count;
@@ -174,7 +174,7 @@ bool ElfMapper::map(AssemblerElfBase &assembler,
     return idx;
   };
   // Undefined symbols that are never used are permitted.
-  const auto sym_addr = [&](AssemblerElfBase::SymRef sym) -> void * {
+  const auto sym_addr = [&](SymRef sym) -> void * {
     size_t idx = sym_idx(sym);
     if (!sym_addrs[idx]) {
       const Elf64_Sym *elf_sym = assembler.sym_ptr(sym);
@@ -204,7 +204,7 @@ bool ElfMapper::map(AssemblerElfBase &assembler,
     auto &elf_sym = assembler.global_symbols[i];
     if (elf_sym.st_shndx != SHN_UNDEF &&
         (elf_sym.st_shndx < SHN_LORESERVE || elf_sym.st_shndx == SHN_XINDEX)) {
-      (void)sym_addr(typename AssemblerElfBase::SymRef(0x8000'0000 | i));
+      (void)sym_addr(SymRef(0x8000'0000 | i));
     }
   }
 
@@ -245,8 +245,7 @@ bool ElfMapper::map(AssemblerElfBase &assembler,
     *dest = (data & mask) | (*dest & ~mask);
   };
   const auto resolve_reloc = [&](u8 *sec_addr, Elf64_Rela &reloc) {
-    auto sym_ref =
-        static_cast<AssemblerElfBase::SymRef>(ELF64_R_SYM(reloc.r_info));
+    auto sym_ref = SymRef(ELF64_R_SYM(reloc.r_info));
     uintptr_t sym = reinterpret_cast<uintptr_t>(sym_addr(sym_ref));
     uintptr_t syma = sym + reloc.r_addend;
     uintptr_t pc = reinterpret_cast<uintptr_t>(sec_addr + reloc.r_offset);
@@ -402,7 +401,7 @@ bool ElfMapper::map(AssemblerElfBase &assembler,
   return true;
 }
 
-void *ElfMapper::get_sym_addr(AssemblerElfBase::SymRef sym) noexcept {
+void *ElfMapper::get_sym_addr(SymRef sym) noexcept {
   auto idx = AssemblerElfBase::sym_idx(sym);
   if (!AssemblerElfBase::sym_is_local(sym)) {
     idx += local_sym_count;

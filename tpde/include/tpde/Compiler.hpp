@@ -5,6 +5,7 @@
 
 #include "CompilerConfig.hpp"
 #include "base.hpp"
+#include "tpde/Assembler.hpp"
 #include <concepts>
 #include <type_traits>
 
@@ -84,9 +85,7 @@ concept Compiler = CompilerConfig<Config> && requires(T a) {
 
   /// Provides the personality function for the current function or
   /// an invalid SymRef otherwise.
-  {
-    a.cur_personality_func()
-  } -> std::same_as<typename Config::Assembler::SymRef>;
+  { a.cur_personality_func() } -> std::same_as<SymRef>;
 
   /// Provides a calling convention assigner for the current function.
   /// Optional, if not implemented, the default C calling convention will be

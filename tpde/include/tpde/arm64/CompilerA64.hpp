@@ -381,8 +381,7 @@ struct CompilerA64 : BaseTy<Adaptor, Derived, Config> {
 
     void add_arg_byval(ValuePart &vp, CCAssignment &cca) noexcept;
     void add_arg_stack(ValuePart &vp, CCAssignment &cca) noexcept;
-    void call_impl(
-        std::variant<typename Assembler::SymRef, ValuePart> &&) noexcept;
+    void call_impl(std::variant<SymRef, ValuePart> &&) noexcept;
     void reset_stack() noexcept;
   };
 
@@ -533,14 +532,14 @@ struct CompilerA64 : BaseTy<Adaptor, Derived, Config> {
   ///
   /// Targets can be a symbol (call to PLT with relocation), or an indirect
   /// call to a ValuePart. Result is an optional reference.
-  void generate_call(std::variant<Assembler::SymRef, ValuePart> &&target,
+  void generate_call(std::variant<SymRef, ValuePart> &&target,
                      std::span<CallArg> arguments,
                      typename Base::ValueRef *result,
                      bool variable_args = false);
 
   /// Generate code sequence to load address of sym into a register. This will
   /// generate a function call for dynamic TLS access models.
-  ScratchReg tls_get_addr(Assembler::SymRef sym, TLSModel model) noexcept;
+  ScratchReg tls_get_addr(SymRef sym, TLSModel model) noexcept;
 
   bool has_cpu_feats(CPU_FEATURES feats) const noexcept {
     return ((cpu_feats & feats) == feats);
@@ -627,7 +626,7 @@ template <IRAdaptor Adaptor,
           template <typename, typename, typename> class BaseTy,
           typename Config>
 void CompilerA64<Adaptor, Derived, BaseTy, Config>::CallBuilder::call_impl(
-    std::variant<typename Assembler::SymRef, ValuePart> &&target) noexcept {
+    std::variant<SymRef, ValuePart> &&target) noexcept {
   u32 sub = 0;
   if (stack_adjust_off != 0) {
     auto *text_data = this->compiler.text_writer.begin_ptr();
@@ -640,7 +639,7 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::CallBuilder::call_impl(
   }
 
 
-  if (auto *sym = std::get_if<typename Assembler::SymRef>(&target)) {
+  if (auto *sym = std::get_if<SymRef>(&target)) {
     ASMC(&this->compiler, BL, 0);
     this->compiler.reloc_text(
         *sym, R_AARCH64_CALL26, this->compiler.text_writer.offset() - 4);
@@ -1871,7 +1870,7 @@ template <IRAdaptor Adaptor,
           template <typename, typename, typename> typename BaseTy,
           typename Config>
 void CompilerA64<Adaptor, Derived, BaseTy, Config>::generate_call(
-    std::variant<Assembler::SymRef, ValuePart> &&target,
+    std::variant<SymRef, ValuePart> &&target,
     std::span<CallArg> arguments,
     typename Base::ValueRef *result,
     bool) {
@@ -1892,7 +1891,7 @@ template <IRAdaptor Adaptor,
           typename Config>
 CompilerA64<Adaptor, Derived, BaseTy, Config>::ScratchReg
     CompilerA64<Adaptor, Derived, BaseTy, Config>::tls_get_addr(
-        Assembler::SymRef sym, TLSModel model) noexcept {
+        SymRef sym, TLSModel model) noexcept {
   switch (model) {
   default: // TODO: implement optimized access for non-gd-model
   case TLSModel::GlobalDynamic: {

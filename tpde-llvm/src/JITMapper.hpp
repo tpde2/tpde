@@ -11,8 +11,7 @@
 namespace tpde_llvm {
 
 class JITMapperImpl {
-  using GlobalMap =
-      llvm::DenseMap<const llvm::GlobalValue *, tpde::AssemblerElfBase::SymRef>;
+  using GlobalMap = llvm::DenseMap<const llvm::GlobalValue *, tpde::SymRef>;
 
   tpde::ElfMapper mapper;
 

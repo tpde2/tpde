@@ -45,8 +45,6 @@ struct LLVMCompilerArm64 : tpde::a64::CompilerA64<LLVMAdaptor,
   using InstRange = typename Base::InstRange;
 
   using Assembler = typename Base::Assembler;
-  using SecRef = typename Assembler::SecRef;
-  using SymRef = typename Assembler::SymRef;
 
   using AsmReg = typename Base::AsmReg;
 

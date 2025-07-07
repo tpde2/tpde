@@ -351,7 +351,7 @@ struct CompilerX64 : BaseTy<Adaptor, Derived, Config> {
   util::SmallVector<u32, 8> func_ret_offs = {};
 
   /// Symbol for __tls_get_addr.
-  Assembler::SymRef sym_tls_get_addr;
+  SymRef sym_tls_get_addr;
 
   class CallBuilder : public Base::template CallBuilderBase<CallBuilder> {
     u32 stack_adjust_off = 0;
@@ -364,8 +364,7 @@ struct CompilerX64 : BaseTy<Adaptor, Derived, Config> {
 
     void add_arg_byval(ValuePart &vp, CCAssignment &cca) noexcept;
     void add_arg_stack(ValuePart &vp, CCAssignment &cca) noexcept;
-    void call_impl(
-        std::variant<typename Assembler::SymRef, ValuePart> &&target) noexcept;
+    void call_impl(std::variant<SymRef, ValuePart> &&target) noexcept;
     void reset_stack() noexcept;
   };
 
@@ -482,14 +481,14 @@ struct CompilerX64 : BaseTy<Adaptor, Derived, Config> {
   ///
   /// Targets can be a symbol (call to PLT with relocation), or an indirect
   /// call to a ValuePart. Result is an optional reference.
-  void generate_call(std::variant<Assembler::SymRef, ValuePart> &&target,
+  void generate_call(std::variant<SymRef, ValuePart> &&target,
                      std::span<CallArg> arguments,
                      typename Base::ValueRef *result,
                      bool variable_args = false);
 
   /// Generate code sequence to load address of sym into a register. This will
   /// generate a function call for dynamic TLS access models.
-  ScratchReg tls_get_addr(Assembler::SymRef sym, TLSModel model) noexcept;
+  ScratchReg tls_get_addr(SymRef sym, TLSModel model) noexcept;
 
   bool has_cpu_feats(CPU_FEATURES feats) const noexcept {
     return ((cpu_feats & feats) == feats);
@@ -1711,7 +1710,7 @@ template <IRAdaptor Adaptor,
           template <typename, typename, typename> class BaseTy,
           typename Config>
 void CompilerX64<Adaptor, Derived, BaseTy, Config>::CallBuilder::call_impl(
-    std::variant<typename Assembler::SymRef, ValuePart> &&target) noexcept {
+    std::variant<SymRef, ValuePart> &&target) noexcept {
   if (this->assigner.is_vararg()) {
     if (this->compiler.register_file.is_used(Reg{AsmReg::AX})) {
       this->compiler.evict_reg(Reg{AsmReg::AX});
@@ -1734,7 +1733,7 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::CallBuilder::call_impl(
     assert(this->assigner.get_stack_size() == 0);
   }
 
-  if (auto *sym = std::get_if<typename Assembler::SymRef>(&target)) {
+  if (auto *sym = std::get_if<SymRef>(&target)) {
     this->compiler.text_writer.ensure_space(16);
     ASMC(&this->compiler, CALL, this->compiler.text_writer.cur_ptr());
     this->compiler.reloc_text(
@@ -1765,7 +1764,7 @@ template <IRAdaptor Adaptor,
           template <typename, typename, typename> typename BaseTy,
           typename Config>
 void CompilerX64<Adaptor, Derived, BaseTy, Config>::generate_call(
-    std::variant<Assembler::SymRef, ValuePart> &&target,
+    std::variant<SymRef, ValuePart> &&target,
     std::span<CallArg> arguments,
     typename Base::ValueRef *result,
     const bool variable_args) {
@@ -1786,7 +1785,7 @@ template <IRAdaptor Adaptor,
           typename Config>
 CompilerX64<Adaptor, Derived, BaseTy, Config>::ScratchReg
     CompilerX64<Adaptor, Derived, BaseTy, Config>::tls_get_addr(
-        Assembler::SymRef sym, TLSModel model) noexcept {
+        SymRef sym, TLSModel model) noexcept {
   switch (model) {
   default: // TODO: implement optimized access for non-gd-model
   case TLSModel::GlobalDynamic: {

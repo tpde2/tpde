@@ -38,7 +38,7 @@ public:
 
   bool map(AssemblerElfBase &assembler, SymbolResolver resolver) noexcept;
 
-  void *get_sym_addr(AssemblerElfBase::SymRef sym) noexcept;
+  void *get_sym_addr(SymRef sym) noexcept;
 };
 
 } // namespace tpde

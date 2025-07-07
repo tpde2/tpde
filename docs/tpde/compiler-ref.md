@@ -62,7 +62,7 @@ you should. Otherwise you currently should always return `true`.
 
 #### cur_personality_func
 ```cpp
-typename CompilerConfig::Assembler::SymRef cur_personality_func() noexcept;
+SymRef cur_personality_func() noexcept;
 ```
 Returns the personality function of the current function. This is relevant for exception handling
 and cleanup actions performed on unwinding.

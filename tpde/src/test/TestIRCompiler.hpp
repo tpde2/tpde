@@ -32,9 +32,7 @@ struct TestIRCompilerX64 : x64::CompilerX64<TestIRAdaptor, TestIRCompilerX64> {
     return this->ir()->functions[this->adaptor->cur_func].has_call;
   }
 
-  x64::PlatformConfig::Assembler::SymRef cur_personality_func() const noexcept {
-    return {};
-  }
+  SymRef cur_personality_func() const noexcept { return {}; }
 
   struct ValueParts {
     static u32 count() noexcept { return 1; }

@@ -171,15 +171,12 @@ public:
   Assembler assembler;
   Assembler::SectionWriter text_writer;
   // TODO(ts): smallvector?
-  std::vector<typename Assembler::SymRef> func_syms;
+  std::vector<SymRef> func_syms;
   // TODO(ts): combine this with the block vectors in the analyzer to save on
   // allocations
   util::SmallVector<typename Assembler::Label> block_labels;
 
-  util::SmallVector<
-      std::pair<typename Assembler::SymRef, typename Assembler::SymRef>,
-      4>
-      personality_syms = {};
+  util::SmallVector<std::pair<SymRef, SymRef>, 4> personality_syms = {};
 
   struct ScratchReg;
   class ValuePart;
@@ -237,7 +234,7 @@ public:
     // CBDerived needs:
     // void add_arg_byval(ValuePart &vp, CCAssignment &cca) noexcept;
     // void add_arg_stack(ValuePart &vp, CCAssignment &cca) noexcept;
-    // void call_impl(std::variant<Assembler::SymRef, ValuePart> &&) noexcept;
+    // void call_impl(std::variant<SymRef, ValuePart> &&) noexcept;
     CBDerived *derived() noexcept { return static_cast<CBDerived *>(this); }
 
     void add_arg(ValuePart &&vp, CCAssignment cca) noexcept;
@@ -247,7 +244,7 @@ public:
     }
 
     // evict registers, do call, reset stack frame
-    void call(std::variant<typename Assembler::SymRef, ValuePart>) noexcept;
+    void call(std::variant<SymRef, ValuePart>) noexcept;
 
     void add_ret(ValuePart &vp, CCAssignment cca) noexcept;
     void add_ret(ValuePart &&vp, CCAssignment cca) noexcept {
@@ -437,10 +434,7 @@ public:
 
   void analysis_end() noexcept {}
 
-  void reloc_text(Assembler::SymRef sym,
-                  u32 type,
-                  u64 offset,
-                  i64 addend = 0) noexcept {
+  void reloc_text(SymRef sym, u32 type, u64 offset, i64 addend = 0) noexcept {
     this->assembler.reloc_sec(
         text_writer.get_sec_ref(), sym, type, offset, addend);
   }
@@ -451,7 +445,7 @@ public:
   }
 
 protected:
-  Assembler::SymRef get_personality_sym() noexcept;
+  SymRef get_personality_sym() noexcept;
 
   bool compile_func(IRFuncRef func, u32 func_idx) noexcept;
 
@@ -587,7 +581,7 @@ void CompilerBase<Adaptor, Derived, Config>::CallBuilderBase<
 template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>
 template <typename CBDerived>
 void CompilerBase<Adaptor, Derived, Config>::CallBuilderBase<CBDerived>::call(
-    std::variant<typename Assembler::SymRef, ValuePart> target) noexcept {
+    std::variant<SymRef, ValuePart> target) noexcept {
   typename RegisterFile::RegBitSet skip_evict = arg_regs;
   if (auto *vp = std::get_if<ValuePart>(&target); vp && vp->can_salvage()) {
     // call_impl will reset vp, thereby unlock+free the register.
@@ -1885,9 +1879,7 @@ typename CompilerBase<Adaptor, Derived, Config>::BlockIndex
 }
 
 template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>
-typename CompilerBase<Adaptor, Derived, Config>::Assembler::SymRef
-    CompilerBase<Adaptor, Derived, Config>::get_personality_sym() noexcept {
-  using SymRef = typename Assembler::SymRef;
+SymRef CompilerBase<Adaptor, Derived, Config>::get_personality_sym() noexcept {
   SymRef personality_sym;
   if (this->adaptor->cur_needs_unwind_info()) {
     SymRef personality_func = derived()->cur_personality_func();

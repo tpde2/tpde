@@ -194,7 +194,7 @@ void GenerationState::generate_cp_entry_sym(llvm::raw_ostream &os,
     exit(1);
   }
 
-  os << "    SymRef &" << sym_name << " = symbols[" << it->second << "];\n";
+  os << "    auto &" << sym_name << " = symbols[" << it->second << "];\n";
   os << "    if (!" << sym_name << ".valid()) [[unlikely]] {\n";
   os << "      const std::array<u8, " << bytes.size() << "> data = {{";
   for (uint8_t byte : bytes) {

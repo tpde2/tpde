@@ -28,9 +28,7 @@ struct TestIRCompilerA64 : a64::CompilerA64<TestIRAdaptor, TestIRCompilerA64> {
   explicit TestIRCompilerA64(TestIRAdaptor *adaptor, bool no_fixed_assignments)
       : Base{adaptor}, no_fixed_assignments(no_fixed_assignments) {}
 
-  a64::PlatformConfig::Assembler::SymRef cur_personality_func() const noexcept {
-    return {};
-  }
+  SymRef cur_personality_func() const noexcept { return {}; }
 
   static bool arg_is_int128(IRValueRef) noexcept { return false; }
   static bool arg_allow_split_reg_stack_passing(IRValueRef) noexcept {

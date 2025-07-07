@@ -55,8 +55,8 @@ struct LLVMCompilerBase : public LLVMCompiler,
   using InstRange = typename Base::InstRange;
 
   using Assembler = typename Base::Assembler;
-  using SecRef = typename Assembler::SecRef;
-  using SymRef = typename Assembler::SymRef;
+  using SecRef = typename tpde::SecRef;
+  using SymRef = typename tpde::SymRef;
 
   using AsmReg = typename Base::AsmReg;
 

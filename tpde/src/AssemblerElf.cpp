@@ -126,8 +126,9 @@ void AssemblerElfBase::reset() noexcept {
   eh_init_cie();
 }
 
-AssemblerElfBase::SecRef AssemblerElfBase::create_section(
-    unsigned type, unsigned flags, unsigned name) noexcept {
+SecRef AssemblerElfBase::create_section(unsigned type,
+                                        unsigned flags,
+                                        unsigned name) noexcept {
   SecRef ref = static_cast<SecRef>(sections.size());
   auto &sec = sections.emplace_back(new (section_allocator) DataSection(ref));
   sec->type = type;
@@ -137,8 +138,9 @@ AssemblerElfBase::SecRef AssemblerElfBase::create_section(
   return ref;
 }
 
-AssemblerElfBase::SecRef AssemblerElfBase::create_rela_section(
-    [[maybe_unused]] SecRef ref, unsigned flags, unsigned rela_name) noexcept {
+SecRef AssemblerElfBase::create_rela_section([[maybe_unused]] SecRef ref,
+                                             unsigned flags,
+                                             unsigned rela_name) noexcept {
   SecRef rela = create_section(SHT_RELA, flags | SHF_INFO_LINK, rela_name);
   assert(ref.id() == rela.id() - 1 && "section and rela must be consecutive");
   DataSection &rela_sec = get_section(rela);
@@ -146,9 +148,8 @@ AssemblerElfBase::SecRef AssemblerElfBase::create_rela_section(
   return rela;
 }
 
-AssemblerElfBase::SymRef
-    AssemblerElfBase::create_section_symbol(SecRef ref,
-                                            std::string_view name) noexcept {
+SymRef AssemblerElfBase::create_section_symbol(SecRef ref,
+                                               std::string_view name) noexcept {
   const auto str_off = strtab.add(name);
 
   unsigned shndx = sec_is_xindex(ref) ? SHN_XINDEX : ref.id();
@@ -168,13 +169,12 @@ AssemblerElfBase::SymRef
   return sym;
 }
 
-AssemblerElfBase::DataSection &
-    AssemblerElfBase::get_or_create_section(SecRef &ref,
-                                            unsigned rela_name,
-                                            unsigned type,
-                                            unsigned flags,
-                                            unsigned align,
-                                            bool with_rela) noexcept {
+DataSection &AssemblerElfBase::get_or_create_section(SecRef &ref,
+                                                     unsigned rela_name,
+                                                     unsigned type,
+                                                     unsigned flags,
+                                                     unsigned align,
+                                                     bool with_rela) noexcept {
   if (!ref.valid()) [[unlikely]] {
     if (with_rela) {
       ref = create_section(type, flags, rela_name + 5);
@@ -199,8 +199,7 @@ const char *AssemblerElfBase::sec_name(SecRef ref) const noexcept {
   return elf::SHSTRTAB.data() + sec.name;
 }
 
-AssemblerElfBase::SecRef
-    AssemblerElfBase::get_data_section(bool rodata, bool relro) noexcept {
+SecRef AssemblerElfBase::get_data_section(bool rodata, bool relro) noexcept {
   SecRef &secref = !rodata ? secref_data : relro ? secref_relro : secref_rodata;
   unsigned off_r = !rodata ? elf::sec_off(".rela.data")
                    : relro ? elf::sec_off(".rela.data.rel.ro")
@@ -210,30 +209,29 @@ AssemblerElfBase::SecRef
   return secref;
 }
 
-AssemblerElfBase::SecRef AssemblerElfBase::get_bss_section() noexcept {
+SecRef AssemblerElfBase::get_bss_section() noexcept {
   unsigned off = elf::sec_off(".bss");
   unsigned flags = SHF_ALLOC | SHF_WRITE;
   (void)get_or_create_section(secref_bss, off, SHT_NOBITS, flags, 1, false);
   return secref_bss;
 }
 
-AssemblerElfBase::SecRef AssemblerElfBase::get_tdata_section() noexcept {
+SecRef AssemblerElfBase::get_tdata_section() noexcept {
   unsigned off_r = elf::sec_off(".rela.tdata");
   unsigned flags = SHF_ALLOC | SHF_WRITE | SHF_TLS;
   (void)get_or_create_section(secref_tdata, off_r, SHT_PROGBITS, flags, 1);
   return secref_tdata;
 }
 
-AssemblerElfBase::SecRef AssemblerElfBase::get_tbss_section() noexcept {
+SecRef AssemblerElfBase::get_tbss_section() noexcept {
   unsigned off = elf::sec_off(".tbss");
   unsigned flags = SHF_ALLOC | SHF_WRITE | SHF_TLS;
   (void)get_or_create_section(secref_tbss, off, SHT_NOBITS, flags, 1, false);
   return secref_tbss;
 }
 
-AssemblerElfBase::SecRef
-    AssemblerElfBase::create_structor_section(bool init,
-                                              SecRef group) noexcept {
+SecRef AssemblerElfBase::create_structor_section(bool init,
+                                                 SecRef group) noexcept {
   // TODO: priorities
   std::string_view name = init ? ".init_array" : ".fini_array";
   unsigned type = init ? SHT_INIT_ARRAY : SHT_FINI_ARRAY;
@@ -243,12 +241,11 @@ AssemblerElfBase::SecRef
   return secref;
 }
 
-AssemblerElfBase::SecRef
-    AssemblerElfBase::create_section(std::string_view name,
-                                     unsigned type,
-                                     unsigned flags,
-                                     bool with_rela,
-                                     SecRef group) noexcept {
+SecRef AssemblerElfBase::create_section(std::string_view name,
+                                        unsigned type,
+                                        unsigned flags,
+                                        bool with_rela,
+                                        SecRef group) noexcept {
   assert(type != SHT_GROUP && "use create_group_section to create groups");
 
   assert(name.find('\0') == std::string_view::npos &&
@@ -284,9 +281,8 @@ AssemblerElfBase::SecRef
   return ref;
 }
 
-AssemblerElfBase::SecRef
-    AssemblerElfBase::create_group_section(SymRef signature_sym,
-                                           bool is_comdat) noexcept {
+SecRef AssemblerElfBase::create_group_section(SymRef signature_sym,
+                                              bool is_comdat) noexcept {
   SecRef ref = create_section(SHT_GROUP, 0, elf::sec_off(".group"));
   DataSection &sec = get_section(ref);
   sec.align = 4;
@@ -323,9 +319,9 @@ void AssemblerElfBase::sym_copy(SymRef dst, SymRef src) noexcept {
   // Don't copy st_info.
 }
 
-AssemblerElfBase::SymRef AssemblerElfBase::sym_add(const std::string_view name,
-                                                   SymBinding binding,
-                                                   u32 type) noexcept {
+SymRef AssemblerElfBase::sym_add(const std::string_view name,
+                                 SymBinding binding,
+                                 u32 type) noexcept {
   size_t str_off = strtab.add(name);
 
   u8 info;

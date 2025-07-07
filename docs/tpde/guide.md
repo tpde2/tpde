@@ -547,7 +547,7 @@ struct TestIRCompilerBase /* ... */ {
         return this->ir()->functions[this->adaptor->cur_func].has_call;
     }
 
-    static typename CompilerConfig::Assembler::SymRef cur_personality_func() {
+    static SymRef cur_personality_func() {
         // as the IR has no means of handling exceptions or specifying unwind actions
         // there are no personality functions
         return {};
