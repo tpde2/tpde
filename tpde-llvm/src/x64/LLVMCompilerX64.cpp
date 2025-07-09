@@ -89,7 +89,6 @@ struct LLVMCompilerX64 : tpde::x64::CompilerX64<LLVMAdaptor,
   bool compile_unreachable(const llvm::Instruction *,
                            const ValInfo &,
                            u64) noexcept;
-  bool compile_alloca(const llvm::Instruction *, const ValInfo &, u64) noexcept;
   bool compile_br(const llvm::Instruction *, const ValInfo &, u64) noexcept;
   void generate_conditional_branch(Jump jmp,
                                    IRBlockRef true_target,
@@ -203,94 +202,6 @@ bool LLVMCompilerX64::compile_unreachable(const llvm::Instruction *,
                                           u64) noexcept {
   ASM(UD2);
   this->release_regs_after_return();
-  return true;
-}
-
-bool LLVMCompilerX64::compile_alloca(const llvm::Instruction *inst,
-                                     const ValInfo &,
-                                     u64) noexcept {
-  const auto *alloca = llvm::cast<llvm::AllocaInst>(inst);
-  assert(this->adaptor->cur_has_dynamic_alloca());
-
-  // refcount
-  const llvm::Value *size_val = alloca->getArraySize();
-  auto [size_vr, size_ref] = this->val_ref_single(size_val);
-  auto [res_vr, res_ref] = this->result_ref_single(alloca);
-
-  auto align = alloca->getAlign().value();
-  if (align >= (u64{1} << 31)) {
-    // We can't encode this as immediate and it doesn't happen in practice.
-    return false;
-  }
-
-  auto &layout = adaptor->mod->getDataLayout();
-  if (auto opt = alloca->getAllocationSize(layout); opt) {
-    const auto size = *opt;
-    assert(!size.isScalable());
-    auto size_val = size.getFixedValue();
-    size_val = tpde::util::align_up(size_val, 16);
-    if (size_val > 0) {
-      assert(size < 0x8000'0000);
-      ASM(SUB64ri, FE_SP, size_val);
-    }
-
-    if (align > 16) {
-      ASM(AND64ri, FE_SP, ~(align - 1));
-    }
-
-    res_ref.alloc_reg();
-  } else {
-    const auto elem_size = layout.getTypeAllocSize(alloca->getAllocatedType());
-    ScratchReg scratch{this};
-
-    AsmReg size_reg = size_ref.load_to_reg();
-    if (auto width = size_val->getType()->getIntegerBitWidth(); width != 64) {
-      if (width > 64) {
-        // Don't support alloca array sizes beyond i64...
-        return false;
-      }
-      size_ref = std::move(size_ref).into_extended(false, width, 64);
-      size_reg = size_ref.cur_reg();
-    }
-    AsmReg res_reg = res_ref.alloc_try_reuse(size_ref);
-
-    if (elem_size == 0) {
-      ASM(XOR32rr, res_reg, res_reg);
-    } else if ((elem_size & (elem_size - 1)) == 0) {
-      // elem_size is power of two
-      const auto shift = tpde::util::cnt_tz(static_cast<u32>(elem_size));
-      if (shift > 0 && shift < 4) {
-        ASM(LEA64rm, res_reg, FE_MEM(FE_NOREG, u8(1 << shift), size_reg, 0));
-      } else {
-        if (size_reg != res_reg) {
-          ASM(MOV64rr, res_reg, size_reg);
-        }
-        if (elem_size != 1) {
-          ASM(SHL64ri, res_reg, shift);
-        }
-      }
-    } else {
-      if (elem_size <= 0x7FFF'FFFF) [[likely]] {
-        ASM(IMUL64rri, res_reg, size_reg, elem_size);
-      } else {
-        auto tmp = scratch.alloc_gp();
-        ASM(MOV64ri, tmp, elem_size);
-        if (size_reg != res_reg) {
-          ASM(MOV64rr, res_reg, size_reg);
-        }
-        ASM(IMUL64rr, res_reg, tmp);
-      }
-    }
-
-    ASM(SUB64rr, FE_SP, res_reg);
-
-    align = align > 16 ? align : 16;
-    if (elem_size & (align - 1)) {
-      ASM(AND64ri, FE_SP, ~(align - 1));
-    }
-  }
-
-  ASM(MOV64rr, res_ref.cur_reg(), FE_SP);
   return true;
 }
 

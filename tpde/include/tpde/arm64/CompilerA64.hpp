@@ -425,6 +425,16 @@ struct CompilerA64 : BaseTy<Adaptor, Derived, Config> {
 
   AsmReg gval_expr_as_reg(GenericValuePart &gv) noexcept;
 
+  /// Dynamic alloca of a fixed-size region.
+  void alloca_fixed(u64 size, u32 align, ValuePart &res) noexcept;
+
+  /// Dynamic alloca of a dynamically-sized region (elem_size * count bytes).
+  /// count must have a size of 64 bit.
+  void alloca_dynamic(u64 elem_size,
+                      ValuePart &&count,
+                      u32 align,
+                      ValuePart &res) noexcept;
+
   void materialize_constant(const u64 *data,
                             RegBank bank,
                             u32 size,
@@ -1335,6 +1345,71 @@ AsmReg CompilerA64<Adaptor, Derived, BaseTy, Config>::gval_expr_as_reg(
 
   gv.state = std::move(scratch);
   return dst;
+}
+
+template <IRAdaptor Adaptor,
+          typename Derived,
+          template <typename, typename, typename> typename BaseTy,
+          typename Config>
+void CompilerA64<Adaptor, Derived, BaseTy, Config>::alloca_fixed(
+    u64 size, u32 align, ValuePart &res) noexcept {
+  assert(align != 0 && (align & (align - 1)) == 0 && "invalid alignment");
+  size = tpde::util::align_up(size, 16);
+  AsmReg res_reg = res.alloc_reg(this);
+  if (size >= 0x10'0000) {
+    auto tmp = permanent_scratch_reg;
+    materialize_constant(size, Config::GP_BANK, 8, tmp);
+    ASM(SUBx_uxtx, res_reg, DA_SP, tmp, 0);
+  } else if (size >= 0x1000) {
+    ASM(SUBxi, res_reg, DA_SP, size & 0xff'f000);
+    ASM(SUBxi, res_reg, res_reg, size & 0xfff);
+  } else {
+    ASM(SUBxi, res_reg, DA_SP, size & 0xfff);
+  }
+
+  if (align > 16) {
+    // The stack pointer is always at least 16-byte aligned.
+    ASM(ANDxi, res_reg, res_reg, ~(u64{align} - 1));
+  }
+
+  if (size > 0) {
+    ASM(MOV_SPx, DA_SP, res_reg);
+  }
+}
+
+template <IRAdaptor Adaptor,
+          typename Derived,
+          template <typename, typename, typename> typename BaseTy,
+          typename Config>
+void CompilerA64<Adaptor, Derived, BaseTy, Config>::alloca_dynamic(
+    u64 elem_size, ValuePart &&count, u32 align, ValuePart &res) noexcept {
+  assert(align != 0 && (align & (align - 1)) == 0 && "invalid alignment");
+  AsmReg size_reg = count.has_reg() ? count.cur_reg() : count.load_to_reg(this);
+  AsmReg res_reg = res.alloc_try_reuse(this, count);
+
+  if (elem_size == 0) {
+    ASM(MOVZw, res_reg, 0);
+  } else if ((elem_size & (elem_size - 1)) == 0) {
+    const auto shift = util::cnt_tz(elem_size);
+    if (shift <= 4) {
+      ASM(SUBx_uxtx, res_reg, DA_SP, size_reg, shift);
+    } else {
+      ASM(LSLxi, res_reg, size_reg, shift);
+      ASM(SUBx_uxtx, res_reg, DA_SP, res_reg, 0);
+    }
+  } else {
+    auto tmp = permanent_scratch_reg;
+    materialize_constant(elem_size, Config::GP_BANK, 8, tmp);
+    ASM(MULx, res_reg, size_reg, tmp);
+    ASM(SUBx_uxtx, res_reg, DA_SP, res_reg, 0);
+  }
+
+  align = align > 16 ? align : 16;
+  if (elem_size & (align - 1)) {
+    ASM(ANDxi, res_reg, res_reg, ~(u64{align} - 1));
+  }
+
+  ASM(MOV_SPx, DA_SP, res_reg);
 }
 
 template <IRAdaptor Adaptor,

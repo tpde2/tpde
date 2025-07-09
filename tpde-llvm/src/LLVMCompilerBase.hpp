@@ -494,6 +494,7 @@ public:
   bool compile_freeze(const llvm::Instruction *, const ValInfo &, u64) noexcept;
   bool compile_call(const llvm::Instruction *, const ValInfo &, u64) noexcept;
   bool compile_select(const llvm::Instruction *, const ValInfo &, u64) noexcept;
+  bool compile_alloca(const llvm::Instruction *, const ValInfo &, u64) noexcept;
   bool compile_gep(const llvm::Instruction *, const ValInfo &, u64) noexcept;
   bool compile_fcmp(const llvm::Instruction *, const ValInfo &, u64) noexcept;
   bool compile_switch(const llvm::Instruction *, const ValInfo &, u64) noexcept;
@@ -514,7 +515,6 @@ public:
     return false;
   }
 
-  bool compile_alloca(const llvm::AllocaInst *) noexcept { return false; }
 
   bool compile_br(const llvm::Instruction *, const ValInfo &, u64) noexcept {
     return false;
@@ -3698,6 +3698,39 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_select(
 
   auto res_ref = res.part(0);
   this->set_value(res_ref, res_scratch);
+  return true;
+}
+
+template <typename Adaptor, typename Derived, typename Config>
+bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_alloca(
+    const llvm::Instruction *inst, const ValInfo &, u64) noexcept {
+  const auto *alloca = llvm::cast<llvm::AllocaInst>(inst);
+  assert(this->adaptor->cur_has_dynamic_alloca());
+
+  auto [res_vr, res_ref] = this->result_ref_single(alloca);
+
+  auto align = alloca->getAlign().value();
+  auto &layout = this->adaptor->mod->getDataLayout();
+  if (auto size = alloca->getAllocationSize(layout)) {
+    if (size->isScalable()) {
+      return false;
+    }
+    derived()->alloca_fixed(size->getFixedValue(), align, res_ref);
+    return true;
+  }
+
+  const llvm::Value *size_val = alloca->getArraySize();
+  auto [size_vr, size_ref] = this->val_ref_single(size_val);
+
+  auto elem_size = layout.getTypeAllocSize(alloca->getAllocatedType());
+  if (auto width = size_val->getType()->getIntegerBitWidth(); width != 64) {
+    if (width > 64) {
+      // Don't support alloca array sizes beyond i64...
+      return false;
+    }
+    size_ref = std::move(size_ref).into_extended(false, width, 64);
+  }
+  derived()->alloca_dynamic(elem_size, std::move(size_ref), align, res_ref);
   return true;
 }
 

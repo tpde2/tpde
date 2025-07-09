@@ -97,7 +97,6 @@ struct LLVMCompilerArm64 : tpde::a64::CompilerA64<LLVMAdaptor,
   bool compile_unreachable(const llvm::Instruction *,
                            const ValInfo &,
                            u64) noexcept;
-  bool compile_alloca(const llvm::Instruction *, const ValInfo &, u64) noexcept;
   bool compile_br(const llvm::Instruction *, const ValInfo &, u64) noexcept;
   void generate_conditional_branch(Jump jmp,
                                    IRBlockRef true_target,
@@ -288,91 +287,6 @@ bool LLVMCompilerArm64::compile_unreachable(const llvm::Instruction *,
                                             u64) noexcept {
   ASM(UDF, 1);
   this->release_regs_after_return();
-  return true;
-}
-
-bool LLVMCompilerArm64::compile_alloca(const llvm::Instruction *inst,
-                                       const ValInfo &,
-                                       u64) noexcept {
-  const auto *alloca = llvm::cast<llvm::AllocaInst>(inst);
-  assert(this->adaptor->cur_has_dynamic_alloca());
-
-  // refcount
-  const llvm::Value *size_val = alloca->getArraySize();
-  auto [size_vr, size_ref] = this->val_ref_single(size_val);
-  auto [res_vr, res_ref] = this->result_ref_single(alloca);
-
-  auto align = alloca->getAlign().value();
-  auto &layout = adaptor->mod->getDataLayout();
-  if (auto opt = alloca->getAllocationSize(layout); opt) {
-    AsmReg res_reg = res_ref.alloc_reg();
-
-    const auto size = *opt;
-    assert(!size.isScalable());
-    auto size_val = size.getFixedValue();
-    size_val = tpde::util::align_up(size_val, 16);
-    if (size_val >= 0x10'0000) {
-      auto tmp = permanent_scratch_reg;
-      materialize_constant(size_val, CompilerConfig::GP_BANK, 8, tmp);
-      ASM(SUBx_uxtx, res_reg, DA_SP, tmp, 0);
-    } else if (size_val >= 0x1000) {
-      ASM(SUBxi, res_reg, DA_SP, size_val & 0xff'f000);
-      ASM(SUBxi, res_reg, res_reg, size_val & 0xfff);
-    } else {
-      ASM(SUBxi, res_reg, DA_SP, size_val & 0xfff);
-    }
-
-    if (align > 16) {
-      // The stack pointer is always at least 16-byte aligned.
-      ASM(ANDxi, res_reg, res_reg, ~(align - 1));
-    }
-
-    if (size_val > 0) {
-      ASM(MOV_SPx, DA_SP, res_reg);
-    }
-
-    res_ref.set_modified();
-    return true;
-  }
-
-  const auto elem_size = layout.getTypeAllocSize(alloca->getAllocatedType());
-
-  AsmReg size_reg = size_ref.load_to_reg();
-  if (auto width = size_val->getType()->getIntegerBitWidth(); width != 64) {
-    if (width > 64) {
-      // Don't support alloca array sizes beyond i64...
-      return false;
-    }
-    // TODO: fold 8/16/32 into sub ext/bfi?
-    size_ref = std::move(size_ref).into_extended(false, width, 64);
-    size_reg = size_ref.cur_reg();
-  }
-  AsmReg res_reg = res_ref.alloc_try_reuse(size_ref);
-
-  if (elem_size == 0) {
-    ASM(MOVZw, res_reg, 0);
-  } else if ((elem_size & (elem_size - 1)) == 0) {
-    const auto shift = __builtin_ctzll(elem_size);
-    if (shift <= 4) {
-      ASM(SUBx_uxtx, res_reg, DA_SP, size_reg, shift);
-    } else {
-      ASM(LSLxi, res_reg, size_reg, shift);
-      ASM(SUBx_uxtx, res_reg, DA_SP, res_reg, 0);
-    }
-  } else {
-    auto tmp = permanent_scratch_reg;
-    materialize_constant(elem_size, CompilerConfig::GP_BANK, 8, tmp);
-    ASM(MULx, res_reg, size_reg, tmp);
-    ASM(SUBx_uxtx, res_reg, DA_SP, res_reg, 0);
-  }
-
-  align = align > 16 ? align : 16;
-  if (elem_size & (align - 1)) {
-    ASM(ANDxi, res_reg, res_reg, ~(align - 1));
-  }
-
-  ASM(MOV_SPx, DA_SP, res_reg);
-  res_ref.set_modified();
   return true;
 }
 

@@ -424,6 +424,16 @@ struct CompilerX64 : BaseTy<Adaptor, Derived, Config> {
 
   AsmReg gval_expr_as_reg(GenericValuePart &gv) noexcept;
 
+  /// Dynamic alloca of a fixed-size region.
+  void alloca_fixed(u64 size, u32 align, ValuePart &res) noexcept;
+
+  /// Dynamic alloca of a dynamically-sized region (elem_size * count bytes).
+  /// count must have a size of 64 bit.
+  void alloca_dynamic(u64 elem_size,
+                      ValuePart &&count,
+                      u32 align,
+                      ValuePart &res) noexcept;
+
   void materialize_constant(const u64 *data,
                             RegBank bank,
                             u32 size,
@@ -1113,6 +1123,75 @@ AsmReg CompilerX64<Adaptor, Derived, BaseTy, Config>::gval_expr_as_reg(
   }
   gv.state = std::move(scratch);
   return dst;
+}
+
+template <IRAdaptor Adaptor,
+          typename Derived,
+          template <typename, typename, typename> typename BaseTy,
+          typename Config>
+void CompilerX64<Adaptor, Derived, BaseTy, Config>::alloca_fixed(
+    u64 size, u32 align, ValuePart &res) noexcept {
+  assert(align != 0 && (align & (align - 1)) == 0 && "invalid alignment");
+  size = tpde::util::align_up(size, 16);
+  if (size > 0) {
+    assert(size < 0x8000'0000);
+    ASM(SUB64ri, FE_SP, size);
+  }
+  if (align > 16) {
+    assert(align < u32{1} << 31 && "alignment >= 2**31 not implemented");
+    ASM(AND64ri, FE_SP, ~(align - 1));
+  }
+  ASM(MOV64rr, res.alloc_reg(this), FE_SP);
+}
+
+template <IRAdaptor Adaptor,
+          typename Derived,
+          template <typename, typename, typename> typename BaseTy,
+          typename Config>
+void CompilerX64<Adaptor, Derived, BaseTy, Config>::alloca_dynamic(
+    u64 elem_size, ValuePart &&count, u32 align, ValuePart &res) noexcept {
+  assert(align != 0 && (align & (align - 1)) == 0 && "invalid alignment");
+  AsmReg size_reg = count.has_reg() ? count.cur_reg() : count.load_to_reg(this);
+  AsmReg res_reg = res.alloc_try_reuse(this, count);
+
+  if (elem_size == 0) {
+    ASM(XOR32rr, res_reg, res_reg);
+  } else if ((elem_size & (elem_size - 1)) == 0) {
+    // elem_size is power of two
+    const auto shift = util::cnt_tz(elem_size);
+    if (shift > 0 && shift < 4) {
+      ASM(LEA64rm, res_reg, FE_MEM(FE_NOREG, u8(1 << shift), size_reg, 0));
+    } else {
+      if (size_reg != res_reg) {
+        ASM(MOV64rr, res_reg, size_reg);
+      }
+      if (elem_size != 1) {
+        ASM(SHL64ri, res_reg, shift);
+      }
+    }
+  } else {
+    if (elem_size <= 0x7FFF'FFFF) [[likely]] {
+      ASM(IMUL64rri, res_reg, size_reg, elem_size);
+    } else {
+      ScratchReg scratch{this};
+      auto tmp = scratch.alloc_gp();
+      ASM(MOV64ri, tmp, elem_size);
+      if (size_reg != res_reg) {
+        ASM(MOV64rr, res_reg, size_reg);
+      }
+      ASM(IMUL64rr, res_reg, tmp);
+    }
+  }
+
+  ASM(SUB64rr, FE_SP, res_reg);
+
+  align = align > 16 ? align : 16;
+  if (elem_size & (align - 1)) {
+    assert(align < u32{1} << 31 && "alignment >= 2**31 not implemented");
+    ASM(AND64ri, FE_SP, ~(align - 1));
+  }
+
+  ASM(MOV64rr, res_reg, FE_SP);
 }
 
 template <IRAdaptor Adaptor,
