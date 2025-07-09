@@ -94,8 +94,13 @@ int main(const int argc, char *argv[]) {
   const int opt_level{3};
 
   assert(!modules.empty());
+#if LLVM_VERSION_MAJOR >= 21
+  const llvm::Triple &triple = modules[0]->getTargetTriple();
+  const llvm::Triple &the_triple = triple;
+#else
   llvm::StringRef triple = modules[0]->getTargetTriple();
   llvm::Triple the_triple(triple);
+#endif
 
   // Required so that our target triple is actually found
   LLVMInitializeX86TargetInfo();

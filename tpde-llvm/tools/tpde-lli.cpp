@@ -7,8 +7,12 @@
   #include <llvm/ExecutionEngine/Orc/EHFrameRegistrationPlugin.h>
 #endif
 #include <llvm/ExecutionEngine/Orc/ExecutionUtils.h>
+#include <llvm/ExecutionEngine/Orc/ExecutorProcessControl.h>
 #include <llvm/ExecutionEngine/Orc/MapperJITLinkMemoryManager.h>
 #include <llvm/ExecutionEngine/Orc/ObjectLinkingLayer.h>
+#if LLVM_VERSION_MAJOR >= 21
+  #include <llvm/ExecutionEngine/Orc/SelfExecutorProcessControl.h>
+#endif
 #include <llvm/ExecutionEngine/Orc/Shared/ExecutorSymbolDef.h>
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/Module.h>
@@ -128,7 +132,7 @@ int main(int argc, char *argv[]) {
 
   size_t page_size = getpagesize();
   llvm::orc::ExecutionSession es(
-      std::make_unique<llvm::orc::UnsupportedExecutorProcessControl>());
+      exit_on_err(llvm::orc::SelfExecutorProcessControl::Create()));
   llvm::orc::MapperJITLinkMemoryManager memory_manager(
       page_size, std::make_unique<llvm::orc::InProcessMemoryMapper>(page_size));
   llvm::orc::ObjectLinkingLayer object_layer(es, memory_manager);
@@ -141,8 +145,13 @@ int main(int argc, char *argv[]) {
 
   exit_on_err(object_layer.add(dylib, std::move(obj_membuf)));
 
+#if LLVM_VERSION_MAJOR >= 21
+  object_layer.addPlugin(
+      exit_on_err(llvm::orc::EHFrameRegistrationPlugin::Create(es)));
+#else
   object_layer.addPlugin(std::make_unique<llvm::orc::EHFrameRegistrationPlugin>(
       es, std::make_unique<llvm::jitlink::InProcessEHFrameRegistrar>()));
+#endif
 
   llvm::orc::ExecutorSymbolDef sym = exit_on_err(es.lookup(&dylib, "main"));
   uintptr_t main_addr = static_cast<uintptr_t>(sym.getAddress().getValue());

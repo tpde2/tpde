@@ -236,7 +236,7 @@ void EncodingTargetArm64::get_inst_candidates(
                 os << ", " << format_reg(op, ops[reg_idx++]);
               }
             } else if (op.isImm()) {
-              if (mnem.starts_with("CCMP") || mnem.starts_with("FCCMP") ||
+              if (mnem.starts_with("CCM") || mnem.starts_with("FCCMP") ||
                   mnem.starts_with("CS") || mnem.starts_with("FCSEL")) {
                 std::array<std::string_view, 16> ccs = {"DA_EQ",
                                                         "DA_NE",
@@ -571,6 +571,10 @@ void EncodingTargetArm64::get_inst_candidates(
   case_default("CCMPXr", "CCMPx");
   case_default("CCMPWi", "CCMPwi");
   case_default("CCMPXi", "CCMPxi");
+  case_default("CCMNWr", "CCMNw");
+  case_default("CCMNXr", "CCMNx");
+  case_default("CCMNWi", "CCMNwi");
+  case_default("CCMNXi", "CCMNxi");
 
   case_default("FCSELSrrr", "FCSELs");
   case_default("FCSELDrrr", "FCSELd");

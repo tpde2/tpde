@@ -556,21 +556,21 @@ u64 TARGET_V1 f64tou64(double a) { return (u64)a; }
 
 // Clang exposes these only under -fno-strict-float-cast-overflow, which would
 // inhibit better code generation for non-saturating conversions on x86-64.
-i32 TARGET_V1 llvm_fptosi_sat_i32_float(float) __asm__("llvm.fptosi.sat.i32.float");
+i32 TARGET_V1 llvm_fptosi_sat_i32_float(float) __asm__("llvm.fptosi.sat.i32.f32");
 i32 TARGET_V1 f32toi32_sat(float a) { return llvm_fptosi_sat_i32_float(a); }
-u32 TARGET_V1 llvm_fptoui_sat_i32_float(float) __asm__("llvm.fptoui.sat.i32.float");
+u32 TARGET_V1 llvm_fptoui_sat_i32_float(float) __asm__("llvm.fptoui.sat.i32.f32");
 u32 TARGET_V1 f32tou32_sat(float a) { return llvm_fptoui_sat_i32_float(a); }
-i64 TARGET_V1 llvm_fptosi_sat_i64_float(float) __asm__("llvm.fptosi.sat.i64.float");
+i64 TARGET_V1 llvm_fptosi_sat_i64_float(float) __asm__("llvm.fptosi.sat.i64.f32");
 i64 TARGET_V1 f32toi64_sat(float a) { return llvm_fptosi_sat_i64_float(a); }
-u64 TARGET_V1 llvm_fptoui_sat_i64_float(float) __asm__("llvm.fptoui.sat.i64.float");
+u64 TARGET_V1 llvm_fptoui_sat_i64_float(float) __asm__("llvm.fptoui.sat.i64.f32");
 u64 TARGET_V1 f32tou64_sat(float a) { return llvm_fptoui_sat_i64_float(a); }
-i32 TARGET_V1 llvm_fptosi_sat_i32_double(double) __asm__("llvm.fptosi.sat.i32.double");
+i32 TARGET_V1 llvm_fptosi_sat_i32_double(double) __asm__("llvm.fptosi.sat.i32.f64");
 i32 TARGET_V1 f64toi32_sat(double a) { return llvm_fptosi_sat_i32_double(a); }
-u32 TARGET_V1 llvm_fptoui_sat_i32_double(double) __asm__("llvm.fptoui.sat.i32.double");
+u32 TARGET_V1 llvm_fptoui_sat_i32_double(double) __asm__("llvm.fptoui.sat.i32.f64");
 u32 TARGET_V1 f64tou32_sat(double a) { return llvm_fptoui_sat_i32_double(a); }
-i64 TARGET_V1 llvm_fptosi_sat_i64_double(double) __asm__("llvm.fptosi.sat.i64.double");
+i64 TARGET_V1 llvm_fptosi_sat_i64_double(double) __asm__("llvm.fptosi.sat.i64.f64");
 i64 TARGET_V1 f64toi64_sat(double a) { return llvm_fptosi_sat_i64_double(a); }
-u64 TARGET_V1 llvm_fptoui_sat_i64_double(double) __asm__("llvm.fptoui.sat.i64.double");
+u64 TARGET_V1 llvm_fptoui_sat_i64_double(double) __asm__("llvm.fptoui.sat.i64.f64");
 u64 TARGET_V1 f64tou64_sat(double a) { return llvm_fptoui_sat_i64_double(a); }
 
 float TARGET_V1 i8tof32(u8 a) { return (float)(i8)a; }
