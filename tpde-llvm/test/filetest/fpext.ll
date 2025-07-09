@@ -85,3 +85,33 @@ define fp128 @fpext_f64tof128(double %in) {
   ret fp128 %ext
 }
 
+define fp128 @fpext_f64tof128_fixed_reg(fp128 %p) {
+; X64-LABEL: <fpext_f64tof128_fixed_reg>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    pxor xmm0, xmm0
+; X64-NEXT:  <L0>:
+; X64-NEXT:    call <L0>
+; X64-NEXT:     R_X86_64_PLT32 __extenddftf2-0x4
+; X64-NEXT:    add rsp, 0x30
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <fpext_f64tof128_fixed_reg>:
+; ARM64:         sub sp, sp, #0xa0
+; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
+; ARM64-NEXT:    movi v0.8b, #0x0
+; ARM64-NEXT:    bl 0xf4 <fpext_f64tof128_fixed_reg+0x14>
+; ARM64-NEXT:     R_AARCH64_CALL26 __extenddftf2
+; ARM64-NEXT:    ldp x29, x30, [sp]
+; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ret
+  %x = fpext double 0.000000e+00 to fp128
+  br label %bb
+bb:
+  ret fp128 %x
+}

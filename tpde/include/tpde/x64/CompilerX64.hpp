@@ -429,7 +429,7 @@ struct CompilerX64 : BaseTy<Adaptor, Derived, Config> {
                             u32 size,
                             AsmReg dst) noexcept;
 
-  AsmReg select_fixed_assignment_reg(RegBank bank, IRValueRef) noexcept;
+  AsmReg select_fixed_assignment_reg(AssignmentPartRef, IRValueRef) noexcept;
 
   enum class Jump {
     ja,
@@ -1225,7 +1225,8 @@ template <IRAdaptor Adaptor,
           typename Config>
 AsmReg
     CompilerX64<Adaptor, Derived, BaseTy, Config>::select_fixed_assignment_reg(
-        const RegBank bank, IRValueRef) noexcept {
+        AssignmentPartRef ap, IRValueRef) noexcept {
+  RegBank bank = ap.bank();
   assert(bank.id() <= Config::NUM_BANKS);
   auto reg_mask = this->register_file.bank_regs(bank);
   reg_mask &= ~fixed_assignment_nonallocatable_mask;

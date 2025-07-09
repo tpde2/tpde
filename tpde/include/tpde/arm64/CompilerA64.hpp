@@ -437,7 +437,7 @@ struct CompilerA64 : BaseTy<Adaptor, Derived, Config> {
     materialize_constant(&const_u64, bank, size, dst);
   }
 
-  AsmReg select_fixed_assignment_reg(RegBank bank, IRValueRef) noexcept;
+  AsmReg select_fixed_assignment_reg(AssignmentPartRef, IRValueRef) noexcept;
 
   struct Jump {
     enum Kind : uint8_t {
@@ -638,6 +638,20 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::CallBuilder::call_impl(
     assert(this->assigner.get_stack_size() == 0);
   }
 
+  // For vector registers, only the lowest half is callee-saved. Evict all
+  // value parts larger than 8 bytes.
+  auto fp_regs = RegisterFile::bank_regs(Config::FP_BANK);
+  auto fp_csrs = fp_regs & this->assigner.get_ccinfo().callee_saved_regs;
+  auto used_fp_csrs = fp_csrs & this->compiler.register_file.used;
+  for (auto reg_id : util::BitSetIterator<>{used_fp_csrs}) {
+    Reg reg{reg_id};
+    ValLocalIdx local_idx = this->compiler.register_file.reg_local_idx(reg);
+    auto part = this->compiler.register_file.reg_part(reg);
+    AssignmentPartRef ap{this->compiler.val_assignment(local_idx), part};
+    if (ap.part_size() > 8) {
+      this->compiler.evict(ap);
+    }
+  }
 
   if (auto *sym = std::get_if<SymRef>(&target)) {
     ASMC(&this->compiler, BL, 0);
@@ -1408,7 +1422,14 @@ template <IRAdaptor Adaptor,
           typename Config>
 AsmReg
     CompilerA64<Adaptor, Derived, BaseTy, Config>::select_fixed_assignment_reg(
-        const RegBank bank, IRValueRef) noexcept {
+        AssignmentPartRef ap, IRValueRef) noexcept {
+  RegBank bank = ap.bank();
+  if (bank == Config::FP_BANK && ap.part_size() > 8) {
+    // FP registers can not in general be fixed registers, as only the lowest 8
+    // bytes are callee-saved.
+    return AsmReg::make_invalid();
+  }
+
   // TODO(ts): why is this in here?
   assert(bank.id() <= Config::NUM_BANKS);
   auto reg_mask = this->register_file.bank_regs(bank);

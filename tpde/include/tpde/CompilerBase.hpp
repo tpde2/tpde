@@ -820,7 +820,7 @@ void CompilerBase<Adaptor, Derived, Config>::init_assignment(
 
     if (try_fixed) {
       // check if there is a fixed register available
-      AsmReg reg = derived()->select_fixed_assignment_reg(ap.bank(), value);
+      AsmReg reg = derived()->select_fixed_assignment_reg(ap, value);
       TPDE_LOG_TRACE("Trying to assign fixed reg to value {}",
                      static_cast<u32>(local_idx));
 

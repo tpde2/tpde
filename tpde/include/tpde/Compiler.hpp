@@ -75,7 +75,8 @@ concept Compiler = CompilerConfig<Config> && requires(T a) {
   } -> std::same_as<typename Config::AsmReg>;
 
   {
-    a.select_fixed_assignment_reg(ARG(RegBank), ARG(typename T::IRValueRef))
+    a.select_fixed_assignment_reg(ARG(AssignmentPartRef),
+                                  ARG(typename T::IRValueRef))
   } -> std::same_as<typename Config::AsmReg>;
 
 

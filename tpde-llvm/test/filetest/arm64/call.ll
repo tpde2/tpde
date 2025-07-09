@@ -57,3 +57,326 @@ define void @call_take_12_fp128() {
   ret void
 }
 
+declare void @take_v2i32(<2 x i32>)
+define void @many_vec_regs_v2i32(ptr %p) {
+; ARM64-LABEL: <many_vec_regs_v2i32>:
+; ARM64:         sub sp, sp, #0x100
+; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    stp d8, d9, [sp, #0x10]
+; ARM64-NEXT:    stp d10, d11, [sp, #0x20]
+; ARM64-NEXT:    stp d12, d13, [sp, #0x30]
+; ARM64-NEXT:    stp d14, d15, [sp, #0x40]
+; ARM64-NEXT:    nop
+; ARM64-NEXT:    ldr d0, [x0]
+; ARM64-NEXT:    ldr d1, [x0]
+; ARM64-NEXT:    ldr d2, [x0]
+; ARM64-NEXT:    ldr d3, [x0]
+; ARM64-NEXT:    ldr d4, [x0]
+; ARM64-NEXT:    ldr d5, [x0]
+; ARM64-NEXT:    ldr d6, [x0]
+; ARM64-NEXT:    ldr d7, [x0]
+; ARM64-NEXT:    ldr d8, [x0]
+; ARM64-NEXT:    ldr d9, [x0]
+; ARM64-NEXT:    ldr d10, [x0]
+; ARM64-NEXT:    ldr d11, [x0]
+; ARM64-NEXT:    ldr d12, [x0]
+; ARM64-NEXT:    ldr d13, [x0]
+; ARM64-NEXT:    ldr d14, [x0]
+; ARM64-NEXT:    ldr d15, [x0]
+; ARM64-NEXT:    ldr d16, [x0]
+; ARM64-NEXT:    ldr d17, [x0]
+; ARM64-NEXT:    ldr d18, [x0]
+; ARM64-NEXT:    ldr d19, [x0]
+; ARM64-NEXT:    ldr d20, [x0]
+; ARM64-NEXT:    str d1, [x29, #0xa0]
+; ARM64-NEXT:    str d2, [x29, #0xa8]
+; ARM64-NEXT:    str d3, [x29, #0xb0]
+; ARM64-NEXT:    str d4, [x29, #0xb8]
+; ARM64-NEXT:    str d5, [x29, #0xc0]
+; ARM64-NEXT:    str d6, [x29, #0xc8]
+; ARM64-NEXT:    str d7, [x29, #0xd0]
+; ARM64-NEXT:    str d16, [x29, #0xd8]
+; ARM64-NEXT:    str d17, [x29, #0xe0]
+; ARM64-NEXT:    str d18, [x29, #0xe8]
+; ARM64-NEXT:    str d19, [x29, #0xf0]
+; ARM64-NEXT:    str d20, [x29, #0xf8]
+; ARM64-NEXT:    bl 0x184 <many_vec_regs_v2i32+0xa4>
+; ARM64-NEXT:     R_AARCH64_CALL26 take_v2i32
+; ARM64-NEXT:    ldr d0, [x29, #0xa0]
+; ARM64-NEXT:    bl 0x18c <many_vec_regs_v2i32+0xac>
+; ARM64-NEXT:     R_AARCH64_CALL26 take_v2i32
+; ARM64-NEXT:    ldr d0, [x29, #0xa8]
+; ARM64-NEXT:    bl 0x194 <many_vec_regs_v2i32+0xb4>
+; ARM64-NEXT:     R_AARCH64_CALL26 take_v2i32
+; ARM64-NEXT:    ldr d0, [x29, #0xb0]
+; ARM64-NEXT:    bl 0x19c <many_vec_regs_v2i32+0xbc>
+; ARM64-NEXT:     R_AARCH64_CALL26 take_v2i32
+; ARM64-NEXT:    ldr d0, [x29, #0xb8]
+; ARM64-NEXT:    bl 0x1a4 <many_vec_regs_v2i32+0xc4>
+; ARM64-NEXT:     R_AARCH64_CALL26 take_v2i32
+; ARM64-NEXT:    ldr d0, [x29, #0xc0]
+; ARM64-NEXT:    bl 0x1ac <many_vec_regs_v2i32+0xcc>
+; ARM64-NEXT:     R_AARCH64_CALL26 take_v2i32
+; ARM64-NEXT:    ldr d0, [x29, #0xc8]
+; ARM64-NEXT:    bl 0x1b4 <many_vec_regs_v2i32+0xd4>
+; ARM64-NEXT:     R_AARCH64_CALL26 take_v2i32
+; ARM64-NEXT:    ldr d0, [x29, #0xd0]
+; ARM64-NEXT:    bl 0x1bc <many_vec_regs_v2i32+0xdc>
+; ARM64-NEXT:     R_AARCH64_CALL26 take_v2i32
+; ARM64-NEXT:    mov v0.16b, v8.16b
+; ARM64-NEXT:    bl 0x1c4 <many_vec_regs_v2i32+0xe4>
+; ARM64-NEXT:     R_AARCH64_CALL26 take_v2i32
+; ARM64-NEXT:    mov v0.16b, v9.16b
+; ARM64-NEXT:    bl 0x1cc <many_vec_regs_v2i32+0xec>
+; ARM64-NEXT:     R_AARCH64_CALL26 take_v2i32
+; ARM64-NEXT:    mov v0.16b, v10.16b
+; ARM64-NEXT:    bl 0x1d4 <many_vec_regs_v2i32+0xf4>
+; ARM64-NEXT:     R_AARCH64_CALL26 take_v2i32
+; ARM64-NEXT:    mov v0.16b, v11.16b
+; ARM64-NEXT:    bl 0x1dc <many_vec_regs_v2i32+0xfc>
+; ARM64-NEXT:     R_AARCH64_CALL26 take_v2i32
+; ARM64-NEXT:    mov v0.16b, v12.16b
+; ARM64-NEXT:    bl 0x1e4 <many_vec_regs_v2i32+0x104>
+; ARM64-NEXT:     R_AARCH64_CALL26 take_v2i32
+; ARM64-NEXT:    mov v0.16b, v13.16b
+; ARM64-NEXT:    bl 0x1ec <many_vec_regs_v2i32+0x10c>
+; ARM64-NEXT:     R_AARCH64_CALL26 take_v2i32
+; ARM64-NEXT:    mov v0.16b, v14.16b
+; ARM64-NEXT:    bl 0x1f4 <many_vec_regs_v2i32+0x114>
+; ARM64-NEXT:     R_AARCH64_CALL26 take_v2i32
+; ARM64-NEXT:    mov v0.16b, v15.16b
+; ARM64-NEXT:    bl 0x1fc <many_vec_regs_v2i32+0x11c>
+; ARM64-NEXT:     R_AARCH64_CALL26 take_v2i32
+; ARM64-NEXT:    ldr d0, [x29, #0xd8]
+; ARM64-NEXT:    bl 0x204 <many_vec_regs_v2i32+0x124>
+; ARM64-NEXT:     R_AARCH64_CALL26 take_v2i32
+; ARM64-NEXT:    ldr d0, [x29, #0xe0]
+; ARM64-NEXT:    bl 0x20c <many_vec_regs_v2i32+0x12c>
+; ARM64-NEXT:     R_AARCH64_CALL26 take_v2i32
+; ARM64-NEXT:    ldr d0, [x29, #0xe8]
+; ARM64-NEXT:    bl 0x214 <many_vec_regs_v2i32+0x134>
+; ARM64-NEXT:     R_AARCH64_CALL26 take_v2i32
+; ARM64-NEXT:    ldr d0, [x29, #0xf0]
+; ARM64-NEXT:    bl 0x21c <many_vec_regs_v2i32+0x13c>
+; ARM64-NEXT:     R_AARCH64_CALL26 take_v2i32
+; ARM64-NEXT:    ldr d0, [x29, #0xf8]
+; ARM64-NEXT:    bl 0x224 <many_vec_regs_v2i32+0x144>
+; ARM64-NEXT:     R_AARCH64_CALL26 take_v2i32
+; ARM64-NEXT:    ldp x29, x30, [sp]
+; ARM64-NEXT:    ldp d8, d9, [sp, #0x10]
+; ARM64-NEXT:    ldp d10, d11, [sp, #0x20]
+; ARM64-NEXT:    ldp d12, d13, [sp, #0x30]
+; ARM64-NEXT:    ldp d14, d15, [sp, #0x40]
+; ARM64-NEXT:    add sp, sp, #0x100
+; ARM64-NEXT:    ret
+  %v0 = load volatile <2 x i32>, ptr %p
+  %v1 = load volatile <2 x i32>, ptr %p
+  %v2 = load volatile <2 x i32>, ptr %p
+  %v3 = load volatile <2 x i32>, ptr %p
+  %v4 = load volatile <2 x i32>, ptr %p
+  %v5 = load volatile <2 x i32>, ptr %p
+  %v6 = load volatile <2 x i32>, ptr %p
+  %v7 = load volatile <2 x i32>, ptr %p
+  %v8 = load volatile <2 x i32>, ptr %p
+  %v9 = load volatile <2 x i32>, ptr %p
+  %v10 = load volatile <2 x i32>, ptr %p
+  %v11 = load volatile <2 x i32>, ptr %p
+  %v12 = load volatile <2 x i32>, ptr %p
+  %v13 = load volatile <2 x i32>, ptr %p
+  %v14 = load volatile <2 x i32>, ptr %p
+  %v15 = load volatile <2 x i32>, ptr %p
+  %v16 = load volatile <2 x i32>, ptr %p
+  %v17 = load volatile <2 x i32>, ptr %p
+  %v18 = load volatile <2 x i32>, ptr %p
+  %v19 = load volatile <2 x i32>, ptr %p
+  %v20 = load volatile <2 x i32>, ptr %p
+  call void @take_v2i32(<2 x i32> %v0)
+  call void @take_v2i32(<2 x i32> %v1)
+  call void @take_v2i32(<2 x i32> %v2)
+  call void @take_v2i32(<2 x i32> %v3)
+  call void @take_v2i32(<2 x i32> %v4)
+  call void @take_v2i32(<2 x i32> %v5)
+  call void @take_v2i32(<2 x i32> %v6)
+  call void @take_v2i32(<2 x i32> %v7)
+  call void @take_v2i32(<2 x i32> %v8)
+  call void @take_v2i32(<2 x i32> %v9)
+  call void @take_v2i32(<2 x i32> %v10)
+  call void @take_v2i32(<2 x i32> %v11)
+  call void @take_v2i32(<2 x i32> %v12)
+  call void @take_v2i32(<2 x i32> %v13)
+  call void @take_v2i32(<2 x i32> %v14)
+  call void @take_v2i32(<2 x i32> %v15)
+  call void @take_v2i32(<2 x i32> %v16)
+  call void @take_v2i32(<2 x i32> %v17)
+  call void @take_v2i32(<2 x i32> %v18)
+  call void @take_v2i32(<2 x i32> %v19)
+  call void @take_v2i32(<2 x i32> %v20)
+  ret void
+}
+
+declare void @take_v4i32(<4 x i32>)
+define void @many_vec_regs_v4i32(ptr %p) {
+; ARM64-LABEL: <many_vec_regs_v4i32>:
+; ARM64:         sub sp, sp, #0x1e0
+; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    stp d8, d9, [sp, #0x10]
+; ARM64-NEXT:    stp d10, d11, [sp, #0x20]
+; ARM64-NEXT:    stp d12, d13, [sp, #0x30]
+; ARM64-NEXT:    stp d14, d15, [sp, #0x40]
+; ARM64-NEXT:    nop
+; ARM64-NEXT:    ldr q0, [x0]
+; ARM64-NEXT:    ldr q1, [x0]
+; ARM64-NEXT:    ldr q2, [x0]
+; ARM64-NEXT:    ldr q3, [x0]
+; ARM64-NEXT:    ldr q4, [x0]
+; ARM64-NEXT:    ldr q5, [x0]
+; ARM64-NEXT:    ldr q6, [x0]
+; ARM64-NEXT:    ldr q7, [x0]
+; ARM64-NEXT:    ldr q8, [x0]
+; ARM64-NEXT:    ldr q9, [x0]
+; ARM64-NEXT:    ldr q10, [x0]
+; ARM64-NEXT:    ldr q11, [x0]
+; ARM64-NEXT:    ldr q12, [x0]
+; ARM64-NEXT:    ldr q13, [x0]
+; ARM64-NEXT:    ldr q14, [x0]
+; ARM64-NEXT:    ldr q15, [x0]
+; ARM64-NEXT:    ldr q16, [x0]
+; ARM64-NEXT:    ldr q17, [x0]
+; ARM64-NEXT:    ldr q18, [x0]
+; ARM64-NEXT:    ldr q19, [x0]
+; ARM64-NEXT:    ldr q20, [x0]
+; ARM64-NEXT:    str q1, [x29, #0xa0]
+; ARM64-NEXT:    str q2, [x29, #0xb0]
+; ARM64-NEXT:    str q3, [x29, #0xc0]
+; ARM64-NEXT:    str q4, [x29, #0xd0]
+; ARM64-NEXT:    str q5, [x29, #0xe0]
+; ARM64-NEXT:    str q6, [x29, #0xf0]
+; ARM64-NEXT:    str q7, [x29, #0x100]
+; ARM64-NEXT:    str q16, [x29, #0x110]
+; ARM64-NEXT:    str q17, [x29, #0x120]
+; ARM64-NEXT:    str q18, [x29, #0x130]
+; ARM64-NEXT:    str q19, [x29, #0x140]
+; ARM64-NEXT:    str q20, [x29, #0x150]
+; ARM64-NEXT:    str q8, [x29, #0x160]
+; ARM64-NEXT:    str q9, [x29, #0x170]
+; ARM64-NEXT:    str q10, [x29, #0x180]
+; ARM64-NEXT:    str q11, [x29, #0x190]
+; ARM64-NEXT:    str q12, [x29, #0x1a0]
+; ARM64-NEXT:    str q13, [x29, #0x1b0]
+; ARM64-NEXT:    str q14, [x29, #0x1c0]
+; ARM64-NEXT:    str q15, [x29, #0x1d0]
+; ARM64-NEXT:    bl 0x324 <many_vec_regs_v4i32+0xc4>
+; ARM64-NEXT:     R_AARCH64_CALL26 take_v4i32
+; ARM64-NEXT:    ldr q0, [x29, #0xa0]
+; ARM64-NEXT:    bl 0x32c <many_vec_regs_v4i32+0xcc>
+; ARM64-NEXT:     R_AARCH64_CALL26 take_v4i32
+; ARM64-NEXT:    ldr q0, [x29, #0xb0]
+; ARM64-NEXT:    bl 0x334 <many_vec_regs_v4i32+0xd4>
+; ARM64-NEXT:     R_AARCH64_CALL26 take_v4i32
+; ARM64-NEXT:    ldr q0, [x29, #0xc0]
+; ARM64-NEXT:    bl 0x33c <many_vec_regs_v4i32+0xdc>
+; ARM64-NEXT:     R_AARCH64_CALL26 take_v4i32
+; ARM64-NEXT:    ldr q0, [x29, #0xd0]
+; ARM64-NEXT:    bl 0x344 <many_vec_regs_v4i32+0xe4>
+; ARM64-NEXT:     R_AARCH64_CALL26 take_v4i32
+; ARM64-NEXT:    ldr q0, [x29, #0xe0]
+; ARM64-NEXT:    bl 0x34c <many_vec_regs_v4i32+0xec>
+; ARM64-NEXT:     R_AARCH64_CALL26 take_v4i32
+; ARM64-NEXT:    ldr q0, [x29, #0xf0]
+; ARM64-NEXT:    bl 0x354 <many_vec_regs_v4i32+0xf4>
+; ARM64-NEXT:     R_AARCH64_CALL26 take_v4i32
+; ARM64-NEXT:    ldr q0, [x29, #0x100]
+; ARM64-NEXT:    bl 0x35c <many_vec_regs_v4i32+0xfc>
+; ARM64-NEXT:     R_AARCH64_CALL26 take_v4i32
+; ARM64-NEXT:    ldr q0, [x29, #0x160]
+; ARM64-NEXT:    bl 0x364 <many_vec_regs_v4i32+0x104>
+; ARM64-NEXT:     R_AARCH64_CALL26 take_v4i32
+; ARM64-NEXT:    ldr q0, [x29, #0x170]
+; ARM64-NEXT:    bl 0x36c <many_vec_regs_v4i32+0x10c>
+; ARM64-NEXT:     R_AARCH64_CALL26 take_v4i32
+; ARM64-NEXT:    ldr q0, [x29, #0x180]
+; ARM64-NEXT:    bl 0x374 <many_vec_regs_v4i32+0x114>
+; ARM64-NEXT:     R_AARCH64_CALL26 take_v4i32
+; ARM64-NEXT:    ldr q0, [x29, #0x190]
+; ARM64-NEXT:    bl 0x37c <many_vec_regs_v4i32+0x11c>
+; ARM64-NEXT:     R_AARCH64_CALL26 take_v4i32
+; ARM64-NEXT:    ldr q0, [x29, #0x1a0]
+; ARM64-NEXT:    bl 0x384 <many_vec_regs_v4i32+0x124>
+; ARM64-NEXT:     R_AARCH64_CALL26 take_v4i32
+; ARM64-NEXT:    ldr q0, [x29, #0x1b0]
+; ARM64-NEXT:    bl 0x38c <many_vec_regs_v4i32+0x12c>
+; ARM64-NEXT:     R_AARCH64_CALL26 take_v4i32
+; ARM64-NEXT:    ldr q0, [x29, #0x1c0]
+; ARM64-NEXT:    bl 0x394 <many_vec_regs_v4i32+0x134>
+; ARM64-NEXT:     R_AARCH64_CALL26 take_v4i32
+; ARM64-NEXT:    ldr q0, [x29, #0x1d0]
+; ARM64-NEXT:    bl 0x39c <many_vec_regs_v4i32+0x13c>
+; ARM64-NEXT:     R_AARCH64_CALL26 take_v4i32
+; ARM64-NEXT:    ldr q0, [x29, #0x110]
+; ARM64-NEXT:    bl 0x3a4 <many_vec_regs_v4i32+0x144>
+; ARM64-NEXT:     R_AARCH64_CALL26 take_v4i32
+; ARM64-NEXT:    ldr q0, [x29, #0x120]
+; ARM64-NEXT:    bl 0x3ac <many_vec_regs_v4i32+0x14c>
+; ARM64-NEXT:     R_AARCH64_CALL26 take_v4i32
+; ARM64-NEXT:    ldr q0, [x29, #0x130]
+; ARM64-NEXT:    bl 0x3b4 <many_vec_regs_v4i32+0x154>
+; ARM64-NEXT:     R_AARCH64_CALL26 take_v4i32
+; ARM64-NEXT:    ldr q0, [x29, #0x140]
+; ARM64-NEXT:    bl 0x3bc <many_vec_regs_v4i32+0x15c>
+; ARM64-NEXT:     R_AARCH64_CALL26 take_v4i32
+; ARM64-NEXT:    ldr q0, [x29, #0x150]
+; ARM64-NEXT:    bl 0x3c4 <many_vec_regs_v4i32+0x164>
+; ARM64-NEXT:     R_AARCH64_CALL26 take_v4i32
+; ARM64-NEXT:    ldp x29, x30, [sp]
+; ARM64-NEXT:    ldp d8, d9, [sp, #0x10]
+; ARM64-NEXT:    ldp d10, d11, [sp, #0x20]
+; ARM64-NEXT:    ldp d12, d13, [sp, #0x30]
+; ARM64-NEXT:    ldp d14, d15, [sp, #0x40]
+; ARM64-NEXT:    add sp, sp, #0x1e0
+; ARM64-NEXT:    ret
+  %v0 = load volatile <4 x i32>, ptr %p
+  %v1 = load volatile <4 x i32>, ptr %p
+  %v2 = load volatile <4 x i32>, ptr %p
+  %v3 = load volatile <4 x i32>, ptr %p
+  %v4 = load volatile <4 x i32>, ptr %p
+  %v5 = load volatile <4 x i32>, ptr %p
+  %v6 = load volatile <4 x i32>, ptr %p
+  %v7 = load volatile <4 x i32>, ptr %p
+  %v8 = load volatile <4 x i32>, ptr %p
+  %v9 = load volatile <4 x i32>, ptr %p
+  %v10 = load volatile <4 x i32>, ptr %p
+  %v11 = load volatile <4 x i32>, ptr %p
+  %v12 = load volatile <4 x i32>, ptr %p
+  %v13 = load volatile <4 x i32>, ptr %p
+  %v14 = load volatile <4 x i32>, ptr %p
+  %v15 = load volatile <4 x i32>, ptr %p
+  %v16 = load volatile <4 x i32>, ptr %p
+  %v17 = load volatile <4 x i32>, ptr %p
+  %v18 = load volatile <4 x i32>, ptr %p
+  %v19 = load volatile <4 x i32>, ptr %p
+  %v20 = load volatile <4 x i32>, ptr %p
+  call void @take_v4i32(<4 x i32> %v0)
+  call void @take_v4i32(<4 x i32> %v1)
+  call void @take_v4i32(<4 x i32> %v2)
+  call void @take_v4i32(<4 x i32> %v3)
+  call void @take_v4i32(<4 x i32> %v4)
+  call void @take_v4i32(<4 x i32> %v5)
+  call void @take_v4i32(<4 x i32> %v6)
+  call void @take_v4i32(<4 x i32> %v7)
+  call void @take_v4i32(<4 x i32> %v8)
+  call void @take_v4i32(<4 x i32> %v9)
+  call void @take_v4i32(<4 x i32> %v10)
+  call void @take_v4i32(<4 x i32> %v11)
+  call void @take_v4i32(<4 x i32> %v12)
+  call void @take_v4i32(<4 x i32> %v13)
+  call void @take_v4i32(<4 x i32> %v14)
+  call void @take_v4i32(<4 x i32> %v15)
+  call void @take_v4i32(<4 x i32> %v16)
+  call void @take_v4i32(<4 x i32> %v17)
+  call void @take_v4i32(<4 x i32> %v18)
+  call void @take_v4i32(<4 x i32> %v19)
+  call void @take_v4i32(<4 x i32> %v20)
+  ret void
+}

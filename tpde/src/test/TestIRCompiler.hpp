@@ -44,13 +44,13 @@ struct TestIRCompilerX64 : x64::CompilerX64<TestIRAdaptor, TestIRCompilerX64> {
 
   ValueParts val_parts(IRValueRef) { return ValueParts{}; }
 
-  AsmReg select_fixed_assignment_reg(const RegBank bank,
+  AsmReg select_fixed_assignment_reg(AssignmentPartRef ap,
                                      const IRValueRef value) noexcept {
     if (no_fixed_assignments && !try_force_fixed_assignment(value)) {
       return AsmReg::make_invalid();
     }
 
-    return Base::select_fixed_assignment_reg(bank, value);
+    return Base::select_fixed_assignment_reg(ap, value);
   }
 
   bool try_force_fixed_assignment(const IRValueRef value) const noexcept {
