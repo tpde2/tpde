@@ -39,6 +39,9 @@ else ()
         add_compile_options(-Wsign-compare)
     endif ()
 
+    add_compile_options(-ffunction-sections -fdata-sections)
+    add_link_options(LINKER:--gc-sections)
+
     # for development builds use -Werror and enable sanitizers
     if (PROJECT_IS_TOP_LEVEL)
         add_compile_options(-Werror -Wno-error=deprecated-declarations)
