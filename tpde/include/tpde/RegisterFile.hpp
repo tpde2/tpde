@@ -160,11 +160,12 @@ public:
     return false;
   }
 
-  /// Decrement lock count, and assert that the register is now unlocked
-  void dec_lock_count_must_zero(const Reg reg) noexcept {
+  /// Decrement lock count by sub, and assert that the register is now unlocked
+  void dec_lock_count_must_zero(const Reg reg,
+                                [[maybe_unused]] u8 sub = 1) noexcept {
     assert(reg.id() < NumRegs);
     assert(is_used(reg));
-    assert(lock_counts[reg.id()] == 1);
+    assert(lock_counts[reg.id()] == sub);
     lock_counts[reg.id()] = 0;
   }
 

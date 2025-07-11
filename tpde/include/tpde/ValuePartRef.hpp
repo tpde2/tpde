@@ -726,20 +726,19 @@ void CompilerBase<Adaptor, Derived, Config>::ValuePart::reset(
   assert(!has_assignment() || assignment().modified() || true);
 #endif
 
-  if (!has_assignment()) {
-    if (state.c.owned) {
+  if (state.c.owned) {
+    if (has_assignment()) {
+      AssignmentPartRef ap = assignment();
+      bool fixed = ap.fixed_assignment();
+      ap.set_register_valid(false);
+      ap.set_fixed_assignment(false);
+      compiler->register_file.dec_lock_count_must_zero(reg, fixed ? 2 : 1);
+    } else {
       compiler->register_file.unmark_fixed(reg);
-      compiler->register_file.unmark_used(reg);
     }
-  } else {
-    assert(compiler->may_change_value_state());
-    bool reg_unlocked = compiler->register_file.dec_lock_count(reg);
-    if (reg_unlocked && state.v.owned) {
-      assert(assignment().register_valid());
-      assert(!assignment().fixed_assignment());
-      compiler->register_file.unmark_used(reg);
-      assignment().set_register_valid(false);
-    }
+    compiler->register_file.unmark_used(reg);
+  } else if (has_assignment()) {
+    compiler->register_file.dec_lock_count(reg);
   }
 
   state.c.reg = AsmReg::make_invalid();
