@@ -89,6 +89,8 @@ enum class LLVMBasicValType : u8 {
   v64i1, ///< <N x i1> for 32 < N <= 64; stored like an i64
 
   complex, ///< Complex escape type
+
+  max
 };
 
 /// Decompose vector type into element count and element type.

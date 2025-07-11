@@ -2084,7 +2084,8 @@ template <typename Adaptor, typename Derived, typename Config>
 bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_int_binary_op(
     const llvm::Instruction *inst, const ValInfo &info, u64 op_val) noexcept {
   IntBinaryOp op = typename IntBinaryOp::Value(op_val);
-  if (info.type == LLVMBasicValType::i128) {
+  auto parts = this->adaptor->val_parts(info);
+  if (info.type == LLVMBasicValType::i128) [[unlikely]] {
     return compile_int_binary_op_i128(inst, info, op);
   }
 
@@ -2092,21 +2093,21 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_int_binary_op(
       bool (Derived::*)(GenericValuePart &&, GenericValuePart &&, ScratchReg &);
   // fns[op.index()][idx]
   static constexpr auto fns = []() constexpr {
-    std::array<EncodeFnTy[9], IntBinaryOp::num_ops> res{};
+    std::array<EncodeFnTy[10], IntBinaryOp::num_ops> res{};
     auto entry = [&res](IntBinaryOp op) { return res[op.index()]; };
 
     // TODO: more consistent naming of encode functions
 #define FN_ENTRY_INT(op, fn)                                                   \
-  entry(op)[0] = &Derived::encode_##fn##i##32;                                 \
-  entry(op)[1] = &Derived::encode_##fn##i##64;
+  entry(op)[1] = &Derived::encode_##fn##i##32;                                 \
+  entry(op)[2] = &Derived::encode_##fn##i##64;
 #define FN_ENTRY_VEC(op, fn, sign)                                             \
-  entry(op)[2] = &Derived::encode_##fn##v8##sign##8;                           \
-  entry(op)[3] = &Derived::encode_##fn##v4##sign##16;                          \
-  entry(op)[4] = &Derived::encode_##fn##v2##sign##32;                          \
-  entry(op)[5] = &Derived::encode_##fn##v16##sign##8;                          \
-  entry(op)[6] = &Derived::encode_##fn##v8##sign##16;                          \
-  entry(op)[7] = &Derived::encode_##fn##v4##sign##32;                          \
-  entry(op)[8] = &Derived::encode_##fn##v2##sign##64;
+  entry(op)[3] = &Derived::encode_##fn##v8##sign##8;                           \
+  entry(op)[4] = &Derived::encode_##fn##v4##sign##16;                          \
+  entry(op)[5] = &Derived::encode_##fn##v2##sign##32;                          \
+  entry(op)[6] = &Derived::encode_##fn##v16##sign##8;                          \
+  entry(op)[7] = &Derived::encode_##fn##v8##sign##16;                          \
+  entry(op)[8] = &Derived::encode_##fn##v4##sign##32;                          \
+  entry(op)[9] = &Derived::encode_##fn##v2##sign##64;
 #define FN_ENTRY(op, fn, sign) FN_ENTRY_INT(op, fn) FN_ENTRY_VEC(op, fn, sign)
 
     FN_ENTRY(IntBinaryOp::add, add, u)
@@ -2128,38 +2129,39 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_int_binary_op(
 
     return res;
   }();
+  auto get_encode_fn =
+      [op](LLVMBasicValType bvt) -> std::pair<EncodeFnTy, bool> {
+    static constexpr auto bvt_lut = []() consteval {
+      std::array<u8, unsigned(LLVMBasicValType::max)> res{};
+      res[unsigned(LLVMBasicValType::i8)] = 1;
+      res[unsigned(LLVMBasicValType::i16)] = 1;
+      res[unsigned(LLVMBasicValType::i32)] = 1;
+      res[unsigned(LLVMBasicValType::i64)] = 2;
+      res[unsigned(LLVMBasicValType::v8i8)] = 3;
+      res[unsigned(LLVMBasicValType::v4i16)] = 4;
+      res[unsigned(LLVMBasicValType::v2i32)] = 5;
+      res[unsigned(LLVMBasicValType::v16i8)] = 6;
+      res[unsigned(LLVMBasicValType::v8i16)] = 7;
+      res[unsigned(LLVMBasicValType::v4i32)] = 8;
+      res[unsigned(LLVMBasicValType::v2i64)] = 9;
+      return res;
+    }();
+    unsigned ty_idx = bvt_lut[unsigned(bvt)];
+    return {fns[op.index()][ty_idx], ty_idx < 3};
+  };
 
   unsigned int_width = inst->getType()->getScalarType()->getIntegerBitWidth();
   assert(int_width <= 64);
-  ValueRef lhs = this->val_ref(inst->getOperand(0));
-  ValueRef rhs = this->val_ref(inst->getOperand(1));
+  const llvm::Use *operands = inst->getOperandList();
+  ValueRef lhs = this->val_ref(operands[0]);
+  ValueRef rhs = this->val_ref(operands[1]);
   ValueRef res = this->result_ref(inst);
 
-  auto handle_part = [this, int_width, op](LLVMBasicValType bvt,
+  auto handle_part = [this, int_width, op](EncodeFnTy encode_fn,
+                                           bool is_scalar,
                                            ValuePartRef &&lhs_op,
                                            ValuePartRef &&rhs_op,
                                            ValuePartRef &res_op) {
-    unsigned ty_idx;
-    switch (bvt) {
-    case LLVMBasicValType::i8:
-    case LLVMBasicValType::i16:
-    case LLVMBasicValType::i32: ty_idx = 0; break;
-    case LLVMBasicValType::i64: ty_idx = 1; break;
-    case LLVMBasicValType::v8i8: ty_idx = 2; break;
-    case LLVMBasicValType::v4i16: ty_idx = 3; break;
-    case LLVMBasicValType::v2i32: ty_idx = 4; break;
-    case LLVMBasicValType::v16i8: ty_idx = 5; break;
-    case LLVMBasicValType::v8i16: ty_idx = 6; break;
-    case LLVMBasicValType::v4i32: ty_idx = 7; break;
-    case LLVMBasicValType::v2i64: ty_idx = 8; break;
-    default: return false;
-    }
-    EncodeFnTy encode_fn = fns[op.index()][ty_idx];
-    bool is_scalar = ty_idx < 2;
-    if (!encode_fn) {
-      return false;
-    }
-
     if (is_scalar) {
       if (op.is_symmetric() && lhs_op.is_const() && !rhs_op.is_const()) {
         // TODO(ts): this is a hack since the encoder can currently not do
@@ -2183,34 +2185,43 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_int_binary_op(
     ScratchReg res_scratch{derived()};
     (derived()->*encode_fn)(std::move(lhs_op), std::move(rhs_op), res_scratch);
     res_op.set_value_reg(res_scratch.release());
-    return true;
   };
 
-  auto parts = this->adaptor->val_parts(inst);
   for (u32 i = 0, n = parts.count(); i != n; ++i) {
+    LLVMBasicValType ty = parts.type(i);
     ValuePartRef res_part = res.part(i);
-    if (!handle_part(parts.type(i), lhs.part(i), rhs.part(i), res_part)) {
-      if (!inst->getType()->isVectorTy() || int_width == 1) {
-        return false;
-      }
-      auto [elem_cnt, elem_ty] = basic_ty_vector_info(parts.type(i));
-      tpde::RegBank bank = this->adaptor->basic_ty_part_bank(elem_ty);
-      for (u32 j = 0; j != elem_cnt; ++j) {
-        u32 elem_idx = i * elem_cnt + j;
-        ValuePartRef e_res{this, bank};
-        ValuePartRef e_lhs{this, bank};
-        ValuePartRef e_rhs{this, bank};
-        // TODO: we might pass the last element as owned. But this code is
-        // fallback only, so don't bother optimizing.
-        ValueRef lhs_unowned = lhs.disowned();
-        ValueRef rhs_unowned = rhs.disowned();
-        derived()->extract_element(lhs_unowned, elem_idx, elem_ty, e_lhs);
-        derived()->extract_element(rhs_unowned, elem_idx, elem_ty, e_rhs);
-        if (!handle_part(elem_ty, std::move(e_lhs), std::move(e_rhs), e_res)) {
-          return false;
-        }
-        derived()->insert_element(res, elem_idx, elem_ty, std::move(e_res));
-      }
+    if (auto [encode_fn, is_scalar] = get_encode_fn(ty); encode_fn) [[likely]] {
+      handle_part(encode_fn, is_scalar, lhs.part(i), rhs.part(i), res_part);
+      continue;
+    }
+
+    // This is a legal vector type for which we don't have an encode function.
+    // Extract elements individually and use scalar functions.
+    if (!inst->getType()->isVectorTy() || int_width == 1) {
+      return false;
+    }
+    auto [elem_cnt, elem_ty] = basic_ty_vector_info(ty);
+    auto [encode_fn, is_scalar] = get_encode_fn(elem_ty);
+    assert(is_scalar && "vector element must be a scalar type");
+    if (!encode_fn) {
+      return false;
+    }
+
+    tpde::RegBank bank = this->adaptor->basic_ty_part_bank(elem_ty);
+    for (u32 j = 0; j != elem_cnt; ++j) {
+      u32 elem_idx = i * elem_cnt + j;
+      ValuePartRef e_res{this, bank};
+      ValuePartRef e_lhs{this, bank};
+      ValuePartRef e_rhs{this, bank};
+      // TODO: we might pass the last element as owned. But this code is
+      // fallback only, so don't bother optimizing.
+      ValueRef lhs_unowned = lhs.disowned();
+      ValueRef rhs_unowned = rhs.disowned();
+      derived()->extract_element(lhs_unowned, elem_idx, elem_ty, e_lhs);
+      derived()->extract_element(rhs_unowned, elem_idx, elem_ty, e_rhs);
+      handle_part(encode_fn, true, std::move(e_lhs), std::move(e_rhs), e_res);
+      // insert_element always treats res as unowned.
+      derived()->insert_element(res, elem_idx, elem_ty, std::move(e_res));
     }
   }
   return true;
