@@ -1517,12 +1517,7 @@ AsmReg
                                    reg_mask](const u64 preferred_regs) -> u64 {
     // try to first get an unused reg, otherwise an unfixed reg
     u64 free_regs = this->register_file.allocatable & ~this->register_file.used;
-    u64 possible_regs = free_regs & preferred_regs & reg_mask;
-    if (possible_regs == 0) {
-      possible_regs = (this->register_file.used & ~this->register_file.fixed) &
-                      preferred_regs & reg_mask;
-    }
-    return possible_regs;
+    return free_regs & preferred_regs & reg_mask;
   };
 
   u64 possible_regs;

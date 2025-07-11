@@ -65,8 +65,6 @@ public:
   RegBitSet allocatable = 0;
   /// Registers that are currently in use. Requires allocatable.
   RegBitSet used = 0;
-  /// Registers that are currently unevictable. Requires used.
-  RegBitSet fixed = 0;
   /// Registers that were clobbered at some point. Used to track registers that
   /// need to be saved/restored.
   RegBitSet clobbered = 0;
@@ -83,7 +81,6 @@ public:
 
   void reset() noexcept {
     used = {};
-    fixed = {};
     clobbered = {};
     clocks = {};
     lock_counts = {};
@@ -96,7 +93,7 @@ public:
 
   [[nodiscard]] bool is_fixed(const Reg reg) const noexcept {
     assert(reg.id() < NumRegs);
-    return (fixed & 1ull << reg.id()) != 0;
+    return lock_counts[reg.id()] > 0;
   }
 
   [[nodiscard]] bool is_clobbered(const Reg reg) const noexcept {
@@ -134,20 +131,21 @@ public:
   void mark_fixed(const Reg reg) noexcept {
     assert(reg.id() < NumRegs);
     assert(is_used(reg));
-    fixed |= (1ull << reg.id());
+    assert(lock_counts[reg.id()] == 0);
+    lock_counts[reg.id()] = 1;
   }
 
   void unmark_fixed(const Reg reg) noexcept {
     assert(reg.id() < NumRegs);
     assert(is_used(reg));
     assert(is_fixed(reg));
-    fixed &= ~(1ull << reg.id());
+    assert(lock_counts[reg.id()] == 1);
+    lock_counts[reg.id()] = 0;
   }
 
   void inc_lock_count(const Reg reg) noexcept {
     assert(reg.id() < NumRegs);
     assert(is_used(reg));
-    mark_fixed(reg);
     ++lock_counts[reg.id()];
   }
 
@@ -157,7 +155,6 @@ public:
     assert(is_used(reg));
     assert(lock_counts[reg.id()] > 0);
     if (--lock_counts[reg.id()] == 0) {
-      unmark_fixed(reg);
       return true;
     }
     return false;
@@ -169,7 +166,6 @@ public:
     assert(is_used(reg));
     assert(lock_counts[reg.id()] == 1);
     lock_counts[reg.id()] = 0;
-    unmark_fixed(reg);
   }
 
   void mark_clobbered(const Reg reg) noexcept {
@@ -191,10 +187,6 @@ public:
     return util::BitSetIterator<>{used};
   }
 
-  [[nodiscard]] util::BitSetIterator<> used_nonfixed_regs() const noexcept {
-    return util::BitSetIterator<>{used & ~fixed};
-  }
-
   [[nodiscard]] Reg
       find_first_free_excluding(const RegBank bank,
                                 const u64 exclusion_mask) const noexcept {
@@ -211,36 +203,12 @@ public:
       find_first_nonfixed_excluding(const RegBank bank,
                                     const u64 exclusion_mask) const noexcept {
     // TODO(ts): implement preferred registers
-    const RegBitSet allocatable_bank = allocatable & ~fixed & bank_regs(bank);
-    const RegBitSet selectable = allocatable_bank & ~exclusion_mask;
-    if (selectable == 0) {
-      return Reg::make_invalid();
+    for (auto reg_id : util::BitSetIterator<>{used & bank_regs(bank)}) {
+      if (!is_fixed(Reg{reg_id}) && !((u64{1} << reg_id) & exclusion_mask)) {
+        return Reg{reg_id};
+      }
     }
-    return Reg{util::cnt_tz(selectable)};
-  }
-
-  [[nodiscard]] Reg
-      find_clocked_nonfixed_excluding(const RegBank bank,
-                                      const u64 exclusion_mask) noexcept {
-    const RegBitSet allocatable_bank = allocatable & ~fixed & bank_regs(bank);
-    const RegBitSet selectable = allocatable_bank & ~exclusion_mask;
-    if (selectable == 0) {
-      return Reg::make_invalid();
-    }
-
-    auto clock = clocks[bank.id()];
-    const u64 reg_id = (selectable >> clock)
-                           ? util::cnt_tz(selectable >> clock) + clock
-                           : util::cnt_tz(selectable);
-
-    // always move clock to after the found reg_id
-    clock = reg_id + 1;
-    if (clock >= RegsPerBank) {
-      clock = 0;
-    }
-    clocks[bank.id()] = clock;
-
-    return Reg{static_cast<u8>(reg_id)};
+    return Reg::make_invalid();
   }
 
   [[nodiscard]] static RegBank reg_bank(const Reg reg) noexcept {

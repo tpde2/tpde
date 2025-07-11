@@ -524,10 +524,8 @@ void CompilerBase<Adaptor, Derived, Config>::CallBuilderBase<
     }
     vp.reset(&compiler);
     assert(!compiler.register_file.is_used(cca.reg));
-    compiler.register_file.mark_used(
-        cca.reg, CompilerBase::INVALID_VAL_LOCAL_IDX, 0);
-    compiler.register_file.mark_fixed(cca.reg);
     compiler.register_file.mark_clobbered(cca.reg);
+    compiler.register_file.allocatable &= ~(u64{1} << cca.reg.id());
     arg_regs |= (1ull << cca.reg.id());
   }
 }
@@ -604,10 +602,8 @@ void CompilerBase<Adaptor, Derived, Config>::CallBuilderBase<CBDerived>::call(
 
   derived()->call_impl(std::move(target));
 
-  assert((compiler.register_file.fixed & arg_regs) == arg_regs);
-  assert((compiler.register_file.used & arg_regs) == arg_regs);
-  compiler.register_file.fixed &= ~arg_regs;
-  compiler.register_file.used &= ~arg_regs;
+  assert((compiler.register_file.allocatable & arg_regs) == 0);
+  compiler.register_file.allocatable |= arg_regs;
 }
 
 template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>
@@ -674,10 +670,8 @@ void CompilerBase<Adaptor, Derived, Config>::RetBuilder::add(
   }
   vp.reset(&compiler);
   assert(!compiler.register_file.is_used(cca.reg));
-  compiler.register_file.mark_used(
-      cca.reg, CompilerBase::INVALID_VAL_LOCAL_IDX, 0);
-  compiler.register_file.mark_fixed(cca.reg);
   compiler.register_file.mark_clobbered(cca.reg);
+  compiler.register_file.allocatable &= ~(u64{1} << cca.reg.id());
   ret_regs |= (1ull << cca.reg.id());
 }
 
@@ -693,10 +687,8 @@ void CompilerBase<Adaptor, Derived, Config>::RetBuilder::add(
 
 template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>
 void CompilerBase<Adaptor, Derived, Config>::RetBuilder::ret() noexcept {
-  assert((compiler.register_file.fixed & ret_regs) == ret_regs);
-  assert((compiler.register_file.used & ret_regs) == ret_regs);
-  compiler.register_file.fixed &= ~ret_regs;
-  compiler.register_file.used &= ~ret_regs;
+  assert((compiler.register_file.allocatable & ret_regs) == 0);
+  compiler.register_file.allocatable |= ret_regs;
 
   compiler.gen_func_epilog();
   compiler.release_regs_after_return();
@@ -1216,13 +1208,16 @@ template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>
 Reg CompilerBase<Adaptor, Derived, Config>::select_reg_evict(
     RegBank bank, u64 exclusion_mask) noexcept {
   TPDE_LOG_DBG("select_reg_evict for bank {}", bank.id());
-  auto candidates = register_file.allocatable & ~register_file.fixed &
-                    register_file.bank_regs(bank) & ~exclusion_mask;
+  auto candidates =
+      register_file.used & register_file.bank_regs(bank) & ~exclusion_mask;
 
   Reg candidate = Reg::make_invalid();
   u32 max_score = 0;
   for (auto reg_id : util::BitSetIterator<>(candidates)) {
     Reg reg{reg_id};
+    if (register_file.is_fixed(reg)) {
+      continue;
+    }
 
     // Must be an evictable value, not a temporary.
     auto local_idx = register_file.reg_local_idx(reg);
@@ -1484,9 +1479,10 @@ void CompilerBase<Adaptor, Derived, Config>::release_spilled_regs(
   assert(may_change_value_state());
 
   // TODO(ts): needs changes for other RegisterFile impls
-  auto used_non_fixed_regs = register_file.used & ~register_file.fixed;
-  for (auto reg_id : util::BitSetIterator<>{regs & used_non_fixed_regs}) {
-    free_reg(Reg{reg_id});
+  for (auto reg_id : util::BitSetIterator<>{regs & register_file.used}) {
+    if (!register_file.is_fixed(Reg{reg_id})) {
+      free_reg(Reg{reg_id});
+    }
   }
 }
 
@@ -1494,8 +1490,10 @@ template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>
 void CompilerBase<Adaptor, Derived, Config>::
     release_regs_after_return() noexcept {
   // we essentially have to free all non-fixed registers
-  for (auto reg_id : register_file.used_nonfixed_regs()) {
-    free_reg(Reg{reg_id});
+  for (auto reg_id : register_file.used_regs()) {
+    if (!register_file.is_fixed(Reg{reg_id})) {
+      free_reg(Reg{reg_id});
+    }
   }
 }
 
