@@ -1398,6 +1398,10 @@ typename CompilerBase<Adaptor, Derived, Config>::RegisterFile::RegBitSet
   assert(may_change_value_state());
 
   const IRBlockRef cur_block_ref = analyzer.block_ref(cur_block_idx);
+  // Earliest succeeding block after the current block that is not the
+  // immediately succeeding block. Used to determine whether a value needs to
+  // be spilled.
+  BlockIndex earliest_next_succ = Analyzer<Adaptor>::INVALID_BLOCK_IDX;
 
   bool must_spill = force_spill;
   if (!must_spill) {
@@ -1408,12 +1412,14 @@ typename CompilerBase<Adaptor, Derived, Config>::RegisterFile::RegBitSet
     u32 succ_count = 0;
     for (const IRBlockRef succ : adaptor->block_succs(cur_block_ref)) {
       ++succ_count;
-      if (static_cast<u32>(analyzer.block_idx(succ)) ==
-          static_cast<u32>(cur_block_idx) + 1) {
+      BlockIndex succ_idx = analyzer.block_idx(succ);
+      if (u32(succ_idx) == u32(cur_block_idx) + 1) {
         next_block_is_succ = true;
         if (analyzer.block_has_multiple_incoming(succ)) {
           next_block_has_multiple_incoming = true;
         }
+      } else if (succ_idx > cur_block_idx && succ_idx < earliest_next_succ) {
+        earliest_next_succ = succ_idx;
       }
     }
 
@@ -1424,87 +1430,52 @@ typename CompilerBase<Adaptor, Derived, Config>::RegisterFile::RegBitSet
     }
   }
 
-  /*if (!next_block_is_succ) {
-      // spill and remove from reg assignment
-      auto spilled = RegisterFile::RegBitSet{};
-      for (auto reg : register_file.used_regs()) {
-          auto local_idx = register_file.reg_local_idx(AsmReg{reg});
-          auto part      = register_file.reg_part(AsmReg{reg});
-          if (local_idx == INVALID_VAL_LOCAL_IDX) {
-              // TODO(ts): can this actually happen?
-              continue;
-          }
-          auto ap = AssignmentPartRef{val_assignment(local_idx), part};
-          ap.spill_if_needed(this);
-          spilled |= RegisterFile::RegBitSet{1ull} << reg;
-      }
-      return spilled;
-  }*/
-
-  const auto spill_reg_if_needed = [&](const auto reg) {
-    auto local_idx = register_file.reg_local_idx(AsmReg{reg});
-    auto part = register_file.reg_part(AsmReg{reg});
+  auto release_regs = RegBitSet{};
+  // TODO(ts): just use register_file.used_nonfixed_regs()?
+  for (auto reg : register_file.used_regs()) {
+    auto local_idx = register_file.reg_local_idx(Reg{reg});
+    auto part = register_file.reg_part(Reg{reg});
     if (local_idx == INVALID_VAL_LOCAL_IDX) {
       // scratch regs can never be held across blocks
-      return true;
+      continue;
     }
-    auto *assignment = val_assignment(local_idx);
-    auto ap = AssignmentPartRef{assignment, part};
+    AssignmentPartRef ap{val_assignment(local_idx), part};
     if (ap.fixed_assignment()) {
       // fixed registers do not need to be spilled
-      return true;
+      continue;
     }
 
-    if (!ap.modified()) {
-      // no need to spill if the value was not modified
-      return false;
+    // Remove from register assignment if the next block cannot rely on the
+    // value being in the specific register.
+    if (must_spill) {
+      release_regs |= RegBitSet{1ull} << reg;
     }
 
-    if (ap.variable_ref()) {
-      return false;
+    if (!ap.modified() || ap.variable_ref()) {
+      // No need to spill values that were already spilled or are variable refs.
+      continue;
     }
 
     const auto &liveness = analyzer.liveness_info(local_idx);
     if (liveness.last <= cur_block_idx) {
-      // no need to spill value if it dies immediately after the block
-      return false;
+      // No need to spill value if it dies immediately after the block.
+      continue;
     }
 
-    if (must_spill) {
+    // If the value is live in a different block, we might need to spill it.
+    // Cases:
+    //  - Live in successor that precedes current block => ignore, value must
+    //    have been spilled already due to RPO.
+    //  - Live only in successor that immediately follows this block => no need
+    //    to spill, value can be kept in register, register state for next block
+    //    is still valid.
+    //  - Live in successor in some distance after current block => spill
+    if (must_spill || earliest_next_succ <= liveness.last) {
       spill(ap);
-      return false;
-    }
-
-    // spill if the value is alive in any successor that is not the next
-    // block
-    for (const IRBlockRef succ : adaptor->block_succs(cur_block_ref)) {
-      const auto block_idx = analyzer.block_idx(succ);
-      if (static_cast<u32>(block_idx) == static_cast<u32>(cur_block_idx) + 1) {
-        continue;
-      }
-      if (block_idx >= liveness.first && block_idx <= liveness.last) {
-        spill(ap);
-        return false;
-      }
-    }
-
-    return false;
-  };
-
-  auto spilled = RegBitSet{};
-  // TODO(ts): just use register_file.used_nonfixed_regs()?
-  for (auto reg : register_file.used_regs()) {
-    const auto reg_fixed = spill_reg_if_needed(reg);
-    // remove from register assignment if the next block cannot rely on the
-    // value being in the specific register
-    if (!reg_fixed && must_spill) {
-      // TODO(ts): this needs to be changed if this is supposed to work
-      // with other RegisterFile implementations
-      spilled |= RegBitSet{1ull} << reg;
     }
   }
 
-  return spilled;
+  return release_regs;
 }
 
 template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>
