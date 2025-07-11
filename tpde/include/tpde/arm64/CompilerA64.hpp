@@ -797,6 +797,8 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::gen_func_prolog_and_args(
             return {};
           }
 
+          AsmReg dst = vp.alloc_reg(this);
+
           this->text_writer.ensure_space(8);
           AsmReg stack_reg = AsmReg::R17;
           // TODO: allocate an actual scratch register for this.
@@ -810,9 +812,8 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::gen_func_prolog_and_args(
             ASMNC(ADDxi, stack_reg, DA_SP, 0);
           }
 
-          AsmReg dst = vp.alloc_reg(this);
           if (cca.byval) {
-            ASM(ADDxi, dst, stack_reg, cca.stack_off);
+            ASMNC(ADDxi, dst, stack_reg, cca.stack_off);
           } else if (cca.bank == Config::GP_BANK) {
             switch (cca.size) {
             case 1: ASMNC(LDRBu, dst, stack_reg, cca.stack_off); break;
@@ -1126,17 +1127,17 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::spill_reg(
   assert(util::align_up(frame_off, size) == frame_off);
   // We don't support stack frames that aren't encodeable with add/sub.
   assert(frame_off < 0x1'000'000);
+  this->text_writer.ensure_space(8);
 
   u32 off = frame_off;
   auto addr_base = AsmReg{AsmReg::FP};
   if (off >= 0x1000 * size) [[unlikely]] {
     // We cannot encode the offset in the store instruction.
-    ASM(ADDxi, permanent_scratch_reg, DA_GP(29), off & ~0xfff);
+    ASMNC(ADDxi, permanent_scratch_reg, DA_GP(29), off & ~0xfff);
     off &= 0xfff;
     addr_base = permanent_scratch_reg;
   }
 
-  this->text_writer.ensure_space(4);
   assert(-static_cast<i32>(frame_off) < 0);
   if (reg.id() <= AsmReg::R30) {
     switch (size) {
@@ -1171,17 +1172,17 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::load_from_stack(
   assert(util::align_up(frame_off, size) == frame_off);
   // We don't support stack frames that aren't encodeable with add/sub.
   assert(frame_off >= 0 && frame_off < 0x1'000'000);
+  this->text_writer.ensure_space(8);
 
   u32 off = frame_off;
   auto addr_base = AsmReg{AsmReg::FP};
   if (off >= 0x1000 * size) [[unlikely]] {
     // need to calculate this explicitly
     addr_base = dst.id() <= AsmReg::R30 ? dst : permanent_scratch_reg;
-    ASM(ADDxi, addr_base, DA_GP(29), off & ~0xfff);
+    ASMNC(ADDxi, addr_base, DA_GP(29), off & ~0xfff);
     off &= 0xfff;
   }
 
-  this->text_writer.ensure_space(4);
   if (dst.id() <= AsmReg::R30) {
     if (!sign_extend) {
       switch (size) {
@@ -1235,26 +1236,27 @@ template <IRAdaptor Adaptor,
           typename Config>
 void CompilerA64<Adaptor, Derived, BaseTy, Config>::mov(
     const AsmReg dst, const AsmReg src, const u32 size) noexcept {
+  this->text_writer.ensure_space(4);
   assert(dst.valid());
   assert(src.valid());
   if (dst.id() <= AsmReg::SP && src.id() <= AsmReg::SP) {
     assert(dst.id() != AsmReg::SP && src.id() != AsmReg::SP);
     if (size > 4) {
-      ASM(MOVx, dst, src);
+      ASMNC(MOVx, dst, src);
     } else {
-      ASM(MOVw, dst, src);
+      ASMNC(MOVw, dst, src);
     }
   } else if (dst.id() >= AsmReg::V0 && src.id() >= AsmReg::V0) {
-    ASM(ORR16b, dst, src, src);
+    ASMNC(ORR16b, dst, src, src);
   } else if (dst.id() <= AsmReg::SP) {
     assert(dst.id() != AsmReg::SP);
     // gp<-vector
     assert(src.id() >= AsmReg::V0);
     assert(size <= 8);
     if (size <= 4) {
-      ASM(FMOVws, dst, src);
+      ASMNC(FMOVws, dst, src);
     } else {
-      ASM(FMOVxd, dst, src);
+      ASMNC(FMOVxd, dst, src);
     }
   } else {
     // vector<-gp
@@ -1262,9 +1264,9 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::mov(
     assert(dst.id() >= AsmReg::V0);
     assert(size <= 8);
     if (size <= 4) {
-      ASM(FMOVsw, dst, src);
+      ASMNC(FMOVsw, dst, src);
     } else {
-      ASM(FMOVdx, dst, src);
+      ASMNC(FMOVdx, dst, src);
     }
   }
 }
@@ -1418,15 +1420,16 @@ template <IRAdaptor Adaptor,
           typename Config>
 void CompilerA64<Adaptor, Derived, BaseTy, Config>::materialize_constant(
     const u64 *data, const RegBank bank, const u32 size, AsmReg dst) noexcept {
+  this->text_writer.ensure_space(5 * 4);
+
   const auto const_u64 = data[0];
   if (bank == Config::GP_BANK) {
     assert(size <= 8);
     if (const_u64 == 0) {
-      ASM(MOVZw, dst, 0);
+      ASMNC(MOVZw, dst, 0);
       return;
     }
 
-    this->text_writer.ensure_space(5 * 4);
     this->text_writer.cur_ptr() +=
         sizeof(u32) *
         de64_MOVconst(reinterpret_cast<u32 *>(this->text_writer.cur_ptr()),

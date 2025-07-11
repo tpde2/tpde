@@ -961,31 +961,32 @@ template <IRAdaptor Adaptor,
           typename Config>
 void CompilerX64<Adaptor, Derived, BaseTy, Config>::mov(
     const AsmReg dst, const AsmReg src, const u32 size) noexcept {
+  this->text_writer.ensure_space(16);
   assert(dst.valid());
   assert(src.valid());
   if (dst.id() <= AsmReg::R15 && src.id() <= AsmReg::R15) {
     if (size > 4) {
-      ASM(MOV64rr, dst, src);
+      ASMNC(MOV64rr, dst, src);
     } else {
-      ASM(MOV32rr, dst, src);
+      ASMNC(MOV32rr, dst, src);
     }
   } else if (dst.id() >= AsmReg::XMM0 && src.id() >= AsmReg::XMM0) {
     if (size <= 16) {
       if (dst.id() > AsmReg::XMM15 || src.id() > AsmReg::XMM15) {
         assert(has_cpu_feats(CPU_AVX512F));
-        ASM(VMOVAPD128rr, dst, src);
+        ASMNC(VMOVAPD128rr, dst, src);
       } else {
-        ASM(SSE_MOVAPDrr, dst, src);
+        ASMNC(SSE_MOVAPDrr, dst, src);
       }
     } else if (size <= 32) {
       assert(has_cpu_feats(CPU_AVX));
       assert((dst.id() <= AsmReg::XMM15 && src.id() <= AsmReg::XMM15) ||
              has_cpu_feats(CPU_AVX512F));
-      ASM(VMOVAPD256rr, dst, src);
+      ASMNC(VMOVAPD256rr, dst, src);
     } else {
       assert(size <= 64);
       assert(has_cpu_feats(CPU_AVX512F));
-      ASM(VMOVAPD512rr, dst, src);
+      ASMNC(VMOVAPD512rr, dst, src);
     }
   } else if (dst.id() <= AsmReg::R15) {
     // gp<-xmm
@@ -994,15 +995,15 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::mov(
     if (src.id() > AsmReg::XMM15) {
       assert(has_cpu_feats(CPU_AVX512F));
       if (size <= 4) {
-        ASM(VMOVD_X2Grr, dst, src);
+        ASMNC(VMOVD_X2Grr, dst, src);
       } else {
-        ASM(VMOVQ_X2Grr, dst, src);
+        ASMNC(VMOVQ_X2Grr, dst, src);
       }
     } else {
       if (size <= 4) {
-        ASM(SSE_MOVD_X2Grr, dst, src);
+        ASMNC(SSE_MOVD_X2Grr, dst, src);
       } else {
-        ASM(SSE_MOVQ_X2Grr, dst, src);
+        ASMNC(SSE_MOVQ_X2Grr, dst, src);
       }
     }
   } else {
@@ -1013,15 +1014,15 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::mov(
     if (dst.id() > AsmReg::XMM15) {
       assert(has_cpu_feats(CPU_AVX512F));
       if (size <= 4) {
-        ASM(VMOVD_G2Xrr, dst, src);
+        ASMNC(VMOVD_G2Xrr, dst, src);
       } else {
-        ASM(VMOVQ_G2Xrr, dst, src);
+        ASMNC(VMOVQ_G2Xrr, dst, src);
       }
     } else {
       if (size <= 4) {
-        ASM(SSE_MOVD_G2Xrr, dst, src);
+        ASMNC(SSE_MOVD_G2Xrr, dst, src);
       } else {
-        ASM(SSE_MOVQ_G2Xrr, dst, src);
+        ASMNC(SSE_MOVQ_G2Xrr, dst, src);
       }
     }
   }
