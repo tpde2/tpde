@@ -159,20 +159,7 @@ void CompilerBase<Adaptor, Derived, Config>::ValueRef::reset() noexcept {
     auto &ref_count = state.a.assignment->references_left;
     assert(ref_count != 0);
     if (--ref_count == 0) {
-      ValLocalIdx local_idx = state.a.local_idx;
-      if (!state.a.assignment->delay_free) {
-        compiler->free_assignment(local_idx);
-      } else {
-        // need to wait until release
-        TPDE_LOG_TRACE("Delay freeing assignment for value {}",
-                       static_cast<u32>(local_idx));
-        const auto &liveness = compiler->analyzer.liveness_info(local_idx);
-        auto &free_list_head =
-            compiler->assignments.delayed_free_lists[u32(liveness.last)];
-        state.a.assignment->next_delayed_free_entry = free_list_head;
-        state.a.assignment->pending_free = true;
-        free_list_head = local_idx;
-      }
+      compiler->release_assignment(state.a.local_idx, state.a.assignment);
     }
   }
 

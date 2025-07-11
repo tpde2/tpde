@@ -310,8 +310,14 @@ public:
 
   void init_assignment(IRValueRef value, ValLocalIdx local_idx) noexcept;
 
+private:
   /// Frees an assignment, its stack slot and registers
-  void free_assignment(ValLocalIdx local_idx) noexcept;
+  void free_assignment(ValLocalIdx local_idx, ValueAssignment *) noexcept;
+
+public:
+  /// Release an assignment when reference count drops to zero, either frees
+  /// the assignment immediately or delays free to the end of the live range.
+  void release_assignment(ValLocalIdx local_idx, ValueAssignment *) noexcept;
 
   /// Init a variable-ref assignment
   void init_variable_ref(ValLocalIdx local_idx, u32 var_ref_data) noexcept;
@@ -857,12 +863,11 @@ void CompilerBase<Adaptor, Derived, Config>::init_assignment(
 
 template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>
 void CompilerBase<Adaptor, Derived, Config>::free_assignment(
-    const ValLocalIdx local_idx) noexcept {
+    ValLocalIdx local_idx, ValueAssignment *assignment) noexcept {
   TPDE_LOG_TRACE("Freeing assignment for value {}",
                  static_cast<u32>(local_idx));
 
-  ValueAssignment *assignment =
-      assignments.value_ptrs[static_cast<u32>(local_idx)];
+  assert(assignments.value_ptrs[static_cast<u32>(local_idx)] == assignment);
   assignments.value_ptrs[static_cast<u32>(local_idx)] = nullptr;
   const auto is_var_ref = assignment->variable_ref;
   const u32 part_count = assignment->part_count;
@@ -898,6 +903,25 @@ void CompilerBase<Adaptor, Derived, Config>::free_assignment(
   }
 
   assignments.allocator.deallocate(assignment);
+}
+
+template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>
+[[gnu::noinline]] void
+    CompilerBase<Adaptor, Derived, Config>::release_assignment(
+        ValLocalIdx local_idx, ValueAssignment *assignment) noexcept {
+  if (!assignment->delay_free) {
+    free_assignment(local_idx, assignment);
+    return;
+  }
+
+  // need to wait until release
+  TPDE_LOG_TRACE("Delay freeing assignment for value {}",
+                 static_cast<u32>(local_idx));
+  const auto &liveness = analyzer.liveness_info(local_idx);
+  auto &free_list_head = assignments.delayed_free_lists[u32(liveness.last)];
+  assignment->next_delayed_free_entry = free_list_head;
+  assignment->pending_free = true;
+  free_list_head = local_idx;
 }
 
 template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>
@@ -1014,8 +1038,8 @@ void CompilerBase<Adaptor, Derived, Config>::handle_func_arg(
       // target and the calling convention whether this is possible.
       vr.reset();
       // Value assignment might have been free'd by ValueRef reset.
-      if (val_assignment(local_idx)) {
-        free_assignment(local_idx);
+      if (ValueAssignment *assignment = val_assignment(local_idx)) {
+        free_assignment(local_idx, assignment);
       }
       init_variable_ref(local_idx, 0);
       ValueAssignment *assignment = this->val_assignment(local_idx);
@@ -2062,9 +2086,9 @@ bool CompilerBase<Adaptor, Derived, Config>::compile_block(
   if (static_cast<u32>(assignments.delayed_free_lists[block_idx]) != ~0u) {
     auto list_entry = assignments.delayed_free_lists[block_idx];
     while (static_cast<u32>(list_entry) != ~0u) {
-      auto next_entry = assignments.value_ptrs[static_cast<u32>(list_entry)]
-                            ->next_delayed_free_entry;
-      derived()->free_assignment(list_entry);
+      auto *assignment = assignments.value_ptrs[static_cast<u32>(list_entry)];
+      auto next_entry = assignment->next_delayed_free_entry;
+      derived()->free_assignment(list_entry, assignment);
       list_entry = next_entry;
     }
   }
