@@ -6,7 +6,6 @@
 #include "tpde/base.hpp"
 #include "tpde/util/SmallVector.hpp"
 #include <cstring>
-#include <elf.h>
 
 namespace tpde {
 
@@ -42,8 +41,12 @@ public:
   bool operator==(const SecRef &other) const { return other.val == val; }
 };
 
-// TODO: Replace with file-format-independent data structure.
-using Relocation = Elf64_Rela;
+struct Relocation {
+  u32 offset;    ///< Offset inside section.
+  SymRef symbol; ///< References symbol.
+  u32 type;      ///< Relocation type. File-format-specifc.
+  i32 addend;    ///< Addend.
+};
 
 struct DataSection {
   friend struct AssemblerElfBase;

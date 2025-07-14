@@ -389,7 +389,7 @@ public:
 private:
   void init_sections() noexcept;
 
-  std::span<Elf64_Rela> get_relocs(SecRef ref) {
+  std::span<Relocation> get_relocs(SecRef ref) {
     return get_section(ref).relocs;
   }
 

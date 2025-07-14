@@ -392,11 +392,8 @@ void AssemblerElfBase::reloc_sec(const SecRef sec_ref,
                                  const u32 type,
                                  const u64 offset,
                                  const i64 addend) noexcept {
-  Elf64_Rela rel{};
-  rel.r_offset = offset;
-  rel.r_info = ELF64_R_INFO(sym.id(), type);
-  rel.r_addend = addend;
-  get_section(sec_ref).relocs.push_back(rel);
+  assert(i32(addend) == addend && "non-32-bit addends are unsupported");
+  get_section(sec_ref).relocs.emplace_back(offset, sym, type, addend);
 }
 
 void AssemblerElfBase::reloc_sec(const SecRef sec,
@@ -991,24 +988,23 @@ std::vector<u8> AssemblerElfBase::build_object_file() noexcept {
       // Skip allocated nullptr relocation section
       i += 1;
 
-      if (rela_hdr->sh_size == 0) {
-        continue;
-      }
+      // Resize invalidates rela_hdr.
+      size_t rela_offset = rela_hdr->sh_offset;
+      out.resize(out.size() + rela_hdr->sh_size);
 
-      const u8 *reloc_begin = reinterpret_cast<const u8 *>(sec.relocs.data());
-      const u8 *reloc_end = reloc_begin + rela_hdr->sh_size;
-      out.insert(out.end(), reloc_begin, reloc_end);
-      // patch relocations in output
-      size_t count = sec.relocs.size();
-      std::span<Elf64_Rela> out_relocs{
-          reinterpret_cast<Elf64_Rela *>(&out[rela_hdr->sh_offset]), count};
-      for (auto &reloc : out_relocs) {
-        if (u32 sym = ELF64_R_SYM(reloc.r_info); !sym_is_local(SymRef{sym})) {
-          auto ty = ELF64_R_TYPE(reloc.r_info);
-          auto fixed_sym = (sym & ~0x8000'0000u) + local_symbols.size();
-          reloc.r_info = ELF64_R_INFO(fixed_sym, ty);
-        }
+      // Addend to symbol id to convert global symbol to the ELF symbol.
+      u32 global_symbol_fix = u32{0x8000'0000} + local_symbols.size();
+
+      auto *rela = reinterpret_cast<Elf64_Rela *>(out.data() + rela_offset);
+      [[maybe_unused]] auto *rela_begin = rela;
+      for (const Relocation &reloc : sec.relocs) {
+        rela->r_addend = reloc.addend;
+        rela->r_offset = reloc.offset;
+        u32 symbol_fix = sym_is_local(reloc.symbol) ? 0 : global_symbol_fix;
+        rela->r_info = ELF64_R_INFO(reloc.symbol.id() + symbol_fix, reloc.type);
+        ++rela;
       }
+      assert(sec_hdr(i)->sh_size == sizeof(Elf64_Rela) * (rela - rela_begin));
     }
   }
 

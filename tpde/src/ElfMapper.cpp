@@ -247,14 +247,14 @@ bool ElfMapper::map(AssemblerElfBase &assembler,
     u32 *dest = reinterpret_cast<u32 *>(pc);
     *dest = (data & mask) | (*dest & ~mask);
   };
-  const auto resolve_reloc = [&](u8 *sec_addr, Elf64_Rela &reloc) {
-    auto sym_ref = SymRef(ELF64_R_SYM(reloc.r_info));
+  const auto resolve_reloc = [&](u8 *sec_addr, Relocation &reloc) {
+    SymRef sym_ref = reloc.symbol;
     uintptr_t sym = reinterpret_cast<uintptr_t>(sym_addr(sym_ref));
-    uintptr_t syma = sym + reloc.r_addend;
-    uintptr_t pc = reinterpret_cast<uintptr_t>(sec_addr + reloc.r_offset);
+    uintptr_t syma = sym + reloc.addend;
+    uintptr_t pc = reinterpret_cast<uintptr_t>(sec_addr + reloc.offset);
 
     if constexpr (TargetArch == Arch::X86_64) {
-      switch (ELF64_R_TYPE(reloc.r_info)) {
+      switch (reloc.type) {
       case R_X86_64_64: {
         u64 v64 = syma;
         std::memcpy(reinterpret_cast<u8 *>(pc), &v64, sizeof(u64));
@@ -273,7 +273,7 @@ bool ElfMapper::map(AssemblerElfBase &assembler,
       case R_X86_64_PLT32: {
         auto v = syma - pc;
         if (util::sext(v, 32) != intptr_t(v)) {
-          v = plt_entry(sym_idx(sym_ref), sym) + reloc.r_addend - pc;
+          v = plt_entry(sym_idx(sym_ref), sym) + reloc.addend - pc;
         }
         if (util::sext(v, 32) != intptr_t(v)) {
           TPDE_LOG_ERR("R_X86_64_PLT32 out of range: {:x}", v);
@@ -285,7 +285,7 @@ bool ElfMapper::map(AssemblerElfBase &assembler,
       }
       case R_X86_64_GOTPCREL: {
         auto got = got_entry(sym_idx(sym_ref), sym);
-        auto v = got + reloc.r_addend - pc;
+        auto v = got + reloc.addend - pc;
         if (util::sext(v, 32) != intptr_t(v)) {
           TPDE_LOG_ERR("R_X86_64_GOTPCREL out of range: {:x}", v);
           success = false;
@@ -295,11 +295,11 @@ bool ElfMapper::map(AssemblerElfBase &assembler,
         break;
       }
       default:
-        TPDE_LOG_ERR("unsupported relocation {}", ELF64_R_TYPE(reloc.r_info));
+        TPDE_LOG_ERR("unsupported relocation {}", reloc.type);
         success = false;
       }
     } else if constexpr (TargetArch == Arch::AArch64) {
-      switch (ELF64_R_TYPE(reloc.r_info)) {
+      switch (reloc.type) {
       case R_AARCH64_ABS64: {
         u64 v64 = syma;
         std::memcpy(reinterpret_cast<u8 *>(pc), &v64, sizeof(u64));
@@ -318,7 +318,7 @@ bool ElfMapper::map(AssemblerElfBase &assembler,
       case R_AARCH64_CALL26: {
         auto v = syma - pc;
         if ((v & 3) || util::sext(v, 28) != intptr_t(v)) {
-          v = plt_entry(sym_idx(sym_ref), sym) + reloc.r_addend - pc;
+          v = plt_entry(sym_idx(sym_ref), sym) + reloc.addend - pc;
         }
         if (util::sext(v, 32) != intptr_t(v)) {
           TPDE_LOG_ERR("R_AARCH64_CALL26 out of range: {:x}", v);
@@ -355,7 +355,7 @@ bool ElfMapper::map(AssemblerElfBase &assembler,
         break;
       }
       default:
-        TPDE_LOG_ERR("unsupported relocation {}", ELF64_R_TYPE(reloc.r_info));
+        TPDE_LOG_ERR("unsupported relocation {}", reloc.type);
         success = false;
       }
     }
