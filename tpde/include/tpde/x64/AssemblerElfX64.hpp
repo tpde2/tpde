@@ -12,7 +12,7 @@ namespace tpde::x64 {
 struct AssemblerElfX64 : AssemblerElf<AssemblerElfX64> {
   using Base = AssemblerElf<AssemblerElfX64>;
 
-  static const TargetInfo TARGET_INFO;
+  static const TargetInfoElf TARGET_INFO;
 
   class SectionWriter : public Base::SectionWriterBase<SectionWriter> {
   public:

@@ -14,7 +14,7 @@ namespace tpde::a64 {
 struct AssemblerElfA64 : AssemblerElf<AssemblerElfA64> {
   using Base = AssemblerElf<AssemblerElfA64>;
 
-  static const TargetInfo TARGET_INFO;
+  static const TargetInfoElf TARGET_INFO;
 
   class SectionWriter : public Base::SectionWriterBase<SectionWriter> {
   public:

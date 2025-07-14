@@ -24,10 +24,10 @@ static constexpr auto cie_instrs = get_cie_initial_instrs();
 
 } // namespace
 
-const AssemblerElfBase::TargetInfo AssemblerElfA64::TARGET_INFO{
-    .elf_osabi = ELFOSABI_SYSV,
-    .elf_machine = EM_AARCH64,
-
+// Clang Format gives random indentation.
+// clang-format off
+const AssemblerElfBase::TargetInfoElf AssemblerElfA64::TARGET_INFO{
+  {
     .cie_return_addr_register = dwarf::a64::DW_reg_lr,
     .cie_instrs = {cie_instrs.first.data(), cie_instrs.second},
     .cie_code_alignment_factor = 4, // ULEB128 4
@@ -35,6 +35,11 @@ const AssemblerElfBase::TargetInfo AssemblerElfA64::TARGET_INFO{
 
     .reloc_pc32 = R_AARCH64_PREL32,
     .reloc_abs64 = R_AARCH64_ABS64,
+  },
+
+  ELFOSABI_SYSV,
+  EM_AARCH64,
 };
+// clang-format on
 
 } // end namespace tpde::a64

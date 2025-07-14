@@ -33,6 +33,7 @@ if (((TPDE_LOGGING STREQUAL "DebugOnly") AND (CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif ()
 
 target_sources(tpde PRIVATE
+    src/Assembler.cpp
     src/AssemblerElf.cpp
     src/base.cpp
     src/ElfMapper.cpp

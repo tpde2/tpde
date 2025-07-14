@@ -136,30 +136,16 @@ constexpr u8 DW_reg_pc = 32;
 
 } // namespace dwarf
 
-struct AssemblerElfBase {
+struct AssemblerElfBase : public Assembler {
   template <class Derived>
   friend struct AssemblerElf;
   friend class ElfMapper;
 
-  struct TargetInfo {
+  struct TargetInfoElf : Assembler::TargetInfo {
     /// The OS ABI for the ELF header.
     u8 elf_osabi;
     /// The machine for the ELF header.
     u16 elf_machine;
-
-    /// The return address register for the CIE.
-    u8 cie_return_addr_register;
-    /// The initial instructions for the CIE.
-    std::span<const u8> cie_instrs;
-    /// Code alignment factor for the CIE, ULEB128, must be one byte.
-    u8 cie_code_alignment_factor;
-    /// Data alignment factor for the CIE, SLEB128, must be one byte.
-    u8 cie_data_alignment_factor;
-
-    /// The relocation type for 32-bit pc-relative offsets.
-    u32 reloc_pc32;
-    /// The relocation type for 64-bit absolute addresses.
-    u32 reloc_abs64;
   };
 
   enum class SymBinding : u8 {
@@ -282,11 +268,6 @@ struct AssemblerElfBase {
   };
 
 private:
-  const TargetInfo &target_info;
-
-  util::BumpAllocator<> section_allocator;
-  util::SmallVector<util::BumpAllocUniquePtr<DataSection>, 16> sections;
-
   std::vector<Elf64_Sym> global_symbols, local_symbols;
   /// Section indices for large section numbers
   util::SmallVector<u32, 0> global_shndx, local_shndx;
@@ -366,25 +347,13 @@ private:
 
 public:
   explicit AssemblerElfBase(const TargetInfo &target_info)
-      : target_info(target_info) {
+      : Assembler(target_info) {
     local_symbols.resize(1); // First symbol must be null.
     init_sections();
     eh_init_cie();
   }
 
-  void reset() noexcept;
-
-  // Sections
-
-  DataSection &get_section(SecRef ref) noexcept {
-    assert(ref.valid());
-    return *sections[ref.id()];
-  }
-
-  const DataSection &get_section(SecRef ref) const noexcept {
-    assert(ref.valid());
-    return *sections[ref.id()];
-  }
+  void reset() noexcept override;
 
 private:
   void init_sections() noexcept;
@@ -649,11 +618,11 @@ public:
 
   u32 except_type_idx_for_sym(SymRef sym) noexcept;
 
-  void finalize() noexcept;
+  void finalize() noexcept override;
 
   // Output file generation
 
-  std::vector<u8> build_object_file() noexcept;
+  std::vector<u8> build_object_file() noexcept override;
 };
 
 template <typename Derived>

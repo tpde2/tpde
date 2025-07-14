@@ -4,6 +4,7 @@
 #pragma once
 
 #include "tpde/base.hpp"
+#include "tpde/util/BumpAllocator.hpp"
 #include "tpde/util/SmallVector.hpp"
 #include <cstring>
 
@@ -107,6 +108,55 @@ public:
     data.resize_uninitialized(data.size() + sizeof(T));
     std::memcpy(data.data() + off, &t, sizeof(T));
   }
+};
+
+/// Assembler base class.
+class Assembler {
+public:
+  struct TargetInfo {
+    /// The return address register for the CIE.
+    u8 cie_return_addr_register;
+    /// The initial instructions for the CIE.
+    std::span<const u8> cie_instrs;
+    /// Code alignment factor for the CIE, ULEB128, must be one byte.
+    u8 cie_code_alignment_factor;
+    /// Data alignment factor for the CIE, SLEB128, must be one byte.
+    u8 cie_data_alignment_factor;
+
+    /// The relocation type for 32-bit pc-relative offsets.
+    u32 reloc_pc32;
+    /// The relocation type for 64-bit absolute addresses.
+    u32 reloc_abs64;
+  };
+
+protected:
+  const TargetInfo &target_info;
+
+  util::BumpAllocator<> section_allocator;
+  util::SmallVector<util::BumpAllocUniquePtr<DataSection>, 16> sections;
+
+  Assembler(const TargetInfo &target_info) noexcept
+      : target_info(target_info) {}
+  virtual ~Assembler();
+
+public:
+  virtual void reset() noexcept;
+
+  // Sections
+
+  DataSection &get_section(SecRef ref) noexcept {
+    assert(ref.valid());
+    return *sections[ref.id()];
+  }
+
+  const DataSection &get_section(SecRef ref) const noexcept {
+    assert(ref.valid());
+    return *sections[ref.id()];
+  }
+
+  virtual void finalize() noexcept {}
+
+  virtual std::vector<u8> build_object_file() noexcept = 0;
 };
 
 } // namespace tpde

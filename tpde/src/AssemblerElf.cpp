@@ -101,8 +101,7 @@ consteval static u32 predef_sec_count() {
 } // namespace elf
 
 void AssemblerElfBase::reset() noexcept {
-  sections.clear();
-  section_allocator.reset();
+  Assembler::reset();
 
   global_symbols.clear();
   local_symbols.resize(1); // first symbol must be null
@@ -802,6 +801,8 @@ void AssemblerElfBase::finalize() noexcept { eh_writer.flush(); }
 
 std::vector<u8> AssemblerElfBase::build_object_file() noexcept {
   using namespace elf;
+
+  auto target_info = static_cast<const TargetInfoElf &>(this->target_info);
 
   std::vector<u8> out{};
 
