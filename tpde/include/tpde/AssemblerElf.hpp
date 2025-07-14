@@ -389,27 +389,8 @@ public:
 private:
   void init_sections() noexcept;
 
-  bool has_reloc_section(SecRef ref) const noexcept {
-    assert(ref.valid());
-    if (ref.id() + 1 < sections.size()) {
-      return sections[ref.id() + 1]->type == SHT_RELA;
-    }
-    return false;
-  }
-
-  DataSection &get_reloc_section(SecRef ref) noexcept {
-    assert(has_reloc_section(ref));
-    DataSection &reloc_sec = *sections[ref.id() + 1];
-    return reloc_sec;
-  }
-
   std::span<Elf64_Rela> get_relocs(SecRef ref) {
-    if (!has_reloc_section(ref)) {
-      return {};
-    }
-    DataSection &rela_sec = get_reloc_section(ref);
-    size_t count = rela_sec.size() / sizeof(Elf64_Rela);
-    return {reinterpret_cast<Elf64_Rela *>(rela_sec.data.data()), count};
+    return get_section(ref).relocs;
   }
 
   /// Allocate a new section.

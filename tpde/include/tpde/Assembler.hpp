@@ -6,6 +6,7 @@
 #include "tpde/base.hpp"
 #include "tpde/util/SmallVector.hpp"
 #include <cstring>
+#include <elf.h>
 
 namespace tpde {
 
@@ -41,7 +42,12 @@ public:
   bool operator==(const SecRef &other) const { return other.val == val; }
 };
 
+// TODO: Replace with file-format-independent data structure.
+using Relocation = Elf64_Rela;
+
 struct DataSection {
+  friend struct AssemblerElfBase;
+
   /// 256 bytes inline storage is enough for 10 relocations, which is a typical
   /// number for a single function (relevant for COMDAT sections with one
   /// section per function).
@@ -63,6 +69,8 @@ struct DataSection {
 private:
   SecRef sec_ref;
 
+  util::SmallVector<Relocation, 4> relocs;
+
 public:
   /// Generic field for target-specific data.
   void *target_info = nullptr;
@@ -70,6 +78,13 @@ public:
   /// Whether the section is virtual, i.e. has no content.
   bool is_virtual;
 
+private:
+  /// Whether the section can have relocations. For ELF, this implies that the
+  /// immediately following section ID is reserved as relocation section and
+  /// that name-5..name is ".rela".
+  bool has_relocs;
+
+public:
 #ifndef NDEBUG
   /// Whether the section is currently in use by a SectionWriter.
   bool locked = false;

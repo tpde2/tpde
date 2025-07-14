@@ -86,6 +86,9 @@ bool ElfMapper::map(AssemblerElfBase &assembler,
   util::SmallVector<AllocSection> alloc_sections;
 
   for (size_t i = 0; i < assembler.sections.size(); ++i) {
+    if (!assembler.sections[i]) { // skip relocation sections
+      continue;
+    }
     const auto &sec = *assembler.sections[i];
     if (!(sec.flags & SHF_ALLOC)) {
       continue;
