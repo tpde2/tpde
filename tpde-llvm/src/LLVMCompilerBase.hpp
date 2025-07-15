@@ -4108,12 +4108,12 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_switch(
   // TODO(ts): check which blocks need PHIs and otherwise jump directly to
   // them? probably better for branch predictor
 
-  tpde::util::SmallVector<typename Assembler::Label, 64> case_labels;
+  tpde::util::SmallVector<tpde::Label, 64> case_labels;
   for (auto i = 0u; i < cases.size(); ++i) {
-    case_labels.push_back(this->assembler.label_create());
+    case_labels.push_back(this->text_writer.label_create());
   }
 
-  const auto default_label = this->assembler.label_create();
+  const auto default_label = this->text_writer.label_create();
 
   const auto build_range = [&,
                             this](size_t begin, size_t end, const auto &self) {
@@ -4147,8 +4147,8 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_switch(
       // subtracting so adjust for that
       range += 1;
 
-      tpde::util::SmallVector<typename Assembler::Label, 32> label_vec;
-      std::span<typename Assembler::Label> labels;
+      tpde::util::SmallVector<tpde::Label, 32> label_vec;
+      std::span<tpde::Label> labels;
       if (range == num_cases) {
         labels = std::span{case_labels.begin() + begin, num_cases};
       } else {
@@ -4175,7 +4175,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_switch(
     // do a binary search step
     const auto half_len = num_cases / 2;
     const auto half_value = cases[begin + half_len].first;
-    const auto gt_label = this->assembler.label_create();
+    const auto gt_label = this->text_writer.label_create();
 
     // this will cmp against the input value, jump to the case if it is
     // equal or to gt_label if the value is greater. Otherwise it will
@@ -4280,7 +4280,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_invoke(
 
     this->release_spilled_regs(spilled);
 
-    unwind_label = this->assembler.label_create();
+    unwind_label = this->text_writer.label_create();
     this->label_place(unwind_label);
 
     // allocate the special registers that are set by the unwinding logic
@@ -4311,7 +4311,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_invoke(
 
   this->assembler.except_add_call_site(off_before_call,
                                        off_after_call - off_before_call,
-                                       unwind_label,
+                                       u32(unwind_label), // TODO: Label type?
                                        only_cleanup);
 
   if (only_cleanup) {

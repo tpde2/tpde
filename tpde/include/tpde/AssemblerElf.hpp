@@ -162,37 +162,10 @@ struct AssemblerElfBase : public Assembler {
     PROTECTED = STV_PROTECTED,
   };
 
-  // TODO: merge Label with SymRef when adding private symbols
-  enum class Label : u32 {
-  };
-
 private:
   std::vector<Elf64_Sym> global_symbols, local_symbols;
   /// Section indices for large section numbers
   util::SmallVector<u32, 0> global_shndx, local_shndx;
-
-protected:
-  struct TempSymbolInfo {
-    /// Section, or invalid if pending
-    SecRef section;
-    /// Offset into section, or index into temp_symbol_fixups if pending
-    union {
-      u32 fixup_idx;
-      u32 off;
-    };
-  };
-
-  struct TempSymbolFixup {
-    SecRef section;
-    u32 next_list_entry;
-    u32 off;
-    u8 kind;
-  };
-
-private:
-  std::vector<TempSymbolInfo> temp_symbols;
-  std::vector<TempSymbolFixup> temp_symbol_fixups;
-  u32 next_free_tsfixup = ~0u;
 
   StringTable strtab;
   /// Storage for extra user-provided section names.
@@ -219,7 +192,7 @@ private:
     /// Start offset *in section* (not inside function)
     u64 start;
     u64 len;
-    Label landing_pad;
+    u32 landing_pad_label;
     u32 action_entry;
   };
 
@@ -403,25 +376,6 @@ public:
     return SecRef(shndx_tab[sym_idx(sym)]);
   }
 
-  Label label_create() noexcept {
-    const Label label = static_cast<Label>(temp_symbols.size());
-    temp_symbols.push_back(TempSymbolInfo{SecRef(), {.fixup_idx = ~0u}});
-    return label;
-  }
-
-  // TODO: return pair of section, offset
-  u32 label_is_pending(Label label) const noexcept {
-    const auto &info = temp_symbols[static_cast<u32>(label)];
-    return !info.section.valid();
-  }
-
-  // TODO: return pair of section, offset
-  u32 label_offset(Label label) const noexcept {
-    assert(!label_is_pending(label));
-    const auto &info = temp_symbols[static_cast<u32>(label)];
-    return info.off;
-  }
-
 protected:
   [[nodiscard]] static bool sym_is_local(const SymRef sym) noexcept {
     return (sym.id() & 0x8000'0000) == 0;
@@ -461,8 +415,6 @@ public:
     reloc_sec(sec, sym, target_info.reloc_abs64, offset, addend);
   }
 
-  void reloc_sec(SecRef sec, Label label, u8 kind, u32 offset) noexcept;
-
   // Unwind and exception info
 
   static constexpr u32 write_eh_inst(u8 *dst, u8 opcode, u64 arg) noexcept {
@@ -496,13 +448,13 @@ public:
 
   void except_begin_func() noexcept;
 
-  void except_encode_func(SymRef func_sym) noexcept;
+  void except_encode_func(SymRef func_sym, const u32 *label_offsets) noexcept;
 
   /// add an entry to the call-site table
   /// must be called in strictly increasing order wrt text_off
   void except_add_call_site(u32 text_off,
                             u32 len,
-                            Label landing_pad,
+                            u32 landing_pad_label,
                             bool is_cleanup) noexcept;
 
   /// Add a cleanup action to the action table
@@ -535,28 +487,6 @@ struct AssemblerElf : public AssemblerElfBase {
   }
 
   Derived *derived() noexcept { return static_cast<Derived *>(this); }
-
-  void label_place(Label label, SecRef sec, u32 off) noexcept;
 };
-
-template <typename Derived>
-void AssemblerElf<Derived>::label_place(Label label,
-                                        SecRef sec,
-                                        u32 offset) noexcept {
-  assert(label_is_pending(label));
-  TempSymbolInfo &info = temp_symbols[static_cast<u32>(label)];
-  u32 fixup_idx = info.fixup_idx;
-  info.section = sec;
-  info.off = offset;
-
-  while (fixup_idx != ~0u) {
-    TempSymbolFixup &fixup = temp_symbol_fixups[fixup_idx];
-    derived()->handle_fixup(info, fixup);
-    auto next = fixup.next_list_entry;
-    fixup.next_list_entry = next_free_tsfixup;
-    next_free_tsfixup = fixup_idx;
-    fixup_idx = next;
-  }
-}
 
 } // namespace tpde

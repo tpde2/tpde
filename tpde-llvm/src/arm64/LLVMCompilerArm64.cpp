@@ -111,20 +111,20 @@ struct LLVMCompilerArm64 : tpde::a64::CompilerA64<LLVMAdaptor,
                        AsmReg tmp_reg,
                        u64 case_value,
                        bool width_is_32) noexcept;
-  void switch_emit_cmpeq(Label case_label,
+  void switch_emit_cmpeq(tpde::Label case_label,
                          AsmReg cmp_reg,
                          AsmReg tmp_reg,
                          u64 case_value,
                          bool width_is_32) noexcept;
-  bool switch_emit_jump_table(Label default_label,
-                              std::span<Label> labels,
+  bool switch_emit_jump_table(tpde::Label default_label,
+                              std::span<tpde::Label> labels,
                               AsmReg cmp_reg,
                               AsmReg tmp_reg,
                               u64 low_bound,
                               u64 high_bound,
                               bool width_is_32) noexcept;
-  void switch_emit_binary_step(Label case_label,
-                               Label gt_label,
+  void switch_emit_binary_step(tpde::Label case_label,
+                               tpde::Label gt_label,
                                AsmReg cmp_reg,
                                AsmReg tmp_reg,
                                u64 case_value,
@@ -592,7 +592,7 @@ void LLVMCompilerArm64::switch_emit_cmp(const AsmReg cmp_reg,
   }
 }
 
-void LLVMCompilerArm64::switch_emit_cmpeq(const Label case_label,
+void LLVMCompilerArm64::switch_emit_cmpeq(const tpde::Label case_label,
                                           const AsmReg cmp_reg,
                                           const AsmReg tmp_reg,
                                           const u64 case_value,
@@ -601,8 +601,8 @@ void LLVMCompilerArm64::switch_emit_cmpeq(const Label case_label,
   generate_raw_jump(Jump::Jeq, case_label);
 }
 
-bool LLVMCompilerArm64::switch_emit_jump_table(Label default_label,
-                                               std::span<Label> labels,
+bool LLVMCompilerArm64::switch_emit_jump_table(tpde::Label default_label,
+                                               std::span<tpde::Label> labels,
                                                AsmReg cmp_reg,
                                                AsmReg tmp_reg,
                                                u64 low_bound,
@@ -637,7 +637,7 @@ bool LLVMCompilerArm64::switch_emit_jump_table(Label default_label,
     }
 
     auto  tmp        = scratch.alloc_gp();
-    Label jump_table = assembler.label_create();
+    tpde::Label jump_table = assembler.label_create();
     ASM(LEA64rm, tmp, FE_MEM(FE_IP, 0, FE_NOREG, -1));
     // we reuse the jump offset stuff since the patch procedure is the same
     assembler.label_add_unresolved_jump_offset(jump_table,
@@ -653,8 +653,8 @@ bool LLVMCompilerArm64::switch_emit_jump_table(Label default_label,
 }
 
 void LLVMCompilerArm64::switch_emit_binary_step(
-    const Label case_label,
-    const Label gt_label,
+    const tpde::Label case_label,
+    const tpde::Label gt_label,
     const AsmReg cmp_reg,
     const AsmReg tmp_reg,
     const u64 case_value,

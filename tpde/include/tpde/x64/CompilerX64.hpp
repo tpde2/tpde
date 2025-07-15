@@ -469,7 +469,7 @@ struct CompilerX64 : BaseTy<Adaptor, Derived, Config> {
                                 bool needs_split,
                                 bool last_inst) noexcept;
 
-  void generate_raw_jump(Jump jmp, Assembler::Label target) noexcept;
+  void generate_raw_jump(Jump jmp, Label target) noexcept;
 
   /// Set dst to 1 if cc is true, otherwise set it to zero
   void generate_raw_set(Jump cc, AsmReg dst) noexcept;
@@ -587,7 +587,7 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::gen_func_prolog_and_args(
     ASM(MOV64mr, mem, FE_R8);
     mem.off += 8;
     ASM(MOV64mr, mem, FE_R9);
-    auto skip_fp = this->assembler.label_create();
+    auto skip_fp = this->text_writer.label_create();
     ASM(TEST8rr, FE_AX, FE_AX);
     generate_raw_jump(Jump::je, skip_fp);
     mem.off += 8;
@@ -772,7 +772,8 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::finish_func(
     auto func_size = this->text_writer.offset() - func_start_off;
     this->assembler.sym_def(func_sym, func_sec, func_start_off, func_size);
     this->assembler.eh_end_fde(fde_off, func_sym);
-    this->assembler.except_encode_func(func_sym);
+    this->assembler.except_encode_func(func_sym,
+                                       this->text_writer.label_offsets.data());
     return;
   }
 
@@ -830,7 +831,8 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::finish_func(
   auto func_size = this->text_writer.offset() - func_start_off;
   this->assembler.sym_def(func_sym, func_sec, func_start_off, func_size);
   this->assembler.eh_end_fde(fde_off, func_sym);
-  this->assembler.except_encode_func(func_sym);
+  this->assembler.except_encode_func(func_sym,
+                                     this->text_writer.label_offsets.data());
 }
 
 template <IRAdaptor Adaptor,
@@ -1442,7 +1444,7 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::generate_branch_to_block(
       generate_raw_jump(jmp, this->block_labels[(u32)target_idx]);
     }
   } else {
-    auto tmp_label = this->assembler.label_create();
+    auto tmp_label = this->text_writer.label_create();
     generate_raw_jump(invert_jump(jmp), tmp_label);
 
     this->derived()->move_to_phi_nodes(target_idx);
@@ -1458,8 +1460,8 @@ template <IRAdaptor Adaptor,
           template <typename, typename, typename> typename BaseTy,
           typename Config>
 void CompilerX64<Adaptor, Derived, BaseTy, Config>::generate_raw_jump(
-    Jump jmp, Assembler::Label target_label) noexcept {
-  if (this->assembler.label_is_pending(target_label)) {
+    Jump jmp, Label target_label) noexcept {
+  if (this->text_writer.label_is_pending(target_label)) {
     this->text_writer.ensure_space(6);
     auto *target = this->text_writer.cur_ptr();
     switch (jmp) {
@@ -1482,15 +1484,13 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::generate_raw_jump(
     case Jump::jnp: ASMNCF(JNP, FE_JMPL, target); break;
     }
 
-    this->assembler.add_unresolved_entry(
-        target_label,
-        this->text_writer.get_sec_ref(),
-        this->text_writer.offset() - 4,
-        Assembler::UnresolvedEntryKind::JMP_OR_MEM_DISP);
+    this->text_writer.label_ref(target_label,
+                                this->text_writer.offset() - 4,
+                                LabelFixupKind::X64_JMP_OR_MEM_DISP);
   } else {
     this->text_writer.ensure_space(6);
     auto *target = this->text_writer.begin_ptr() +
-                   this->assembler.label_offset(target_label);
+                   this->text_writer.label_offset(target_label);
     switch (jmp) {
     case Jump::ja: ASMNC(JA, target); break;
     case Jump::jae: ASMNC(JNC, target); break;

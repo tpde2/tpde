@@ -1033,16 +1033,16 @@ bool create_encode_function(llvm::MachineFunction *func,
   if (multiple_bbs) {
     write_buf += "\n    // Creating label for convergence point at the "
                  "end of the function\n";
-    write_buf += "    Label ret_converge_label = "
-                 "derived()->assembler.label_create();\n";
+    write_buf += "    tpde::Label ret_converge_label = "
+                 "derived()->text_writer.label_create();\n";
     write_buf += "    // Creating labels for blocks that are jump targets\n";
   }
 
   for (auto bb_it = func->begin(); bb_it != func->end(); ++bb_it) {
     if (multiple_bbs && !bb_it->pred_empty()) {
       std::format_to(std::back_inserter(write_buf),
-                     "    Label block{}_label = "
-                     "derived()->assembler.label_create();\n",
+                     "    tpde::Label block{}_label = "
+                     "derived()->text_writer.label_create();\n",
                      bb_it->getNumber());
 
       os << "  // Start of block " << bb_it->getNumber() << "\n";

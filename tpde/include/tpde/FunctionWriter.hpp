@@ -4,9 +4,25 @@
 
 #include "tpde/Assembler.hpp"
 #include "tpde/base.hpp"
+#include "tpde/util/SmallVector.hpp"
 #include <cstring>
 
 namespace tpde {
+
+enum class Label : u32 {
+};
+
+enum class LabelFixupKind : u8 {
+  ArchKindBegin,
+
+  X64_JMP_OR_MEM_DISP = ArchKindBegin,
+  X64_JUMP_TABLE,
+
+  AARCH64_BR = ArchKindBegin,
+  AARCH64_COND_BR,
+  AARCH64_TEST_BR,
+  AARCH64_JUMP_TABLE,
+};
 
 /// Helper class to write function text.
 template <typename Derived>
@@ -16,6 +32,20 @@ protected:
   u8 *data_begin = nullptr;
   u8 *data_cur = nullptr;
   u8 *data_reserve_end = nullptr;
+
+public:
+  /// Label offsets into section, ~0u indicates unplaced label.
+  util::SmallVector<u32> label_offsets;
+
+protected:
+  struct LabelFixup {
+    Label label;
+    u32 off;
+    LabelFixupKind kind;
+  };
+
+  /// Fixups for labels placed after their first use, processed at function end.
+  util::SmallVector<LabelFixup> label_fixups;
 
 public:
   /// Growth size for more_space; adjusted exponentially after every grow.
@@ -50,6 +80,16 @@ public:
     data_cur = data_begin + section->data.size();
     data_reserve_end = data_cur;
   }
+
+  void begin_func() noexcept {
+    label_offsets.clear();
+    label_fixups.clear();
+  }
+
+  void finish_func() noexcept { derived()->handle_fixups(); }
+
+  /// \name Text Writing
+  /// @{
 
   /// Get the current offset into the section.
   size_t offset() const noexcept { return data_cur - data_begin; }
@@ -106,6 +146,41 @@ public:
     data_cur = data_begin + util::align_up(offset(), align);
     section->align = std::max(section->align, u32(align));
   }
+
+  /// @}
+
+  /// \name Labels
+  /// @{
+
+  /// Create a new unplaced label.
+  Label label_create() noexcept {
+    const Label label = Label(label_offsets.size());
+    label_offsets.push_back(~0u);
+    return label;
+  }
+
+  bool label_is_pending(Label label) const noexcept {
+    return label_offsets[u32(label)] == ~0u;
+  }
+
+  u32 label_offset(Label label) const noexcept {
+    assert(!label_is_pending(label));
+    return label_offsets[u32(label)];
+  }
+
+  /// Place unplaced label at the specified offset inside the section.
+  void label_place(Label label, u32 off) noexcept {
+    assert(label_is_pending(label));
+    label_offsets[u32(label)] = off;
+  }
+
+  /// Reference label at given offset inside the code section.
+  void label_ref(Label label, u32 off, LabelFixupKind kind) noexcept {
+    assert(label_is_pending(label));
+    label_fixups.emplace_back(LabelFixup{label, off, kind});
+  }
+
+  /// @}
 };
 
 template <typename Derived>

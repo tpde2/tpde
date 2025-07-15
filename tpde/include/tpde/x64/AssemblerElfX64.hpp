@@ -14,45 +14,7 @@ struct AssemblerElfX64 : AssemblerElf<AssemblerElfX64> {
 
   static const TargetInfoElf TARGET_INFO;
 
-  enum class UnresolvedEntryKind : u8 {
-    JMP_OR_MEM_DISP,
-    JUMP_TABLE,
-  };
-
   explicit AssemblerElfX64() = default;
-
-  void add_unresolved_entry(Label label,
-                            SecRef sec,
-                            u32 off,
-                            UnresolvedEntryKind kind) noexcept {
-    AssemblerElfBase::reloc_sec(sec, label, static_cast<u8>(kind), off);
-  }
-
-  void handle_fixup(const TempSymbolInfo &info,
-                    const TempSymbolFixup &fixup) noexcept;
 };
-
-inline void
-    AssemblerElfX64::handle_fixup(const TempSymbolInfo &info,
-                                  const TempSymbolFixup &fixup) noexcept {
-  // TODO: emit relocations when fixup is in different section
-  assert(info.section == fixup.section && "multi-text section not supported");
-  u8 *dst_ptr = get_section(fixup.section).data.data() + fixup.off;
-
-  switch (static_cast<UnresolvedEntryKind>(fixup.kind)) {
-  case UnresolvedEntryKind::JMP_OR_MEM_DISP: {
-    // fix the jump immediate
-    u32 value = (info.off - fixup.off) - 4;
-    std::memcpy(dst_ptr, &value, sizeof(u32));
-    break;
-  }
-  case UnresolvedEntryKind::JUMP_TABLE: {
-    const auto table_off = *reinterpret_cast<u32 *>(dst_ptr);
-    const auto diff = (i32)info.off - (i32)table_off;
-    std::memcpy(dst_ptr, &diff, sizeof(u32));
-    break;
-  }
-  }
-}
 
 } // namespace tpde::x64

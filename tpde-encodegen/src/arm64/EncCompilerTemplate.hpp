@@ -53,7 +53,6 @@ struct EncodeCompiler {
     using ValuePartRef = typename CompilerA64::ValuePartRef;
     using GenericValuePart = typename CompilerA64::GenericValuePart;
     using Assembler    = typename CompilerA64::Assembler;
-    using Label        = typename Assembler::Label;
 
     std::optional<u64> encodeable_as_shiftimm(GenericValuePart &gv, unsigned size) const noexcept {
         if (gv.is_imm() && gv.imm_size() <= 8) {

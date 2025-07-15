@@ -14,6 +14,7 @@
 #include "tpde/base.hpp"
 #include "tpde/util/misc.hpp"
 #include "tpde/x64/CompilerX64.hpp"
+#include "tpde/x64/FunctionWriterX64.hpp"
 
 namespace tpde_llvm::x64 {
 
@@ -103,20 +104,20 @@ struct LLVMCompilerX64 : tpde::x64::CompilerX64<LLVMAdaptor,
                        AsmReg tmp_reg,
                        u64 case_value,
                        bool width_is_32) noexcept;
-  void switch_emit_cmpeq(Label case_label,
+  void switch_emit_cmpeq(tpde::Label case_label,
                          AsmReg cmp_reg,
                          AsmReg tmp_reg,
                          u64 case_value,
                          bool width_is_32) noexcept;
-  bool switch_emit_jump_table(Label default_label,
-                              std::span<Label> labels,
+  bool switch_emit_jump_table(tpde::Label default_label,
+                              std::span<tpde::Label> labels,
                               AsmReg cmp_reg,
                               AsmReg tmp_reg,
                               u64 low_bound,
                               u64 high_bound,
                               bool width_is_32) noexcept;
-  void switch_emit_binary_step(Label case_label,
-                               Label gt_label,
+  void switch_emit_binary_step(tpde::Label case_label,
+                               tpde::Label gt_label,
                                AsmReg cmp_reg,
                                AsmReg tmp_reg,
                                u64 case_value,
@@ -484,7 +485,7 @@ void LLVMCompilerX64::switch_emit_cmp(const AsmReg cmp_reg,
   }
 }
 
-void LLVMCompilerX64::switch_emit_cmpeq(const Label case_label,
+void LLVMCompilerX64::switch_emit_cmpeq(const tpde::Label case_label,
                                         const AsmReg cmp_reg,
                                         const AsmReg tmp_reg,
                                         const u64 case_value,
@@ -493,8 +494,8 @@ void LLVMCompilerX64::switch_emit_cmpeq(const Label case_label,
   generate_raw_jump(Jump::je, case_label);
 }
 
-bool LLVMCompilerX64::switch_emit_jump_table(Label default_label,
-                                             std::span<Label> labels,
+bool LLVMCompilerX64::switch_emit_jump_table(tpde::Label default_label,
+                                             std::span<tpde::Label> labels,
                                              AsmReg cmp_reg,
                                              AsmReg tmp_reg,
                                              u64 low_bound,
@@ -522,42 +523,37 @@ bool LLVMCompilerX64::switch_emit_jump_table(Label default_label,
     }
   }
 
-  Label jump_table = assembler.label_create();
+  tpde::Label jump_table = text_writer.label_create();
   ASM(LEA64rm, tmp_reg, FE_MEM(FE_IP, 0, FE_NOREG, -1));
   // we reuse the jump offset stuff since the patch procedure is the same
-  assembler.add_unresolved_entry(
-      jump_table,
-      text_writer.get_sec_ref(),
-      text_writer.offset() - 4,
-      Assembler::UnresolvedEntryKind::JMP_OR_MEM_DISP);
+  text_writer.label_ref(jump_table,
+                        text_writer.offset() - 4,
+                        tpde::LabelFixupKind::X64_JMP_OR_MEM_DISP);
   // load the 4 byte displacement from the jump table
   ASM(MOVSXr64m32, cmp_reg, FE_MEM(tmp_reg, 4, cmp_reg, 0));
   ASM(ADD64rr, tmp_reg, cmp_reg);
   ASM(JMPr, tmp_reg);
 
-  auto sec_ref = text_writer.get_sec_ref();
   text_writer.align(4);
   text_writer.ensure_space(4 + 4 * labels.size());
   label_place(jump_table);
   const auto table_off = text_writer.offset();
   for (u32 i = 0; i < labels.size(); i++) {
-    if (assembler.label_is_pending(labels[i])) {
-      assembler.add_unresolved_entry(
-          labels[i],
-          sec_ref,
-          text_writer.offset(),
-          tpde::x64::AssemblerElfX64::UnresolvedEntryKind::JUMP_TABLE);
+    if (text_writer.label_is_pending(labels[i])) {
+      text_writer.label_ref(labels[i],
+                            text_writer.offset(),
+                            tpde::LabelFixupKind::X64_JUMP_TABLE);
       text_writer.write<u32>(table_off);
     } else {
-      const auto label_off = assembler.label_offset(labels[i]);
+      const auto label_off = text_writer.label_offset(labels[i]);
       text_writer.write<i32>((i32)label_off - (i32)table_off);
     }
   }
   return true;
 }
 
-void LLVMCompilerX64::switch_emit_binary_step(const Label case_label,
-                                              const Label gt_label,
+void LLVMCompilerX64::switch_emit_binary_step(const tpde::Label case_label,
+                                              const tpde::Label gt_label,
                                               const AsmReg cmp_reg,
                                               const AsmReg tmp_reg,
                                               const u64 case_value,

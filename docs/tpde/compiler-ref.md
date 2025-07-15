@@ -779,9 +779,9 @@ void reloc_text(SymRef sym, u32 type, u64 offset, i64 addend = 0) noexcept;
 Adds a reloctation to `sym` in the current text section at `offset` of `type` (architecture-/platform-specific) with an optional addend.
 
 ### Labels
-- markers for code in current function
+- markers for code in current function, labels are cleared at the end of a function
 - used for `generate_raw_jump` in architecture compilers to encode control flow when compiling a single instruction
-- create with [label_create](@ref AssemblerElf::label_create)
+- create with [label_create](@ref FunctionWriter::label_create)
 - place with [label_place](@ref CompilerBase::label_place)
 - all control flow within an instruction must converge at the end of it, i.e. no branches to blocks inside control flow
 
@@ -797,8 +797,8 @@ void compile_highest_bit_set(IRInstRef inst) noexcept {
     // very inefficient implementation...
 
     // create labels for jump targets
-    Label fin = this->assembler.label_create();
-    Label cont = this->assembler.label_create();
+    Label fin = this->text_writer.label_create();
+    Label cont = this->text_writer.label_create();
 
     ASM(XOR32rr, out_reg, out_reg);
     ASM(DEC64r, out_reg);
@@ -854,20 +854,19 @@ void write_jump_table(Label jump_table, std::span<Label> cases) {
     // offsets to case labels should be relative to the start of the table
     u32 table_off = this->text_writer.offset();
     for (Label case_label : cases) {
-        // add_unresolved_offset can only be used for labels which aren't placed yet
+        // label_ref can only be used for labels which aren't placed yet
         // depending on how you use this, the labels might always be unplaced
-        if (this->assembler.label_is_pending(case_label)) {
-            this->assembler.add_unresolved_entry(
+        if (this->text_writer.label_is_pending(case_label)) {
+            this->text_writer.label_ref(
                 case_label,
-                text_ref,
                 this->text_writer.offset(),
-                tpde::x64::AssemblerElfX64::UnresolvedEntryKind::JUMP_TABLE // for x64
+                tpde::LabelFixupKind::X64_JUMP_TABLE // for x64
             );
             // write the table_offset, this will be used to calculate the actual offset when the label is placed
             this->text_writer.write<u32>(table_off);
         } else {
             // write the correct offset
-            u32 label_off = this->assembler.label_offset(case_label);
+            u32 label_off = this->text_writer.label_offset(case_label);
             this->text_writer.write<i32>((i32)label_off - (i32)table_off);
         }
     }

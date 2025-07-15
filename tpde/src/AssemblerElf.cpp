@@ -105,9 +105,6 @@ void AssemblerElfBase::reset() noexcept {
 
   global_symbols.clear();
   local_symbols.resize(1); // first symbol must be null
-  temp_symbols.clear();
-  temp_symbol_fixups.clear();
-  next_free_tsfixup = ~0u;
   strtab = StringTable();
   shstrtab_extra = StringTable();
   secref_text = SecRef();
@@ -395,30 +392,6 @@ void AssemblerElfBase::reloc_sec(const SecRef sec_ref,
   get_section(sec_ref).relocs.emplace_back(offset, sym, type, addend);
 }
 
-void AssemblerElfBase::reloc_sec(const SecRef sec,
-                                 const Label label,
-                                 const u8 kind,
-                                 const u32 offset) noexcept {
-  assert(label_is_pending(label));
-  u32 fixup_idx;
-  if (next_free_tsfixup != ~0u) {
-    fixup_idx = next_free_tsfixup;
-    next_free_tsfixup = temp_symbol_fixups[fixup_idx].next_list_entry;
-  } else {
-    fixup_idx = temp_symbol_fixups.size();
-    temp_symbol_fixups.push_back(TempSymbolFixup{});
-  }
-
-  TempSymbolInfo &info = temp_symbols[static_cast<u32>(label)];
-  temp_symbol_fixups[fixup_idx] = TempSymbolFixup{
-      .section = sec,
-      .next_list_entry = info.fixup_idx,
-      .off = offset,
-      .kind = kind,
-  };
-  info.fixup_idx = fixup_idx;
-}
-
 void AssemblerElfBase::eh_align_frame() noexcept {
   if (unsigned count = -eh_writer.size() & 7) {
     eh_writer.reserve(8);
@@ -630,7 +603,8 @@ void AssemblerElfBase::except_begin_func() noexcept {
   except_action_table.resize(2); // cleanup entry
 }
 
-void AssemblerElfBase::except_encode_func(SymRef func_sym) noexcept {
+void AssemblerElfBase::except_encode_func(SymRef func_sym,
+                                          const u32 *label_offsets) noexcept {
   if (!cur_personality_func_addr.valid()) {
     assert(except_call_site_table.empty());
     assert(except_type_info_table.empty());
@@ -660,7 +634,7 @@ void AssemblerElfBase::except_encode_func(SymRef func_sym) noexcept {
       }
       ecst_writer.write_uleb_unchecked(info.start - fn_start);
       ecst_writer.write_uleb_unchecked(info.len);
-      u64 fn_off = label_offset(info.landing_pad) - fn_start;
+      u64 fn_off = label_offsets[info.landing_pad_label] - fn_start;
       assert(fn_off < (fn_end - fn_start));
       ecst_writer.write_uleb_unchecked(fn_off);
       ecst_writer.write_uleb_unchecked(info.action_entry);
@@ -723,12 +697,12 @@ void AssemblerElfBase::except_encode_func(SymRef func_sym) noexcept {
 
 void AssemblerElfBase::except_add_call_site(const u32 text_off,
                                             const u32 len,
-                                            const Label landing_pad,
+                                            const u32 landing_pad_label,
                                             const bool is_cleanup) noexcept {
   except_call_site_table.push_back(ExceptCallSiteInfo{
       .start = text_off,
       .len = len,
-      .landing_pad = landing_pad,
+      .landing_pad_label = landing_pad_label,
       .action_entry =
           (is_cleanup ? 0 : static_cast<u32>(except_action_table.size()) + 1),
   });

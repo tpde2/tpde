@@ -13,6 +13,7 @@
 #include "CompilerConfig.hpp"
 #include "IRAdaptor.hpp"
 #include "tpde/AssignmentPartRef.hpp"
+#include "tpde/FunctionWriter.hpp"
 #include "tpde/RegisterFile.hpp"
 #include "tpde/ValLocalIdx.hpp"
 #include "tpde/ValueAssignment.hpp"
@@ -174,7 +175,7 @@ public:
   std::vector<SymRef> func_syms;
   // TODO(ts): combine this with the block vectors in the analyzer to save on
   // allocations
-  util::SmallVector<typename Assembler::Label> block_labels;
+  util::SmallVector<Label> block_labels;
 
   util::SmallVector<std::pair<SymRef, SymRef>, 4> personality_syms = {};
 
@@ -445,9 +446,8 @@ public:
         text_writer.get_sec_ref(), sym, type, offset, addend);
   }
 
-  void label_place(Assembler::Label label) noexcept {
-    this->assembler.label_place(
-        label, text_writer.get_sec_ref(), text_writer.offset());
+  void label_place(Label label) noexcept {
+    this->text_writer.label_place(label, text_writer.offset());
   }
 
 protected:
@@ -1942,6 +1942,7 @@ bool CompilerBase<Adaptor, Derived, Config>::compile_func(
 
   // Simple heuristic for initial allocation size
   u32 expected_code_size = 0x8 * analyzer.num_insts + 0x40;
+  this->text_writer.begin_func();
   this->text_writer.growth_size = expected_code_size;
   this->text_writer.ensure_space(expected_code_size);
 
@@ -1950,7 +1951,7 @@ bool CompilerBase<Adaptor, Derived, Config>::compile_func(
   block_labels.clear();
   block_labels.resize_uninitialized(analyzer.block_layout.size());
   for (u32 i = 0; i < analyzer.block_layout.size(); ++i) {
-    block_labels[i] = assembler.label_create();
+    block_labels[i] = text_writer.label_create();
   }
 
   // TODO(ts): place function label
@@ -2008,6 +2009,7 @@ bool CompilerBase<Adaptor, Derived, Config>::compile_func(
          "found non-freed ValueAssignment, maybe missing ref-count?");
 
   derived()->finish_func(func_idx);
+  this->text_writer.finish_func();
 
   return true;
 }
