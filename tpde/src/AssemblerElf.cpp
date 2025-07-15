@@ -100,7 +100,7 @@ consteval static u32 predef_sec_count() {
 
 } // namespace elf
 
-void AssemblerElfBase::reset() noexcept {
+void AssemblerElf::reset() noexcept {
   Assembler::reset();
 
   global_symbols.clear();
@@ -122,9 +122,9 @@ void AssemblerElfBase::reset() noexcept {
   eh_init_cie();
 }
 
-SecRef AssemblerElfBase::create_section(unsigned type,
-                                        unsigned flags,
-                                        unsigned name) noexcept {
+SecRef AssemblerElf::create_section(unsigned type,
+                                    unsigned flags,
+                                    unsigned name) noexcept {
   SecRef ref = static_cast<SecRef>(sections.size());
   auto &sec = sections.emplace_back(new (section_allocator) DataSection(ref));
   sec->type = type;
@@ -135,8 +135,8 @@ SecRef AssemblerElfBase::create_section(unsigned type,
   return ref;
 }
 
-SymRef AssemblerElfBase::create_section_symbol(SecRef ref,
-                                               std::string_view name) noexcept {
+SymRef AssemblerElf::create_section_symbol(SecRef ref,
+                                           std::string_view name) noexcept {
   const auto str_off = strtab.add(name);
 
   unsigned shndx = sec_is_xindex(ref) ? SHN_XINDEX : ref.id();
@@ -156,12 +156,12 @@ SymRef AssemblerElfBase::create_section_symbol(SecRef ref,
   return sym;
 }
 
-DataSection &AssemblerElfBase::get_or_create_section(SecRef &ref,
-                                                     unsigned rela_name,
-                                                     unsigned type,
-                                                     unsigned flags,
-                                                     unsigned align,
-                                                     bool with_rela) noexcept {
+DataSection &AssemblerElf::get_or_create_section(SecRef &ref,
+                                                 unsigned rela_name,
+                                                 unsigned type,
+                                                 unsigned flags,
+                                                 unsigned align,
+                                                 bool with_rela) noexcept {
   if (!ref.valid()) [[unlikely]] {
     if (with_rela) {
       ref = create_section(type, flags, rela_name + 5);
@@ -181,13 +181,13 @@ DataSection &AssemblerElfBase::get_or_create_section(SecRef &ref,
   return get_section(ref);
 }
 
-const char *AssemblerElfBase::sec_name(SecRef ref) const noexcept {
+const char *AssemblerElf::sec_name(SecRef ref) const noexcept {
   const DataSection &sec = get_section(ref);
   assert(sec.name < elf::SHSTRTAB.size());
   return elf::SHSTRTAB.data() + sec.name;
 }
 
-SecRef AssemblerElfBase::get_data_section(bool rodata, bool relro) noexcept {
+SecRef AssemblerElf::get_data_section(bool rodata, bool relro) noexcept {
   SecRef &secref = !rodata ? secref_data : relro ? secref_relro : secref_rodata;
   unsigned off_r = !rodata ? elf::sec_off(".rela.data")
                    : relro ? elf::sec_off(".rela.data.rel.ro")
@@ -197,29 +197,28 @@ SecRef AssemblerElfBase::get_data_section(bool rodata, bool relro) noexcept {
   return secref;
 }
 
-SecRef AssemblerElfBase::get_bss_section() noexcept {
+SecRef AssemblerElf::get_bss_section() noexcept {
   unsigned off = elf::sec_off(".bss");
   unsigned flags = SHF_ALLOC | SHF_WRITE;
   (void)get_or_create_section(secref_bss, off, SHT_NOBITS, flags, 1, false);
   return secref_bss;
 }
 
-SecRef AssemblerElfBase::get_tdata_section() noexcept {
+SecRef AssemblerElf::get_tdata_section() noexcept {
   unsigned off_r = elf::sec_off(".rela.tdata");
   unsigned flags = SHF_ALLOC | SHF_WRITE | SHF_TLS;
   (void)get_or_create_section(secref_tdata, off_r, SHT_PROGBITS, flags, 1);
   return secref_tdata;
 }
 
-SecRef AssemblerElfBase::get_tbss_section() noexcept {
+SecRef AssemblerElf::get_tbss_section() noexcept {
   unsigned off = elf::sec_off(".tbss");
   unsigned flags = SHF_ALLOC | SHF_WRITE | SHF_TLS;
   (void)get_or_create_section(secref_tbss, off, SHT_NOBITS, flags, 1, false);
   return secref_tbss;
 }
 
-SecRef AssemblerElfBase::create_structor_section(bool init,
-                                                 SecRef group) noexcept {
+SecRef AssemblerElf::create_structor_section(bool init, SecRef group) noexcept {
   // TODO: priorities
   std::string_view name = init ? ".init_array" : ".fini_array";
   unsigned type = init ? SHT_INIT_ARRAY : SHT_FINI_ARRAY;
@@ -229,11 +228,11 @@ SecRef AssemblerElfBase::create_structor_section(bool init,
   return secref;
 }
 
-SecRef AssemblerElfBase::create_section(std::string_view name,
-                                        unsigned type,
-                                        unsigned flags,
-                                        bool with_rela,
-                                        SecRef group) noexcept {
+SecRef AssemblerElf::create_section(std::string_view name,
+                                    unsigned type,
+                                    unsigned flags,
+                                    bool with_rela,
+                                    SecRef group) noexcept {
   assert(type != SHT_GROUP && "use create_group_section to create groups");
 
   assert(name.find('\0') == std::string_view::npos &&
@@ -270,8 +269,8 @@ SecRef AssemblerElfBase::create_section(std::string_view name,
   return ref;
 }
 
-SecRef AssemblerElfBase::create_group_section(SymRef signature_sym,
-                                              bool is_comdat) noexcept {
+SecRef AssemblerElf::create_group_section(SymRef signature_sym,
+                                          bool is_comdat) noexcept {
   SecRef ref = create_section(SHT_GROUP, 0, elf::sec_off(".group"));
   DataSection &sec = get_section(ref);
   sec.align = 4;
@@ -281,7 +280,7 @@ SecRef AssemblerElfBase::create_group_section(SymRef signature_sym,
   return ref;
 }
 
-void AssemblerElfBase::init_sections() noexcept {
+void AssemblerElf::init_sections() noexcept {
   for (size_t i = 0; i < elf::predef_sec_count(); i++) {
     (void)create_section(SHT_NULL, 0, 0);
   }
@@ -296,7 +295,7 @@ void AssemblerElfBase::init_sections() noexcept {
 }
 
 
-void AssemblerElfBase::sym_copy(SymRef dst, SymRef src) noexcept {
+void AssemblerElf::sym_copy(SymRef dst, SymRef src) noexcept {
   Elf64_Sym *src_ptr = sym_ptr(src), *dst_ptr = sym_ptr(dst);
 
   dst_ptr->st_shndx = src_ptr->st_shndx;
@@ -308,14 +307,14 @@ void AssemblerElfBase::sym_copy(SymRef dst, SymRef src) noexcept {
   // Don't copy st_info.
 }
 
-SymRef AssemblerElfBase::sym_add(const std::string_view name,
-                                 SymBinding binding,
-                                 u32 type) noexcept {
+SymRef AssemblerElf::sym_add(const std::string_view name,
+                             SymBinding binding,
+                             u32 type) noexcept {
   size_t str_off = strtab.add(name);
 
   u8 info;
   switch (binding) {
-    using enum AssemblerElfBase::SymBinding;
+    using enum AssemblerElf::SymBinding;
   case LOCAL: info = ELF64_ST_INFO(STB_LOCAL, type); break;
   case WEAK: info = ELF64_ST_INFO(STB_WEAK, type); break;
   case GLOBAL: info = ELF64_ST_INFO(STB_GLOBAL, type); break;
@@ -339,11 +338,11 @@ SymRef AssemblerElfBase::sym_add(const std::string_view name,
   }
 }
 
-void AssemblerElfBase::sym_def_predef_data(SecRef sec_ref,
-                                           SymRef sym_ref,
-                                           std::span<const u8> data,
-                                           const u32 align,
-                                           u32 *off) noexcept {
+void AssemblerElf::sym_def_predef_data(SecRef sec_ref,
+                                       SymRef sym_ref,
+                                       std::span<const u8> data,
+                                       const u32 align,
+                                       u32 *off) noexcept {
   DataSection &sec = get_section(sec_ref);
   sec.align = std::max(sec.align, align);
   size_t pos = util::align_up(sec.size(), align);
@@ -357,7 +356,7 @@ void AssemblerElfBase::sym_def_predef_data(SecRef sec_ref,
   }
 }
 
-void AssemblerElfBase::sym_def_predef_zero(
+void AssemblerElf::sym_def_predef_zero(
     SecRef sec_ref, SymRef sym_ref, u32 size, u32 align, u32 *off) noexcept {
   DataSection &sec = get_section(sec_ref);
   sec.align = std::max(sec.align, align);
@@ -374,7 +373,7 @@ void AssemblerElfBase::sym_def_predef_zero(
   }
 }
 
-void AssemblerElfBase::sym_def_xindex(SymRef sym_ref, SecRef sec_ref) noexcept {
+void AssemblerElf::sym_def_xindex(SymRef sym_ref, SecRef sec_ref) noexcept {
   assert(sec_is_xindex(sec_ref));
   auto &shndx = sym_is_local(sym_ref) ? local_shndx : global_shndx;
   if (shndx.size() <= sym_idx(sym_ref)) {
@@ -383,16 +382,16 @@ void AssemblerElfBase::sym_def_xindex(SymRef sym_ref, SecRef sec_ref) noexcept {
   shndx[sym_idx(sym_ref)] = sec_ref.id();
 }
 
-void AssemblerElfBase::reloc_sec(const SecRef sec_ref,
-                                 const SymRef sym,
-                                 const u32 type,
-                                 const u64 offset,
-                                 const i64 addend) noexcept {
+void AssemblerElf::reloc_sec(const SecRef sec_ref,
+                             const SymRef sym,
+                             const u32 type,
+                             const u64 offset,
+                             const i64 addend) noexcept {
   assert(i32(addend) == addend && "non-32-bit addends are unsupported");
   get_section(sec_ref).relocs.emplace_back(offset, sym, type, addend);
 }
 
-void AssemblerElfBase::eh_align_frame() noexcept {
+void AssemblerElf::eh_align_frame() noexcept {
   if (unsigned count = -eh_writer.size() & 7) {
     eh_writer.reserve(8);
     // Small hack for performance: always write 8 bytes (single instruction, no
@@ -404,7 +403,7 @@ void AssemblerElfBase::eh_align_frame() noexcept {
   }
 }
 
-void AssemblerElfBase::eh_write_inst(const u8 opcode, const u64 arg) noexcept {
+void AssemblerElf::eh_write_inst(const u8 opcode, const u64 arg) noexcept {
   if ((opcode & dwarf::DWARF_CFI_PRIMARY_OPCODE_MASK) != 0) {
     assert((arg & dwarf::DWARF_CFI_PRIMARY_OPCODE_MASK) == 0);
     eh_writer.write<u8>(opcode | arg);
@@ -415,14 +414,14 @@ void AssemblerElfBase::eh_write_inst(const u8 opcode, const u64 arg) noexcept {
   }
 }
 
-void AssemblerElfBase::eh_write_inst(const u8 opcode,
-                                     const u64 first_arg,
-                                     const u64 second_arg) noexcept {
+void AssemblerElf::eh_write_inst(const u8 opcode,
+                                 const u64 first_arg,
+                                 const u64 second_arg) noexcept {
   eh_write_inst(opcode, first_arg);
   eh_writer.write_uleb(second_arg);
 }
 
-void AssemblerElfBase::eh_init_cie(SymRef personality_func_addr) noexcept {
+void AssemblerElf::eh_init_cie(SymRef personality_func_addr) noexcept {
   // write out the initial CIE
 
   // CIE layout:
@@ -517,7 +516,7 @@ void AssemblerElfBase::eh_init_cie(SymRef personality_func_addr) noexcept {
   }
 }
 
-u32 AssemblerElfBase::eh_begin_fde(SymRef personality_func_addr) noexcept {
+u32 AssemblerElf::eh_begin_fde(SymRef personality_func_addr) noexcept {
   if (personality_func_addr != cur_personality_func_addr) {
     eh_init_cie(personality_func_addr);
     cur_personality_func_addr = personality_func_addr;
@@ -558,7 +557,7 @@ u32 AssemblerElfBase::eh_begin_fde(SymRef personality_func_addr) noexcept {
   return fde_off;
 }
 
-void AssemblerElfBase::eh_end_fde(u32 fde_start, SymRef func) noexcept {
+void AssemblerElf::eh_end_fde(u32 fde_start, SymRef func) noexcept {
   eh_align_frame();
 
   u8 *eh_data = eh_writer.data();
@@ -595,7 +594,7 @@ void AssemblerElfBase::eh_end_fde(u32 fde_start, SymRef func) noexcept {
   }
 }
 
-void AssemblerElfBase::except_begin_func() noexcept {
+void AssemblerElf::except_begin_func() noexcept {
   except_call_site_table.clear();
   except_action_table.clear();
   except_type_info_table.clear();
@@ -603,8 +602,8 @@ void AssemblerElfBase::except_begin_func() noexcept {
   except_action_table.resize(2); // cleanup entry
 }
 
-void AssemblerElfBase::except_encode_func(SymRef func_sym,
-                                          const u32 *label_offsets) noexcept {
+void AssemblerElf::except_encode_func(SymRef func_sym,
+                                      const u32 *label_offsets) noexcept {
   if (!cur_personality_func_addr.valid()) {
     assert(except_call_site_table.empty());
     assert(except_type_info_table.empty());
@@ -695,10 +694,10 @@ void AssemblerElfBase::except_encode_func(SymRef func_sym,
   }
 }
 
-void AssemblerElfBase::except_add_call_site(const u32 text_off,
-                                            const u32 len,
-                                            const u32 landing_pad_label,
-                                            const bool is_cleanup) noexcept {
+void AssemblerElf::except_add_call_site(const u32 text_off,
+                                        const u32 len,
+                                        const u32 landing_pad_label,
+                                        const bool is_cleanup) noexcept {
   except_call_site_table.push_back(ExceptCallSiteInfo{
       .start = text_off,
       .len = len,
@@ -708,15 +707,15 @@ void AssemblerElfBase::except_add_call_site(const u32 text_off,
   });
 }
 
-void AssemblerElfBase::except_add_cleanup_action() noexcept {
+void AssemblerElf::except_add_cleanup_action() noexcept {
   // pop back the action offset
   except_action_table.pop_back();
   i64 offset = -static_cast<i64>(except_action_table.size());
   util::VectorWriter(except_action_table).write_sleb(offset);
 }
 
-void AssemblerElfBase::except_add_action(const bool first_action,
-                                         const SymRef type_sym) noexcept {
+void AssemblerElf::except_add_action(const bool first_action,
+                                     const SymRef type_sym) noexcept {
   if (!first_action) {
     except_action_table.back() = 1;
   }
@@ -741,7 +740,7 @@ void AssemblerElfBase::except_add_action(const bool first_action,
   except_action_table.push_back(0);
 }
 
-void AssemblerElfBase::except_add_empty_spec_action(
+void AssemblerElf::except_add_empty_spec_action(
     const bool first_action) noexcept {
   if (!first_action) {
     except_action_table.back() = 1;
@@ -755,7 +754,7 @@ void AssemblerElfBase::except_add_empty_spec_action(
   except_action_table.push_back(0);
 }
 
-u32 AssemblerElfBase::except_type_idx_for_sym(const SymRef sym) noexcept {
+u32 AssemblerElf::except_type_idx_for_sym(const SymRef sym) noexcept {
   // to explain the indexing
   // a ttypeIndex of 0 is reserved for a cleanup action so the type table
   // starts at 1 but the first entry in the type table is reserved for the 0
@@ -771,9 +770,9 @@ u32 AssemblerElfBase::except_type_idx_for_sym(const SymRef sym) noexcept {
   return idx;
 }
 
-void AssemblerElfBase::finalize() noexcept { eh_writer.flush(); }
+void AssemblerElf::finalize() noexcept { eh_writer.flush(); }
 
-std::vector<u8> AssemblerElfBase::build_object_file() noexcept {
+std::vector<u8> AssemblerElf::build_object_file() noexcept {
   using namespace elf;
 
   auto target_info = static_cast<const TargetInfoElf &>(this->target_info);
@@ -1011,5 +1010,77 @@ std::vector<u8> AssemblerElfBase::build_object_file() noexcept {
 
   return out;
 }
+
+namespace {
+
+static constexpr auto get_cie_initial_instrs_a64() {
+  std::array<u8, 32> data{};
+  // the current frame setup does not have a constant offset from the FP
+  // to the CFA so we need to encode that at the end
+  // for now just encode the CFA before the first sub sp
+
+  // def_cfa sp, 0
+  unsigned len = AssemblerElf::write_eh_inst(
+      data.data(), dwarf::DW_CFA_def_cfa, dwarf::a64::DW_reg_sp, 0);
+  return std::make_pair(data, len);
+}
+
+static constexpr auto cie_instrs_a64 = get_cie_initial_instrs_a64();
+
+// TODO: use static constexpr array in C++23.
+static constexpr auto get_cie_initial_instrs_x64() {
+  std::array<u8, 32> data{};
+  // the current frame setup does not have a constant offset from the FP
+  // to the CFA so we need to encode that at the end
+  // for now just encode the CFA before the first sub sp
+
+  // we always emit a frame-setup so we can encode that in the CIE
+
+  u8 *dst = data.data();
+  // def_cfa rsp, 8
+  dst += AssemblerElf::write_eh_inst(
+      dst, dwarf::DW_CFA_def_cfa, dwarf::x64::DW_reg_rsp, 8);
+  // cfa_offset ra, 8
+  dst += AssemblerElf::write_eh_inst(
+      dst, dwarf::DW_CFA_offset, dwarf::x64::DW_reg_ra, 1);
+  return std::make_pair(data, dst - data.data());
+}
+
+static constexpr auto cie_instrs_x64 = get_cie_initial_instrs_x64();
+
+} // namespace
+
+// Clang Format gives random indentation.
+// clang-format off
+const AssemblerElf::TargetInfoElf AssemblerElfA64::TARGET_INFO{
+  {
+    .cie_return_addr_register = dwarf::a64::DW_reg_lr,
+    .cie_instrs = {cie_instrs_a64.first.data(), cie_instrs_a64.second},
+    .cie_code_alignment_factor = 4, // ULEB128 4
+    .cie_data_alignment_factor = 120, // SLEB128 -8
+
+    .reloc_pc32 = R_AARCH64_PREL32,
+    .reloc_abs64 = R_AARCH64_ABS64,
+  },
+
+  ELFOSABI_SYSV,
+  EM_AARCH64,
+};
+
+const AssemblerElf::TargetInfoElf AssemblerElfX64::TARGET_INFO{
+  {
+    .cie_return_addr_register = dwarf::x64::DW_reg_ra,
+    .cie_instrs = {cie_instrs_x64.first.data(), cie_instrs_x64.second},
+    .cie_code_alignment_factor = 1,   // ULEB128 1
+    .cie_data_alignment_factor = 120, // SLEB128 -8
+
+    .reloc_pc32 = R_X86_64_PC32,
+    .reloc_abs64 = R_X86_64_64,
+  },
+
+  ELFOSABI_SYSV,
+  EM_X86_64,
+};
+// clang-format on
 
 } // end namespace tpde

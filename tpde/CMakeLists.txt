@@ -77,13 +77,11 @@ if (TPDE_X64)
 
     target_link_libraries(tpde PUBLIC fadec::fadec)
     target_sources(tpde PRIVATE
-        src/x64/AssemblerElfX64.cpp
 
         PUBLIC
         FILE_SET HEADERS
         BASE_DIRS include
         FILES
-            include/tpde/x64/AssemblerElfX64.hpp
             include/tpde/x64/CompilerX64.hpp
             include/tpde/x64/FunctionWriterX64.hpp
     )
@@ -95,13 +93,11 @@ if (TPDE_A64)
 
     target_link_libraries(tpde PUBLIC disarm64::disarm64)
     target_sources(tpde PRIVATE
-        src/arm64/AssemblerElfA64.cpp
 
         PUBLIC
         FILE_SET HEADERS
         BASE_DIRS include
         FILES
-            include/tpde/arm64/AssemblerElfA64.hpp
             include/tpde/arm64/CompilerA64.hpp
             include/tpde/arm64/FunctionWriterA64.hpp
     )

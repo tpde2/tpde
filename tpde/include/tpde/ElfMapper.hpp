@@ -36,7 +36,7 @@ public:
 
   void reset() noexcept;
 
-  bool map(AssemblerElfBase &assembler, SymbolResolver resolver) noexcept;
+  bool map(AssemblerElf &assembler, SymbolResolver resolver) noexcept;
 
   void *get_sym_addr(SymRef sym) noexcept;
 };

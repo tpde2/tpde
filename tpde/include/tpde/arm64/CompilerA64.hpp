@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 #pragma once
 
-#include "AssemblerElfA64.hpp"
+#include "tpde/AssemblerElf.hpp"
 #include "tpde/AssignmentPartRef.hpp"
 #include "tpde/CompilerBase.hpp"
 #include "tpde/arm64/FunctionWriterA64.hpp"

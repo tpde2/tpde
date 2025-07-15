@@ -21,7 +21,7 @@ public:
   JITMapperImpl(GlobalMap &&globals) : globals(std::move(globals)) {}
 
   /// Map the ELF from the assembler into memory, returns true on success.
-  bool map(tpde::AssemblerElfBase &, tpde::ElfMapper::SymbolResolver) noexcept;
+  bool map(tpde::AssemblerElf &, tpde::ElfMapper::SymbolResolver) noexcept;
 
   void *lookup_global(llvm::GlobalValue *gv) noexcept {
     return mapper.get_sym_addr(globals.lookup(gv));

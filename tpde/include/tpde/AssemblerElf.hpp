@@ -134,9 +134,7 @@ constexpr u8 DW_reg_pc = 32;
 
 } // namespace dwarf
 
-struct AssemblerElfBase : public Assembler {
-  template <class Derived>
-  friend struct AssemblerElf;
+struct AssemblerElf : public Assembler {
   friend class ElfMapper;
 
   struct TargetInfoElf : Assembler::TargetInfo {
@@ -218,7 +216,7 @@ private:
   SymRef cur_func;
 
 public:
-  explicit AssemblerElfBase(const TargetInfo &target_info)
+  explicit AssemblerElf(const TargetInfoElf &target_info)
       : Assembler(target_info) {
     local_symbols.resize(1); // First symbol must be null.
     init_sections();
@@ -476,17 +474,17 @@ public:
   std::vector<u8> build_object_file() noexcept override;
 };
 
-/// AssemblerElf contains the architecture-independent logic to emit
-/// ELF object files (currently linux-specific) which is then extended by
-/// AssemblerElfX64 or AssemblerElfA64
-template <typename Derived>
-struct AssemblerElf : public AssemblerElfBase {
-  /// The current write pointer for the text section
-  explicit AssemblerElf() : AssemblerElfBase(Derived::TARGET_INFO) {
-    static_assert(std::is_base_of_v<AssemblerElf, Derived>);
-  }
+// TODO: Remove these types, instead find a good way to specify architecture as
+// enum parameter (probably contained in Assembler?) to constructor.
 
-  Derived *derived() noexcept { return static_cast<Derived *>(this); }
+struct AssemblerElfA64 : AssemblerElf {
+  static const TargetInfoElf TARGET_INFO;
+  explicit AssemblerElfA64() noexcept : AssemblerElf(TARGET_INFO) {}
+};
+
+struct AssemblerElfX64 : AssemblerElf {
+  static const TargetInfoElf TARGET_INFO;
+  explicit AssemblerElfX64() noexcept : AssemblerElf(TARGET_INFO) {}
 };
 
 } // namespace tpde

@@ -59,8 +59,7 @@ void ElfMapper::reset() noexcept {
   sym_addrs.clear();
 }
 
-bool ElfMapper::map(AssemblerElfBase &assembler,
-                    SymbolResolver resolver) noexcept {
+bool ElfMapper::map(AssemblerElf &assembler, SymbolResolver resolver) noexcept {
   // Approximate number of PLT/GOT slots.
   // TODO: better approximation
   u32 got_plt_slot_count =
@@ -170,8 +169,8 @@ bool ElfMapper::map(AssemblerElfBase &assembler,
   local_sym_count = assembler.local_symbols.size();
   sym_addrs.resize(local_sym_count + assembler.global_symbols.size());
   const auto sym_idx = [&](SymRef sym) -> size_t {
-    auto idx = AssemblerElfBase::sym_idx(sym);
-    if (!AssemblerElfBase::sym_is_local(sym)) {
+    auto idx = AssemblerElf::sym_idx(sym);
+    if (!AssemblerElf::sym_is_local(sym)) {
       idx += local_sym_count;
     }
     return idx;
@@ -405,8 +404,8 @@ bool ElfMapper::map(AssemblerElfBase &assembler,
 }
 
 void *ElfMapper::get_sym_addr(SymRef sym) noexcept {
-  auto idx = AssemblerElfBase::sym_idx(sym);
-  if (!AssemblerElfBase::sym_is_local(sym)) {
+  auto idx = AssemblerElf::sym_idx(sym);
+  if (!AssemblerElf::sym_is_local(sym)) {
     idx += local_sym_count;
   }
   assert(idx < sym_addrs.size());
