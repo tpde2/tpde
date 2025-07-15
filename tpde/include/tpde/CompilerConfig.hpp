@@ -28,6 +28,7 @@ concept CompilerConfig = requires {
 
   typename T::Assembler;
   typename T::AsmReg;
+  typename T::FunctionWriter;
 };
 
 struct CompilerConfigDefault {

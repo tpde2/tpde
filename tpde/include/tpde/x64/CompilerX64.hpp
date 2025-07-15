@@ -6,9 +6,8 @@
 #include "AssemblerElfX64.hpp"
 #include "tpde/AssignmentPartRef.hpp"
 #include "tpde/CompilerBase.hpp"
-#include "tpde/ValLocalIdx.hpp"
-#include "tpde/ValueAssignment.hpp"
 #include "tpde/base.hpp"
+#include "tpde/x64/FunctionWriterX64.hpp"
 
 #include <bit>
 
@@ -247,6 +246,7 @@ struct PlatformConfig : CompilerConfigDefault {
   using Assembler = AssemblerElfX64;
   using AsmReg = tpde::x64::AsmReg;
   using DefaultCCAssigner = CCAssignerSysV;
+  using FunctionWriter = FunctionWriterX64;
 
   static constexpr RegBank GP_BANK{0};
   static constexpr RegBank FP_BANK{1};

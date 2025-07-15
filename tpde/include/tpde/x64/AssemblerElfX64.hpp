@@ -14,11 +14,6 @@ struct AssemblerElfX64 : AssemblerElf<AssemblerElfX64> {
 
   static const TargetInfoElf TARGET_INFO;
 
-  class SectionWriter : public Base::SectionWriterBase<SectionWriter> {
-  public:
-    void align(size_t align) noexcept;
-  };
-
   enum class UnresolvedEntryKind : u8 {
     JMP_OR_MEM_DISP,
     JUMP_TABLE,
@@ -57,15 +52,6 @@ inline void
     std::memcpy(dst_ptr, &diff, sizeof(u32));
     break;
   }
-  }
-}
-
-inline void AssemblerElfX64::SectionWriter::align(size_t align) noexcept {
-  u32 old_off = offset();
-  SectionWriterBase::align(align);
-  // Pad text section with NOPs.
-  if (u32 cur_off = offset(); cur_off > old_off) {
-    fe64_NOP(cur_ptr() - (cur_off - old_off), cur_off - old_off);
   }
 }
 

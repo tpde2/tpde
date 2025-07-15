@@ -6,6 +6,7 @@
 #include "AssemblerElfA64.hpp"
 #include "tpde/AssignmentPartRef.hpp"
 #include "tpde/CompilerBase.hpp"
+#include "tpde/arm64/FunctionWriterA64.hpp"
 #include "tpde/base.hpp"
 #include "tpde/util/SmallVector.hpp"
 #include "tpde/util/misc.hpp"
@@ -290,6 +291,7 @@ struct PlatformConfig : CompilerConfigDefault {
   using Assembler = AssemblerElfA64;
   using AsmReg = tpde::a64::AsmReg;
   using DefaultCCAssigner = CCAssignerAAPCS;
+  using FunctionWriter = FunctionWriterA64;
 
   static constexpr RegBank GP_BANK{0};
   static constexpr RegBank FP_BANK{1};

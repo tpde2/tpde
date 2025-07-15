@@ -169,7 +169,7 @@ private:
 
 public:
   Assembler assembler;
-  Assembler::SectionWriter text_writer;
+  Config::FunctionWriter text_writer;
   // TODO(ts): smallvector?
   std::vector<SymRef> func_syms;
   // TODO(ts): combine this with the block vectors in the analyzer to save on

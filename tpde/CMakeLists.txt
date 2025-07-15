@@ -52,6 +52,7 @@ target_sources(tpde PRIVATE
         include/tpde/CompilerBase.hpp
         include/tpde/AssemblerElf.hpp
         include/tpde/ElfMapper.hpp
+        include/tpde/FunctionWriter.hpp
         include/tpde/IRAdaptor.hpp
         include/tpde/RegisterFile.hpp
         include/tpde/ScratchReg.hpp
@@ -84,6 +85,7 @@ if (TPDE_X64)
         FILES
             include/tpde/x64/AssemblerElfX64.hpp
             include/tpde/x64/CompilerX64.hpp
+            include/tpde/x64/FunctionWriterX64.hpp
     )
 endif ()
 
@@ -101,6 +103,7 @@ if (TPDE_A64)
         FILES
             include/tpde/arm64/AssemblerElfA64.hpp
             include/tpde/arm64/CompilerA64.hpp
+            include/tpde/arm64/FunctionWriterA64.hpp
     )
 endif ()
 
