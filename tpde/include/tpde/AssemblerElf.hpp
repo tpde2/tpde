@@ -134,9 +134,10 @@ constexpr u8 DW_reg_pc = 32;
 
 } // namespace dwarf
 
-struct AssemblerElf : public Assembler {
+class AssemblerElf : public Assembler {
   friend class ElfMapper;
 
+protected:
   struct TargetInfoElf : Assembler::TargetInfo {
     /// The OS ABI for the ELF header.
     u8 elf_osabi;
@@ -144,6 +145,7 @@ struct AssemblerElf : public Assembler {
     u16 elf_machine;
   };
 
+public:
   enum class SymBinding : u8 {
     /// Symbol with local linkage, must be defined
     LOCAL,
@@ -169,7 +171,6 @@ private:
   /// Storage for extra user-provided section names.
   StringTable shstrtab_extra;
 
-protected:
   SecRef secref_text = SecRef();
   SecRef secref_rodata = SecRef();
   SecRef secref_relro = SecRef();
@@ -355,11 +356,6 @@ public:
     sym_ptr(sym)->st_other = static_cast<u8>(visibility);
   }
 
-  /// Forcefully set value of symbol, doesn't change section.
-  void sym_set_value(SymRef sym, u64 value) noexcept {
-    sym_ptr(sym)->st_value = value;
-  }
-
   const char *sym_name(SymRef sym) const noexcept {
     return strtab.data() + sym_ptr(sym)->st_name;
   }
@@ -374,7 +370,7 @@ public:
     return SecRef(shndx_tab[sym_idx(sym)]);
   }
 
-protected:
+private:
   [[nodiscard]] static bool sym_is_local(const SymRef sym) noexcept {
     return (sym.id() & 0x8000'0000) == 0;
   }
@@ -477,13 +473,17 @@ public:
 // TODO: Remove these types, instead find a good way to specify architecture as
 // enum parameter (probably contained in Assembler?) to constructor.
 
-struct AssemblerElfA64 : AssemblerElf {
+class AssemblerElfA64 final : public AssemblerElf {
   static const TargetInfoElf TARGET_INFO;
+
+public:
   explicit AssemblerElfA64() noexcept : AssemblerElf(TARGET_INFO) {}
 };
 
-struct AssemblerElfX64 : AssemblerElf {
+class AssemblerElfX64 final : public AssemblerElf {
   static const TargetInfoElf TARGET_INFO;
+
+public:
   explicit AssemblerElfX64() noexcept : AssemblerElf(TARGET_INFO) {}
 };
 

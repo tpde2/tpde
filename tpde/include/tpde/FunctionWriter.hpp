@@ -47,10 +47,10 @@ protected:
   /// Fixups for labels placed after their first use, processed at function end.
   util::SmallVector<LabelFixup> label_fixups;
 
-public:
   /// Growth size for more_space; adjusted exponentially after every grow.
   u32 growth_size = 0x10000;
 
+public:
   FunctionWriter() noexcept = default;
 
   ~FunctionWriter() {
@@ -81,9 +81,11 @@ public:
     data_reserve_end = data_cur;
   }
 
-  void begin_func() noexcept {
+  void begin_func(u32 expected_size) noexcept {
     label_offsets.clear();
     label_fixups.clear();
+    growth_size = expected_size;
+    ensure_space(expected_size);
   }
 
   void finish_func() noexcept { derived()->handle_fixups(); }

@@ -981,7 +981,6 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::finish_func(
     u32 skip = util::align_down(func_prologue_alloc - prologue.size() * 4, 16);
     std::memset(this->text_writer.begin_ptr() + func_start_off, 0, skip);
     func_start_off += skip;
-    this->assembler.sym_set_value(this->func_syms[func_idx], func_start_off);
     std::memcpy(this->text_writer.begin_ptr() + func_start_off,
                 prologue.data(),
                 prologue.size() * sizeof(u32));

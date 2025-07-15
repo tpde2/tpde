@@ -50,7 +50,7 @@ struct Relocation {
 };
 
 struct DataSection {
-  friend struct AssemblerElf;
+  friend class AssemblerElf;
 
   /// 256 bytes inline storage is enough for 10 relocations, which is a typical
   /// number for a single function (relevant for COMDAT sections with one
