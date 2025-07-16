@@ -114,7 +114,7 @@ concept Compiler = CompilerConfig<Config> && requires(T a) {
   /// ValRefSpecial.
   {
     a.val_part_ref_special(ARG(typename T::ValRefSpecial &), ARG(u32))
-  } -> std::same_as<typename T::ValuePartRef>;
+  } -> std::same_as<typename T::ValuePart>;
 
   /// The compiler numbers functions and this gives the derived implementation
   /// a chance to save that mapping

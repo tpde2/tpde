@@ -582,7 +582,7 @@ struct TestIRCompilerBase /* ... */ {
     static std::optional<ValRefSpecial> val_ref_special(IRValueRef) {
         return {};
     }
-    ValuePartRef val_part_ref_special(ValRefSpecial&, u32 /* part_idx */) noexcept {
+    ValuePart val_part_ref_special(ValRefSpecial&, u32 /* part_idx */) noexcept {
         TPDE_UNREACHABLE("val_part_ref_special called when IR does not have special values");
     }
 

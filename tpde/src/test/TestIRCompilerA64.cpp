@@ -66,7 +66,7 @@ struct TestIRCompilerA64 : a64::CompilerA64<TestIRAdaptor, TestIRCompilerA64> {
     return {};
   }
 
-  ValuePartRef val_part_ref_special(ValRefSpecial &, u32) noexcept {
+  ValuePart val_part_ref_special(ValRefSpecial &, u32) noexcept {
     TPDE_UNREACHABLE("val_part_ref_special on IR without special values");
   }
 

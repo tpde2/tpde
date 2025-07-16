@@ -109,12 +109,12 @@ More about this later when explaining how to implement constants.
 
 #### val_part_ref_special
 ```cpp
-ValuePartRef val_part_ref_special(ValRefSpecial& val_ref_special, u32 part_idx) noexcept;
+ValuePart val_part_ref_special(ValRefSpecial& val_ref_special, u32 part_idx) noexcept;
 ```
-When you return a `ValRefSpecial` in `val_ref_special` and a part of it is accessed, this function is called and you need to provide a `ValuePartRef`
+When you return a `ValRefSpecial` in `val_ref_special` and a part of it is accessed, this function is called and you need to provide a `ValuePart`
 for it.
 
-More details about what `ValuePartRef`s can be found below.
+More details about what `ValuePart`s can be found below.
 
 #### define_func_idx
 ```cpp

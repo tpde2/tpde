@@ -127,7 +127,8 @@ public:
       return ValuePartRef{
           compiler, local_idx(), state.a.assignment, part, state.a.mode == 2};
     }
-    return compiler->derived()->val_part_ref_special(state.s, part);
+    return ValuePartRef{
+        compiler, compiler->derived()->val_part_ref_special(state.s, part)};
   }
 
   /// Like part(), but the returned part is always unowned and will not release
@@ -137,7 +138,8 @@ public:
       return ValuePartRef{
           compiler, local_idx(), state.a.assignment, part, false};
     }
-    return compiler->derived()->val_part_ref_special(state.s, part);
+    return ValuePartRef{
+        compiler, compiler->derived()->val_part_ref_special(state.s, part)};
   }
 
   /// Reset the reference to the value part

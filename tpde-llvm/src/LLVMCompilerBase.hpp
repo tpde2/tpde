@@ -258,22 +258,17 @@ struct LLVMCompilerBase : public LLVMCompiler,
     return this->adaptor->val_parts(val);
   }
 
-  std::optional<ValuePartRef> val_ref_constant(IRValueRef val_idx,
-                                               u32 part) noexcept;
+  ValuePart val_ref_constant(const llvm::Constant *, u32 part) noexcept;
 
   std::optional<ValRefSpecial> val_ref_special(IRValueRef value) noexcept {
     if (llvm::isa<llvm::Constant>(value)) {
-      return val_ref_constant(value);
+      return ValRefSpecial{.value = value};
     }
     return std::nullopt;
   }
 
-  ValuePartRef val_part_ref_special(ValRefSpecial &vrs, u32 part) noexcept {
-    return *val_ref_constant(vrs.value, part);
-  }
-
-  ValRefSpecial val_ref_constant(IRValueRef value) noexcept {
-    return ValRefSpecial{.value = value};
+  ValuePart val_part_ref_special(ValRefSpecial &vrs, u32 part) noexcept {
+    return val_ref_constant(llvm::cast<llvm::Constant>(vrs.value), part);
   }
 
   ValueRef result_ref(const llvm::Value *v) noexcept {
@@ -571,11 +566,9 @@ void LLVMCompilerBase<Adaptor, Derived, Config>::analysis_end() noexcept {
 }
 
 template <typename Adaptor, typename Derived, typename Config>
-std::optional<typename LLVMCompilerBase<Adaptor, Derived, Config>::ValuePartRef>
+typename LLVMCompilerBase<Adaptor, Derived, Config>::ValuePart
     LLVMCompilerBase<Adaptor, Derived, Config>::val_ref_constant(
-        IRValueRef val, u32 part) noexcept {
-  auto *const_val = llvm::cast<llvm::Constant>(val);
-
+        const llvm::Constant *const_val, u32 part) noexcept {
   auto [ty, ty_idx] = this->adaptor->lower_type(const_val->getType());
   unsigned sub_part = part;
 
@@ -633,7 +626,7 @@ std::optional<typename LLVMCompilerBase<Adaptor, Derived, Config>::ValuePartRef>
       this->init_variable_ref(local_idx, static_cast<u32>(local_idx));
       assignment = this->val_assignment(local_idx);
     }
-    return ValuePartRef{this, local_idx, assignment, 0, /*owned=*/false};
+    return ValuePart{local_idx, assignment, 0, /*owned=*/false};
   }
 
   u32 size = this->adaptor->basic_ty_part_size(ty);
@@ -645,7 +638,7 @@ std::optional<typename LLVMCompilerBase<Adaptor, Derived, Config>::ValuePartRef>
       llvm::isa<llvm::ConstantAggregateZero>(const_val)) {
     static const std::array<u64, 8> zero{};
     assert(size <= zero.size() * sizeof(u64));
-    return ValuePartRef(this, zero.data(), size, bank);
+    return ValuePart(zero.data(), size, bank);
   }
 
   if (auto *cdv = llvm::dyn_cast<llvm::ConstantDataVector>(const_val)) {
@@ -657,7 +650,7 @@ std::optional<typename LLVMCompilerBase<Adaptor, Derived, Config>::ValuePartRef>
       *copy = 0; // zero-initialize
     }
     std::memcpy(copy, data.data() + sub_part * size, size);
-    return ValuePartRef(this, copy, size, bank);
+    return ValuePart(copy, size, bank);
   }
 
   if (llvm::isa<llvm::ConstantVector>(const_val)) {
@@ -673,7 +666,7 @@ std::optional<typename LLVMCompilerBase<Adaptor, Derived, Config>::ValuePartRef>
           assert((llvm::isa<llvm::UndefValue, llvm::PoisonValue>(it.value())));
         }
       }
-      return ValuePartRef(this, val, size, bank);
+      return ValuePart(val, size, bank);
     }
 
     // TODO(ts): check how to handle this
@@ -684,7 +677,7 @@ std::optional<typename LLVMCompilerBase<Adaptor, Derived, Config>::ValuePartRef>
     assert(sub_part < (ty == LLVMBasicValType::i128 ? 2 : 1));
     assert(size <= 8 && "multi-word integer as single part?");
     const u64 *data = const_int->getValue().getRawData();
-    return ValuePartRef(this, data[sub_part], size, bank);
+    return ValuePart(data[sub_part], size, bank);
   }
 
   if (const auto *const_fp = llvm::dyn_cast<llvm::ConstantFP>(const_val);
@@ -697,7 +690,7 @@ std::optional<typename LLVMCompilerBase<Adaptor, Derived, Config>::ValuePartRef>
         data, int_val.getRawData(), int_val.getNumWords() * sizeof(u64));
 
     assert(size <= int_val.getNumWords() * sizeof(u64));
-    return ValuePartRef(this, data, size, bank);
+    return ValuePart(data, size, bank);
   }
 
   std::string const_str;
@@ -2806,7 +2799,7 @@ void LLVMCompilerBase<Adaptor, Derived, Config>::extract_element(
     auto *cst = llvm::cast<llvm::Constant>(vec_vr.state.s.value);
     assert(cst->getType()->isVectorTy());
     auto *elem = cst->getAggregateElement(idx);
-    out.set_value(this, *val_ref_constant(elem, 0));
+    out.set_value(this, val_ref_constant(elem, 0));
     return;
   }
 
