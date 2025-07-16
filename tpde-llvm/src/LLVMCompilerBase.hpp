@@ -466,7 +466,7 @@ public:
   void insert_element(ValueRef &vec_vr,
                       unsigned idx,
                       LLVMBasicValType ty,
-                      GenericValuePart el) noexcept;
+                      GenericValuePart &&el) noexcept;
   bool compile_extract_element(const llvm::Instruction *,
                                const ValInfo &,
                                u64) noexcept;
@@ -2844,7 +2844,7 @@ void LLVMCompilerBase<Adaptor, Derived, Config>::insert_element(
     ValueRef &vec_vr,
     unsigned idx,
     LLVMBasicValType ty,
-    GenericValuePart el) noexcept {
+    GenericValuePart &&el) noexcept {
   tpde::ValueAssignment *va = vec_vr.assignment();
   u32 elem_sz = this->adaptor->basic_ty_part_size(ty);
 

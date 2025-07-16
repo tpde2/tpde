@@ -137,10 +137,10 @@ struct LLVMCompilerArm64 : tpde::a64::CompilerA64<LLVMAdaptor,
   bool handle_intrin(const llvm::IntrinsicInst *) noexcept;
 
   bool handle_overflow_intrin_128(OverflowOp op,
-                                  GenericValuePart lhs_lo,
-                                  GenericValuePart lhs_hi,
-                                  GenericValuePart rhs_lo,
-                                  GenericValuePart rhs_hi,
+                                  GenericValuePart &&lhs_lo,
+                                  GenericValuePart &&lhs_hi,
+                                  GenericValuePart &&rhs_lo,
+                                  GenericValuePart &&rhs_hi,
                                   ScratchReg &res_lo,
                                   ScratchReg &res_hi,
                                   ScratchReg &res_of) noexcept;
@@ -785,10 +785,10 @@ bool LLVMCompilerArm64::handle_intrin(
 
 bool LLVMCompilerArm64::handle_overflow_intrin_128(
     OverflowOp op,
-    GenericValuePart lhs_lo,
-    GenericValuePart lhs_hi,
-    GenericValuePart rhs_lo,
-    GenericValuePart rhs_hi,
+    GenericValuePart &&lhs_lo,
+    GenericValuePart &&lhs_hi,
+    GenericValuePart &&rhs_lo,
+    GenericValuePart &&rhs_hi,
     ScratchReg &res_lo,
     ScratchReg &res_hi,
     ScratchReg &res_of) noexcept {

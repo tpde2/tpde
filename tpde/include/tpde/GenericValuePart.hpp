@@ -77,22 +77,14 @@ struct CompilerBase<Adaptor, Derived, Config>::GenericValuePart {
   }
 
   // salvaging
-  GenericValuePart(ScratchReg &&reg) noexcept {
-    assert(reg.has_reg());
-    state = std::move(reg);
+  GenericValuePart(ScratchReg &&reg) noexcept : state{std::move(reg)} {
+    assert(std::get<ScratchReg>(state).has_reg());
   }
 
   // salvaging
   GenericValuePart(ValuePartRef &&ref) noexcept : state{std::move(ref)} {}
 
-  GenericValuePart(Expr expr) noexcept {
-    ScratchReg *base_scratch = std::get_if<ScratchReg>(&expr.base);
-    if (base_scratch && !expr.has_index() && expr.disp == 0) {
-      state = std::move(*base_scratch);
-    } else {
-      state = std::move(expr);
-    }
-  }
+  GenericValuePart(Expr expr) noexcept : state{std::move(expr)} {}
 
   [[nodiscard]] bool is_expr() const noexcept {
     return std::holds_alternative<Expr>(state);
