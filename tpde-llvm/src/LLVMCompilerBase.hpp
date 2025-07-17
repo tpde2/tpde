@@ -3572,33 +3572,48 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_call(
     auto *op = call->getArgOperand(i);
     CallArg arg{op};
 
-    if (call->paramHasAttr(i, llvm::Attribute::AttrKind::ZExt)) {
-      arg.flag = CallArg::Flag::zext;
-      arg.ext_bits = op->getType()->getIntegerBitWidth();
-    } else if (call->paramHasAttr(i, llvm::Attribute::AttrKind::SExt)) {
-      arg.flag = CallArg::Flag::sext;
-      arg.ext_bits = op->getType()->getIntegerBitWidth();
-    } else if (call->paramHasAttr(i, llvm::Attribute::AttrKind::ByVal)) {
-      arg.flag = CallArg::Flag::byval;
-      auto &data_layout = this->adaptor->mod->getDataLayout();
-      llvm::Type *byval_ty = call->getParamByValType(i);
-      arg.byval_size = data_layout.getTypeAllocSize(byval_ty);
+    auto [ty, ty_idx] = this->adaptor->lower_type(op);
+    this->adaptor->check_type_compatibility(op->getType(), ty, ty_idx);
 
-      if (auto param_align = call->getParamStackAlign(i)) {
-        arg.byval_align = param_align->value();
-      } else if (auto param_align = call->getParamAlign(i)) {
-        arg.byval_align = param_align->value();
-      } else {
-        arg.byval_align = data_layout.getABITypeAlign(byval_ty).value();
+    // paramHasAttr queries are expensive, so avoid them if possible. LLVM
+    // provides no possibility to query the absence of all ABI-related
+    // attributes (which is the common case) somewhat efficiently.
+    switch (ty) {
+    case LLVMBasicValType::ptr:
+      if (call->paramHasAttr(i, llvm::Attribute::AttrKind::ByVal)) {
+        arg.flag = CallArg::Flag::byval;
+        auto &data_layout = this->adaptor->mod->getDataLayout();
+        llvm::Type *byval_ty = call->getParamByValType(i);
+        arg.byval_size = data_layout.getTypeAllocSize(byval_ty);
+
+        if (auto param_align = call->getParamStackAlign(i)) {
+          arg.byval_align = param_align->value();
+        } else if (auto param_align = call->getParamAlign(i)) {
+          arg.byval_align = param_align->value();
+        } else {
+          arg.byval_align = data_layout.getABITypeAlign(byval_ty).value();
+        }
+      } else if (call->paramHasAttr(i, llvm::Attribute::AttrKind::StructRet)) {
+        arg.flag = CallArg::Flag::sret;
       }
-    } else if (call->paramHasAttr(i, llvm::Attribute::AttrKind::StructRet)) {
-      arg.flag = CallArg::Flag::sret;
+      break;
+    case LLVMBasicValType::i8:
+    case LLVMBasicValType::i16:
+    case LLVMBasicValType::i32:
+    case LLVMBasicValType::i64:
+      if (call->paramHasAttr(i, llvm::Attribute::AttrKind::ZExt)) {
+        arg.flag = CallArg::Flag::zext;
+        arg.ext_bits = op->getType()->getIntegerBitWidth();
+      } else if (call->paramHasAttr(i, llvm::Attribute::AttrKind::SExt)) {
+        arg.flag = CallArg::Flag::sext;
+        arg.ext_bits = op->getType()->getIntegerBitWidth();
+      }
+      break;
+    default: break;
     }
     assert(!call->paramHasAttr(i, llvm::Attribute::AttrKind::InAlloca));
     assert(!call->paramHasAttr(i, llvm::Attribute::AttrKind::Preallocated));
 
-    auto [ty, ty_idx] = this->adaptor->lower_type(op);
-    this->adaptor->check_type_compatibility(op->getType(), ty, ty_idx);
     // Explicitly pass part count to avoid duplicate type lowering.
     cb->add_arg(arg, this->adaptor->type_part_count(ty, ty_idx));
   }
