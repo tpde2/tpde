@@ -50,6 +50,7 @@ struct Relocation {
 };
 
 struct DataSection {
+  friend class Assembler;
   friend class AssemblerElf;
 
   /// 256 bytes inline storage is enough for 10 relocations, which is a typical
@@ -142,7 +143,8 @@ protected:
 public:
   virtual void reset() noexcept;
 
-  // Sections
+  /// \name Sections
+  /// @{
 
   DataSection &get_section(SecRef ref) noexcept {
     assert(ref.valid());
@@ -153,6 +155,28 @@ public:
     assert(ref.valid());
     return *sections[ref.id()];
   }
+
+  /// @}
+
+  /// \name Relocations
+  /// @{
+
+  /// Add relocation. Type is file-format and target-specific.
+  void reloc_sec(
+      SecRef sec, SymRef sym, u32 type, u32 offset, i64 addend) noexcept {
+    assert(i32(addend) == addend && "non-32-bit addends are unsupported");
+    get_section(sec).relocs.emplace_back(offset, sym, type, addend);
+  }
+
+  void reloc_pc32(SecRef sec, SymRef sym, u32 offset, i64 addend) noexcept {
+    reloc_sec(sec, sym, target_info.reloc_pc32, offset, addend);
+  }
+
+  void reloc_abs(SecRef sec, SymRef sym, u32 offset, i64 addend) noexcept {
+    reloc_sec(sec, sym, target_info.reloc_abs64, offset, addend);
+  }
+
+  /// @}
 
   virtual void finalize() noexcept {}
 

@@ -395,22 +395,9 @@ private:
     }
   }
 
-  // Relocations
-
-public:
-  void reloc_sec(
-      SecRef sec, SymRef sym, u32 type, u64 offset, i64 addend) noexcept;
-
-  void reloc_pc32(SecRef sec, SymRef sym, u64 offset, i64 addend) noexcept {
-    reloc_sec(sec, sym, target_info.reloc_pc32, offset, addend);
-  }
-
-  void reloc_abs(SecRef sec, SymRef sym, u64 offset, i64 addend) noexcept {
-    reloc_sec(sec, sym, target_info.reloc_abs64, offset, addend);
-  }
-
   // Unwind and exception info
 
+public:
   static constexpr u32 write_eh_inst(u8 *dst, u8 opcode, u64 arg) noexcept {
     if (opcode & dwarf::DWARF_CFI_PRIMARY_OPCODE_MASK) {
       assert((arg & dwarf::DWARF_CFI_PRIMARY_OPCODE_MASK) == 0);

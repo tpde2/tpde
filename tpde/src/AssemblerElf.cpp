@@ -382,15 +382,6 @@ void AssemblerElf::sym_def_xindex(SymRef sym_ref, SecRef sec_ref) noexcept {
   shndx[sym_idx(sym_ref)] = sec_ref.id();
 }
 
-void AssemblerElf::reloc_sec(const SecRef sec_ref,
-                             const SymRef sym,
-                             const u32 type,
-                             const u64 offset,
-                             const i64 addend) noexcept {
-  assert(i32(addend) == addend && "non-32-bit addends are unsupported");
-  get_section(sec_ref).relocs.emplace_back(offset, sym, type, addend);
-}
-
 void AssemblerElf::eh_align_frame() noexcept {
   if (unsigned count = -eh_writer.size() & 7) {
     eh_writer.reserve(8);
