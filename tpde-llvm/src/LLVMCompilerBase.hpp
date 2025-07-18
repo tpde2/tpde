@@ -612,7 +612,8 @@ typename LLVMCompilerBase<Adaptor, Derived, Config>::ValuePart
     ty = part_descs[part].part.type;
     assert(ty != LLVMBasicValType::invalid);
   } else if (ty == LLVMBasicValType::invalid) [[unlikely]] {
-    TPDE_FATAL("cannot handle constant of illegal/unsupported type");
+    // Invalid types were already reported. Just try to keep going.
+    return ValuePart(u64{0}, 1, Config::GP_BANK);
   }
 
   // At this point, ty is the basic type of the element and sub_part the part
