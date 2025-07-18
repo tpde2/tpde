@@ -2717,28 +2717,42 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_int_to_ptr(
 template <typename Adaptor, typename Derived, typename Config>
 bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_bitcast(
     const llvm::Instruction *inst, const ValInfo &val_info, u64) noexcept {
-  // at most this should be fine to implement as a copy operation
-  // as the values cannot be aggregates
-  // TODO: this is not necessarily a no-op for vectors
   const auto src = inst->getOperand(0);
+  ValueRef src_ref = this->val_ref(src);
+  ValueRef res_ref = this->result_ref(inst);
 
-  const auto src_parts = this->adaptor->val_parts(src);
-  const auto dst_parts = this->adaptor->val_parts(val_info);
-  // TODO(ts): support 128bit values
-  if (src_parts.count() != 1 || dst_parts.count() != 1) {
-    return false;
+  const auto src_part_count = this->adaptor->val_parts(src).count();
+  const auto dst_part_count = this->adaptor->val_parts(val_info).count();
+  // bitcast only support scalar and vector types of the same size. Multi-part
+  // values must be of homogeneous element type.
+  if (src_part_count == dst_part_count) {
+    for (u32 i = 0; i != dst_part_count; ++i) {
+      ValuePartRef res_vpr = res_ref.part(i);
+      ValuePartRef src_vpr = src_ref.part(i);
+      assert(src_vpr.part_size() == res_vpr.part_size());
+      if (src_vpr.bank() == res_vpr.bank()) {
+        res_vpr.set_value(std::move(src_vpr));
+      } else {
+        AsmReg src_reg = src_vpr.load_to_reg();
+        derived()->mov(res_vpr.alloc_reg(), src_reg, res_vpr.part_size());
+      }
+    }
+    return true;
   }
 
-  auto [_, src_ref] = this->val_ref_single(src);
+  // In-memory bitcast.
+  this->allocate_spill_slot(tpde::AssignmentPartRef{res_ref.assignment(), 0});
+  for (u32 i = 0; i != dst_part_count; ++i) {
+    tpde::AssignmentPartRef ap{res_ref.assignment(), i};
+    ap.set_stack_valid();
+  }
 
-  ValueRef res_ref = this->result_ref(inst);
-  if (src_parts.reg_bank(0) == dst_parts.reg_bank(0)) {
-    res_ref.part(0).set_value(std::move(src_ref));
-  } else {
-    ValuePartRef res_vpr = res_ref.part(0);
-    AsmReg src_reg = src_ref.load_to_reg();
-    derived()->mov(res_vpr.alloc_reg(), src_reg, res_vpr.part_size());
-    res_vpr.set_modified();
+  i32 frame_off = tpde::AssignmentPartRef{res_ref.assignment(), 0}.frame_off();
+  for (u32 i = 0, n = src_part_count; i != n; ++i) {
+    ValuePartRef src_vpr = src_ref.part(i);
+    u32 part_size = src_vpr.part_size();
+    derived()->spill_reg(src_vpr.load_to_reg(), frame_off, part_size);
+    frame_off += part_size;
   }
 
   return true;

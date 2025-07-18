@@ -130,3 +130,317 @@ entry:
   %1 = bitcast <16 x i8> %0 to <4 x float>
   ret <4 x float> %1
 }
+
+define void @bitcast_v16i32_v16f32(ptr %src, ptr %dst) {
+; X64-LABEL: <bitcast_v16i32_v16f32>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    movups xmm0, xmmword ptr [rdi]
+; X64-NEXT:    movups xmm1, xmmword ptr [rdi + 0x10]
+; X64-NEXT:    movups xmm2, xmmword ptr [rdi + 0x20]
+; X64-NEXT:    movups xmm3, xmmword ptr [rdi + 0x30]
+; X64-NEXT:    movups xmmword ptr [rsi], xmm0
+; X64-NEXT:    movups xmmword ptr [rsi + 0x10], xmm1
+; X64-NEXT:    movups xmmword ptr [rsi + 0x20], xmm2
+; X64-NEXT:    movups xmmword ptr [rsi + 0x30], xmm3
+; X64-NEXT:    add rsp, 0x30
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <bitcast_v16i32_v16f32>:
+; ARM64:         sub sp, sp, #0xa0
+; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
+; ARM64-NEXT:    ldr q0, [x0]
+; ARM64-NEXT:    ldr q1, [x0, #0x10]
+; ARM64-NEXT:    ldr q2, [x0, #0x20]
+; ARM64-NEXT:    ldr q3, [x0, #0x30]
+; ARM64-NEXT:    str q0, [x1]
+; ARM64-NEXT:    str q1, [x1, #0x10]
+; ARM64-NEXT:    str q2, [x1, #0x20]
+; ARM64-NEXT:    str q3, [x1, #0x30]
+; ARM64-NEXT:    ldp x29, x30, [sp]
+; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ret
+  %a = load <16 x i32>, ptr %src
+  %r = bitcast <16 x i32> %a to <16 x float>
+  store <16 x float> %r, ptr %dst
+  ret void
+}
+
+define void @bitcast_v24i8_v6f32(ptr %src, ptr %dst) {
+; X64-LABEL: <bitcast_v24i8_v6f32>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    movsd xmm0, qword ptr [rdi]
+; X64-NEXT:    movsd xmm1, qword ptr [rdi + 0x8]
+; X64-NEXT:    movsd xmm2, qword ptr [rdi + 0x10]
+; X64-NEXT:    movsd qword ptr [rsi], xmm0
+; X64-NEXT:    movsd qword ptr [rsi + 0x8], xmm1
+; X64-NEXT:    movsd qword ptr [rsi + 0x10], xmm2
+; X64-NEXT:    add rsp, 0x30
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <bitcast_v24i8_v6f32>:
+; ARM64:         sub sp, sp, #0xa0
+; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
+; ARM64-NEXT:    ldr d0, [x0]
+; ARM64-NEXT:    ldr d1, [x0, #0x8]
+; ARM64-NEXT:    ldr d2, [x0, #0x10]
+; ARM64-NEXT:    str d0, [x1]
+; ARM64-NEXT:    str d1, [x1, #0x8]
+; ARM64-NEXT:    str d2, [x1, #0x10]
+; ARM64-NEXT:    ldp x29, x30, [sp]
+; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ret
+  %a = load <24 x i8>, ptr %src
+  %r = bitcast <24 x i8> %a to <6 x float>
+  store <6 x float> %r, ptr %dst
+  ret void
+}
+
+define void @bitcast_v6i8_v3i16(ptr %src, ptr %dst) {
+; X64-LABEL: <bitcast_v6i8_v3i16>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    push rbx
+; X64-NEXT:    nop dword ptr [rax + rax]
+; X64-NEXT:    sub rsp, 0x28
+; X64-NEXT:    movzx eax, byte ptr [rdi]
+; X64-NEXT:    movzx ecx, byte ptr [rdi + 0x1]
+; X64-NEXT:    movzx edx, byte ptr [rdi + 0x2]
+; X64-NEXT:    movzx ebx, byte ptr [rdi + 0x3]
+; X64-NEXT:    movzx r8d, byte ptr [rdi + 0x4]
+; X64-NEXT:    movzx r9d, byte ptr [rdi + 0x5]
+; X64-NEXT:    mov byte ptr [rbp - 0x30], al
+; X64-NEXT:    mov byte ptr [rbp - 0x2f], cl
+; X64-NEXT:    mov byte ptr [rbp - 0x2e], dl
+; X64-NEXT:    mov byte ptr [rbp - 0x2d], bl
+; X64-NEXT:    mov byte ptr [rbp - 0x2c], r8b
+; X64-NEXT:    mov byte ptr [rbp - 0x2b], r9b
+; X64-NEXT:    movzx eax, word ptr [rbp - 0x30]
+; X64-NEXT:    mov word ptr [rsi], ax
+; X64-NEXT:    movzx eax, word ptr [rbp - 0x2e]
+; X64-NEXT:    mov word ptr [rsi + 0x2], ax
+; X64-NEXT:    movzx eax, word ptr [rbp - 0x2c]
+; X64-NEXT:    mov word ptr [rsi + 0x4], ax
+; X64-NEXT:    add rsp, 0x28
+; X64-NEXT:    pop rbx
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <bitcast_v6i8_v3i16>:
+; ARM64:         sub sp, sp, #0xb0
+; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
+; ARM64-NEXT:    ldrb w2, [x0]
+; ARM64-NEXT:    ldrb w3, [x0, #0x1]
+; ARM64-NEXT:    ldrb w4, [x0, #0x2]
+; ARM64-NEXT:    ldrb w5, [x0, #0x3]
+; ARM64-NEXT:    ldrb w6, [x0, #0x4]
+; ARM64-NEXT:    ldrb w7, [x0, #0x5]
+; ARM64-NEXT:    strb w2, [x29, #0xa0]
+; ARM64-NEXT:    strb w3, [x29, #0xa1]
+; ARM64-NEXT:    strb w4, [x29, #0xa2]
+; ARM64-NEXT:    strb w5, [x29, #0xa3]
+; ARM64-NEXT:    strb w6, [x29, #0xa4]
+; ARM64-NEXT:    strb w7, [x29, #0xa5]
+; ARM64-NEXT:    ldrh w0, [x29, #0xa0]
+; ARM64-NEXT:    strh w0, [x1]
+; ARM64-NEXT:    ldrh w0, [x29, #0xa2]
+; ARM64-NEXT:    strh w0, [x1, #0x2]
+; ARM64-NEXT:    ldrh w0, [x29, #0xa4]
+; ARM64-NEXT:    strh w0, [x1, #0x4]
+; ARM64-NEXT:    ldp x29, x30, [sp]
+; ARM64-NEXT:    add sp, sp, #0xb0
+; ARM64-NEXT:    ret
+  %a = load <6 x i8>, ptr %src
+  %r = bitcast <6 x i8> %a to <3 x i16>
+  store <3 x i16> %r, ptr %dst
+  ret void
+}
+
+define void @bitcast_v16i1_v2i8(ptr %src, ptr %dst) {
+; X64-LABEL: <bitcast_v16i1_v2i8>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    movzx edi, word ptr [rdi]
+; X64-NEXT:    mov word ptr [rbp - 0x2a], di
+; X64-NEXT:    movzx eax, byte ptr [rbp - 0x2a]
+; X64-NEXT:    mov byte ptr [rsi], al
+; X64-NEXT:    movzx eax, byte ptr [rbp - 0x29]
+; X64-NEXT:    mov byte ptr [rsi + 0x1], al
+; X64-NEXT:    add rsp, 0x30
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <bitcast_v16i1_v2i8>:
+; ARM64:         sub sp, sp, #0xb0
+; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
+; ARM64-NEXT:    ldrh w0, [x0]
+; ARM64-NEXT:    strh w0, [x29, #0xa0]
+; ARM64-NEXT:    ldrb w0, [x29, #0xa0]
+; ARM64-NEXT:    strb w0, [x1]
+; ARM64-NEXT:    ldrb w0, [x29, #0xa1]
+; ARM64-NEXT:    strb w0, [x1, #0x1]
+; ARM64-NEXT:    ldp x29, x30, [sp]
+; ARM64-NEXT:    add sp, sp, #0xb0
+; ARM64-NEXT:    ret
+  %a = load <16 x i1>, ptr %src
+  %r = bitcast <16 x i1> %a to <2 x i8>
+  store <2 x i8> %r, ptr %dst
+  ret void
+}
+
+define void @bitcast_v8i1_i8(ptr %src, ptr %dst) {
+; X64-LABEL: <bitcast_v8i1_i8>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    movzx edi, byte ptr [rdi]
+; X64-NEXT:    mov byte ptr [rsi], dil
+; X64-NEXT:    add rsp, 0x30
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <bitcast_v8i1_i8>:
+; ARM64:         sub sp, sp, #0xa0
+; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
+; ARM64-NEXT:    ldrb w0, [x0]
+; ARM64-NEXT:    strb w0, [x1]
+; ARM64-NEXT:    ldp x29, x30, [sp]
+; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ret
+  %a = load <8 x i1>, ptr %src
+  %r = bitcast <8 x i1> %a to i8
+  store i8 %r, ptr %dst
+  ret void
+}
+
+define void @bitcast_v16i1_i16(ptr %src, ptr %dst) {
+; X64-LABEL: <bitcast_v16i1_i16>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    movzx edi, word ptr [rdi]
+; X64-NEXT:    mov word ptr [rsi], di
+; X64-NEXT:    add rsp, 0x30
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <bitcast_v16i1_i16>:
+; ARM64:         sub sp, sp, #0xa0
+; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
+; ARM64-NEXT:    ldrh w0, [x0]
+; ARM64-NEXT:    strh w0, [x1]
+; ARM64-NEXT:    ldp x29, x30, [sp]
+; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ret
+  %a = load <16 x i1>, ptr %src
+  %r = bitcast <16 x i1> %a to i16
+  store i16 %r, ptr %dst
+  ret void
+}
+
+define fp128 @bitcast_i128_f128(i128 %a) {
+; X64-LABEL: <bitcast_i128_f128>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    sub rsp, 0x40
+; X64-NEXT:    mov qword ptr [rbp - 0x40], rdi
+; X64-NEXT:    mov qword ptr [rbp - 0x38], rsi
+; X64-NEXT:    movapd xmm0, xmmword ptr [rbp - 0x40]
+; X64-NEXT:    add rsp, 0x40
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <bitcast_i128_f128>:
+; ARM64:         sub sp, sp, #0xb0
+; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
+; ARM64-NEXT:    str x0, [x29, #0xa0]
+; ARM64-NEXT:    str x1, [x29, #0xa8]
+; ARM64-NEXT:    ldr q0, [x29, #0xa0]
+; ARM64-NEXT:    ldp x29, x30, [sp]
+; ARM64-NEXT:    add sp, sp, #0xb0
+; ARM64-NEXT:    ret
+  %r = bitcast i128 %a to fp128
+  ret fp128 %r
+}
+
+define i128 @bitcast_f128_i128(fp128 %a) {
+; X64-LABEL: <bitcast_f128_i128>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    sub rsp, 0x40
+; X64-NEXT:    movapd xmmword ptr [rbp - 0x40], xmm0
+; X64-NEXT:    mov rax, qword ptr [rbp - 0x40]
+; X64-NEXT:    mov rdx, qword ptr [rbp - 0x38]
+; X64-NEXT:    add rsp, 0x40
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <bitcast_f128_i128>:
+; ARM64:         sub sp, sp, #0xb0
+; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
+; ARM64-NEXT:    str q0, [x29, #0xa0]
+; ARM64-NEXT:    ldr x0, [x29, #0xa0]
+; ARM64-NEXT:    ldr x1, [x29, #0xa8]
+; ARM64-NEXT:    ldp x29, x30, [sp]
+; ARM64-NEXT:    add sp, sp, #0xb0
+; ARM64-NEXT:    ret
+  %r = bitcast fp128 %a to i128
+  ret i128 %r
+}
+
+define i128 @bitcast_f128_v2i64(<2 x i64> %a) {
+; X64-LABEL: <bitcast_f128_v2i64>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    sub rsp, 0x40
+; X64-NEXT:    movapd xmmword ptr [rbp - 0x40], xmm0
+; X64-NEXT:    mov rax, qword ptr [rbp - 0x40]
+; X64-NEXT:    mov rdx, qword ptr [rbp - 0x38]
+; X64-NEXT:    add rsp, 0x40
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <bitcast_f128_v2i64>:
+; ARM64:         sub sp, sp, #0xb0
+; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
+; ARM64-NEXT:    str q0, [x29, #0xa0]
+; ARM64-NEXT:    ldr x0, [x29, #0xa0]
+; ARM64-NEXT:    ldr x1, [x29, #0xa8]
+; ARM64-NEXT:    ldp x29, x30, [sp]
+; ARM64-NEXT:    add sp, sp, #0xb0
+; ARM64-NEXT:    ret
+  %r = bitcast <2 x i64> %a to i128
+  ret i128 %r
+}
