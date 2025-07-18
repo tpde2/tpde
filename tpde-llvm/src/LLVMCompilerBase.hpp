@@ -2909,19 +2909,30 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_extract_element(
     return false;
   }
 
+  ValueRef vec_vr = this->val_ref(src);
+  auto [res_vr, result] = this->result_ref_single(inst);
+  ScratchReg scratch_res{this};
+
   if (inst->getType()->isIntegerTy(1)) {
-    return false;
+    // i1 vectors are integers, extracting an element is just a shift.
+    assert(this->adaptor->val_parts(src).count() == 1);
+    // index 0 extract occurs so often that is it worth to have a special case.
+    if (auto *ci = llvm::dyn_cast<llvm::ConstantInt>(index);
+        ci && ci->isZeroValue()) {
+      result.set_value(vec_vr.part(0));
+    } else {
+      derived()->encode_shri64(
+          vec_vr.part(0), this->val_ref(index).part(0), scratch_res);
+      this->set_value(result, scratch_res);
+    }
+    return true;
   }
 
   auto *vec_ty = llvm::cast<llvm::FixedVectorType>(src->getType());
   unsigned nelem = vec_ty->getNumElements();
   assert(index->getType()->getIntegerBitWidth() >= 8);
-
-  auto [res_vr, result] = this->result_ref_single(inst);
   LLVMBasicValType bvt = val_info.type;
 
-  ScratchReg scratch_res{this};
-  ValueRef vec_vr = this->val_ref(src);
   if (auto *ci = llvm::dyn_cast<llvm::ConstantInt>(index)) {
     unsigned cidx = ci->getZExtValue();
     cidx = cidx < nelem ? cidx : 0;
@@ -2980,12 +2991,19 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_insert_element(
   assert(index->getType()->getIntegerBitWidth() >= 8);
 
   auto ins = inst->getOperand(1);
-  if (ins->getType()->isIntegerTy(1)) {
-    return false;
-  }
   auto [val_ref, val] = this->val_ref_single(ins);
-
   ValueRef res_vr = this->result_ref(inst);
+
+  if (ins->getType()->isIntegerTy(1)) {
+    assert(res_vr.assignment()->part_count == 1);
+    ValueRef src_vr = this->val_ref(inst->getOperand(0));
+    ScratchReg res{this};
+    derived()->encode_insert_vi1(
+        src_vr.part(0), this->val_ref(index).part(0), std::move(val), res);
+    res_vr.part(0).set_value_reg(res.release());
+    return true;
+  }
+
   auto [bvt, _] = this->adaptor->lower_type(ins->getType());
   assert(bvt != LLVMBasicValType::complex);
 

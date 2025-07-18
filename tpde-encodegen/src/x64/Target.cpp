@@ -549,6 +549,10 @@ void EncodingTargetX64::get_inst_candidates(
   handle_ri("TEST16mr", "TEST16mi", 5, 0, "TEST16mr", "TEST16mi");
   handle_ri("TEST32mr", "TEST32mi", 5, 0, "TEST32mr", "TEST32mi");
   handle_ri("TEST64mr", "TEST64mi32", 5, 0, "TEST64mr", "TEST64mi");
+  handle_ri("BTR8rr", "BTR8ri", 2, -1, "BTR8rr", "BTR8ri");
+  handle_ri("BTR16rr", "BTR16ri", 2, -1, "BTR16rr", "BTR16ri");
+  handle_ri("BTR32rr", "BTR32ri", 2, -1, "BTR32rr", "BTR32ri");
+  handle_ri("BTR64rr", "BTR64ri32", 2, -1, "BTR64rr", "BTR64ri");
 
   handle_ri_shift("SHR8rCL", "SHR8ri", 3, -1, "SHR8rr", "SHR8ri");
   handle_ri_shift("SHR16rCL", "SHR16ri", 3, -1, "SHR16rr", "SHR16ri");

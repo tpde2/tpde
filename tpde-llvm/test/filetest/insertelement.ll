@@ -5,6 +5,414 @@
 ; RUN: tpde-llc --target=x86_64 %s | %objdump | FileCheck %s -check-prefixes=X64
 ; RUN: tpde-llc --target=aarch64 %s | %objdump | FileCheck %s -check-prefixes=ARM64
 
+define void @ins_v5i1_0(ptr %p, i1 %e) {
+; X64-LABEL: <ins_v5i1_0>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    movzx eax, byte ptr [rdi]
+; X64-NEXT:    mov ecx, 0x0
+; X64-NEXT:    btr rax, rcx
+; X64-NEXT:    mov esi, esi
+; X64-NEXT:    shl rsi, cl
+; X64-NEXT:    or rsi, rax
+; X64-NEXT:    mov byte ptr [rdi], sil
+; X64-NEXT:    add rsp, 0x30
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <ins_v5i1_0>:
+; ARM64:         sub sp, sp, #0xa0
+; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
+; ARM64-NEXT:    ldrb w2, [x0]
+; ARM64-NEXT:    mov w3, #0x1 // =1
+; ARM64-NEXT:    and x1, x1, #0x1
+; ARM64-NEXT:    lsr x3, x3, #0
+; ARM64-NEXT:    lsr x1, x1, #0
+; ARM64-NEXT:    bic x3, x2, x3
+; ARM64-NEXT:    orr x2, x3, x1
+; ARM64-NEXT:    strb w2, [x0]
+; ARM64-NEXT:    ldp x29, x30, [sp]
+; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ret
+  %v = load <5 x i1>, ptr %p
+  %r = insertelement <5 x i1> %v, i1 %e, i32 0
+  store <5 x i1> %r, ptr %p
+  ret void
+}
+
+define void @ins_v5i1_3(ptr %p, i1 %e) {
+; X64-LABEL: <ins_v5i1_3>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    movzx eax, byte ptr [rdi]
+; X64-NEXT:    mov ecx, 0x3
+; X64-NEXT:    btr rax, rcx
+; X64-NEXT:    mov esi, esi
+; X64-NEXT:    shl rsi, cl
+; X64-NEXT:    or rsi, rax
+; X64-NEXT:    mov byte ptr [rdi], sil
+; X64-NEXT:    add rsp, 0x30
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <ins_v5i1_3>:
+; ARM64:         sub sp, sp, #0xa0
+; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
+; ARM64-NEXT:    ldrb w2, [x0]
+; ARM64-NEXT:    mov w3, #0x1 // =1
+; ARM64-NEXT:    and x1, x1, #0x1
+; ARM64-NEXT:    lsl x3, x3, #3
+; ARM64-NEXT:    lsl x1, x1, #3
+; ARM64-NEXT:    bic x3, x2, x3
+; ARM64-NEXT:    orr x2, x3, x1
+; ARM64-NEXT:    strb w2, [x0]
+; ARM64-NEXT:    ldp x29, x30, [sp]
+; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ret
+  %v = load <5 x i1>, ptr %p
+  %r = insertelement <5 x i1> %v, i1 %e, i32 3
+  store <5 x i1> %r, ptr %p
+  ret void
+}
+
+define void @ins_v5i1_chain(ptr %p, i1 %e0, i1 %e1, i1 %e2, i1 %e3, i1 %e4) {
+; X64-LABEL: <ins_v5i1_chain>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    mov byte ptr [rbp - 0x29], cl
+; X64-NEXT:    mov ecx, 0x0
+; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    btr rax, rcx
+; X64-NEXT:    mov esi, esi
+; X64-NEXT:    shl rsi, cl
+; X64-NEXT:    or rsi, rax
+; X64-NEXT:    mov ecx, 0x1
+; X64-NEXT:    btr rsi, rcx
+; X64-NEXT:    mov edx, edx
+; X64-NEXT:    shl rdx, cl
+; X64-NEXT:    or rdx, rsi
+; X64-NEXT:    mov ecx, 0x2
+; X64-NEXT:    btr rdx, rcx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0x29]
+; X64-NEXT:    shl rax, cl
+; X64-NEXT:    or rax, rdx
+; X64-NEXT:    mov ecx, 0x3
+; X64-NEXT:    btr rax, rcx
+; X64-NEXT:    mov r8d, r8d
+; X64-NEXT:    shl r8, cl
+; X64-NEXT:    or r8, rax
+; X64-NEXT:    mov ecx, 0x4
+; X64-NEXT:    btr r8, rcx
+; X64-NEXT:    mov r9d, r9d
+; X64-NEXT:    shl r9, cl
+; X64-NEXT:    or r9, r8
+; X64-NEXT:    mov byte ptr [rdi], r9b
+; X64-NEXT:    add rsp, 0x30
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <ins_v5i1_chain>:
+; ARM64:         sub sp, sp, #0xa0
+; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
+; ARM64-NEXT:    mov w6, #0x1 // =1
+; ARM64-NEXT:    and x1, x1, #0x1
+; ARM64-NEXT:    lsr x6, x6, #0
+; ARM64-NEXT:    lsr x1, x1, #0
+; ARM64-NEXT:    mov w7, #0x0 // =0
+; ARM64-NEXT:    bic x6, x7, x6
+; ARM64-NEXT:    orr x7, x6, x1
+; ARM64-NEXT:    mov w1, #0x1 // =1
+; ARM64-NEXT:    and x2, x2, #0x1
+; ARM64-NEXT:    lsl x1, x1, #1
+; ARM64-NEXT:    lsl x2, x2, #1
+; ARM64-NEXT:    bic x1, x7, x1
+; ARM64-NEXT:    orr x6, x1, x2
+; ARM64-NEXT:    mov w1, #0x1 // =1
+; ARM64-NEXT:    and x3, x3, #0x1
+; ARM64-NEXT:    lsl x1, x1, #2
+; ARM64-NEXT:    lsl x3, x3, #2
+; ARM64-NEXT:    bic x1, x6, x1
+; ARM64-NEXT:    orr x2, x1, x3
+; ARM64-NEXT:    mov w1, #0x1 // =1
+; ARM64-NEXT:    and x4, x4, #0x1
+; ARM64-NEXT:    lsl x1, x1, #3
+; ARM64-NEXT:    lsl x4, x4, #3
+; ARM64-NEXT:    bic x1, x2, x1
+; ARM64-NEXT:    orr x2, x1, x4
+; ARM64-NEXT:    mov w1, #0x1 // =1
+; ARM64-NEXT:    and x5, x5, #0x1
+; ARM64-NEXT:    lsl x1, x1, #4
+; ARM64-NEXT:    lsl x5, x5, #4
+; ARM64-NEXT:    bic x1, x2, x1
+; ARM64-NEXT:    orr x2, x1, x5
+; ARM64-NEXT:    strb w2, [x0]
+; ARM64-NEXT:    ldp x29, x30, [sp]
+; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ret
+  %r0 = insertelement <5 x i1> poison, i1 %e0, i32 0
+  %r1 = insertelement <5 x i1> %r0, i1 %e1, i32 1
+  %r2 = insertelement <5 x i1> %r1, i1 %e2, i32 2
+  %r3 = insertelement <5 x i1> %r2, i1 %e3, i32 3
+  %r4 = insertelement <5 x i1> %r3, i1 %e4, i32 4
+  store <5 x i1> %r4, ptr %p
+  ret void
+}
+
+define void @ins_v5i1_dyn(ptr %p, i1 %e, i32 %i) {
+; X64-LABEL: <ins_v5i1_dyn>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    movzx eax, byte ptr [rdi]
+; X64-NEXT:    mov ecx, edx
+; X64-NEXT:    btr rax, rcx
+; X64-NEXT:    mov esi, esi
+; X64-NEXT:    shl rsi, cl
+; X64-NEXT:    or rsi, rax
+; X64-NEXT:    mov byte ptr [rdi], sil
+; X64-NEXT:    add rsp, 0x30
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <ins_v5i1_dyn>:
+; ARM64:         sub sp, sp, #0xa0
+; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
+; ARM64-NEXT:    ldrb w3, [x0]
+; ARM64-NEXT:    mov w4, #0x1 // =1
+; ARM64-NEXT:    and x1, x1, #0x1
+; ARM64-NEXT:    lsl x4, x4, x2
+; ARM64-NEXT:    lsl x1, x1, x2
+; ARM64-NEXT:    bic x4, x3, x4
+; ARM64-NEXT:    orr x2, x4, x1
+; ARM64-NEXT:    strb w2, [x0]
+; ARM64-NEXT:    ldp x29, x30, [sp]
+; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ret
+  %v = load <5 x i1>, ptr %p
+  %r = insertelement <5 x i1> %v, i1 %e, i32 %i
+  store <5 x i1> %r, ptr %p
+  ret void
+}
+
+define void @ins_v16i1_0(ptr %p, i1 %e) {
+; X64-LABEL: <ins_v16i1_0>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    movzx eax, word ptr [rdi]
+; X64-NEXT:    mov ecx, 0x0
+; X64-NEXT:    btr rax, rcx
+; X64-NEXT:    mov esi, esi
+; X64-NEXT:    shl rsi, cl
+; X64-NEXT:    or rsi, rax
+; X64-NEXT:    mov word ptr [rdi], si
+; X64-NEXT:    add rsp, 0x30
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <ins_v16i1_0>:
+; ARM64:         sub sp, sp, #0xa0
+; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
+; ARM64-NEXT:    ldrh w2, [x0]
+; ARM64-NEXT:    mov w3, #0x1 // =1
+; ARM64-NEXT:    and x1, x1, #0x1
+; ARM64-NEXT:    lsr x3, x3, #0
+; ARM64-NEXT:    lsr x1, x1, #0
+; ARM64-NEXT:    bic x3, x2, x3
+; ARM64-NEXT:    orr x2, x3, x1
+; ARM64-NEXT:    strh w2, [x0]
+; ARM64-NEXT:    ldp x29, x30, [sp]
+; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ret
+  %v = load <16 x i1>, ptr %p
+  %r = insertelement <16 x i1> %v, i1 %e, i32 0
+  store <16 x i1> %r, ptr %p
+  ret void
+}
+
+define void @ins_v16i1_3(ptr %p, i1 %e) {
+; X64-LABEL: <ins_v16i1_3>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    movzx eax, word ptr [rdi]
+; X64-NEXT:    mov ecx, 0x3
+; X64-NEXT:    btr rax, rcx
+; X64-NEXT:    mov esi, esi
+; X64-NEXT:    shl rsi, cl
+; X64-NEXT:    or rsi, rax
+; X64-NEXT:    mov word ptr [rdi], si
+; X64-NEXT:    add rsp, 0x30
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <ins_v16i1_3>:
+; ARM64:         sub sp, sp, #0xa0
+; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
+; ARM64-NEXT:    ldrh w2, [x0]
+; ARM64-NEXT:    mov w3, #0x1 // =1
+; ARM64-NEXT:    and x1, x1, #0x1
+; ARM64-NEXT:    lsl x3, x3, #3
+; ARM64-NEXT:    lsl x1, x1, #3
+; ARM64-NEXT:    bic x3, x2, x3
+; ARM64-NEXT:    orr x2, x3, x1
+; ARM64-NEXT:    strh w2, [x0]
+; ARM64-NEXT:    ldp x29, x30, [sp]
+; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ret
+  %v = load <16 x i1>, ptr %p
+  %r = insertelement <16 x i1> %v, i1 %e, i32 3
+  store <16 x i1> %r, ptr %p
+  ret void
+}
+
+define void @ins_v16i1_chain(ptr %p, i1 %e0, i1 %e1, i1 %e2, i1 %e3, i1 %e4) {
+; X64-LABEL: <ins_v16i1_chain>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    mov byte ptr [rbp - 0x29], cl
+; X64-NEXT:    mov ecx, 0x0
+; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    btr rax, rcx
+; X64-NEXT:    mov esi, esi
+; X64-NEXT:    shl rsi, cl
+; X64-NEXT:    or rsi, rax
+; X64-NEXT:    mov ecx, 0x1
+; X64-NEXT:    btr rsi, rcx
+; X64-NEXT:    mov edx, edx
+; X64-NEXT:    shl rdx, cl
+; X64-NEXT:    or rdx, rsi
+; X64-NEXT:    mov ecx, 0x2
+; X64-NEXT:    btr rdx, rcx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0x29]
+; X64-NEXT:    shl rax, cl
+; X64-NEXT:    or rax, rdx
+; X64-NEXT:    mov ecx, 0x3
+; X64-NEXT:    btr rax, rcx
+; X64-NEXT:    mov r8d, r8d
+; X64-NEXT:    shl r8, cl
+; X64-NEXT:    or r8, rax
+; X64-NEXT:    mov ecx, 0x4
+; X64-NEXT:    btr r8, rcx
+; X64-NEXT:    mov r9d, r9d
+; X64-NEXT:    shl r9, cl
+; X64-NEXT:    or r9, r8
+; X64-NEXT:    mov word ptr [rdi], r9w
+; X64-NEXT:    add rsp, 0x30
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <ins_v16i1_chain>:
+; ARM64:         sub sp, sp, #0xa0
+; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
+; ARM64-NEXT:    mov w6, #0x1 // =1
+; ARM64-NEXT:    and x1, x1, #0x1
+; ARM64-NEXT:    lsr x6, x6, #0
+; ARM64-NEXT:    lsr x1, x1, #0
+; ARM64-NEXT:    mov w7, #0x0 // =0
+; ARM64-NEXT:    bic x6, x7, x6
+; ARM64-NEXT:    orr x7, x6, x1
+; ARM64-NEXT:    mov w1, #0x1 // =1
+; ARM64-NEXT:    and x2, x2, #0x1
+; ARM64-NEXT:    lsl x1, x1, #1
+; ARM64-NEXT:    lsl x2, x2, #1
+; ARM64-NEXT:    bic x1, x7, x1
+; ARM64-NEXT:    orr x6, x1, x2
+; ARM64-NEXT:    mov w1, #0x1 // =1
+; ARM64-NEXT:    and x3, x3, #0x1
+; ARM64-NEXT:    lsl x1, x1, #2
+; ARM64-NEXT:    lsl x3, x3, #2
+; ARM64-NEXT:    bic x1, x6, x1
+; ARM64-NEXT:    orr x2, x1, x3
+; ARM64-NEXT:    mov w1, #0x1 // =1
+; ARM64-NEXT:    and x4, x4, #0x1
+; ARM64-NEXT:    lsl x1, x1, #3
+; ARM64-NEXT:    lsl x4, x4, #3
+; ARM64-NEXT:    bic x1, x2, x1
+; ARM64-NEXT:    orr x2, x1, x4
+; ARM64-NEXT:    mov w1, #0x1 // =1
+; ARM64-NEXT:    and x5, x5, #0x1
+; ARM64-NEXT:    lsl x1, x1, #4
+; ARM64-NEXT:    lsl x5, x5, #4
+; ARM64-NEXT:    bic x1, x2, x1
+; ARM64-NEXT:    orr x2, x1, x5
+; ARM64-NEXT:    strh w2, [x0]
+; ARM64-NEXT:    ldp x29, x30, [sp]
+; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ret
+  %r0 = insertelement <16 x i1> poison, i1 %e0, i32 0
+  %r1 = insertelement <16 x i1> %r0, i1 %e1, i32 1
+  %r2 = insertelement <16 x i1> %r1, i1 %e2, i32 2
+  %r3 = insertelement <16 x i1> %r2, i1 %e3, i32 3
+  %r4 = insertelement <16 x i1> %r3, i1 %e4, i32 4
+  store <16 x i1> %r4, ptr %p
+  ret void
+}
+
+define void @ins_v16i1_dyn(ptr %p, i1 %e, i32 %i) {
+; X64-LABEL: <ins_v16i1_dyn>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    movzx eax, word ptr [rdi]
+; X64-NEXT:    mov ecx, edx
+; X64-NEXT:    btr rax, rcx
+; X64-NEXT:    mov esi, esi
+; X64-NEXT:    shl rsi, cl
+; X64-NEXT:    or rsi, rax
+; X64-NEXT:    mov word ptr [rdi], si
+; X64-NEXT:    add rsp, 0x30
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <ins_v16i1_dyn>:
+; ARM64:         sub sp, sp, #0xa0
+; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
+; ARM64-NEXT:    ldrh w3, [x0]
+; ARM64-NEXT:    mov w4, #0x1 // =1
+; ARM64-NEXT:    and x1, x1, #0x1
+; ARM64-NEXT:    lsl x4, x4, x2
+; ARM64-NEXT:    lsl x1, x1, x2
+; ARM64-NEXT:    bic x4, x3, x4
+; ARM64-NEXT:    orr x2, x4, x1
+; ARM64-NEXT:    strh w2, [x0]
+; ARM64-NEXT:    ldp x29, x30, [sp]
+; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ret
+  %v = load <16 x i1>, ptr %p
+  %r = insertelement <16 x i1> %v, i1 %e, i32 %i
+  store <16 x i1> %r, ptr %p
+  ret void
+}
+
 define void @ins_v5i8_0(ptr %p, i8 %e) {
 ; X64-LABEL: <ins_v5i8_0>:
 ; X64:         push rbp
@@ -784,7 +1192,7 @@ define <2 x float> @ins_v2f32_const_nosalvage(<2 x float> %v) {
 ; ARM64-NEXT:    mov v0.16b, v8.16b
 ; ARM64-NEXT:    movi v1.8b, #0x0
 ; ARM64-NEXT:    mov v0.s[0], v1.s[0]
-; ARM64-NEXT:    b 0x6d4 <ins_v2f32_const_nosalvage+0x14>
+; ARM64-NEXT:    b 0xa94 <ins_v2f32_const_nosalvage+0x14>
   br label %loop
 
 loop:
