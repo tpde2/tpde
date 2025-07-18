@@ -1075,9 +1075,6 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::global_init_to_data(
     const llvm::DataLayout &layout,
     const llvm::Constant *constant,
     u32 off) noexcept {
-  const auto alloc_size = layout.getTypeAllocSize(constant->getType());
-  assert(off + alloc_size <= data.size());
-
   // Handle all-zero values quickly.
   if (constant->isNullValue() || llvm::isa<llvm::UndefValue>(constant)) {
     return true;
@@ -1085,58 +1082,43 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::global_init_to_data(
 
   if (auto *CI = llvm::dyn_cast<llvm::ConstantInt>(constant); CI) {
     // TODO: endianness?
-    llvm::StoreIntToMemory(CI->getValue(), data.data() + off, alloc_size);
+    unsigned store_size = (CI->getValue().getBitWidth() + 7) / 8;
+    llvm::StoreIntToMemory(CI->getValue(), data.data() + off, store_size);
     return true;
   }
   if (auto *CF = llvm::dyn_cast<llvm::ConstantFP>(constant); CF) {
     // TODO: endianness?
-    llvm::StoreIntToMemory(
-        CF->getValue().bitcastToAPInt(), data.data() + off, alloc_size);
+    llvm::APInt int_val = CF->getValue().bitcastToAPInt();
+    unsigned store_size = (int_val.getBitWidth() + 7) / 8;
+    llvm::StoreIntToMemory(int_val, data.data() + off, store_size);
     return true;
   }
   if (auto *CDS = llvm::dyn_cast<llvm::ConstantDataSequential>(constant); CDS) {
-    auto d = CDS->getRawDataValues();
-    assert(d.size() <= alloc_size);
-    std::copy(d.bytes_begin(), d.bytes_end(), data.begin() + off);
+    llvm::copy(CDS->getRawDataValues(), data.begin() + off);
     return true;
   }
   if (auto *CA = llvm::dyn_cast<llvm::ConstantArray>(constant); CA) {
-    const auto num_elements = CA->getType()->getNumElements();
-    const auto element_size =
-        layout.getTypeAllocSize(CA->getType()->getElementType());
+    auto elem_sz = layout.getTypeAllocSize(CA->getType()->getElementType());
     bool success = true;
-    for (auto i = 0u; i < num_elements; ++i) {
-      success &= global_init_to_data(reloc_base,
-                                     data,
-                                     relocs,
-                                     layout,
-                                     CA->getAggregateElement(i),
-                                     off + i * element_size);
+    for (const llvm::Use &v : CA->operands()) {
+      auto *cv = llvm::cast<llvm::Constant>(v);
+      success &= global_init_to_data(reloc_base, data, relocs, layout, cv, off);
+      off += elem_sz;
     }
     return success;
   }
-  if (auto *CA = llvm::dyn_cast<llvm::ConstantAggregate>(constant); CA) {
-    const auto num_elements = CA->getType()->getStructNumElements();
-    auto &ctx = constant->getContext();
-
-    auto *ty = CA->getType();
-    auto c0 = llvm::ConstantInt::get(ctx, llvm::APInt(32, 0, false));
-
+  if (auto *cs = llvm::dyn_cast<llvm::ConstantStruct>(constant); cs) {
+    const auto *struct_layout = layout.getStructLayout(cs->getType());
+    llvm::ArrayRef<llvm::TypeSize> offsets = struct_layout->getMemberOffsets();
     bool success = true;
-    for (auto i = 0u; i < num_elements; ++i) {
-      auto idx = llvm::ConstantInt::get(ctx, llvm::APInt(32, (u64)i, false));
-      auto agg_off = layout.getIndexedOffsetInType(ty, {c0, idx});
-      success &= global_init_to_data(reloc_base,
-                                     data,
-                                     relocs,
-                                     layout,
-                                     CA->getAggregateElement(i),
-                                     off + agg_off);
+    for (auto [moff, v] : llvm::zip_equal(offsets, cs->operands())) {
+      auto *cv = llvm::cast<llvm::Constant>(v);
+      success &=
+          global_init_to_data(reloc_base, data, relocs, layout, cv, off + moff);
     }
     return success;
   }
   if (auto *GV = llvm::dyn_cast<llvm::GlobalValue>(constant); GV) {
-    assert(alloc_size == 8);
     relocs.push_back({off, 0, global_sym(GV)});
     return true;
   }
@@ -1148,9 +1130,13 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::global_init_to_data(
     switch (expr->getOpcode()) {
     case llvm::Instruction::IntToPtr:
       if (auto *CI = llvm::dyn_cast<llvm::ConstantInt>(expr->getOperand(0))) {
-        auto alloc_size = layout.getTypeAllocSize(expr->getType());
+        unsigned store_size = layout.getTypeStoreSize(expr->getType());
+        unsigned int_size = (CI->getValue().getBitWidth() + 7) / 8;
+        unsigned copy_size = std::min(store_size, int_size);
         // TODO: endianness?
-        llvm::StoreIntToMemory(CI->getValue(), data.data() + off, alloc_size);
+        llvm::StoreIntToMemory(CI->getValue(), data.data() + off, copy_size);
+        // If store_size > int_size, zero-fill. data is pre-initialized with
+        // zeroes, so do nothing.
         return true;
       }
       break;
