@@ -199,8 +199,7 @@ struct LLVMAdaptor {
   };
 
   /// Value info. Values are numbered in the following order:
-  /// - 0..<global_idx_end: GlobalValue
-  /// - global_idx_end..<arg_idx_end: Arguments
+  /// - 0..<arg_idx_end: Arguments
   /// - arg_idx_end..: Instructions
   tpde::util::SmallVector<ValInfo, 128> values;
   /// Map from global value to value index. Globals are the lowest values.
@@ -228,8 +227,6 @@ struct LLVMAdaptor {
   bool func_unsupported = false;
   bool globals_init = false;
   bool func_has_dynamic_alloca = false;
-  // Index boundaries into values.
-  u32 global_idx_end = 0;
 
   tpde::util::SmallVector<BlockInfo, 128> blocks;
   tpde::util::SmallVector<u32, 256> block_succ_indices;
@@ -279,7 +276,7 @@ struct LLVMAdaptor {
   }
 
   [[nodiscard]] u32 cur_highest_val_idx() const noexcept {
-    return values.size();
+    return values.size() + global_list.size();
   }
 
   [[nodiscard]] auto cur_args() const noexcept {
@@ -594,7 +591,7 @@ public:
   }
 
   u32 arg_lookup_idx(const llvm::Argument *arg) const noexcept {
-    return global_idx_end + arg->getArgNo();
+    return arg->getArgNo();
   }
 
   [[nodiscard]] u32

@@ -620,10 +620,11 @@ typename LLVMCompilerBase<Adaptor, Derived, Config>::ValuePart
 
   if (auto *gv = llvm::dyn_cast<llvm::GlobalValue>(const_val)) {
     assert(ty == LLVMBasicValType::ptr && sub_part == 0);
-    auto local_idx = tpde::ValLocalIdx(this->adaptor->global_lookup.lookup(gv));
+    u32 gv_id = this->adaptor->global_lookup.lookup(gv);
+    auto local_idx = tpde::ValLocalIdx(this->adaptor->values.size() + gv_id);
     auto *assignment = this->val_assignment(local_idx);
     if (!assignment) {
-      this->init_variable_ref(local_idx, static_cast<u32>(local_idx));
+      this->init_variable_ref(local_idx, gv_id);
       assignment = this->val_assignment(local_idx);
     }
     return ValuePart{local_idx, assignment, 0, /*owned=*/false};

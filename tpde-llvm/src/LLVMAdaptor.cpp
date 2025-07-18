@@ -260,12 +260,8 @@ bool LLVMAdaptor::switch_func(const IRFuncRef function) noexcept {
     global_list.reserve(512);
     auto add_global = [&](llvm::GlobalValue *gv) {
       assert(global_lookup.find(gv) == global_lookup.end());
-      assert(global_list.size() == values.size());
+      global_lookup.insert_or_assign(gv, global_list.size());
       global_list.push_back(gv);
-      global_lookup.insert_or_assign(gv, values.size());
-      values.push_back(ValInfo{.type = LLVMBasicValType::ptr,
-                               .fused = false,
-                               .complex_part_tys_idx = ~0u});
 
       if (gv->isThreadLocal()) [[unlikely]] {
         // Rewrite all accesses to thread-local variables to go through the
@@ -318,10 +314,9 @@ bool LLVMAdaptor::switch_func(const IRFuncRef function) noexcept {
     for (llvm::Function &fn : mod->functions()) {
       add_global(&fn);
     }
-    global_idx_end = values.size();
-  } else {
-    values.resize(global_idx_end);
   }
+
+  values.clear();
 
   const size_t arg_count = function->arg_size();
   for (size_t i = 0; i < arg_count; ++i) {
@@ -460,7 +455,6 @@ void LLVMAdaptor::reset() noexcept {
   initial_stack_slot_indices.clear();
   cur_func = nullptr;
   globals_init = false;
-  global_idx_end = 0;
   blocks.clear();
   block_succ_indices.clear();
   block_succ_ranges.clear();
