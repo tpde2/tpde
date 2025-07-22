@@ -134,9 +134,9 @@ struct LLVMCompilerX64 : tpde::x64::CompilerX64<LLVMAdaptor,
                                   GenericValuePart &&lhs_hi,
                                   GenericValuePart &&rhs_lo,
                                   GenericValuePart &&rhs_hi,
-                                  ScratchReg &res_lo,
-                                  ScratchReg &res_hi,
-                                  ScratchReg &res_of) noexcept;
+                                  ValuePart &&res_lo,
+                                  ValuePart &&res_hi,
+                                  ValuePart &&res_of) noexcept;
 };
 
 void LLVMCompilerX64::finish_func(u32 func_idx) noexcept {
@@ -666,16 +666,16 @@ bool LLVMCompilerX64::handle_overflow_intrin_128(OverflowOp op,
                                                  GenericValuePart &&lhs_hi,
                                                  GenericValuePart &&rhs_lo,
                                                  GenericValuePart &&rhs_hi,
-                                                 ScratchReg &res_lo,
-                                                 ScratchReg &res_hi,
-                                                 ScratchReg &res_of) noexcept {
+                                                 ValuePart &&res_lo,
+                                                 ValuePart &&res_hi,
+                                                 ValuePart &&res_of) noexcept {
   using EncodeFnTy = bool (LLVMCompilerX64::*)(GenericValuePart &&,
                                                GenericValuePart &&,
                                                GenericValuePart &&,
                                                GenericValuePart &&,
-                                               ScratchReg &,
-                                               ScratchReg &,
-                                               ScratchReg &);
+                                               ValuePart &,
+                                               ValuePart &,
+                                               ValuePart &);
   EncodeFnTy encode_fn = nullptr;
   switch (op) {
   case OverflowOp::uadd:

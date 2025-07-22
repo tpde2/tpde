@@ -277,6 +277,20 @@ public:
     return res;
   }
 
+  /// Move into a scratch register, reuse an existing register if possible.
+  ScratchReg into_scratch(CompilerBase *compiler) && noexcept {
+    // TODO: implement this. This needs size information to copy the value.
+    assert((has_assignment() || state.c.owned) &&
+           "into_scratch from unowned ValuePart not implemented");
+    ScratchReg res{compiler};
+    if (can_salvage()) {
+      res.alloc_specific(salvage(compiler));
+    } else {
+      reload_into_specific_fixed(compiler, res.alloc(bank()));
+    }
+    return res;
+  }
+
   /// Extend integer value, reuse existing register if possible. Constants are
   /// extended without allocating a register.
   ValuePart into_extended(CompilerBase *compiler,

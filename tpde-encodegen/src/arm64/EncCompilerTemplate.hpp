@@ -51,6 +51,7 @@ struct EncodeCompiler {
     using ScratchReg   = typename CompilerA64::ScratchReg;
     using AsmReg       = typename CompilerA64::AsmReg;
     using ValuePartRef = typename CompilerA64::ValuePartRef;
+    using ValuePart = typename CompilerA64::ValuePart;
     using GenericValuePart = typename CompilerA64::GenericValuePart;
     using Assembler    = typename CompilerA64::Assembler;
 

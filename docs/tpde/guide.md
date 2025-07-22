@@ -968,12 +968,9 @@ bool compile_add(IRInstRef inst) {
     ValueRef rhs_ref = this->val_ref(lhs_idx);
     ValueRef res_ref = this->result_ref(inst);
 
-    ScratchReg res_scratch{this};
-    if (!derived()->encode_addi64(lhs_ref.part(0), rhs_ref.part(0), res_scratch)) {
+    if (!derived()->encode_addi64(lhs_ref.part(0), rhs_ref.part(0), res_ref.part(0))) {
         return false;
     }
-
-    this->set_value(res_ref.part(0), res_scratch);
     return true;
 }
 
@@ -987,12 +984,9 @@ bool compile_sub(IRInstRef inst) {
     ValueRef rhs_ref = this->val_ref(lhs_idx);
     ValueRef res_ref = this->result_ref(inst);
 
-    ScratchReg res_scratch{this};
-    if (!derived()->encode_subi64(lhs_ref.part(0), rhs_ref.part(0), res_scratch)) {
+    if (!derived()->encode_subi64(lhs_ref.part(0), rhs_ref.part(0), res_ref.part(0))) {
         return false;
     }
-
-    this->set_value(res_ref.part(0), res_scratch);
     return true;
 }
 ```

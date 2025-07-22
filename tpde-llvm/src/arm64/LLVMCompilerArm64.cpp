@@ -141,9 +141,9 @@ struct LLVMCompilerArm64 : tpde::a64::CompilerA64<LLVMAdaptor,
                                   GenericValuePart &&lhs_hi,
                                   GenericValuePart &&rhs_lo,
                                   GenericValuePart &&rhs_hi,
-                                  ScratchReg &res_lo,
-                                  ScratchReg &res_hi,
-                                  ScratchReg &res_of) noexcept;
+                                  ValuePart &&res_lo,
+                                  ValuePart &&res_hi,
+                                  ValuePart &&res_of) noexcept;
 };
 
 void LLVMCompilerArm64::finish_func(u32 func_idx) noexcept {
@@ -789,60 +789,60 @@ bool LLVMCompilerArm64::handle_overflow_intrin_128(
     GenericValuePart &&lhs_hi,
     GenericValuePart &&rhs_lo,
     GenericValuePart &&rhs_hi,
-    ScratchReg &res_lo,
-    ScratchReg &res_hi,
-    ScratchReg &res_of) noexcept {
+    ValuePart &&res_lo,
+    ValuePart &&res_hi,
+    ValuePart &&res_of) noexcept {
   switch (op) {
   case OverflowOp::uadd: {
-    AsmReg lhs_lo_reg = gval_as_reg_reuse(lhs_lo, res_lo);
-    AsmReg rhs_lo_reg = gval_as_reg_reuse(rhs_lo, res_lo);
-    AsmReg res_lo_reg = res_lo.alloc_gp();
+    AsmReg lhs_lo_reg = gval_as_reg(lhs_lo); // TODO: reuse reg
+    AsmReg rhs_lo_reg = gval_as_reg(rhs_lo); // TODO: reuse reg
+    AsmReg res_lo_reg = res_lo.alloc_reg(this);
     ASM(ADDSx, res_lo_reg, lhs_lo_reg, rhs_lo_reg);
-    AsmReg lhs_hi_reg = gval_as_reg_reuse(lhs_hi, res_hi);
-    AsmReg rhs_hi_reg = gval_as_reg_reuse(rhs_hi, res_hi);
-    AsmReg res_hi_reg = res_hi.alloc_gp();
+    AsmReg lhs_hi_reg = gval_as_reg(lhs_hi); // TODO: reuse reg
+    AsmReg rhs_hi_reg = gval_as_reg(rhs_hi); // TODO: reuse reg
+    AsmReg res_hi_reg = res_hi.alloc_reg(this);
     ASM(ADCSx, res_hi_reg, lhs_hi_reg, rhs_hi_reg);
-    AsmReg res_of_reg = res_of.alloc_gp();
+    AsmReg res_of_reg = res_of.alloc_reg(this);
     ASM(CSETw, res_of_reg, DA_CS);
     return true;
   }
   case OverflowOp::sadd: {
-    AsmReg lhs_lo_reg = gval_as_reg_reuse(lhs_lo, res_lo);
-    AsmReg rhs_lo_reg = gval_as_reg_reuse(rhs_lo, res_lo);
-    AsmReg res_lo_reg = res_lo.alloc_gp();
+    AsmReg lhs_lo_reg = gval_as_reg(lhs_lo); // TODO: reuse reg
+    AsmReg rhs_lo_reg = gval_as_reg(rhs_lo); // TODO: reuse reg
+    AsmReg res_lo_reg = res_lo.alloc_reg(this);
     ASM(ADDSx, res_lo_reg, lhs_lo_reg, rhs_lo_reg);
-    AsmReg lhs_hi_reg = gval_as_reg_reuse(lhs_hi, res_hi);
-    AsmReg rhs_hi_reg = gval_as_reg_reuse(rhs_hi, res_hi);
-    AsmReg res_hi_reg = res_hi.alloc_gp();
+    AsmReg lhs_hi_reg = gval_as_reg(lhs_hi); // TODO: reuse reg
+    AsmReg rhs_hi_reg = gval_as_reg(rhs_hi); // TODO: reuse reg
+    AsmReg res_hi_reg = res_hi.alloc_reg(this);
     ASM(ADCSx, res_hi_reg, lhs_hi_reg, rhs_hi_reg);
-    AsmReg res_of_reg = res_of.alloc_gp();
+    AsmReg res_of_reg = res_of.alloc_reg(this);
     ASM(CSETw, res_of_reg, DA_VS);
     return true;
   }
 
   case OverflowOp::usub: {
-    AsmReg lhs_lo_reg = gval_as_reg_reuse(lhs_lo, res_lo);
-    AsmReg rhs_lo_reg = gval_as_reg_reuse(rhs_lo, res_lo);
-    AsmReg res_lo_reg = res_lo.alloc_gp();
+    AsmReg lhs_lo_reg = gval_as_reg(lhs_lo); // TODO: reuse reg
+    AsmReg rhs_lo_reg = gval_as_reg(rhs_lo); // TODO: reuse reg
+    AsmReg res_lo_reg = res_lo.alloc_reg(this);
     ASM(SUBSx, res_lo_reg, lhs_lo_reg, rhs_lo_reg);
-    AsmReg lhs_hi_reg = gval_as_reg_reuse(lhs_hi, res_hi);
-    AsmReg rhs_hi_reg = gval_as_reg_reuse(rhs_hi, res_hi);
-    AsmReg res_hi_reg = res_hi.alloc_gp();
+    AsmReg lhs_hi_reg = gval_as_reg(lhs_hi); // TODO: reuse reg
+    AsmReg rhs_hi_reg = gval_as_reg(rhs_hi); // TODO: reuse reg
+    AsmReg res_hi_reg = res_hi.alloc_reg(this);
     ASM(SBCSx, res_hi_reg, lhs_hi_reg, rhs_hi_reg);
-    AsmReg res_of_reg = res_of.alloc_gp();
+    AsmReg res_of_reg = res_of.alloc_reg(this);
     ASM(CSETw, res_of_reg, DA_CC);
     return true;
   }
   case OverflowOp::ssub: {
-    AsmReg lhs_lo_reg = gval_as_reg_reuse(lhs_lo, res_lo);
-    AsmReg rhs_lo_reg = gval_as_reg_reuse(rhs_lo, res_lo);
-    AsmReg res_lo_reg = res_lo.alloc_gp();
+    AsmReg lhs_lo_reg = gval_as_reg(lhs_lo); // TODO: reuse reg
+    AsmReg rhs_lo_reg = gval_as_reg(rhs_lo); // TODO: reuse reg
+    AsmReg res_lo_reg = res_lo.alloc_reg(this);
     ASM(SUBSx, res_lo_reg, lhs_lo_reg, rhs_lo_reg);
-    AsmReg lhs_hi_reg = gval_as_reg_reuse(lhs_hi, res_hi);
-    AsmReg rhs_hi_reg = gval_as_reg_reuse(rhs_hi, res_hi);
-    AsmReg res_hi_reg = res_hi.alloc_gp();
+    AsmReg lhs_hi_reg = gval_as_reg(lhs_hi); // TODO: reuse reg
+    AsmReg rhs_hi_reg = gval_as_reg(rhs_hi); // TODO: reuse reg
+    AsmReg res_hi_reg = res_hi.alloc_reg(this);
     ASM(SBCSx, res_hi_reg, lhs_hi_reg, rhs_hi_reg);
-    AsmReg res_of_reg = res_of.alloc_gp();
+    AsmReg res_of_reg = res_of.alloc_reg(this);
     ASM(CSETw, res_of_reg, DA_VS);
     return true;
   }

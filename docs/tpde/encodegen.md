@@ -117,11 +117,8 @@ void compile_add(IRInstRef inst) {
     IRValueRef res_val = /* ... */;
 
     ValueRef lhs_ref = this->val_ref(lhs_val), rhs_ref = this->val_ref(rhs_val);
-    ScratchReg res_scratch{this};
-    this->encode_addi32(lhs_ref.part(0), rhs_ref.part(1), res_scratch);
-
-    // set result
-    this->set_value(this->result_ref(res_val).part(0), res_scratch);
+    ValueRef res_ref = this->result_ref(res_val);
+    this->encode_addi32(lhs_ref.part(0), rhs_ref.part(0), res_ref.part(0));
 }
 ```
 
@@ -163,11 +160,8 @@ void compile_load(IRInstRef inst) {
     addr.disp = load_off;
 
     // call the snippet encoder with the calculated expression
-    ScratchReg res_scratch{this};
-    this->encode_loadi8_zext(std::move(addr), res_scratch);
-
-    // set the result
-    this->set_value(this->result_ref(res_val).part(0), res_scratch);
+    ValueRef res_ref = this->result_ref(res_val);
+    this->encode_loadi8_zext(std::move(addr), res_ref.part(0));
 }
 ```
 

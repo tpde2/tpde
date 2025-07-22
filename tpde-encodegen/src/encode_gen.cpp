@@ -1185,67 +1185,59 @@ bool create_encode_function(llvm::MachineFunction *func,
       state.asm_operand_refs.erase(it);
     }
 
-    os << "  result_" << idx << " = std::move(scratch_" << name << ");\n";
+    os << "  result_" << idx << ".set_value(derived(), std::move(scratch_"
+       << name << "));\n";
   }
 
   // TODO
   // for now, always return true
   os << "  return true;\n";
 
-  std::string func_decl{};
   // finish up function header
   {
-    std::format_to(
-        std::back_inserter(impl_lines),
-        "template <typename Adaptor,\n"
-        "          typename Derived,\n"
-        "          template <typename, typename, typename>\n"
-        "          class BaseTy,\n"
-        "          typename Config>"
-        "bool EncodeCompiler<Adaptor, Derived, BaseTy, Config>::encode_{}(",
-        name);
-    std::format_to(std::back_inserter(decl_lines), "    bool encode_{}(", name);
-  }
-
-  auto first = true;
-  for (auto &param : state.param_names) {
-    if (!first) {
-      std::format_to(std::back_inserter(func_decl), ", ");
-    } else {
-      first = false;
+    std::string func_args;
+    llvm::raw_string_ostream func_args_os(func_args);
+    for (auto &param : state.param_names) {
+      func_args_os << (func_args.empty() ? "" : ", ") << "GenericValuePart &&"
+                   << param;
     }
-    std::format_to(
-        std::back_inserter(func_decl), "GenericValuePart &&{}", param);
-  }
-
-  if (state.num_ret_regs == -1) {
-    // TODO(ts): might mean no return
-    std::cerr
-        << "ERROR: number of return registers not set at end of function\n";
-    return false;
-  }
-
-  for (int i = 0; i < state.num_ret_regs; ++i) {
-    if (!first) {
-      std::format_to(std::back_inserter(func_decl), ", ");
-    } else {
-      first = false;
+    // We generate two variants: one with lvalue ref results and one with rvalue
+    // ref results. This permits callers to use call the function with rvalues.
+    std::string func_args_rvalue = func_args;
+    llvm::raw_string_ostream func_args_rvalue_os(func_args_rvalue);
+    for (int i = 0; i < state.num_ret_regs; ++i) {
+      func_args_os << (func_args.empty() ? "" : ", ") << "ValuePart &result_"
+                   << i;
+      func_args_rvalue_os << (func_args.empty() ? "" : ", ")
+                          << "ValuePart &&result_" << i;
     }
-    std::format_to(std::back_inserter(func_decl), "ScratchReg &result_{}", i);
+
+    llvm::raw_string_ostream(impl_lines)
+        << "template <typename Adaptor,\n"
+           "          typename Derived,\n"
+           "          template <typename, typename, typename>\n"
+           "          class BaseTy,\n"
+           "          typename Config>\n"
+           "bool EncodeCompiler<Adaptor, Derived, BaseTy, Config>::encode_"
+        << name << "(" << func_args << ") {\n"
+        << write_buf << write_buf_inner << "\n}\n\n";
+    llvm::raw_string_ostream decl_os(decl_lines);
+    decl_os << "  bool encode_" << name << "(" << func_args << ");\n";
+    if (state.num_ret_regs > 0) {
+      decl_os << "  bool encode_" << name << "(" << func_args_rvalue << ") { ";
+      decl_os << " return encode_" << name << "(";
+      bool first = true;
+      for (auto &param : state.param_names) {
+        decl_os << (first ? "" : ", ") << "std::move(" << param << ")";
+        first = false;
+      }
+      for (int i = 0; i < state.num_ret_regs; ++i) {
+        decl_os << (first ? "" : ", ") << "result_" << i;
+        first = false;
+      }
+      decl_os << "); }\n";
+    }
   }
-
-  func_decl += ')';
-
-  decl_lines += func_decl;
-  decl_lines += ";\n";
-
-  impl_lines += func_decl;
-  impl_lines += " {\n";
-
-  impl_lines += write_buf;
-  impl_lines += write_buf_inner;
-
-  impl_lines += "\n}\n\n";
 
   return true;
 }

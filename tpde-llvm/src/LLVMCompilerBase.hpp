@@ -1491,7 +1491,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_load_generic(
     }
 
     const auto order = load->getOrdering();
-    using EncodeFnTy = bool (Derived::*)(GenericValuePart &&, ScratchReg &);
+    using EncodeFnTy = bool (Derived::*)(GenericValuePart &&, ValuePart &&);
     EncodeFnTy encode_fn = nullptr;
     if (order == llvm::AtomicOrdering::Monotonic) {
       switch (width) {
@@ -1520,18 +1520,11 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_load_generic(
       }
     }
 
-    ScratchReg res_scratch{derived()};
-    if (!(derived()->*encode_fn)(std::move(ptr_op), res_scratch)) {
-      return false;
-    }
-
-    ValuePartRef res_part = res.part(0);
-    this->set_value(res_part, res_scratch);
+    (derived()->*encode_fn)(std::move(ptr_op), res.part(0));
     return true;
   }
 
   unsigned num_bits;
-  ScratchReg res_scratch{this};
   switch (this->adaptor->val_info(load).type) {
     using enum LLVMBasicValType;
   case i1:
@@ -1544,14 +1537,14 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_load_generic(
   load_single_integer:
     switch (tpde::util::align_up(num_bits, 8)) {
     case 1:
-    case 8: derived()->encode_loadi8(std::move(ptr_op), res_scratch); break;
-    case 16: derived()->encode_loadi16(std::move(ptr_op), res_scratch); break;
-    case 24: derived()->encode_loadi24(std::move(ptr_op), res_scratch); break;
-    case 32: derived()->encode_loadi32(std::move(ptr_op), res_scratch); break;
-    case 40: derived()->encode_loadi40(std::move(ptr_op), res_scratch); break;
-    case 48: derived()->encode_loadi48(std::move(ptr_op), res_scratch); break;
-    case 56: derived()->encode_loadi56(std::move(ptr_op), res_scratch); break;
-    case 64: derived()->encode_loadi64(std::move(ptr_op), res_scratch); break;
+    case 8: derived()->encode_loadi8(std::move(ptr_op), res.part(0)); break;
+    case 16: derived()->encode_loadi16(std::move(ptr_op), res.part(0)); break;
+    case 24: derived()->encode_loadi24(std::move(ptr_op), res.part(0)); break;
+    case 32: derived()->encode_loadi32(std::move(ptr_op), res.part(0)); break;
+    case 40: derived()->encode_loadi40(std::move(ptr_op), res.part(0)); break;
+    case 48: derived()->encode_loadi48(std::move(ptr_op), res.part(0)); break;
+    case 56: derived()->encode_loadi56(std::move(ptr_op), res.part(0)); break;
+    case 64: derived()->encode_loadi64(std::move(ptr_op), res.part(0)); break;
     default: assert(0); return false;
     }
     break;
@@ -1565,40 +1558,23 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_load_generic(
         llvm::cast<llvm::FixedVectorType>(load->getType())->getNumElements();
     goto load_single_integer;
 
-  case ptr: {
-    derived()->encode_loadi64(std::move(ptr_op), res_scratch);
-    break;
-  }
-  case i128: {
-    ScratchReg res_scratch_high{derived()};
-    auto res_low = res.part(0);
-    auto res_high = res.part(1);
-
-    derived()->encode_loadi128(
-        std::move(ptr_op), res_scratch, res_scratch_high);
-    this->set_value(res_low, res_scratch);
-    this->set_value(res_high, res_scratch_high);
+  case ptr: derived()->encode_loadi64(std::move(ptr_op), res.part(0)); break;
+  case i128:
+    derived()->encode_loadi128(std::move(ptr_op), res.part(0), res.part(1));
     return true;
-  }
-  case f32: {
-    derived()->encode_loadf32(std::move(ptr_op), res_scratch);
-    break;
-  }
+  case f32: derived()->encode_loadf32(std::move(ptr_op), res.part(0)); break;
   case v8i8:
   case v4i16:
   case v2i32:
   case v2f32:
-  case f64: {
-    derived()->encode_loadf64(std::move(ptr_op), res_scratch);
-    break;
-  }
+  case f64: derived()->encode_loadf64(std::move(ptr_op), res.part(0)); break;
   case v16i8:
   case v8i16:
   case v4i32:
   case v2i64:
   case v4f32:
   case v2f64:
-  case f128: derived()->encode_loadv128(std::move(ptr_op), res_scratch); break;
+  case f128: derived()->encode_loadv128(std::move(ptr_op), res.part(0)); break;
   case complex: {
     auto ty_idx = this->adaptor->val_info(load).complex_part_tys_idx;
     const LLVMComplexPart *part_descs =
@@ -1610,7 +1586,6 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_load_generic(
 
     unsigned off = 0;
     for (unsigned i = 0; i < part_count; i++) {
-      auto part_ref = res.part(i);
       auto part_addr =
           typename GenericValuePart::Expr{ptr_reg, static_cast<tpde::i32>(off)};
       auto part_ty = part_descs[i].part.type;
@@ -1618,33 +1593,33 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_load_generic(
       case i1:
       case i8:
       case v8i1:
-        derived()->encode_loadi8(std::move(part_addr), res_scratch);
+        derived()->encode_loadi8(std::move(part_addr), res.part(i));
         break;
       case i16:
       case v16i1:
-        derived()->encode_loadi16(std::move(part_addr), res_scratch);
+        derived()->encode_loadi16(std::move(part_addr), res.part(i));
         break;
       case i32:
       case v32i1:
-        derived()->encode_loadi32(std::move(part_addr), res_scratch);
+        derived()->encode_loadi32(std::move(part_addr), res.part(i));
         break;
       case i64:
       case v64i1:
       case ptr:
-        derived()->encode_loadi64(std::move(part_addr), res_scratch);
+        derived()->encode_loadi64(std::move(part_addr), res.part(i));
         break;
       case i128:
-        derived()->encode_loadi64(std::move(part_addr), res_scratch);
+        derived()->encode_loadi64(std::move(part_addr), res.part(i));
         break;
       case f32:
-        derived()->encode_loadf32(std::move(part_addr), res_scratch);
+        derived()->encode_loadf32(std::move(part_addr), res.part(i));
         break;
       case v8i8:
       case v4i16:
       case v2i32:
       case v2f32:
       case f64:
-        derived()->encode_loadf64(std::move(part_addr), res_scratch);
+        derived()->encode_loadf64(std::move(part_addr), res.part(i));
         break;
       case v16i8:
       case v8i16:
@@ -1653,22 +1628,17 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_load_generic(
       case v4f32:
       case v2f64:
       case f128:
-        derived()->encode_loadv128(std::move(part_addr), res_scratch);
+        derived()->encode_loadv128(std::move(part_addr), res.part(i));
         break;
       default: assert(0); return false;
       }
 
       off += part_descs[i].part.size + part_descs[i].part.pad_after;
-
-      this->set_value(part_ref, res_scratch);
     }
     return true;
   }
   default: return false;
   }
-
-  ValuePartRef res_ref = res.part(0);
-  this->set_value(res_ref, res_scratch);
 
   return true;
 }
@@ -1946,8 +1916,6 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_int_binary_op_i128(
     std::swap(lhs, rhs);
   }
 
-  ScratchReg scratch_low{derived()}, scratch_high{derived()};
-
   if (op.is_shift()) {
     ValuePartRef shift_amt = rhs.part(0);
     if (shift_amt.is_const()) {
@@ -1960,16 +1928,16 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_int_binary_op_i128(
               lhs.part(1),
               ValuePartRef(this, imm1, 1, Config::GP_BANK),
               ValuePartRef(this, imm2, 1, Config::GP_BANK),
-              scratch_low,
-              scratch_high);
+              res.part(0),
+              res.part(1));
         } else if (op == IntBinaryOp::shr) {
           derived()->encode_shri128_lt64(
               lhs.part(0),
               lhs.part(1),
               ValuePartRef(this, imm1, 1, Config::GP_BANK),
               ValuePartRef(this, imm2, 1, Config::GP_BANK),
-              scratch_low,
-              scratch_high);
+              res.part(0),
+              res.part(1));
         } else {
           assert(op == IntBinaryOp::ashr);
           derived()->encode_ashri128_lt64(
@@ -1977,8 +1945,8 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_int_binary_op_i128(
               lhs.part(1),
               ValuePartRef(this, imm1, 1, Config::GP_BANK),
               ValuePartRef(this, imm2, 1, Config::GP_BANK),
-              scratch_low,
-              scratch_high);
+              res.part(0),
+              res.part(1));
         }
       } else {
         imm1 -= 64;
@@ -1986,21 +1954,21 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_int_binary_op_i128(
           derived()->encode_shli128_ge64(
               lhs.part(0),
               ValuePartRef(this, imm1, 1, Config::GP_BANK),
-              scratch_low,
-              scratch_high);
+              res.part(0),
+              res.part(1));
         } else if (op == IntBinaryOp::shr) {
           derived()->encode_shri128_ge64(
               lhs.part(1),
               ValuePartRef(this, imm1, 1, Config::GP_BANK),
-              scratch_low,
-              scratch_high);
+              res.part(0),
+              res.part(1));
         } else {
           assert(op == IntBinaryOp::ashr);
           derived()->encode_ashri128_ge64(
               lhs.part(1),
               ValuePartRef(this, imm1, 1, Config::GP_BANK),
-              scratch_low,
-              scratch_high);
+              res.part(0),
+              res.part(1));
         }
       }
     } else {
@@ -2008,21 +1976,21 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_int_binary_op_i128(
         derived()->encode_shli128(lhs.part(0),
                                   lhs.part(1),
                                   std::move(shift_amt),
-                                  scratch_low,
-                                  scratch_high);
+                                  res.part(0),
+                                  res.part(1));
       } else if (op == IntBinaryOp::shr) {
         derived()->encode_shri128(lhs.part(0),
                                   lhs.part(1),
                                   std::move(shift_amt),
-                                  scratch_low,
-                                  scratch_high);
+                                  res.part(0),
+                                  res.part(1));
       } else {
         assert(op == IntBinaryOp::ashr);
         derived()->encode_ashri128(lhs.part(0),
                                    lhs.part(1),
                                    std::move(shift_amt),
-                                   scratch_low,
-                                   scratch_high);
+                                   res.part(0),
+                                   res.part(1));
       }
     }
   } else {
@@ -2030,8 +1998,8 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_int_binary_op_i128(
                                          GenericValuePart &&,
                                          GenericValuePart &&,
                                          GenericValuePart &&,
-                                         ScratchReg &,
-                                         ScratchReg &);
+                                         ValuePart &&,
+                                         ValuePart &&);
     static const std::array<EncodeFnTy, 10> encode_ptrs = {
         {
          &Derived::encode_addi128,
@@ -2051,12 +2019,9 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_int_binary_op_i128(
                                             lhs.part(1),
                                             rhs.part(0),
                                             rhs.part(1),
-                                            scratch_low,
-                                            scratch_high);
+                                            res.part(0),
+                                            res.part(1));
   }
-
-  this->set_value(res.part(0), scratch_low);
-  this->set_value(res.part(1), scratch_high);
 
   return true;
 }
@@ -2071,7 +2036,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_int_binary_op(
   }
 
   using EncodeFnTy =
-      bool (Derived::*)(GenericValuePart &&, GenericValuePart &&, ScratchReg &);
+      bool (Derived::*)(GenericValuePart &&, GenericValuePart &&, ValuePart &);
   // fns[op.index()][idx]
   static constexpr auto fns = []() constexpr {
     std::array<EncodeFnTy[10], IntBinaryOp::num_ops> res{};
@@ -2163,9 +2128,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_int_binary_op(
       }
     }
 
-    ScratchReg res_scratch{derived()};
-    (derived()->*encode_fn)(std::move(lhs_op), std::move(rhs_op), res_scratch);
-    res_op.set_value_reg(res_scratch.release());
+    (derived()->*encode_fn)(std::move(lhs_op), std::move(rhs_op), res_op);
   };
 
   for (u32 i = 0, n = parts.count(); i != n; ++i) {
@@ -2251,7 +2214,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_float_binary_op(
   }
 
   using EncodeFnTy =
-      bool (Derived::*)(GenericValuePart &&, GenericValuePart &&, ScratchReg &);
+      bool (Derived::*)(GenericValuePart &&, GenericValuePart &&, ValuePart &&);
   EncodeFnTy encode_fn = nullptr;
 
   switch (val_info.type) {
@@ -2304,13 +2267,8 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_float_binary_op(
   default: return false;
   }
 
-  auto [res_vr, res] = this->result_ref_single(inst);
-  ScratchReg res_scratch{derived()};
-  if (!(derived()->*encode_fn)(lhs.part(0), rhs.part(0), res_scratch)) {
-    return false;
-  }
-  this->set_value(res, res_scratch);
-  return true;
+  ValueRef res = this->result_ref(inst);
+  return (derived()->*encode_fn)(lhs.part(0), rhs.part(0), res.part(0));
 }
 
 template <typename Adaptor, typename Derived, typename Config>
@@ -2318,56 +2276,49 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_fneg(
     const llvm::Instruction *inst, const ValInfo &val_info, u64) noexcept {
   auto src = this->val_ref(inst->getOperand(0));
   auto [res_vr, res_ref] = this->result_ref_single(inst);
-  auto res_scratch = ScratchReg{derived()};
   switch (val_info.type) {
     using enum LLVMBasicValType;
-  case f32: derived()->encode_fnegf32(src.part(0), res_scratch); break;
-  case f64: derived()->encode_fnegf64(src.part(0), res_scratch); break;
-  case f128: derived()->encode_fnegf128(src.part(0), res_scratch); break;
-  case v2f32: derived()->encode_fnegv2f32(src.part(0), res_scratch); break;
-  case v4f32: derived()->encode_fnegv4f32(src.part(0), res_scratch); break;
-  case v2f64: derived()->encode_fnegv2f64(src.part(0), res_scratch); break;
+  case f32: derived()->encode_fnegf32(src.part(0), res_ref); break;
+  case f64: derived()->encode_fnegf64(src.part(0), res_ref); break;
+  case f128: derived()->encode_fnegf128(src.part(0), res_ref); break;
+  case v2f32: derived()->encode_fnegv2f32(src.part(0), res_ref); break;
+  case v4f32: derived()->encode_fnegv4f32(src.part(0), res_ref); break;
+  case v2f64: derived()->encode_fnegv2f64(src.part(0), res_ref); break;
   default: return false;
   }
-
-  this->set_value(res_ref, res_scratch);
   return true;
 }
 
 template <typename Adaptor, typename Derived, typename Config>
 bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_float_ext_trunc(
     const llvm::Instruction *inst, const ValInfo &, u64) noexcept {
-  auto *src_val = inst->getOperand(0);
+  const llvm::Value *src_val = inst->getOperand(0);
   auto *src_ty = src_val->getType();
   auto *dst_ty = inst->getType();
 
   auto res_vr = this->result_ref(inst);
 
-  ScratchReg res_scratch{derived()};
   SymRef sym;
   if (src_ty->isDoubleTy() && dst_ty->isFloatTy()) {
     auto src_ref = this->val_ref(src_val);
-    derived()->encode_f64tof32(src_ref.part(0), res_scratch);
+    derived()->encode_f64tof32(src_ref.part(0), res_vr.part(0));
   } else if (src_ty->isFP128Ty() && dst_ty->isFloatTy()) {
     sym = get_libfunc_sym(LibFunc::trunctfsf2);
   } else if (src_ty->isFP128Ty() && dst_ty->isDoubleTy()) {
     sym = get_libfunc_sym(LibFunc::trunctfdf2);
   } else if (src_ty->isFloatTy() && dst_ty->isDoubleTy()) {
     auto src_ref = this->val_ref(src_val);
-    derived()->encode_f32tof64(src_ref.part(0), res_scratch);
+    derived()->encode_f32tof64(src_ref.part(0), res_vr.part(0));
   } else if (src_ty->isFloatTy() && dst_ty->isFP128Ty()) {
     sym = get_libfunc_sym(LibFunc::extendsftf2);
   } else if (src_ty->isDoubleTy() && dst_ty->isFP128Ty()) {
     sym = get_libfunc_sym(LibFunc::extenddftf2);
-  }
-
-  if (res_scratch.has_reg()) {
-    this->set_value(res_vr.part(0), res_scratch);
-  } else if (sym.valid()) {
-    IRValueRef src_ref = src_val;
-    derived()->create_helper_call({&src_ref, 1}, &res_vr, sym);
   } else {
     return false;
+  }
+
+  if (sym.valid()) {
+    derived()->create_helper_call({&src_val, 1}, &res_vr, sym);
   }
 
   return true;
@@ -2410,7 +2361,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_float_to_int(
 
   const auto src_double = src_ty->isDoubleTy();
 
-  using EncodeFnTy = bool (Derived::*)(GenericValuePart &&, ScratchReg &);
+  using EncodeFnTy = bool (Derived::*)(GenericValuePart &&, ValuePart &&);
   static constexpr auto fns = []() {
     // fns[is_double][dst64][sign][sat]
     std::array<EncodeFnTy[2][2][2], 2> fns{};
@@ -2440,14 +2391,8 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_float_to_int(
   }
 
   auto src_ref = this->val_ref(src_val);
-  auto [res_vr, res_ref] = this->result_ref_single(inst);
-  auto res_scratch = ScratchReg{derived()};
-  if (!(derived()->*fn)(src_ref.part(0), res_scratch)) {
-    return false;
-  }
-
-  this->set_value(res_ref, res_scratch);
-  return true;
+  auto res_ref = this->result_ref(inst);
+  return (derived()->*fn)(src_ref.part(0), res_ref.part(0));
 }
 
 template <typename Adaptor, typename Derived, typename Config>
@@ -2491,7 +2436,6 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_int_to_float(
   ValueRef src_ref = this->val_ref(src_val);
   ValuePartRef src_op = src_ref.part(0);
   auto [res_vr, res_ref] = this->result_ref_single(inst);
-  auto res_scratch = ScratchReg{derived()};
 
   if (bit_width != 32 && bit_width != 64) {
     unsigned ext = tpde::util::align_up(bit_width, 32);
@@ -2501,34 +2445,32 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_int_to_float(
   if (sign) {
     if (bit_width > 32) {
       if (dst_double) {
-        derived()->encode_i64tof64(std::move(src_op), res_scratch);
+        derived()->encode_i64tof64(std::move(src_op), res_ref);
       } else {
-        derived()->encode_i64tof32(std::move(src_op), res_scratch);
+        derived()->encode_i64tof32(std::move(src_op), res_ref);
       }
     } else {
       if (dst_double) {
-        derived()->encode_i32tof64(std::move(src_op), res_scratch);
+        derived()->encode_i32tof64(std::move(src_op), res_ref);
       } else {
-        derived()->encode_i32tof32(std::move(src_op), res_scratch);
+        derived()->encode_i32tof32(std::move(src_op), res_ref);
       }
     }
   } else {
     if (bit_width > 32) {
       if (dst_double) {
-        derived()->encode_u64tof64(std::move(src_op), res_scratch);
+        derived()->encode_u64tof64(std::move(src_op), res_ref);
       } else {
-        derived()->encode_u64tof32(std::move(src_op), res_scratch);
+        derived()->encode_u64tof32(std::move(src_op), res_ref);
       }
     } else {
       if (dst_double) {
-        derived()->encode_u32tof64(std::move(src_op), res_scratch);
+        derived()->encode_u32tof64(std::move(src_op), res_ref);
       } else {
-        derived()->encode_u32tof32(std::move(src_op), res_scratch);
+        derived()->encode_u32tof32(std::move(src_op), res_ref);
       }
     }
   }
-
-  this->set_value(res_ref, res_scratch);
   return true;
 }
 
@@ -2559,7 +2501,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_int_trunc(
     // packing of the individual comparison results.
     auto [ty, ty_idx] = this->adaptor->lower_type(src);
 
-    using EncodeFnTy = bool (Derived::*)(GenericValuePart &&, ScratchReg &);
+    using EncodeFnTy = bool (Derived::*)(GenericValuePart &&, ValuePart &&);
     EncodeFnTy encode_fn;
     switch (ty) {
     case v8i8: encode_fn = &Derived::encode_trunc_v8i8_1; break;
@@ -2571,13 +2513,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_int_trunc(
     case v2i64: encode_fn = &Derived::encode_trunc_v2i64_1; break;
     default: return false;
     }
-
-    ScratchReg res{derived()};
-    if (!(derived()->*encode_fn)(src_vr.part(0), res)) {
-      return false;
-    }
-    this->set_value(res_vr.part(0), res);
-    return true;
+    return (derived()->*encode_fn)(src_vr.part(0), res_vr.part(0));
   }
   case v8i8:
   case v4i16:
@@ -2589,7 +2525,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_int_trunc(
       return false;
     }
 
-    using EncodeFnTy = bool (Derived::*)(GenericValuePart &&, ScratchReg &);
+    using EncodeFnTy = bool (Derived::*)(GenericValuePart &&, ValuePart &&);
     EncodeFnTy encode_fn = nullptr;
     switch (dst_width) {
     case 8: encode_fn = &Derived::encode_trunc_v8i16_8; break;
@@ -2597,13 +2533,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_int_trunc(
     case 32: encode_fn = &Derived::encode_trunc_v2i64_32; break;
     default: return false;
     }
-    ScratchReg res{derived()};
-    if (!(derived()->*encode_fn)(src_vr.part(0), res)) {
-      return false;
-    }
-    ValuePartRef res_ref = res_vr.part(0);
-    this->set_value(res_ref, res);
-    return true;
+    return (derived()->*encode_fn)(src_vr.part(0), res_vr.part(0));
   }
   default: return false;
   }
@@ -2638,12 +2568,10 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_int_ext(
     auto res_ref_high = res.part(1);
 
     if (sign) {
-      ScratchReg scratch_high{derived()};
       if (!low.has_reg()) {
         low.load_to_reg();
       }
-      derived()->encode_fill_with_sign64(low.get_unowned_ref(), scratch_high);
-      this->set_value(res_ref_high, scratch_high);
+      derived()->encode_fill_with_sign64(low.get_unowned_ref(), res_ref_high);
     } else {
       res_ref_high.set_value(ValuePart{u64{0}, 8, res_ref_high.bank()});
     }
@@ -2826,19 +2754,17 @@ void LLVMCompilerBase<Adaptor, Derived, Config>::extract_element(
   auto &expr = std::get<typename GenericValuePart::Expr>(addr.state);
   expr.disp += off_in_part;
 
-  ScratchReg out_reg{this};
   switch (ty) {
     using enum LLVMBasicValType;
-  case i8: derived()->encode_loadi8(std::move(addr), out_reg); break;
-  case i16: derived()->encode_loadi16(std::move(addr), out_reg); break;
-  case i32: derived()->encode_loadi32(std::move(addr), out_reg); break;
+  case i8: derived()->encode_loadi8(std::move(addr), out); break;
+  case i16: derived()->encode_loadi16(std::move(addr), out); break;
+  case i32: derived()->encode_loadi32(std::move(addr), out); break;
   case i64:
-  case ptr: derived()->encode_loadi64(std::move(addr), out_reg); break;
-  case f32: derived()->encode_loadf32(std::move(addr), out_reg); break;
-  case f64: derived()->encode_loadf64(std::move(addr), out_reg); break;
+  case ptr: derived()->encode_loadi64(std::move(addr), out); break;
+  case f32: derived()->encode_loadf32(std::move(addr), out); break;
+  case f64: derived()->encode_loadf64(std::move(addr), out); break;
   default: TPDE_UNREACHABLE("unexpected vector element type");
   }
-  out.set_value_reg(this, out_reg.release());
 }
 
 template <typename Adaptor, typename Derived, typename Config>
@@ -2898,7 +2824,6 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_extract_element(
 
   ValueRef vec_vr = this->val_ref(src);
   auto [res_vr, result] = this->result_ref_single(inst);
-  ScratchReg scratch_res{this};
 
   if (inst->getType()->isIntegerTy(1)) {
     // i1 vectors are integers, extracting an element is just a shift.
@@ -2909,8 +2834,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_extract_element(
       result.set_value(vec_vr.part(0));
     } else {
       derived()->encode_shri64(
-          vec_vr.part(0), this->val_ref(index).part(0), scratch_res);
-      this->set_value(result, scratch_res);
+          vec_vr.part(0), this->val_ref(index).part(0), result);
     }
     return true;
   }
@@ -2934,7 +2858,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_extract_element(
   }
 
   // Second, create address. Mask index, out-of-bounds access are just poison.
-  ScratchReg idx_scratch{this};
+  ValuePartRef idx_scratch{this, Config::GP_BANK};
   GenericValuePart addr = derived()->val_spill_slot({vec_vr.assignment(), 0});
   auto &expr = std::get<typename GenericValuePart::Expr>(addr.state);
   if ((nelem & (nelem - 1)) == 0) {
@@ -2949,22 +2873,20 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_extract_element(
   }
   assert(expr.scale == 0);
   expr.scale = this->adaptor->basic_ty_part_size(bvt);
-  expr.index = std::move(idx_scratch);
+  expr.index = std::move(idx_scratch).into_scratch(this);
 
   // Third, do the load.
   switch (bvt) {
     using enum LLVMBasicValType;
-  case i8: derived()->encode_loadi8(std::move(addr), scratch_res); break;
-  case i16: derived()->encode_loadi16(std::move(addr), scratch_res); break;
-  case i32: derived()->encode_loadi32(std::move(addr), scratch_res); break;
+  case i8: derived()->encode_loadi8(std::move(addr), result); break;
+  case i16: derived()->encode_loadi16(std::move(addr), result); break;
+  case i32: derived()->encode_loadi32(std::move(addr), result); break;
   case i64:
-  case ptr: derived()->encode_loadi64(std::move(addr), scratch_res); break;
-  case f32: derived()->encode_loadf32(std::move(addr), scratch_res); break;
-  case f64: derived()->encode_loadf64(std::move(addr), scratch_res); break;
+  case ptr: derived()->encode_loadi64(std::move(addr), result); break;
+  case f32: derived()->encode_loadf32(std::move(addr), result); break;
+  case f64: derived()->encode_loadf64(std::move(addr), result); break;
   default: TPDE_UNREACHABLE("unexpected vector element type");
   }
-
-  this->set_value(result, scratch_res);
   return true;
 }
 
@@ -2984,10 +2906,10 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_insert_element(
   if (ins->getType()->isIntegerTy(1)) {
     assert(res_vr.assignment()->part_count == 1);
     ValueRef src_vr = this->val_ref(inst->getOperand(0));
-    ScratchReg res{this};
-    derived()->encode_insert_vi1(
-        src_vr.part(0), this->val_ref(index).part(0), std::move(val), res);
-    res_vr.part(0).set_value_reg(res.release());
+    derived()->encode_insert_vi1(src_vr.part(0),
+                                 this->val_ref(index).part(0),
+                                 std::move(val),
+                                 res_vr.part(0));
     return true;
   }
 
@@ -3024,7 +2946,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_insert_element(
   }
 
   // Second, create address. Mask index, out-of-bounds access are just poison.
-  ScratchReg idx_scratch{this};
+  ValuePartRef idx_scratch{this, Config::GP_BANK};
   GenericValuePart addr = derived()->val_spill_slot({res_vr.assignment(), 0});
   auto &expr = std::get<typename GenericValuePart::Expr>(addr.state);
   if ((nelem & (nelem - 1)) == 0) {
@@ -3039,7 +2961,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_insert_element(
   }
   assert(expr.scale == 0);
   expr.scale = val.part_size();
-  expr.index = std::move(idx_scratch);
+  expr.index = std::move(idx_scratch).into_scratch(this);
 
   // Third, do the store.
   switch (bvt) {
@@ -3144,7 +3066,7 @@ template <typename Adaptor, typename Derived, typename Config>
 bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_icmp_vector(
     const llvm::Instruction *inst, const ValInfo &, u64) noexcept {
   using EncodeFnTy =
-      bool (Derived::*)(GenericValuePart &&, GenericValuePart &&, ScratchReg &);
+      bool (Derived::*)(GenericValuePart &&, GenericValuePart &&, ValuePart &&);
   // fns[pred][type][bitvec=0/mask=1]
   static constexpr auto fns = []() constexpr {
     constexpr unsigned NumPreds = llvm::ICmpInst::LAST_ICMP_PREDICATE -
@@ -3203,6 +3125,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_icmp_vector(
     if (llvm::isa<llvm::SExtInst, llvm::ZExtInst>(fuse_inst) &&
         fuse_inst->getType() == lhs->getType()) {
       fuse_ext = fuse_inst;
+      this->adaptor->inst_set_fused(fuse_ext, true);
     }
   }
 
@@ -3228,28 +3151,14 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_icmp_vector(
 
   auto lhs_vr = this->val_ref(lhs);
   auto rhs_vr = this->val_ref(rhs);
-  ScratchReg res{this};
-  if (!(derived()->*encode_fn)(lhs_vr.part(0), rhs_vr.part(0), res)) {
-    return false;
-  }
-
-  if (fuse_ext) {
-    auto [_, res_ref] = this->result_ref_single(fuse_ext);
-    this->set_value(res_ref, res);
-    this->adaptor->inst_set_fused(fuse_ext, true);
-  } else {
-    auto [_, res_ref] = this->result_ref_single(inst);
-    this->set_value(res_ref, res);
-  }
-
-  return true;
+  auto res = this->result_ref(fuse_ext ? fuse_ext : inst);
+  return (derived()->*encode_fn)(lhs_vr.part(0), rhs_vr.part(0), res.part(0));
 }
 
 template <typename Adaptor, typename Derived, typename Config>
 bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_cmpxchg(
     const llvm::Instruction *inst, const ValInfo &, u64) noexcept {
   const auto *cmpxchg = llvm::cast<llvm::AtomicCmpXchgInst>(inst);
-  auto *cmp_val = cmpxchg->getCompareOperand();
   auto *new_val = cmpxchg->getNewValOperand();
   auto *val_ty = new_val->getType();
   unsigned width = 64;
@@ -3274,8 +3183,8 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_cmpxchg(
   using EncodeFnTy = bool (Derived::*)(GenericValuePart &&,
                                        GenericValuePart &&,
                                        GenericValuePart &&,
-                                       ScratchReg &,
-                                       ScratchReg &);
+                                       ValuePart &&,
+                                       ValuePart &&);
   static constexpr auto fns = []() constexpr {
     using enum llvm::AtomicOrdering;
     std::array<EncodeFnTy[size_t(LAST) + 1], 4> res{};
@@ -3302,19 +3211,10 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_cmpxchg(
     return res;
   }();
 
-  auto *ptr_val = cmpxchg->getPointerOperand();
-  assert(ptr_val->getType()->isPointerTy());
-  auto ptr_ref = this->val_ref(ptr_val);
-
-  auto cmp_ref = this->val_ref(cmp_val);
+  auto ptr_ref = this->val_ref(cmpxchg->getPointerOperand());
+  auto cmp_ref = this->val_ref(cmpxchg->getCompareOperand());
   auto new_ref = this->val_ref(new_val);
-
   auto res = this->result_ref(cmpxchg);
-  auto res_ref = res.part(0);
-  auto res_ref_high = res.part(1);
-
-  ScratchReg orig_scratch{derived()};
-  ScratchReg succ_scratch{derived()};
 
   llvm::AtomicOrdering order = cmpxchg->getMergedOrdering();
   EncodeFnTy encode_fn = fns[width_idx][size_t(order)];
@@ -3322,13 +3222,10 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_cmpxchg(
   if (!(derived()->*encode_fn)(ptr_ref.part(0),
                                cmp_ref.part(0),
                                new_ref.part(0),
-                               orig_scratch,
-                               succ_scratch)) {
+                               res.part(0),
+                               res.part(1))) {
     return false;
   }
-
-  this->set_value(res_ref, orig_scratch);
-  this->set_value(res_ref_high, succ_scratch);
 
   // clang-format off
     // TODO(ts): fusing with subsequent extractvalues + br's
@@ -3369,7 +3266,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_atomicrmw(
   // TODO: implement non-seq_cst orderings more efficiently
   // TODO: use more efficient implementation when the result is not used. On
   // x86-64, the current implementation gives many cmpxchg loops.
-  bool (Derived::*fn)(GenericValuePart &&, GenericValuePart &&, ScratchReg &) =
+  bool (Derived::*fn)(GenericValuePart &&, GenericValuePart &&, ValuePart &&) =
       nullptr;
   switch (rmw->getOperation()) {
   case llvm::AtomicRMWInst::Xchg:
@@ -3521,13 +3418,8 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_atomicrmw(
 
   auto ptr_ref = this->val_ref(rmw->getPointerOperand());
   auto val_ref = this->val_ref(rmw->getValOperand());
-  auto [res_vr, res_ref] = this->result_ref_single(rmw);
-  ScratchReg res{this};
-  if (!(derived()->*fn)(ptr_ref.part(0), val_ref.part(0), res)) {
-    return false;
-  }
-  this->set_value(res_ref, res);
-  return true;
+  auto res_ref = this->result_ref(rmw);
+  return (derived()->*fn)(ptr_ref.part(0), val_ref.part(0), res_ref.part(0));
 }
 
 template <typename Adaptor, typename Derived, typename Config>
@@ -3665,7 +3557,6 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_select(
   auto lhs = this->val_ref(inst->getOperand(1));
   auto rhs = this->val_ref(inst->getOperand(2));
 
-  ScratchReg res_scratch{derived()};
   auto res = this->result_ref(inst);
 
   switch (val_info.type) {
@@ -3678,17 +3569,17 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_select(
   case i32:
   case v32i1:
     derived()->encode_select_i32(
-        std::move(cond), lhs.part(0), rhs.part(0), res_scratch);
+        std::move(cond), lhs.part(0), rhs.part(0), res.part(0));
     break;
   case i64:
   case v64i1:
   case ptr:
     derived()->encode_select_i64(
-        std::move(cond), lhs.part(0), rhs.part(0), res_scratch);
+        std::move(cond), lhs.part(0), rhs.part(0), res.part(0));
     break;
   case f32:
     derived()->encode_select_f32(
-        std::move(cond), lhs.part(0), rhs.part(0), res_scratch);
+        std::move(cond), lhs.part(0), rhs.part(0), res.part(0));
     break;
   case f64:
   case v8i8:
@@ -3696,7 +3587,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_select(
   case v2i32:
   case v2f32:
     derived()->encode_select_f64(
-        std::move(cond), lhs.part(0), rhs.part(0), res_scratch);
+        std::move(cond), lhs.part(0), rhs.part(0), res.part(0));
     break;
   case f128:
   case v16i8:
@@ -3706,7 +3597,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_select(
   case v4f32:
   case v2f64:
     derived()->encode_select_v2u64(
-        std::move(cond), lhs.part(0), rhs.part(0), res_scratch);
+        std::move(cond), lhs.part(0), rhs.part(0), res.part(0));
     break;
   case complex: {
     // Handle case of complex with two i64 as i128, this is extremely hacky...
@@ -3719,24 +3610,17 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_select(
   }
     [[fallthrough]];
   case i128: {
-    ScratchReg res_scratch_high{derived()};
-    auto res_ref_high = res.part(1);
-
     derived()->encode_select_i128(std::move(cond),
                                   lhs.part(0),
                                   lhs.part(1),
                                   rhs.part(0),
                                   rhs.part(1),
-                                  res_scratch,
-                                  res_scratch_high);
-    this->set_value(res_ref_high, res_scratch_high);
+                                  res.part(0),
+                                  res.part(1));
     break;
   }
   default: TPDE_UNREACHABLE("invalid select basic type"); break;
   }
-
-  auto res_ref = res.part(0);
-  this->set_value(res_ref, res_scratch);
   return true;
 }
 
@@ -3918,12 +3802,9 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_gep(
 
   AsmReg res_reg = derived()->gval_expr_as_reg(addr);
   if (auto *op_reg = std::get_if<ScratchReg>(&addr.state)) {
-    ScratchReg res_scratch = std::move(*op_reg);
-    this->set_value(res_ref, res_scratch);
+    res_ref.set_value(std::move(*op_reg));
   } else {
-    ScratchReg res_scratch{derived()};
-    derived()->mov(res_scratch.alloc_gp(), res_reg, 8);
-    this->set_value(res_ref, res_scratch);
+    derived()->mov(res_ref.alloc_reg(), res_reg, 8);
   }
 
   return true;
@@ -4026,7 +3907,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_fcmp(
   }
 
   using EncodeFnTy =
-      bool (Derived::*)(GenericValuePart &&, GenericValuePart &&, ScratchReg &);
+      bool (Derived::*)(GenericValuePart &&, GenericValuePart &&, ValuePart &&);
   EncodeFnTy fn = nullptr;
 
   if (cmp_ty->isFloatTy()) {
@@ -4071,15 +3952,8 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_fcmp(
 
   ValueRef lhs = this->val_ref(cmp->getOperand(0));
   ValueRef rhs = this->val_ref(cmp->getOperand(1));
-  ScratchReg res_scratch{derived()};
-  auto [res_vr, res_ref] = this->result_ref_single(cmp);
-
-  if (!(derived()->*fn)(lhs.part(0), rhs.part(0), res_scratch)) {
-    return false;
-  }
-
-  this->set_value(res_ref, res_scratch);
-  return true;
+  ValueRef res = this->result_ref(cmp);
+  return (derived()->*fn)(lhs.part(0), rhs.part(0), res.part(0));
 }
 
 template <typename Adaptor, typename Derived, typename Config>
@@ -4500,9 +4374,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_intrin(
     auto ptr = this->val_ref(inst->getOperand(0));
     auto off = this->val_ref(inst->getOperand(1));
     auto [res_vr, res_ref] = this->result_ref_single(inst);
-    ScratchReg res{derived()};
-    derived()->encode_loadreli64(ptr.part(0), off.part(0), res);
-    this->set_value(res_ref, res);
+    derived()->encode_loadreli64(ptr.part(0), off.part(0), res_ref);
     return true;
   }
   case llvm::Intrinsic::threadlocal_address: {
@@ -4576,67 +4448,59 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_intrin(
     }
 
     using EncodeFnTy = bool (Derived::*)(
-        GenericValuePart &&, GenericValuePart &&, ScratchReg &);
+        GenericValuePart &&, GenericValuePart &&, ValuePart &&);
     EncodeFnTy fn;
-    switch (intrin_id) {
-      using enum llvm::Intrinsic::IndependentIntrinsics;
-    case minnum:
-      fn = is_double ? &Derived::encode_minnumf64 : &Derived::encode_minnumf32;
-      break;
-    case maxnum:
-      fn = is_double ? &Derived::encode_maxnumf64 : &Derived::encode_maxnumf32;
-      break;
-    case copysign:
-      fn = is_double ? &Derived::encode_copysignf64
-                     : &Derived::encode_copysignf32;
-      break;
-    default: TPDE_UNREACHABLE("invalid binary fp intrinsic");
+    if (is_double) {
+      switch (intrin_id) {
+        using enum llvm::Intrinsic::IndependentIntrinsics;
+      case minnum: fn = &Derived::encode_minnumf64; break;
+      case maxnum: fn = &Derived::encode_maxnumf64; break;
+      case copysign: fn = &Derived::encode_copysignf64; break;
+      default: TPDE_UNREACHABLE("invalid binary fp intrinsic");
+      }
+    } else {
+      switch (intrin_id) {
+        using enum llvm::Intrinsic::IndependentIntrinsics;
+      case minnum: fn = &Derived::encode_minnumf32; break;
+      case maxnum: fn = &Derived::encode_maxnumf32; break;
+      case copysign: fn = &Derived::encode_copysignf32; break;
+      default: TPDE_UNREACHABLE("invalid binary fp intrinsic");
+      }
     }
 
     auto lhs = this->val_ref(inst->getOperand(0));
     auto rhs = this->val_ref(inst->getOperand(1));
-    auto [res_vr, res_ref] = this->result_ref_single(inst);
-    ScratchReg res{derived()};
-    if (!(derived()->*fn)(lhs.part(0), rhs.part(0), res)) {
-      return false;
-    }
-    this->set_value(res_ref, res);
-    return true;
+    auto res = this->result_ref(inst);
+    return (derived()->*fn)(lhs.part(0), rhs.part(0), res.part(0));
   }
   case llvm::Intrinsic::fabs: {
     auto *val = inst->getOperand(0);
     auto *ty = val->getType();
 
     auto [res_vr, res_ref] = this->result_ref_single(inst);
-    ScratchReg res_scratch{derived()};
-
     if (ty->isDoubleTy()) {
-      derived()->encode_fabsf64(this->val_ref(val).part(0), res_scratch);
+      derived()->encode_fabsf64(this->val_ref(val).part(0), res_ref);
     } else if (ty->isFloatTy()) {
-      derived()->encode_fabsf32(this->val_ref(val).part(0), res_scratch);
+      derived()->encode_fabsf32(this->val_ref(val).part(0), res_ref);
     } else if (ty->isFP128Ty()) {
-      derived()->encode_fabsf128(this->val_ref(val).part(0), res_scratch);
+      derived()->encode_fabsf128(this->val_ref(val).part(0), res_ref);
     } else {
       return false;
     }
-    this->set_value(res_ref, res_scratch);
     return true;
   }
   case llvm::Intrinsic::sqrt: {
     auto *val = inst->getOperand(0);
     auto *ty = val->getType();
-    if (!ty->isFloatTy() && !ty->isDoubleTy()) {
-      return false;
-    }
 
     auto [res_vr, res_ref] = this->result_ref_single(inst);
-    ScratchReg res_scratch{derived()};
     if (ty->isDoubleTy()) {
-      derived()->encode_sqrtf64(this->val_ref(val).part(0), res_scratch);
+      derived()->encode_sqrtf64(this->val_ref(val).part(0), res_ref);
+    } else if (ty->isFloatTy()) {
+      derived()->encode_sqrtf32(this->val_ref(val).part(0), res_ref);
     } else {
-      derived()->encode_sqrtf32(this->val_ref(val).part(0), res_scratch);
+      return false;
     }
-    this->set_value(res_ref, res_scratch);
     return true;
   }
   case llvm::Intrinsic::fmuladd: {
@@ -4668,15 +4532,13 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_intrin(
     const auto is_double = inst->getOperand(0)->getType()->isDoubleTy();
 
     auto [res_vr, res_ref] = this->result_ref_single(inst);
-    ScratchReg res_scratch{derived()};
     if (is_double) {
       derived()->encode_fmaf64(
-          op1_ref.part(0), op2_ref.part(0), op3_ref.part(0), res_scratch);
+          op1_ref.part(0), op2_ref.part(0), op3_ref.part(0), res_ref);
     } else {
       derived()->encode_fmaf32(
-          op1_ref.part(0), op2_ref.part(0), op3_ref.part(0), res_scratch);
+          op1_ref.part(0), op2_ref.part(0), op3_ref.part(0), res_ref);
     }
-    this->set_value(res_ref, res_scratch);
     return true;
   }
   case llvm::Intrinsic::abs: {
@@ -4690,10 +4552,8 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_intrin(
 
     if (width == 128) {
       ValueRef res_ref = this->result_ref(inst);
-      ScratchReg lo{derived()}, hi{derived()};
-      derived()->encode_absi128(val_ref.part(0), val_ref.part(1), lo, hi);
-      this->set_value(res_ref.part(0), lo);
-      this->set_value(res_ref.part(1), hi);
+      derived()->encode_absi128(
+          val_ref.part(0), val_ref.part(1), res_ref.part(0), res_ref.part(1));
       return true;
     }
     if (width > 64) {
@@ -4706,14 +4566,12 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_intrin(
       op = std::move(op).into_extended(/*sign=*/true, width, dst_width);
     }
 
-    ScratchReg res{derived()};
     auto [res_vr, res_ref] = this->result_ref_single(inst);
     if (width <= 32) {
-      derived()->encode_absi32(std::move(op), res);
+      derived()->encode_absi32(std::move(op), res_ref);
     } else {
-      derived()->encode_absi64(std::move(op), res);
+      derived()->encode_absi64(std::move(op), res_ref);
     }
-    this->set_value(res_ref, res);
     return true;
   }
   case llvm::Intrinsic::ucmp:
@@ -4750,10 +4608,9 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_intrin(
       rhs = std::move(rhs).into_extended(sign, width, dst_width);
     }
 
-    ScratchReg res{derived()};
-    auto [res_vr, res_ref] = this->result_ref_single(inst);
+    ValueRef res = this->result_ref(inst);
     using EncodeFnTy = bool (Derived::*)(
-        GenericValuePart &&, GenericValuePart &&, ScratchReg &);
+        GenericValuePart &&, GenericValuePart &&, ValuePart &&);
     EncodeFnTy encode_fn = nullptr;
     if (width <= 32) {
       switch (intrin_id) {
@@ -4776,20 +4633,14 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_intrin(
       default: TPDE_UNREACHABLE("invalid intrinsic");
       }
     }
-    if (!(derived()->*encode_fn)(std::move(lhs), std::move(rhs), res)) {
-      return false;
-    }
-    this->set_value(res_ref, res);
-    return true;
+    return (derived()->*encode_fn)(std::move(lhs), std::move(rhs), res.part(0));
   }
   case llvm::Intrinsic::ptrmask: {
     // ptrmask is just an integer and.
     ValueRef lhs = this->val_ref(inst->getOperand(0));
     ValueRef rhs = this->val_ref(inst->getOperand(1));
     auto [res_vr, res] = this->result_ref_single(inst);
-    auto res_scratch = ScratchReg{derived()};
-    derived()->encode_landi64(lhs.part(0), rhs.part(0), res_scratch);
-    this->set_value(res, res_scratch);
+    derived()->encode_landi64(lhs.part(0), rhs.part(0), res);
     return true;
   }
   case llvm::Intrinsic::uadd_with_overflow:
@@ -4828,14 +4679,14 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_intrin(
       return false;
     }
 
-    ScratchReg res{derived()};
+    auto [res_vr, res_ref] = this->result_ref_single(inst);
 
     // TODO: generate better code for constant amounts.
     bool shift_left = intrin_id == llvm::Intrinsic::fshl;
     if (inst->getOperand(0) == inst->getOperand(1)) {
       // Better code for rotate.
       using EncodeFnTy = bool (Derived::*)(
-          GenericValuePart &&, GenericValuePart &&, ScratchReg &);
+          GenericValuePart &&, GenericValuePart &&, ValuePart &);
       EncodeFnTy fn = nullptr;
       if (shift_left) {
         switch (width) {
@@ -4859,14 +4710,14 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_intrin(
       (void)this->val_ref(inst->getOperand(1));
       auto lhs = this->val_ref(inst->getOperand(0));
       auto amt = this->val_ref(inst->getOperand(2));
-      if (!(derived()->*fn)(lhs.part(0), amt.part(0), res)) {
+      if (!(derived()->*fn)(lhs.part(0), amt.part(0), res_ref)) {
         return false;
       }
     } else {
       using EncodeFnTy = bool (Derived::*)(GenericValuePart &&,
                                            GenericValuePart &&,
                                            GenericValuePart &&,
-                                           ScratchReg &);
+                                           ValuePart &);
       EncodeFnTy fn = nullptr;
       if (shift_left) {
         switch (width) {
@@ -4889,13 +4740,11 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_intrin(
       auto lhs = this->val_ref(inst->getOperand(0));
       auto rhs = this->val_ref(inst->getOperand(1));
       auto amt = this->val_ref(inst->getOperand(2));
-      if (!(derived()->*fn)(lhs.part(0), rhs.part(0), amt.part(0), res)) {
+      if (!(derived()->*fn)(lhs.part(0), rhs.part(0), amt.part(0), res_ref)) {
         return false;
       }
     }
 
-    auto [res_vr, res_ref] = this->result_ref_single(inst);
-    this->set_value(res_ref, res);
     return true;
   }
   case llvm::Intrinsic::bswap: {
@@ -4908,7 +4757,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_intrin(
       return false;
     }
 
-    using EncodeFnTy = bool (Derived::*)(GenericValuePart &&, ScratchReg &);
+    using EncodeFnTy = bool (Derived::*)(GenericValuePart &&, ValuePart &&);
     static constexpr std::array<EncodeFnTy, 4> encode_fns = {
         &Derived::encode_bswapi16,
         &Derived::encode_bswapi32,
@@ -4917,14 +4766,8 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_intrin(
     };
     EncodeFnTy encode_fn = encode_fns[width / 16 - 1];
 
-    ScratchReg res{derived()};
-    if (!(derived()->*encode_fn)(this->val_ref(val).part(0), res)) {
-      return false;
-    }
-
-    auto [res_vr, res_ref] = this->result_ref_single(inst);
-    this->set_value(res_ref, res);
-    return true;
+    return (derived()->*encode_fn)(this->val_ref(val).part(0),
+                                   this->result_ref(inst).part(0));
   }
   case llvm::Intrinsic::ctpop: {
     auto *val = inst->getOperand(0);
@@ -4943,15 +4786,12 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_intrin(
       op = std::move(op).into_extended(/*sign=*/false, width, tgt_width);
     }
 
-    ScratchReg res{derived()};
-    if (width <= 32) {
-      derived()->encode_ctpopi32(std::move(op), res);
-    } else {
-      derived()->encode_ctpopi64(std::move(op), res);
-    }
-
     auto [res_vr, res_ref] = this->result_ref_single(inst);
-    this->set_value(res_ref, res);
+    if (width <= 32) {
+      derived()->encode_ctpopi32(std::move(op), res_ref);
+    } else {
+      derived()->encode_ctpopi64(std::move(op), res_ref);
+    }
     return true;
   }
   case llvm::Intrinsic::ctlz:
@@ -4968,36 +4808,35 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_intrin(
 
     auto val_ref = this->val_ref(val);
     auto [res_vr, res_ref] = this->result_ref_single(inst);
-    ScratchReg res{derived()};
 
     if (intrin_id == llvm::Intrinsic::ctlz) {
       switch (width) {
       case 8:
         if (zero_is_poison) {
-          derived()->encode_ctlzi8_zero_poison(val_ref.part(0), res);
+          derived()->encode_ctlzi8_zero_poison(val_ref.part(0), res_ref);
         } else {
-          derived()->encode_ctlzi8(val_ref.part(0), res);
+          derived()->encode_ctlzi8(val_ref.part(0), res_ref);
         }
         break;
       case 16:
         if (zero_is_poison) {
-          derived()->encode_ctlzi16_zero_poison(val_ref.part(0), res);
+          derived()->encode_ctlzi16_zero_poison(val_ref.part(0), res_ref);
         } else {
-          derived()->encode_ctlzi16(val_ref.part(0), res);
+          derived()->encode_ctlzi16(val_ref.part(0), res_ref);
         }
         break;
       case 32:
         if (zero_is_poison) {
-          derived()->encode_ctlzi32_zero_poison(val_ref.part(0), res);
+          derived()->encode_ctlzi32_zero_poison(val_ref.part(0), res_ref);
         } else {
-          derived()->encode_ctlzi32(val_ref.part(0), res);
+          derived()->encode_ctlzi32(val_ref.part(0), res_ref);
         }
         break;
       case 64:
         if (zero_is_poison) {
-          derived()->encode_ctlzi64_zero_poison(val_ref.part(0), res);
+          derived()->encode_ctlzi64_zero_poison(val_ref.part(0), res_ref);
         } else {
-          derived()->encode_ctlzi64(val_ref.part(0), res);
+          derived()->encode_ctlzi64(val_ref.part(0), res_ref);
         }
         break;
       default: TPDE_UNREACHABLE("invalid size");
@@ -5007,37 +4846,35 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_intrin(
       switch (width) {
       case 8:
         if (zero_is_poison) {
-          derived()->encode_cttzi32_zero_poison(val_ref.part(0), res);
+          derived()->encode_cttzi32_zero_poison(val_ref.part(0), res_ref);
         } else {
-          derived()->encode_cttzi8(val_ref.part(0), res);
+          derived()->encode_cttzi8(val_ref.part(0), res_ref);
         }
         break;
       case 16:
         if (zero_is_poison) {
-          derived()->encode_cttzi32_zero_poison(val_ref.part(0), res);
+          derived()->encode_cttzi32_zero_poison(val_ref.part(0), res_ref);
         } else {
-          derived()->encode_cttzi16(val_ref.part(0), res);
+          derived()->encode_cttzi16(val_ref.part(0), res_ref);
         }
         break;
       case 32:
         if (zero_is_poison) {
-          derived()->encode_cttzi32_zero_poison(val_ref.part(0), res);
+          derived()->encode_cttzi32_zero_poison(val_ref.part(0), res_ref);
         } else {
-          derived()->encode_cttzi32(val_ref.part(0), res);
+          derived()->encode_cttzi32(val_ref.part(0), res_ref);
         }
         break;
       case 64:
         if (zero_is_poison) {
-          derived()->encode_cttzi64_zero_poison(val_ref.part(0), res);
+          derived()->encode_cttzi64_zero_poison(val_ref.part(0), res_ref);
         } else {
-          derived()->encode_cttzi64(val_ref.part(0), res);
+          derived()->encode_cttzi64(val_ref.part(0), res_ref);
         }
         break;
       default: TPDE_UNREACHABLE("invalid size");
       }
     }
-
-    this->set_value(res_ref, res);
     return true;
   }
   case llvm::Intrinsic::bitreverse: {
@@ -5055,7 +4892,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_intrin(
     if (width % 32) {
       u64 amt = (width < 32 ? 32 : 64) - width;
       ValuePartRef amt_val{this, &amt, 8, Config::GP_BANK};
-      ScratchReg shifted{this};
+      ValuePartRef shifted{this, Config::GP_BANK};
       if (width < 32) {
         derived()->encode_shli32(std::move(op), std::move(amt_val), shifted);
       } else {
@@ -5064,15 +4901,12 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_intrin(
       op = std::move(shifted);
     }
 
-    ScratchReg res{derived()};
-    if (width <= 32) {
-      derived()->encode_bitreversei32(std::move(op), res);
-    } else {
-      derived()->encode_bitreversei64(std::move(op), res);
-    }
-
     auto [res_vr, res_ref] = this->result_ref_single(inst);
-    this->set_value(res_ref, res);
+    if (width <= 32) {
+      derived()->encode_bitreversei32(std::move(op), res_ref);
+    } else {
+      derived()->encode_bitreversei64(std::move(op), res_ref);
+    }
     return true;
   }
   case llvm::Intrinsic::prefetch: {
@@ -5167,7 +5001,6 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_is_fpclass(
         NEG_NORM | NEG_SUBNORM | NEG_ZERO | POS_ZERO | POS_SUBNORM | POS_NORM,
   };
 
-  ScratchReg res_scratch{derived()};
   auto [res_vr, res_ref] = this->result_ref_single(inst);
   auto [op_vr, op_ref] = this->val_ref_single(op);
 
@@ -5178,12 +5011,11 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_is_fpclass(
   if (test == cond) {                                                          \
     if (is_double) {                                                           \
       derived()->encode_is_fpclass_##name##_double(                            \
-          std::move(zero_ref), std::move(op_ref), res_scratch);                \
+          std::move(zero_ref), std::move(op_ref), res_ref);                    \
     } else {                                                                   \
       derived()->encode_is_fpclass_##name##_float(                             \
-          std::move(zero_ref), std::move(op_ref), res_scratch);                \
+          std::move(zero_ref), std::move(op_ref), res_ref);                    \
     }                                                                          \
-    this->set_value(res_ref, res_scratch);                                     \
     return true;                                                               \
   }
 
@@ -5194,12 +5026,13 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_is_fpclass(
 
   // we OR' together the results from each test so initialize the result with
   // zero
-  zero_ref.reload_into_specific_fixed(res_scratch.alloc_gp());
+  ValuePartRef res_scratch{derived(), Config::GP_BANK};
+  zero_ref.reload_into_specific_fixed(res_scratch.alloc_reg());
 
   op_ref.load_to_reg();
 
   using EncodeFnTy =
-      bool (Derived::*)(GenericValuePart &&, GenericValuePart &&, ScratchReg &);
+      bool (Derived::*)(GenericValuePart &&, GenericValuePart &&, ValuePart &);
   static constexpr auto encode_fns = []() {
     return std::array<EncodeFnTy[2], 10>{{
 #define TEST(name)                                                             \
@@ -5213,7 +5046,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_is_fpclass(
 
   for (unsigned i = 0; i < encode_fns.size(); i++) {
     if (test & (1 << i)) {
-      // note that the std::move(res_scratch) here creates a new ScratchReg that
+      // note that the std::move(res_scratch) here creates a new ValuePart that
       // manages the register inside the GenericValuePart and res_scratch
       // becomes invalid by the time the encode function is entered
       (derived()->*encode_fns[i][is_double])(
@@ -5221,7 +5054,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_is_fpclass(
     }
   }
 
-  this->set_value(res_ref, res_scratch);
+  res_ref.set_value(std::move(res_scratch));
   return true;
 }
 
@@ -5230,36 +5063,23 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_overflow_intrin(
     const llvm::IntrinsicInst *inst, OverflowOp op) noexcept {
   ValueRef lhs = this->val_ref(inst->getOperand(0));
   ValueRef rhs = this->val_ref(inst->getOperand(1));
+  ValueRef res = this->result_ref(inst);
 
   auto *ty = inst->getOperand(0)->getType();
   assert(ty->isIntegerTy());
   const auto width = ty->getIntegerBitWidth();
 
   if (width == 128) {
-    auto lhs_ref = lhs.part(0);
-    auto rhs_ref = rhs.part(0);
-    GenericValuePart lhs_op_high = lhs.part(1);
-    GenericValuePart rhs_op_high = rhs.part(1);
-    ScratchReg res_val{derived()}, res_val_high{derived()}, res_of{derived()};
-
     if (!derived()->handle_overflow_intrin_128(op,
-                                               std::move(lhs_ref),
-                                               std::move(lhs_op_high),
-                                               std::move(rhs_ref),
-                                               std::move(rhs_op_high),
-                                               res_val,
-                                               res_val_high,
-                                               res_of)) {
+                                               lhs.part(0),
+                                               lhs.part(1),
+                                               rhs.part(0),
+                                               rhs.part(1),
+                                               res.part(0),
+                                               res.part(1),
+                                               res.part(2))) {
       return false;
     }
-
-    auto res_ref = this->result_ref(inst);
-    auto res_ref_val = res_ref.part(0);
-    auto res_ref_high = res_ref.part(1);
-    auto res_ref_of = res_ref.part(2);
-    this->set_value(res_ref_val, res_val);
-    this->set_value(res_ref_high, res_val_high);
-    this->set_value(res_ref_of, res_of);
     return true;
   }
 
@@ -5273,7 +5093,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_overflow_intrin(
   }
 
   using EncodeFnTy = bool (Derived::*)(
-      GenericValuePart &&, GenericValuePart &&, ScratchReg &, ScratchReg &);
+      GenericValuePart &&, GenericValuePart &&, ValuePart &&, ValuePart &&);
   std::array<std::array<EncodeFnTy, 4>, 6> encode_fns = {
       {
        {&Derived::encode_of_add_u8,
@@ -5304,18 +5124,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_overflow_intrin(
   };
 
   EncodeFnTy encode_fn = encode_fns[static_cast<u32>(op)][width_idx];
-
-  ScratchReg res_val{derived()}, res_of{derived()};
-
-  if (!(derived()->*encode_fn)(lhs.part(0), rhs.part(0), res_val, res_of)) {
-    return false;
-  }
-
-  auto res_ref = this->result_ref(inst);
-  auto res_ref_val = res_ref.part(0);
-  auto res_ref_of = res_ref.part(1);
-  this->set_value(res_ref_val, res_val);
-  this->set_value(res_ref_of, res_of);
+  (derived()->*encode_fn)(lhs.part(0), rhs.part(0), res.part(0), res.part(1));
   return true;
 }
 
@@ -5338,7 +5147,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_saturating_intrin(
   }
 
   using EncodeFnTy =
-      bool (Derived::*)(GenericValuePart &&, GenericValuePart &&, ScratchReg &);
+      bool (Derived::*)(GenericValuePart &&, GenericValuePart &&, ValuePart &&);
   std::array<std::array<EncodeFnTy, 4>, 4> encode_fns{
       {
        {&Derived::encode_sat_add_u8,
@@ -5364,14 +5173,8 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_saturating_intrin(
 
   ValueRef lhs = this->val_ref(inst->getOperand(0));
   ValueRef rhs = this->val_ref(inst->getOperand(1));
-  ScratchReg res{derived()};
-  if (!(derived()->*encode_fn)(lhs.part(0), rhs.part(0), res)) {
-    return false;
-  }
-
-  auto [res_vr, res_ref_val] = this->result_ref_single(inst);
-  this->set_value(res_ref_val, res);
-  return true;
+  ValueRef res = this->result_ref(inst);
+  return (derived()->*encode_fn)(lhs.part(0), rhs.part(0), res.part(0));
 }
 
 template <typename Adaptor, typename Derived, typename Config>

@@ -293,9 +293,11 @@ define i128 @usub_i128_0(i128 %0, i128 %1) {
 ; ARM64-NEXT:    stp x29, x30, [sp]
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
-; ARM64-NEXT:    subs x0, x0, x2
-; ARM64-NEXT:    sbcs x1, x1, x3
-; ARM64-NEXT:    cset w4, lo
+; ARM64-NEXT:    subs x4, x0, x2
+; ARM64-NEXT:    sbcs x5, x1, x3
+; ARM64-NEXT:    cset w6, lo
+; ARM64-NEXT:    mov x0, x4
+; ARM64-NEXT:    mov x1, x5
 ; ARM64-NEXT:    ldp x29, x30, [sp]
 ; ARM64-NEXT:    add sp, sp, #0xa0
 ; ARM64-NEXT:    ret
@@ -324,10 +326,10 @@ define i1 @usub_i128_1(i128 %0, i128 %1) {
 ; ARM64-NEXT:    stp x29, x30, [sp]
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
-; ARM64-NEXT:    subs x0, x0, x2
-; ARM64-NEXT:    sbcs x1, x1, x3
-; ARM64-NEXT:    cset w4, lo
-; ARM64-NEXT:    mov w0, w4
+; ARM64-NEXT:    subs x4, x0, x2
+; ARM64-NEXT:    sbcs x5, x1, x3
+; ARM64-NEXT:    cset w6, lo
+; ARM64-NEXT:    mov w0, w6
 ; ARM64-NEXT:    ldp x29, x30, [sp]
 ; ARM64-NEXT:    add sp, sp, #0xa0
 ; ARM64-NEXT:    ret
@@ -614,9 +616,11 @@ define i128 @ssub_i128_0(i128 %0, i128 %1) {
 ; ARM64-NEXT:    stp x29, x30, [sp]
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
-; ARM64-NEXT:    subs x0, x0, x2
-; ARM64-NEXT:    sbcs x1, x1, x3
-; ARM64-NEXT:    cset w4, vs
+; ARM64-NEXT:    subs x4, x0, x2
+; ARM64-NEXT:    sbcs x5, x1, x3
+; ARM64-NEXT:    cset w6, vs
+; ARM64-NEXT:    mov x0, x4
+; ARM64-NEXT:    mov x1, x5
 ; ARM64-NEXT:    ldp x29, x30, [sp]
 ; ARM64-NEXT:    add sp, sp, #0xa0
 ; ARM64-NEXT:    ret
@@ -645,10 +649,10 @@ define i1 @ssub_i128_1(i128 %0, i128 %1) {
 ; ARM64-NEXT:    stp x29, x30, [sp]
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
-; ARM64-NEXT:    subs x0, x0, x2
-; ARM64-NEXT:    sbcs x1, x1, x3
-; ARM64-NEXT:    cset w4, vs
-; ARM64-NEXT:    mov w0, w4
+; ARM64-NEXT:    subs x4, x0, x2
+; ARM64-NEXT:    sbcs x5, x1, x3
+; ARM64-NEXT:    cset w6, vs
+; ARM64-NEXT:    mov w0, w6
 ; ARM64-NEXT:    ldp x29, x30, [sp]
 ; ARM64-NEXT:    add sp, sp, #0xa0
 ; ARM64-NEXT:    ret
