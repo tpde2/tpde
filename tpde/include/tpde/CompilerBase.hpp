@@ -1121,46 +1121,7 @@ std::pair<typename CompilerBase<Adaptor, Derived, Config>::ValueRef,
 template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>
 void CompilerBase<Adaptor, Derived, Config>::set_value(
     ValuePartRef &val_ref, ScratchReg &scratch) noexcept {
-  auto ap = val_ref.assignment();
-  assert(scratch.has_reg());
-  auto reg = scratch.cur_reg();
-
-  if (ap.fixed_assignment()) {
-    auto cur_reg = ap.get_reg();
-    assert(register_file.is_used(cur_reg));
-    assert(register_file.is_fixed(cur_reg));
-    assert(register_file.reg_local_idx(cur_reg) == val_ref.local_idx());
-
-    if (cur_reg.id() != reg.id()) {
-      derived()->mov(cur_reg, reg, ap.part_size());
-    }
-
-    ap.set_register_valid(true);
-    ap.set_modified(true);
-    return;
-  }
-
-  if (ap.register_valid()) {
-    auto cur_reg = ap.get_reg();
-    if (cur_reg.id() == reg.id()) {
-      ap.set_modified(true);
-      return;
-    }
-    val_ref.unlock();
-    assert(!register_file.is_fixed(cur_reg));
-    register_file.unmark_used(cur_reg);
-  }
-
-  // ScratchReg's reg is fixed and used => unfix, keep used, update assignment
-  assert(register_file.is_used(reg));
-  assert(register_file.is_fixed(reg));
-  assert(register_file.is_clobbered(reg));
-  scratch.force_set_reg(AsmReg::make_invalid());
-  register_file.unmark_fixed(reg);
-  register_file.update_reg_assignment(reg, val_ref.local_idx(), val_ref.part());
-  ap.set_reg(reg);
-  ap.set_register_valid(true);
-  ap.set_modified(true);
+  val_ref.set_value(std::move(scratch));
 }
 
 template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>

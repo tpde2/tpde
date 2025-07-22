@@ -315,6 +315,10 @@ public:
   /// the value part will be unlocked.
   void set_value(CompilerBase *compiler, ValuePart &&other) noexcept;
 
+  /// Set the value to the value of the scratch register, taking ownership of
+  /// the register.
+  void set_value(CompilerBase *compiler, ScratchReg &&other) noexcept;
+
   /// Set the value to the value of the specified register, possibly taking
   /// ownership of the register. Intended for filling in arguments/calls results
   /// which inherently get stored to fixed registers. There must not be a
@@ -635,6 +639,62 @@ void CompilerBase<Adaptor, Derived, Config>::ValuePart::set_value(
 }
 
 template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>
+void CompilerBase<Adaptor, Derived, Config>::ValuePart::set_value(
+    CompilerBase *compiler, ScratchReg &&other) noexcept {
+  assert(compiler->may_change_value_state());
+
+  auto &reg_file = compiler->register_file;
+
+  // We could support this, but there shouldn't bee the need for that.
+  assert(other.has_reg() && "cannot initialize with invalid register");
+  Reg value_reg = other.cur_reg();
+  assert(reg_file.is_fixed(value_reg));
+  assert(reg_file.is_used(value_reg));
+  assert(reg_file.is_clobbered(value_reg));
+  assert(!state.c.reg.valid() &&
+         "attempted to overwrite already initialized and locked ValuePartRef");
+
+  if (!has_assignment()) {
+    assert(!is_const() && "cannot mutate constant ValuePartRef");
+    state.c.reg = value_reg;
+    state.c.owned = true;
+    assert(reg_file.reg_local_idx(value_reg) == INVALID_VAL_LOCAL_IDX);
+    assert(reg_file.reg_part(value_reg) == 0);
+    other.force_set_reg(AsmReg::make_invalid());
+    return;
+  }
+
+  // Update the value of the assignment part
+  auto ap = assignment();
+  assert(!ap.variable_ref() && "cannot update variable ref");
+
+  if (ap.fixed_assignment()) {
+    // For fixed assignments, copy the value into the fixed register.
+    auto cur_reg = ap.get_reg();
+    assert(reg_file.is_used(cur_reg));
+    assert(reg_file.is_fixed(cur_reg));
+    assert(reg_file.reg_local_idx(cur_reg) == local_idx());
+    assert(ap.register_valid() && !ap.stack_valid() &&
+           "invalid state for fixed assignment");
+    assert(cur_reg != value_reg);
+    compiler->derived()->mov(cur_reg, value_reg, ap.part_size());
+    other.reset();
+    return;
+  }
+
+  // Otherwise, take the register.
+  assert(!ap.register_valid() && !ap.stack_valid() &&
+         "attempted to overwrite already initialized ValuePartRef");
+
+  // ScratchReg's reg is fixed and used => unfix, keep used, update assignment
+  reg_file.unmark_fixed(value_reg);
+  reg_file.update_reg_assignment(value_reg, local_idx(), part());
+  ap.set_reg(value_reg);
+  ap.set_register_valid(true);
+  other.force_set_reg(AsmReg::make_invalid());
+}
+
+template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>
 void CompilerBase<Adaptor, Derived, Config>::ValuePart::set_value_reg(
     CompilerBase *compiler, AsmReg value_reg) noexcept {
   assert(compiler->may_change_value_state());
@@ -818,6 +878,10 @@ struct CompilerBase<Adaptor, Derived, Config>::ValuePartRef : ValuePart {
   void unlock() noexcept { ValuePart::unlock(compiler); }
 
   void set_value(ValuePart &&other) noexcept {
+    ValuePart::set_value(compiler, std::move(other));
+  }
+
+  void set_value(ScratchReg &&other) noexcept {
     ValuePart::set_value(compiler, std::move(other));
   }
 
