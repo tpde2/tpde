@@ -93,7 +93,6 @@ struct GenerationState {
                              std::string_view sym_name,
                              unsigned cp_idx);
 
-  void handle_return(llvm::raw_ostream &os, llvm::MachineInstr *inst);
   void handle_terminator(llvm::raw_ostream &os, llvm::MachineInstr *inst);
 
   void handle_end_of_block(llvm::raw_ostream &os, llvm::MachineBasicBlock *);
@@ -768,49 +767,6 @@ void GenerationState::handle_end_of_block(llvm::raw_ostream &os,
   }
 }
 
-void GenerationState::handle_return(llvm::raw_ostream &os,
-                                    llvm::MachineInstr *inst) {
-  // record the number of return regs
-  {
-    unsigned num_ret_regs = 0;
-    std::vector<unsigned> ret_regs = {};
-    for (const auto &mach_op : inst->uses()) {
-      assert(mach_op.getType() == llvm::MachineOperand::MO_Register);
-      if (mach_op.isUndef()) { // LR on AArch64
-        continue;
-      }
-      const auto reg = mach_op.getReg();
-      assert(reg.isPhysical());
-      const auto reg_id = target->reg_id_from_mc_reg(reg);
-      if (this->num_ret_regs == -1) {
-        used_regs.insert(reg_id);
-        ret_regs.push_back(reg_id);
-      } else {
-        if (return_regs.size() <= num_ret_regs ||
-            return_regs[num_ret_regs] != reg_id) {
-          std::cerr << std::format(
-              "ERROR: Found mismatching return with register "
-              "{}({})",
-              reg_id,
-              target->reg_name_lower(reg_id));
-          exit(1);
-        }
-      }
-      ++num_ret_regs;
-    }
-    if (this->num_ret_regs == -1) {
-      this->num_ret_regs = static_cast<int>(num_ret_regs);
-      return_regs = std::move(ret_regs);
-    }
-  }
-
-  if (func->size() > 1 && inst->getParent()->getNextNode()) {
-    os << "  derived()->generate_raw_jump(Derived::Jump::jmp, "
-          "ret_converge_label);\n";
-    return;
-  }
-}
-
 void GenerationState::handle_terminator(llvm::raw_ostream &os,
                                         llvm::MachineInstr *inst) {
   if (!inst->isBranch() || inst->isIndirectBranch()) {
@@ -871,6 +827,19 @@ bool encode_prepass(llvm::MachineFunction *func, GenerationState &state) {
         continue;
       }
 
+      if (inst.isReturn()) {
+        if (state.num_ret_regs == -1) {
+          for (const auto &mo : inst.all_uses()) {
+            if (!mo.isReg() || mo.isUndef()) { // undef => skip LR on AArch64
+              continue;
+            }
+            auto reg_id = state.target->reg_id_from_mc_reg(mo.getReg());
+            state.return_regs.push_back(reg_id);
+          }
+          state.num_ret_regs = state.return_regs.size();
+        }
+      }
+
       if (inst.isTerminator() || inst.isPseudo() ||
           state.target->inst_should_be_skipped(inst)) {
         continue;
@@ -896,14 +865,9 @@ bool encode_prepass(llvm::MachineFunction *func, GenerationState &state) {
   if (func->size() == 1 && func->begin()->back().isReturn()) {
     // For single-block functions, try to identify moves to result registers
     const auto &mbb = *func->begin();
-    const auto &ret = mbb.back();
-    unsigned missing_defs = 0;
-    for (const auto &mo : ret.operands()) {
-      if (!mo.isReg() || !mo.isUse() || mo.isUndef()) {
-        continue;
-      }
-      state.ret_defs[state.target->reg_id_from_mc_reg(mo.getReg())] = nullptr;
-      missing_defs += 1;
+    unsigned missing_defs = state.num_ret_regs;
+    for (auto ret_reg : state.return_regs) {
+      state.ret_defs[ret_reg] = nullptr;
     }
 
     // Find last def that is unused
@@ -1062,7 +1026,10 @@ bool create_encode_function(llvm::MachineFunction *func,
       os << "\n";
 
       if (inst->isReturn()) {
-        state.handle_return(os, inst);
+        if (func->size() > 1 && inst->getParent()->getNextNode()) {
+          os << "  derived()->generate_raw_jump(Derived::Jump::jmp, "
+                "ret_converge_label);\n";
+        }
       } else if (inst->isTerminator()) {
         state.handle_terminator(os, inst);
       } else {
