@@ -343,7 +343,9 @@ public:
   std::pair<ValueRef, ValuePartRef>
       result_ref_single(IRValueRef value) noexcept;
 
+  [[deprecated("Use ValuePartRef::set_value")]]
   void set_value(ValuePartRef &val_ref, ScratchReg &scratch) noexcept;
+  [[deprecated("Use ValuePartRef::set_value")]]
   void set_value(ValuePartRef &&val_ref, ScratchReg &scratch) noexcept {
     set_value(val_ref, scratch);
   }

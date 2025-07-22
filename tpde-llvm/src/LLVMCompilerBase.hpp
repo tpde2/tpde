@@ -4383,7 +4383,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_intrin(
     // TODO: optimize for different TLS access models
     ScratchReg res =
         derived()->tls_get_addr(global_sym(gv), tpde::TLSModel::GlobalDynamic);
-    this->set_value(res_ref, res);
+    res_ref.set_value(std::move(res));
     return true;
   }
   case llvm::Intrinsic::vaend: {

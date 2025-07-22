@@ -433,7 +433,6 @@ bool LLVMCompilerArm64::compile_icmp(const llvm::Instruction *inst,
 
   auto lhs = this->val_ref(cmp->getOperand(0));
   auto rhs = this->val_ref(cmp->getOperand(1));
-  ScratchReg res_scratch{this};
 
   if (int_width == 128) {
     auto lhs_lo = lhs.part(0);
@@ -479,6 +478,7 @@ bool LLVMCompilerArm64::compile_icmp(const llvm::Instruction *inst,
         // register. This case is not easy to detect here, though. Therefore,
         // for now we always copy the value into a register that we own.
         // TODO: copy only when lhs_reg belongs to an overwritten PHI node.
+        ScratchReg res_scratch{this};
         if (!lhs_op.can_salvage()) {
           AsmReg src_reg = lhs_reg;
           lhs_reg = res_scratch.alloc_gp();
@@ -535,16 +535,14 @@ bool LLVMCompilerArm64::compile_icmp(const llvm::Instruction *inst,
   } else if (fuse_ext) {
     auto [_, res_ref] = this->result_ref_single(fuse_ext);
     if (llvm::isa<llvm::ZExtInst>(fuse_ext)) {
-      generate_raw_set(jump, res_scratch.alloc_gp());
+      generate_raw_set(jump, res_ref.alloc_reg());
     } else {
-      generate_raw_mask(jump, res_scratch.alloc_gp());
+      generate_raw_mask(jump, res_ref.alloc_reg());
     }
-    set_value(res_ref, res_scratch);
     this->adaptor->inst_set_fused(fuse_ext, true);
   } else {
     auto [_, res_ref] = this->result_ref_single(cmp);
-    generate_raw_set(jump, res_scratch.alloc_gp());
-    set_value(res_ref, res_scratch);
+    generate_raw_set(jump, res_ref.alloc_reg());
   }
 
   return true;

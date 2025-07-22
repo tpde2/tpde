@@ -348,7 +348,6 @@ bool LLVMCompilerX64::compile_icmp(const llvm::Instruction *inst,
 
   auto lhs = this->val_ref(cmp->getOperand(0));
   auto rhs = this->val_ref(cmp->getOperand(1));
-  ScratchReg res_scratch{this};
 
   if (int_width == 128) {
     // for 128 bit compares, we need to swap the operands sometimes
@@ -364,6 +363,7 @@ bool LLVMCompilerX64::compile_icmp(const llvm::Instruction *inst,
     auto rhs_reg_hi = rhs_hi.load_to_reg();
 
     // Compare the ints using carried subtraction
+    ScratchReg res_scratch{this};
     if ((jump == Jump::je) || (jump == Jump::jne)) {
       // for eq,neq do something a bit quicker
       ScratchReg scratch{this};
@@ -430,16 +430,14 @@ bool LLVMCompilerX64::compile_icmp(const llvm::Instruction *inst,
   } else if (fuse_ext) {
     auto [_, res_ref] = result_ref_single(fuse_ext);
     if (llvm::isa<llvm::ZExtInst>(fuse_ext)) {
-      generate_raw_set(jump, res_scratch.alloc_gp());
+      generate_raw_set(jump, res_ref.alloc_reg());
     } else {
-      generate_raw_mask(jump, res_scratch.alloc_gp());
+      generate_raw_mask(jump, res_ref.alloc_reg());
     }
-    set_value(res_ref, res_scratch);
     this->adaptor->inst_set_fused(fuse_ext, true);
   } else {
     auto [_, res_ref] = result_ref_single(cmp);
-    generate_raw_set(jump, res_scratch.alloc_gp());
-    set_value(res_ref, res_scratch);
+    generate_raw_set(jump, res_ref.alloc_reg());
   }
 
   return true;
