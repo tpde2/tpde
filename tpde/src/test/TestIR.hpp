@@ -120,15 +120,32 @@ struct TestIR {
   void print() const noexcept;
 };
 
+class IRValueRef {
+  u32 val;
+
+public:
+  explicit constexpr IRValueRef(u32 val) : val(val) {}
+  explicit constexpr operator u32() const { return val; }
+  bool operator==(const IRValueRef &other) const { return val == other.val; }
+};
+
+class IRInstRef {
+  u32 val;
+
+public:
+  explicit constexpr IRInstRef(u32 val) : val(val) {}
+  explicit constexpr operator u32() const { return val; }
+  explicit constexpr operator IRValueRef() const { return IRValueRef(val); }
+  bool operator==(const IRInstRef &other) const { return val == other.val; }
+};
+
 struct TestIRAdaptor {
   TestIR *ir;
 
   explicit TestIRAdaptor(TestIR *ir) : ir(ir) {}
 
-  enum class IRValueRef : u32 {
-  };
-  enum class IRInstRef : u32 {
-  };
+  using IRValueRef = tpde::test::IRValueRef;
+  using IRInstRef = tpde::test::IRInstRef;
   enum class IRBlockRef : u32 {
   };
   enum class IRFuncRef : u32 {

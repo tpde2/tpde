@@ -109,7 +109,6 @@ concept IRAdaptor = requires(T a) {
   requires requires(typename T::IRValueRef r, typename T::IRValueRef w) {
     { r == T::INVALID_VALUE_REF } -> std::convertible_to<bool>;
     { r != T::INVALID_VALUE_REF } -> std::convertible_to<bool>;
-    { r < w } -> std::convertible_to<bool>;
   };
 
 
