@@ -786,8 +786,11 @@ FOPS(double)
 #undef FOP
 
 // --------------------------
-// prefetch
+// miscellaneous
 // --------------------------
+
+void TARGET_V1 trap(void) { __builtin_trap(); }
+void TARGET_V1 debugtrap(void) { __builtin_debugtrap(); }
 
 void prefetch_rl0(void* addr) { __builtin_prefetch(addr, 0, 0); }
 void prefetch_rl1(void* addr) { __builtin_prefetch(addr, 0, 1); }

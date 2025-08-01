@@ -94,9 +94,6 @@ struct LLVMCompilerArm64 : tpde::a64::CompilerA64<LLVMAdaptor,
                       LLVMBasicValType ty,
                       GenericValuePart el) noexcept;
 
-  bool compile_unreachable(const llvm::Instruction *,
-                           const ValInfo &,
-                           u64) noexcept;
   bool compile_br(const llvm::Instruction *, const ValInfo &, u64) noexcept;
   void generate_conditional_branch(Jump jmp,
                                    IRBlockRef true_target,
@@ -280,14 +277,6 @@ void LLVMCompilerArm64::insert_element(ValueRef &vec_vr,
   }
 
   vec_ref.set_modified();
-}
-
-bool LLVMCompilerArm64::compile_unreachable(const llvm::Instruction *,
-                                            const ValInfo &,
-                                            u64) noexcept {
-  ASM(UDF, 1);
-  this->release_regs_after_return();
-  return true;
 }
 
 bool LLVMCompilerArm64::compile_br(const llvm::Instruction *inst,
@@ -744,8 +733,6 @@ bool LLVMCompilerArm64::handle_intrin(
     ASM(MOVx, res_vr.alloc_reg(), op->isZeroValue() ? DA_GP(29) : DA_ZR);
     return true;
   }
-  case llvm::Intrinsic::trap: ASM(BRK, 1); return true;
-  case llvm::Intrinsic::debugtrap: ASM(BRK, 0xf000); return true;
   case llvm::Intrinsic::aarch64_crc32cx: {
     auto [lhs_vr, lhs_ref] = this->val_ref_single(inst->getOperand(0));
     auto [rhs_vr, rhs_ref] = this->val_ref_single(inst->getOperand(1));

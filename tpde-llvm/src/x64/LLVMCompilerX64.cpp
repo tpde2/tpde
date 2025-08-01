@@ -87,9 +87,6 @@ struct LLVMCompilerX64 : tpde::x64::CompilerX64<LLVMAdaptor,
   std::optional<CallBuilder>
       create_call_builder(const llvm::CallBase * = nullptr) noexcept;
 
-  bool compile_unreachable(const llvm::Instruction *,
-                           const ValInfo &,
-                           u64) noexcept;
   bool compile_br(const llvm::Instruction *, const ValInfo &, u64) noexcept;
   void generate_conditional_branch(Jump jmp,
                                    IRBlockRef true_target,
@@ -196,14 +193,6 @@ std::optional<LLVMCompilerX64::CallBuilder>
                        std::get<tpde::x64::CCAssignerSysV>(cc_assigners)};
   default: return std::nullopt;
   }
-}
-
-bool LLVMCompilerX64::compile_unreachable(const llvm::Instruction *,
-                                          const ValInfo &,
-                                          u64) noexcept {
-  ASM(UD2);
-  this->release_regs_after_return();
-  return true;
 }
 
 bool LLVMCompilerX64::compile_br(const llvm::Instruction *inst,
@@ -652,8 +641,6 @@ bool LLVMCompilerX64::handle_intrin(const llvm::IntrinsicInst *inst) noexcept {
     this->result_ref(inst).part(0).set_value(std::move(res));
     return true;
   }
-  case llvm::Intrinsic::trap: ASM(UD2); return true;
-  case llvm::Intrinsic::debugtrap: ASM(INT3); return true;
   case llvm::Intrinsic::x86_sse2_pause: ASM(PAUSE); return true;
   default: return false;
   }

@@ -1008,6 +1008,8 @@ void EncodingTargetX64::get_inst_candidates(
     handle_default("PREFETCHT0m", 0);
   } else if (Name == "TRAP") {
     handle_default("UD2");
+  } else if (Name == "INT3") {
+    handle_default("INT3");
   }
 
   if (candidates.size() == 0) {

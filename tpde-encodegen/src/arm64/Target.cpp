@@ -1040,6 +1040,8 @@ void EncodingTargetArm64::get_inst_candidates(
   case_default("STLRW", "STLRw");
   case_default("STLRX", "STLRx");
 
+  case_default("BRK", "BRK");
+
   if (candidates.empty()) {
     llvm::errs() << "ERROR: unhandled instruction " << Name << "\n";
     assert(false);

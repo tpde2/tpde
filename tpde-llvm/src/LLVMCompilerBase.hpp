@@ -413,6 +413,9 @@ public:
 
   bool compile_inst(const llvm::Instruction *, InstRange) noexcept;
 
+  bool compile_unreachable(const llvm::Instruction *,
+                           const ValInfo &,
+                           u64) noexcept;
   bool compile_ret(const llvm::Instruction *, const ValInfo &, u64) noexcept;
   bool compile_load_generic(const llvm::LoadInst *,
                             GenericValuePart &&) noexcept;
@@ -505,10 +508,6 @@ public:
                                OverflowOp) noexcept;
   bool compile_saturating_intrin(const llvm::IntrinsicInst *,
                                  OverflowOp) noexcept;
-
-  bool compile_unreachable(const llvm::UnreachableInst *) noexcept {
-    return false;
-  }
 
 
   bool compile_br(const llvm::Instruction *, const ValInfo &, u64) noexcept {
@@ -1421,6 +1420,14 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_inst(
   assert(i->getOpcode() < fns.size());
   const auto [compile_fn, arg] = fns[i->getOpcode()];
   return (derived()->*compile_fn)(i, val_info, arg);
+}
+
+template <typename Adaptor, typename Derived, typename Config>
+bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_unreachable(
+    const llvm::Instruction *, const ValInfo &, u64) noexcept {
+  derived()->encode_trap();
+  this->release_regs_after_return();
+  return true;
 }
 
 template <typename Adaptor, typename Derived, typename Config>
@@ -4909,6 +4916,8 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_intrin(
     }
     return true;
   }
+  case llvm::Intrinsic::trap: return derived()->encode_trap();
+  case llvm::Intrinsic::debugtrap: return derived()->encode_debugtrap();
   case llvm::Intrinsic::prefetch: {
     auto ptr_ref = this->val_ref(inst->getOperand(0));
 

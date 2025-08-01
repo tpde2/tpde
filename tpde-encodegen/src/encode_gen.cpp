@@ -60,7 +60,7 @@ struct GenerationState {
   /// multiple blocks. Used for eliminating useless moves at function end.
   llvm::DenseMap<unsigned, const llvm::MachineInstr *> ret_defs{};
   unsigned cur_inst_id = 0;
-  int num_ret_regs = -1;
+  unsigned num_ret_regs = 0;
   std::vector<unsigned> return_regs = {};
   unsigned &sym_count;
   std::unordered_map<unsigned, unsigned> const_pool_indices_used = {};
@@ -820,6 +820,7 @@ void GenerationState::handle_terminator(llvm::raw_ostream &os,
 }
 
 bool encode_prepass(llvm::MachineFunction *func, GenerationState &state) {
+  bool ret_regs_defined = false;
   for (auto bb_it = func->begin(); bb_it != func->end(); ++bb_it) {
     for (auto inst_it = bb_it->begin(); inst_it != bb_it->end(); ++inst_it) {
       llvm::MachineInstr &inst = *inst_it;
@@ -828,7 +829,7 @@ bool encode_prepass(llvm::MachineFunction *func, GenerationState &state) {
       }
 
       if (inst.isReturn()) {
-        if (state.num_ret_regs == -1) {
+        if (!ret_regs_defined) {
           for (const auto &mo : inst.all_uses()) {
             if (!mo.isReg() || mo.isUndef()) { // undef => skip LR on AArch64
               continue;
@@ -837,6 +838,7 @@ bool encode_prepass(llvm::MachineFunction *func, GenerationState &state) {
             state.return_regs.push_back(reg_id);
           }
           state.num_ret_regs = state.return_regs.size();
+          ret_regs_defined = true;
         }
       }
 
@@ -1139,8 +1141,7 @@ bool create_encode_function(llvm::MachineFunction *func,
 
   // assignments for the results need to be after the check for fixed reg
   // backups
-  assert(state.num_ret_regs >= 0);
-  for (int idx = 0; idx < state.num_ret_regs; ++idx) {
+  for (unsigned idx = 0; idx < state.num_ret_regs; ++idx) {
     const auto reg = state.return_regs[idx];
     auto name = state.target->reg_name_lower(reg);
 
@@ -1172,7 +1173,7 @@ bool create_encode_function(llvm::MachineFunction *func,
     // ref results. This permits callers to use call the function with rvalues.
     std::string func_args_rvalue = func_args;
     llvm::raw_string_ostream func_args_rvalue_os(func_args_rvalue);
-    for (int i = 0; i < state.num_ret_regs; ++i) {
+    for (unsigned i = 0; i < state.num_ret_regs; ++i) {
       func_args_os << (func_args.empty() ? "" : ", ") << "ValuePart &result_"
                    << i;
       func_args_rvalue_os << (func_args.empty() ? "" : ", ")
@@ -1198,7 +1199,7 @@ bool create_encode_function(llvm::MachineFunction *func,
         decl_os << (first ? "" : ", ") << "std::move(" << param << ")";
         first = false;
       }
-      for (int i = 0; i < state.num_ret_regs; ++i) {
+      for (unsigned i = 0; i < state.num_ret_regs; ++i) {
         decl_os << (first ? "" : ", ") << "result_" << i;
         first = false;
       }

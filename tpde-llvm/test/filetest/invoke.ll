@@ -75,7 +75,7 @@ define i32 @invoke_manyargs() personality ptr @__gxx_personality_v0 {
 ; ARM64-NEXT:     ...
 ; ARM64-NEXT:    bl 0xa4 <invoke_manyargs+0x84>
 ; ARM64-NEXT:     R_AARCH64_CALL26 _Unwind_Resume
-; ARM64-NEXT:    udf #0x1
+; ARM64-NEXT:    brk #0x1
 entry:
   %call = invoke i32 @mayThrow(i32 1, i32 2, i32 3, i32 4, i32 5, i32 6, i32 7, i32 8, i32 9, i32 10)
           to label %invoke.cont unwind label %lpad
@@ -197,7 +197,7 @@ define void @invoke_landingpad_phi() personality ptr @__gxx_personality_v0 {
 ; ARM64-NEXT:    mov w1, #0x0 // =0
 ; ARM64-NEXT:    bl 0x178 <invoke_landingpad_phi+0xb8>
 ; ARM64-NEXT:     R_AARCH64_CALL26 _Unwind_Resume
-; ARM64-NEXT:    udf #0x1
+; ARM64-NEXT:    brk #0x1
   br label %1
 
 1:                                                ; preds = %17, %0
