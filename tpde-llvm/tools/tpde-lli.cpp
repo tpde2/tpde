@@ -126,7 +126,7 @@ int main(int argc, char *argv[]) {
   auto obj_membuf = llvm::MemoryBuffer::getMemBuffer(buf_strref, "", false);
   assert(obj_membuf->getBufferSize());
 
-  size_t page_size = getpagesize();
+  size_t page_size = exit_on_err(llvm::sys::Process::getPageSize());
   llvm::orc::ExecutionSession es(
       std::make_unique<llvm::orc::UnsupportedExecutorProcessControl>());
   llvm::orc::MapperJITLinkMemoryManager memory_manager(
