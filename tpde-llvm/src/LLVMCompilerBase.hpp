@@ -1467,7 +1467,6 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_ret(
 template <typename Adaptor, typename Derived, typename Config>
 bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_load_generic(
     const llvm::LoadInst *load, GenericValuePart &&ptr_op) noexcept {
-  auto res = this->result_ref(load);
   // TODO(ts): if the ref-count is <= 1, then skip emitting the load as LLVM
   // does that, too. at least on ARM
 
@@ -1527,11 +1526,14 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_load_generic(
       }
     }
 
+    ValueRef res = this->result_ref(load);
     (derived()->*encode_fn)(std::move(ptr_op), res.part(0));
     return true;
   }
 
   unsigned num_bits;
+  bool sext = false;
+  const llvm::Instruction *target = load;
   switch (this->adaptor->val_info(load).type) {
     using enum LLVMBasicValType;
   case i1:
@@ -1541,19 +1543,47 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_load_generic(
   case i64: {
     assert(load->getType()->isIntegerTy());
     num_bits = load->getType()->getIntegerBitWidth();
-  load_single_integer:
-    switch (tpde::util::align_up(num_bits, 8)) {
-    case 1:
-    case 8: derived()->encode_loadi8(std::move(ptr_op), res.part(0)); break;
-    case 16: derived()->encode_loadi16(std::move(ptr_op), res.part(0)); break;
-    case 24: derived()->encode_loadi24(std::move(ptr_op), res.part(0)); break;
-    case 32: derived()->encode_loadi32(std::move(ptr_op), res.part(0)); break;
-    case 40: derived()->encode_loadi40(std::move(ptr_op), res.part(0)); break;
-    case 48: derived()->encode_loadi48(std::move(ptr_op), res.part(0)); break;
-    case 56: derived()->encode_loadi56(std::move(ptr_op), res.part(0)); break;
-    case 64: derived()->encode_loadi64(std::move(ptr_op), res.part(0)); break;
-    default: assert(0); return false;
+    // Most loads are 8/16/32/64-bit loads, and are frequently zext/sext-ed or
+    // trunc-ed (e.g. to i1) immediately afterwards.
+    if (load->hasOneUse()) {
+      auto *user = llvm::cast<llvm::Instruction>(load->use_begin()->getUser());
+      // TODO: evaluate when same block condition is actually required.
+      if (user->getParent() != load->getParent()) {
+        goto load_single_integer;
+      }
+      if (llvm::isa<llvm::TruncInst>(user)) {
+        // Trunc is a no-op, so simply make the load the result.
+        target = user;
+        this->adaptor->inst_set_fused(user, true);
+      } else if (llvm::isa<llvm::ZExtInst, llvm::SExtInst>(user) &&
+                 user->getType()->getIntegerBitWidth() <= 64 && num_bits >= 8 &&
+                 (num_bits & (num_bits - 1)) == 0) {
+        // 8/16/32/64-bit loads can trivially zext/sext.
+        target = user;
+        sext = llvm::isa<llvm::SExtInst>(user);
+        this->adaptor->inst_set_fused(user, true);
+      }
     }
+
+  load_single_integer:
+    using EncodeFnTy = bool (Derived::*)(GenericValuePart &&, ValuePart &&);
+    static constexpr auto fns = []() consteval {
+      std::array<EncodeFnTy[2], 8> res{};
+      res[0][0] = &Derived::encode_loadi8_zext;
+      res[0][1] = &Derived::encode_loadi8_sext;
+      res[1][0] = &Derived::encode_loadi16_zext;
+      res[1][1] = &Derived::encode_loadi16_sext;
+      res[2][0] = &Derived::encode_loadi24;
+      res[3][0] = &Derived::encode_loadi32_zext;
+      res[3][1] = &Derived::encode_loadi32_sext;
+      res[4][0] = &Derived::encode_loadi40;
+      res[5][0] = &Derived::encode_loadi48;
+      res[6][0] = &Derived::encode_loadi56;
+      res[7][0] = &Derived::encode_loadi64;
+      return res;
+    }();
+    EncodeFnTy fn = fns[(num_bits - 1) / 8][sext];
+    (derived()->*fn)(std::move(ptr_op), this->result_ref(target).part(0));
     break;
   }
   case v8i1:
@@ -1565,23 +1595,35 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_load_generic(
         llvm::cast<llvm::FixedVectorType>(load->getType())->getNumElements();
     goto load_single_integer;
 
-  case ptr: derived()->encode_loadi64(std::move(ptr_op), res.part(0)); break;
-  case i128:
+  case ptr: num_bits = 64; goto load_single_integer;
+
+  case i128: {
+    ValueRef res = this->result_ref(load);
     derived()->encode_loadi128(std::move(ptr_op), res.part(0), res.part(1));
-    return true;
-  case f32: derived()->encode_loadf32(std::move(ptr_op), res.part(0)); break;
+    break;
+  }
+  case f32:
+    derived()->encode_loadf32(std::move(ptr_op),
+                              this->result_ref(load).part(0));
+    break;
   case v8i8:
   case v4i16:
   case v2i32:
   case v2f32:
-  case f64: derived()->encode_loadf64(std::move(ptr_op), res.part(0)); break;
+  case f64:
+    derived()->encode_loadf64(std::move(ptr_op),
+                              this->result_ref(load).part(0));
+    break;
   case v16i8:
   case v8i16:
   case v4i32:
   case v2i64:
   case v4f32:
   case v2f64:
-  case f128: derived()->encode_loadv128(std::move(ptr_op), res.part(0)); break;
+  case f128:
+    derived()->encode_loadv128(std::move(ptr_op),
+                               this->result_ref(load).part(0));
+    break;
   case complex: {
     auto ty_idx = this->adaptor->val_info(load).complex_part_tys_idx;
     const LLVMComplexPart *part_descs =
@@ -1591,6 +1633,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_load_generic(
     // TODO: fuse expr; not easy, because we lose the GVP
     AsmReg ptr_reg = this->gval_as_reg(ptr_op);
 
+    ValueRef res = this->result_ref(target);
     unsigned off = 0;
     for (unsigned i = 0; i < part_count; i++) {
       auto part_addr =
@@ -1600,15 +1643,15 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_load_generic(
       case i1:
       case i8:
       case v8i1:
-        derived()->encode_loadi8(std::move(part_addr), res.part(i));
+        derived()->encode_loadi8_zext(std::move(part_addr), res.part(i));
         break;
       case i16:
       case v16i1:
-        derived()->encode_loadi16(std::move(part_addr), res.part(i));
+        derived()->encode_loadi16_zext(std::move(part_addr), res.part(i));
         break;
       case i32:
       case v32i1:
-        derived()->encode_loadi32(std::move(part_addr), res.part(i));
+        derived()->encode_loadi32_zext(std::move(part_addr), res.part(i));
         break;
       case i64:
       case v64i1:
@@ -2763,9 +2806,9 @@ void LLVMCompilerBase<Adaptor, Derived, Config>::extract_element(
 
   switch (ty) {
     using enum LLVMBasicValType;
-  case i8: derived()->encode_loadi8(std::move(addr), out); break;
-  case i16: derived()->encode_loadi16(std::move(addr), out); break;
-  case i32: derived()->encode_loadi32(std::move(addr), out); break;
+  case i8: derived()->encode_loadi8_zext(std::move(addr), out); break;
+  case i16: derived()->encode_loadi16_zext(std::move(addr), out); break;
+  case i32: derived()->encode_loadi32_zext(std::move(addr), out); break;
   case i64:
   case ptr: derived()->encode_loadi64(std::move(addr), out); break;
   case f32: derived()->encode_loadf32(std::move(addr), out); break;
@@ -2885,9 +2928,9 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_extract_element(
   // Third, do the load.
   switch (bvt) {
     using enum LLVMBasicValType;
-  case i8: derived()->encode_loadi8(std::move(addr), result); break;
-  case i16: derived()->encode_loadi16(std::move(addr), result); break;
-  case i32: derived()->encode_loadi32(std::move(addr), result); break;
+  case i8: derived()->encode_loadi8_zext(std::move(addr), result); break;
+  case i16: derived()->encode_loadi16_zext(std::move(addr), result); break;
+  case i32: derived()->encode_loadi32_zext(std::move(addr), result); break;
   case i64:
   case ptr: derived()->encode_loadi64(std::move(addr), result); break;
   case f32: derived()->encode_loadf32(std::move(addr), result); break;
