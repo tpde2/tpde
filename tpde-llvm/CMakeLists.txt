@@ -60,9 +60,9 @@ target_sources(tpde_llvm PRIVATE
         src/LLVMCompilerBase.hpp
 )
 
-set(CLANG_HINTS "")
+set(TPDE_CLANG_HINTS "")
 if (DEFINED LLVM_DIR)
-    set(CLANG_HINTS "${LLVM_DIR}/../clang")
+    set(TPDE_CLANG_HINTS "${LLVM_DIR}/../clang")
 endif ()
 
 function(check_clang_version validator_result_var CANDIDATE)
@@ -89,16 +89,16 @@ function(check_clang_version validator_result_var CANDIDATE)
         endif ()
     endif ()
 endfunction()
-find_program(CLANG NO_CACHE REQUIRED
+find_program(TPDE_CLANG NO_CACHE REQUIRED
              NAMES clang-${LLVM_VERSION_MAJOR} clang-20 clang-19 clang-18 clang
              HINTS ${LLVM_TOOLS_BINARY_DIR}
              VALIDATOR check_clang_version)
-message(STATUS "Found Clang: " ${CLANG})
+message(STATUS "Found Clang: " ${TPDE_CLANG})
 
 if (TPDE_X64)
     add_custom_command(
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/encode_template_x64.bc
-        COMMAND ${CLANG} -c -emit-llvm -ffreestanding -fcf-protection=none
+        COMMAND ${TPDE_CLANG} -c -emit-llvm -ffreestanding -fcf-protection=none
             -O3 -fomit-frame-pointer -fno-math-errno
             --target=x86_64-linux -march=x86-64-v4
             -o ${CMAKE_CURRENT_BINARY_DIR}/encode_template_x64.bc
@@ -136,7 +136,7 @@ endif ()
 if (TPDE_A64)
     add_custom_command(
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/encode_template_arm64.bc
-        COMMAND ${CLANG} -c -emit-llvm -ffreestanding -fcf-protection=none
+        COMMAND ${TPDE_CLANG} -c -emit-llvm -ffreestanding -fcf-protection=none
             -O3 -fomit-frame-pointer -fno-math-errno
             --target=aarch64 -march=armv8.1-a
             -o ${CMAKE_CURRENT_BINARY_DIR}/encode_template_arm64.bc
