@@ -35,7 +35,6 @@ index 259972bdf8f0..8e65b44b7452 100644
  #include "DebugOptions.def"
  
 diff --git a/clang/include/clang/Driver/Options.td b/clang/include/clang/Driver/Options.td
-index 02e5c4cbb4bf..dc65628f6e1c 100644
 --- a/clang/include/clang/Driver/Options.td
 +++ b/clang/include/clang/Driver/Options.td
 @@ -3621,6 +3621,18 @@ defm disable_block_signature_string : BoolFOption<"disable-block-signature-strin
@@ -58,7 +57,6 @@ index 02e5c4cbb4bf..dc65628f6e1c 100644
    Visibility<[ClangOption, FlangOption]>,
    HelpText<"Omit the frame pointer from functions that don't need it. "
 diff --git a/clang/lib/CodeGen/BackendUtil.cpp b/clang/lib/CodeGen/BackendUtil.cpp
-index 3e65eeb3755d..63dd36faf7f4 100644
 --- a/clang/lib/CodeGen/BackendUtil.cpp
 +++ b/clang/lib/CodeGen/BackendUtil.cpp
 @@ -9,6 +9,7 @@
@@ -69,7 +67,7 @@ index 3e65eeb3755d..63dd36faf7f4 100644
  #include "clang/Basic/CodeGenOptions.h"
  #include "clang/Basic/Diagnostic.h"
  #include "clang/Basic/LangOptions.h"
-@@ -1184,6 +1185,36 @@ void EmitAssemblyHelper::RunOptimizationPipeline(
+@@ -1184,6 +1185,35 @@ void EmitAssemblyHelper::RunOptimizationPipeline(
  void EmitAssemblyHelper::RunCodegenPipeline(
      BackendAction Action, std::unique_ptr<raw_pwrite_stream> &OS,
      std::unique_ptr<llvm::ToolOutputFile> &DwoOS) {
@@ -87,8 +85,7 @@ index 3e65eeb3755d..63dd36faf7f4 100644
 +    auto Compiler = tpde_llvm::LLVMCompiler::create(TargetTriple);
 +    std::vector<uint8_t> ObjectBuf;
 +    if (Compiler && Compiler->compile_to_elf(*TheModule, ObjectBuf)) {
-+      OS->pwrite(reinterpret_cast<char *>(ObjectBuf.data()), ObjectBuf.size(),
-+                 0);
++      OS->write(reinterpret_cast<char *>(ObjectBuf.data()), ObjectBuf.size());
 +      return;
 +    }
 +
@@ -125,7 +122,6 @@ index 868ec847b963..c3f8b295674b 100644
 +add_subdirectory(tpde2)
 +target_link_libraries(clangCodeGen PRIVATE $<BUILD_LOCAL_INTERFACE:tpde_llvm>)
 diff --git a/clang/lib/Driver/ToolChains/Clang.cpp b/clang/lib/Driver/ToolChains/Clang.cpp
-index 57b7d2bd4698..89d46efa28ab 100644
 --- a/clang/lib/Driver/ToolChains/Clang.cpp
 +++ b/clang/lib/Driver/ToolChains/Clang.cpp
 @@ -8031,6 +8031,10 @@ void Clang::ConstructJob(Compilation &C, const JobAction &JA,
@@ -140,7 +136,6 @@ index 57b7d2bd4698..89d46efa28ab 100644
                                 options::OPT_fno_global_isel)) {
      CmdArgs.push_back("-mllvm");
 diff --git a/clang/lib/Driver/ToolChains/Flang.cpp b/clang/lib/Driver/ToolChains/Flang.cpp
-index 1ae865f37911..894a7ebaf6f4 100644
 --- a/clang/lib/Driver/ToolChains/Flang.cpp
 +++ b/clang/lib/Driver/ToolChains/Flang.cpp
 @@ -159,7 +159,8 @@ void Flang::addCodegenOptions(const ArgList &Args,
@@ -154,7 +149,6 @@ index 1ae865f37911..894a7ebaf6f4 100644
  
  void Flang::addPicOptions(const ArgList &Args, ArgStringList &CmdArgs) const {
 diff --git a/flang/include/flang/Frontend/CodeGenOptions.def b/flang/include/flang/Frontend/CodeGenOptions.def
-index deb8d1aede51..0b29f2024149 100644
 --- a/flang/include/flang/Frontend/CodeGenOptions.def
 +++ b/flang/include/flang/Frontend/CodeGenOptions.def
 @@ -41,5 +41,8 @@ ENUM_CODEGENOPT(DebugInfo,  llvm::codegenoptions::DebugInfoKind, 4,  llvm::codeg
@@ -167,7 +161,6 @@ index deb8d1aede51..0b29f2024149 100644
  #undef CODEGENOPT
  #undef ENUM_CODEGENOPT
 diff --git a/flang/lib/Frontend/CMakeLists.txt b/flang/lib/Frontend/CMakeLists.txt
-index d063ed36d00b..f69497b0bfca 100644
 --- a/flang/lib/Frontend/CMakeLists.txt
 +++ b/flang/lib/Frontend/CMakeLists.txt
 @@ -67,5 +67,7 @@ add_flang_library(flangFrontend
@@ -179,7 +172,6 @@ index d063ed36d00b..f69497b0bfca 100644
  )
 +target_link_libraries(flangFrontend PRIVATE $<BUILD_LOCAL_INTERFACE:tpde_llvm>)
 diff --git a/flang/lib/Frontend/CompilerInvocation.cpp b/flang/lib/Frontend/CompilerInvocation.cpp
-index 68b5950d3a51..bd47b9346b3a 100644
 --- a/flang/lib/Frontend/CompilerInvocation.cpp
 +++ b/flang/lib/Frontend/CompilerInvocation.cpp
 @@ -426,6 +426,15 @@ static void parseCodeGenArgs(Fortran::frontend::CodeGenOptions &opts,
@@ -199,7 +191,6 @@ index 68b5950d3a51..bd47b9346b3a 100644
  
  /// Parses all target input arguments and populates the target
 diff --git a/flang/lib/Frontend/FrontendActions.cpp b/flang/lib/Frontend/FrontendActions.cpp
-index b0545a7ac2f9..910c0d06480d 100644
 --- a/flang/lib/Frontend/FrontendActions.cpp
 +++ b/flang/lib/Frontend/FrontendActions.cpp
 @@ -42,6 +42,7 @@
@@ -210,7 +201,7 @@ index b0545a7ac2f9..910c0d06480d 100644
  #include "clang/Basic/Diagnostic.h"
  #include "clang/Basic/DiagnosticFrontend.h"
  #include "clang/Basic/FileManager.h"
-@@ -976,6 +977,36 @@ static void generateMachineCodeOrAssemblyImpl(clang::DiagnosticsEngine &diags,
+@@ -976,6 +977,35 @@ static void generateMachineCodeOrAssemblyImpl(clang::DiagnosticsEngine &diags,
            (act == BackendActionTy::Backend_EmitAssembly)) &&
           "Unsupported action");
  
@@ -228,8 +219,7 @@ index b0545a7ac2f9..910c0d06480d 100644
 +    auto compiler = tpde_llvm::LLVMCompiler::create(triple);
 +    std::vector<uint8_t> objectBuf;
 +    if (compiler && compiler->compile_to_elf(llvmModule, objectBuf)) {
-+      os.pwrite(reinterpret_cast<char *>(objectBuf.data()), objectBuf.size(),
-+                0);
++      os.write(reinterpret_cast<char *>(objectBuf.data()), objectBuf.size());
 +      return;
 +    }
 +
@@ -249,4 +239,3 @@ index b0545a7ac2f9..910c0d06480d 100644
    // TODO: Switch to the new PM once it's available in the backend.
 -- 
 2.49.0
-
