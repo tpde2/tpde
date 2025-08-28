@@ -441,28 +441,31 @@ struct CompilerX64 : BaseTy<Adaptor, Derived, Config> {
 
   AsmReg select_fixed_assignment_reg(AssignmentPartRef, IRValueRef) noexcept;
 
+  /// Jump conditions.
   enum class Jump {
-    ja,
-    jae,
-    jb,
-    jbe,
-    je,
-    jg,
-    jge,
-    jl,
-    jle,
-    jmp,
-    jne,
-    jno,
-    jo,
-    js,
-    jns,
-    jp,
-    jnp,
+    jo = 0, ///< Jump if overflow (OF=1).
+    jno,    ///< Jump if not overflow (OF=0).
+    jb,     ///< Jump if below/if carry (CF=1).
+    jae,    ///< Jump if above or equal/if not carry (CF=0).
+    je,     ///< Jump if equal/if zero (ZF=1).
+    jne,    ///< Jump if not equal/if not zero (ZF=0).
+    jbe,    ///< Jump if below or equal (CF=1 or ZF=1).
+    ja,     ///< Jump if above (CF=0 and ZF=0).
+    js,     ///< Jump if sign (SF=1).
+    jns,    ///< Jump if not sign (SF=0).
+    jp,     ///< Jump if parity even (PF=1).
+    jnp,    ///< Jump if parity odd (PF=0).
+    jl,     ///< Jump if less (SF!=OF).
+    jge,    ///< Jump if greater or equal (SF=OF).
+    jle,    ///< Jump if less or equal (ZF=1 or SF!=OF).
+    jg,     ///< Jump if greater (ZF=0 and SF=OF).
+    jmp,    ///< Unconditional jump
   };
 
   Jump invert_jump(Jump jmp) noexcept;
   Jump swap_jump(Jump jmp) noexcept;
+
+  FeCond jump_to_cond(Jump jmp) noexcept;
 
   void generate_branch_to_block(Jump jmp,
                                 IRBlockRef target,
@@ -1386,7 +1389,6 @@ typename CompilerX64<Adaptor, Derived, BaseTy, Config>::Jump
   case Jump::jge: return Jump::jl;
   case Jump::jl: return Jump::jge;
   case Jump::jle: return Jump::jg;
-  case Jump::jmp: return Jump::jmp;
   case Jump::jne: return Jump::je;
   case Jump::jno: return Jump::jo;
   case Jump::jo: return Jump::jno;
@@ -1394,7 +1396,7 @@ typename CompilerX64<Adaptor, Derived, BaseTy, Config>::Jump
   case Jump::jns: return Jump::js;
   case Jump::jp: return Jump::jnp;
   case Jump::jnp: return Jump::jp;
-  default: TPDE_UNREACHABLE("invalid jump condition");
+  default: TPDE_UNREACHABLE("invalid jump kind for invert_jump");
   }
 }
 
@@ -1411,20 +1413,43 @@ typename CompilerX64<Adaptor, Derived, BaseTy, Config>::Jump
   case Jump::jb: return Jump::ja;
   case Jump::jbe: return Jump::jae;
   case Jump::je: return Jump::je;
+  case Jump::jne: return Jump::jne;
   case Jump::jg: return Jump::jl;
   case Jump::jge: return Jump::jle;
   case Jump::jl: return Jump::jg;
   case Jump::jle: return Jump::jge;
-  case Jump::jmp: return Jump::jmp;
-  case Jump::jne: return Jump::jne;
-  case Jump::jno: return Jump::jno;
-  case Jump::jo: return Jump::jo;
-  case Jump::js: return Jump::js;
-  case Jump::jns: return Jump::jns;
-  case Jump::jp: return Jump::jp;
-  case Jump::jnp: return Jump::jnp;
-  default: TPDE_UNREACHABLE("invalid jump condition");
+  default: TPDE_UNREACHABLE("invalid jump kind for swap_jump");
   }
+}
+
+template <IRAdaptor Adaptor,
+          typename Derived,
+          template <typename, typename, typename> class BaseTy,
+          typename Config>
+FeCond CompilerX64<Adaptor, Derived, BaseTy, Config>::jump_to_cond(
+    Jump jmp) noexcept {
+  // LLVM won't transform the switch into a shift.
+  FeCond res = FeCond(u32(jmp) << 16);
+  switch (jmp) {
+  case Jump::ja: assert(res == FE_CC_A && "FeCond value mismatch?"); break;
+  case Jump::jae: assert(res == FE_CC_AE && "FeCond value mismatch?"); break;
+  case Jump::jb: assert(res == FE_CC_B && "FeCond value mismatch?"); break;
+  case Jump::jbe: assert(res == FE_CC_BE && "FeCond value mismatch?"); break;
+  case Jump::je: assert(res == FE_CC_E && "FeCond value mismatch?"); break;
+  case Jump::jg: assert(res == FE_CC_G && "FeCond value mismatch?"); break;
+  case Jump::jge: assert(res == FE_CC_GE && "FeCond value mismatch?"); break;
+  case Jump::jl: assert(res == FE_CC_L && "FeCond value mismatch?"); break;
+  case Jump::jle: assert(res == FE_CC_LE && "FeCond value mismatch?"); break;
+  case Jump::jne: assert(res == FE_CC_NE && "FeCond value mismatch?"); break;
+  case Jump::jno: assert(res == FE_CC_NO && "FeCond value mismatch?"); break;
+  case Jump::jo: assert(res == FE_CC_O && "FeCond value mismatch?"); break;
+  case Jump::js: assert(res == FE_CC_S && "FeCond value mismatch?"); break;
+  case Jump::jns: assert(res == FE_CC_NS && "FeCond value mismatch?"); break;
+  case Jump::jp: assert(res == FE_CC_P && "FeCond value mismatch?"); break;
+  case Jump::jnp: assert(res == FE_CC_NP && "FeCond value mismatch?"); break;
+  default: TPDE_UNREACHABLE("invalid conditional jump");
+  }
+  return res;
 }
 
 template <IRAdaptor Adaptor,
@@ -1461,55 +1486,24 @@ template <IRAdaptor Adaptor,
           typename Config>
 void CompilerX64<Adaptor, Derived, BaseTy, Config>::generate_raw_jump(
     Jump jmp, Label target_label) noexcept {
-  if (this->text_writer.label_is_pending(target_label)) {
-    this->text_writer.ensure_space(6);
-    auto *target = this->text_writer.cur_ptr();
-    switch (jmp) {
-    case Jump::ja: ASMNCF(JA, FE_JMPL, target); break;
-    case Jump::jae: ASMNCF(JNC, FE_JMPL, target); break;
-    case Jump::jb: ASMNCF(JC, FE_JMPL, target); break;
-    case Jump::jbe: ASMNCF(JBE, FE_JMPL, target); break;
-    case Jump::je: ASMNCF(JZ, FE_JMPL, target); break;
-    case Jump::jg: ASMNCF(JG, FE_JMPL, target); break;
-    case Jump::jge: ASMNCF(JGE, FE_JMPL, target); break;
-    case Jump::jl: ASMNCF(JL, FE_JMPL, target); break;
-    case Jump::jle: ASMNCF(JLE, FE_JMPL, target); break;
-    case Jump::jmp: ASMNCF(JMP, FE_JMPL, target); break;
-    case Jump::jne: ASMNCF(JNZ, FE_JMPL, target); break;
-    case Jump::jno: ASMNCF(JNO, FE_JMPL, target); break;
-    case Jump::jo: ASMNCF(JO, FE_JMPL, target); break;
-    case Jump::js: ASMNCF(JS, FE_JMPL, target); break;
-    case Jump::jns: ASMNCF(JNS, FE_JMPL, target); break;
-    case Jump::jp: ASMNCF(JP, FE_JMPL, target); break;
-    case Jump::jnp: ASMNCF(JNP, FE_JMPL, target); break;
-    }
+  this->text_writer.ensure_space(6); // For safe ptr arithmetic on code buffer.
+  bool pending = this->text_writer.label_is_pending(target_label);
+  void *target = this->text_writer.cur_ptr();
+  if (!pending) {
+    target = this->text_writer.begin_ptr() +
+             this->text_writer.label_offset(target_label);
+  }
 
+  if (jmp == Jump::jmp) {
+    ASMNCF(JMP, pending ? FE_JMPL : 0, target);
+  } else {
+    ASMNCF(Jcc, (pending ? FE_JMPL : 0) | jump_to_cond(jmp), target);
+  }
+
+  if (pending) {
     this->text_writer.label_ref(target_label,
                                 this->text_writer.offset() - 4,
                                 LabelFixupKind::X64_JMP_OR_MEM_DISP);
-  } else {
-    this->text_writer.ensure_space(6);
-    auto *target = this->text_writer.begin_ptr() +
-                   this->text_writer.label_offset(target_label);
-    switch (jmp) {
-    case Jump::ja: ASMNC(JA, target); break;
-    case Jump::jae: ASMNC(JNC, target); break;
-    case Jump::jb: ASMNC(JC, target); break;
-    case Jump::jbe: ASMNC(JBE, target); break;
-    case Jump::je: ASMNC(JZ, target); break;
-    case Jump::jg: ASMNC(JG, target); break;
-    case Jump::jge: ASMNC(JGE, target); break;
-    case Jump::jl: ASMNC(JL, target); break;
-    case Jump::jle: ASMNC(JLE, target); break;
-    case Jump::jmp: ASMNC(JMP, target); break;
-    case Jump::jne: ASMNC(JNZ, target); break;
-    case Jump::jno: ASMNC(JNO, target); break;
-    case Jump::jo: ASMNC(JO, target); break;
-    case Jump::js: ASMNC(JS, target); break;
-    case Jump::jns: ASMNC(JNS, target); break;
-    case Jump::jp: ASMNC(JP, target); break;
-    case Jump::jnp: ASMNC(JNP, target); break;
-    }
   }
 }
 
@@ -1520,25 +1514,7 @@ template <IRAdaptor Adaptor,
 void CompilerX64<Adaptor, Derived, BaseTy, Config>::generate_raw_set(
     Jump cc, AsmReg dst) noexcept {
   ASM(MOV32ri, dst, 0);
-  switch (cc) {
-  case Jump::ja: ASM(SETA8r, dst); break;
-  case Jump::jae: ASM(SETNC8r, dst); break;
-  case Jump::jb: ASM(SETC8r, dst); break;
-  case Jump::jbe: ASM(SETBE8r, dst); break;
-  case Jump::je: ASM(SETZ8r, dst); break;
-  case Jump::jg: ASM(SETG8r, dst); break;
-  case Jump::jge: ASM(SETGE8r, dst); break;
-  case Jump::jl: ASM(SETL8r, dst); break;
-  case Jump::jle: ASM(SETLE8r, dst); break;
-  case Jump::jmp: ASM(MOV32ri, dst, 1); break;
-  case Jump::jne: ASM(SETNZ8r, dst); break;
-  case Jump::jno: ASM(SETNO8r, dst); break;
-  case Jump::jo: ASM(SETO8r, dst); break;
-  case Jump::js: ASM(SETS8r, dst); break;
-  case Jump::jns: ASM(SETNS8r, dst); break;
-  case Jump::jp: ASM(SETP8r, dst); break;
-  case Jump::jnp: ASM(SETNP8r, dst); break;
-  }
+  ASMF(SETcc8r, jump_to_cond(cc), dst);
 }
 
 template <IRAdaptor Adaptor,
@@ -1557,47 +1533,10 @@ template <IRAdaptor Adaptor,
           typename Config>
 void CompilerX64<Adaptor, Derived, BaseTy, Config>::generate_raw_cmov(
     Jump cc, AsmReg dst, AsmReg src, bool is_64) noexcept {
-  this->text_writer.ensure_space(16);
   if (is_64) {
-    switch (cc) {
-    case Jump::ja: ASMNC(CMOVA64rr, dst, src); break;
-    case Jump::jae: ASMNC(CMOVNC64rr, dst, src); break;
-    case Jump::jb: ASMNC(CMOVC64rr, dst, src); break;
-    case Jump::jbe: ASMNC(CMOVBE64rr, dst, src); break;
-    case Jump::je: ASMNC(CMOVZ64rr, dst, src); break;
-    case Jump::jg: ASMNC(CMOVG64rr, dst, src); break;
-    case Jump::jge: ASMNC(CMOVGE64rr, dst, src); break;
-    case Jump::jl: ASMNC(CMOVL64rr, dst, src); break;
-    case Jump::jle: ASMNC(CMOVLE64rr, dst, src); break;
-    case Jump::jmp: ASMNC(MOV64rr, dst, src); break;
-    case Jump::jne: ASMNC(CMOVNZ64rr, dst, src); break;
-    case Jump::jno: ASMNC(CMOVNO64rr, dst, src); break;
-    case Jump::jo: ASMNC(CMOVO64rr, dst, src); break;
-    case Jump::js: ASMNC(CMOVS64rr, dst, src); break;
-    case Jump::jns: ASMNC(CMOVNS64rr, dst, src); break;
-    case Jump::jp: ASMNC(CMOVP64rr, dst, src); break;
-    case Jump::jnp: ASMNC(CMOVNP64rr, dst, src); break;
-    }
+    ASMF(CMOVcc64rr, jump_to_cond(cc), dst, src);
   } else {
-    switch (cc) {
-    case Jump::ja: ASMNC(CMOVA32rr, dst, src); break;
-    case Jump::jae: ASMNC(CMOVNC32rr, dst, src); break;
-    case Jump::jb: ASMNC(CMOVC32rr, dst, src); break;
-    case Jump::jbe: ASMNC(CMOVBE32rr, dst, src); break;
-    case Jump::je: ASMNC(CMOVZ32rr, dst, src); break;
-    case Jump::jg: ASMNC(CMOVG32rr, dst, src); break;
-    case Jump::jge: ASMNC(CMOVGE32rr, dst, src); break;
-    case Jump::jl: ASMNC(CMOVL32rr, dst, src); break;
-    case Jump::jle: ASMNC(CMOVLE32rr, dst, src); break;
-    case Jump::jmp: ASMNC(MOV32rr, dst, src); break;
-    case Jump::jne: ASMNC(CMOVNZ32rr, dst, src); break;
-    case Jump::jno: ASMNC(CMOVNO32rr, dst, src); break;
-    case Jump::jo: ASMNC(CMOVO32rr, dst, src); break;
-    case Jump::js: ASMNC(CMOVS32rr, dst, src); break;
-    case Jump::jns: ASMNC(CMOVNS32rr, dst, src); break;
-    case Jump::jp: ASMNC(CMOVP32rr, dst, src); break;
-    case Jump::jnp: ASMNC(CMOVNP32rr, dst, src); break;
-    }
+    ASMF(CMOVcc32rr, jump_to_cond(cc), dst, src);
   }
 }
 
