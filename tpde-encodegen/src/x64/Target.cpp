@@ -229,7 +229,8 @@ void EncodingTargetX64::get_inst_candidates(
       unsigned sc = has_idx ? mi.getOperand(memop_start + 1).getImm() : 0;
       std::string_view idx = has_idx ? "FE_AX" : "FE_NOREG";
       auto off = mi.getOperand(memop_start + 3).getImm();
-      auto cond = std::format("FE_MEM(FE_NOREG, {}, {}, {})", sc, idx, off);
+      auto cond = std::format(
+          "FE_MEM(FE_NOREG, {}, {}, {}), {}", sc, idx, off, mnem == "LEA32rm");
 
       candidates.emplace_back(
           memop_start,
@@ -275,7 +276,8 @@ void EncodingTargetX64::get_inst_candidates(
         mi.getOperand(memop_start + 1).getImm() == 1 &&
         mi.getOperand(memop_start + 3).isImm()) {
       auto off = mi.getOperand(memop_start + 3).getImm();
-      auto cond = std::format("FE_MEM(FE_AX, 0, FE_NOREG, {})", off);
+      auto cond = std::format(
+          "FE_MEM(FE_AX, 0, FE_NOREG, {}), {}", off, mnem == "LEA32rm");
 
       candidates.emplace_back(
           memop_start + 2,

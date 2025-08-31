@@ -58,7 +58,7 @@ struct EncodeCompiler {
 
     [[nodiscard]] static std::optional<i32> encodeable_as_imm32_sext(GenericValuePart &gv) noexcept;
     [[nodiscard]] static std::optional<FeMem> encodeable_as_mem(GenericValuePart &gv, unsigned align) noexcept;
-    [[nodiscard]] static std::optional<FeMem> encodeable_with(GenericValuePart &gv, FeMem other) noexcept;
+    [[nodiscard]] static std::optional<FeMem> encodeable_with(GenericValuePart &gv, FeMem other, bool addr32 = false) noexcept;
     void          try_salvage_or_materialize(GenericValuePart &gv,
                                              ScratchReg     &dst_scratch,
                                              u8              bank,
@@ -176,10 +176,10 @@ template <typename Adaptor,
           class BaseTy,
           typename Config>
 std::optional<FeMem> EncodeCompiler<Adaptor, Derived, BaseTy, Config>::
-    encodeable_with(GenericValuePart &gv, FeMem other) noexcept {
-    const auto disp_encodeable = [](u64 a, u64 b) -> std::optional<i32> {
+    encodeable_with(GenericValuePart &gv, FeMem other, bool addr32) noexcept {
+    const auto disp_encodeable = [addr32](u64 a, u64 b) -> std::optional<i32> {
         auto sum = static_cast<i32>(a + b);
-        if (static_cast<i64>(sum) == static_cast<i64>(a + b))
+        if (addr32 || static_cast<i64>(sum) == static_cast<i64>(a + b))
             return sum;
         return std::nullopt;
     };

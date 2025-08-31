@@ -267,8 +267,7 @@ define void @add_i32_invert(i32 %0) {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:    mov eax, 0xffffffff
-; X64-NEXT:    lea edi, [rdi + rax]
+; X64-NEXT:    lea edi, [rdi - 0x1]
 ; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -345,8 +344,7 @@ define void @add_i32_FFFFFFFF(i32 %0) {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:    mov eax, 0xffffffff
-; X64-NEXT:    lea edi, [rdi + rax]
+; X64-NEXT:    lea edi, [rdi - 0x1]
 ; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
