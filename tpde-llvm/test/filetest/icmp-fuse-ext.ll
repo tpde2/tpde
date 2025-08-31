@@ -96,7 +96,6 @@ define i128 @icmp_fuse_zexti128(i32, i32) {
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
 ; X64-NEXT:    cmp edi, esi
-; X64-NEXT:    mov eax, 0x0
 ; X64-NEXT:    setl al
 ; X64-NEXT:    and eax, 0x1
 ; X64-NEXT:    mov ecx, 0x0
@@ -245,7 +244,6 @@ define i128 @icmp_fuse_sexti128(i32, i32) {
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
 ; X64-NEXT:    cmp edi, esi
-; X64-NEXT:    mov eax, 0x0
 ; X64-NEXT:    setl al
 ; X64-NEXT:    shl rax, 0x3f
 ; X64-NEXT:    sar rax, 0x3f
@@ -280,7 +278,6 @@ define i64 @icmp_ext_nofuse(i32, i32) {
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
 ; X64-NEXT:    cmp edi, esi
-; X64-NEXT:    mov eax, 0x0
 ; X64-NEXT:    setl al
 ; X64-NEXT:    mov ecx, eax
 ; X64-NEXT:    and ecx, 0x1

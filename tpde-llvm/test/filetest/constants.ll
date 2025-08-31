@@ -1421,7 +1421,6 @@ define void @phi_gep_before_icmp_twice() {
 ; X64-NEXT:    lea rcx, [rcx + 0xa]
 ; X64-NEXT:    mov edx, 0x0
 ; X64-NEXT:    test rdx, rdx
-; X64-NEXT:    mov edx, 0x0
 ; X64-NEXT:    setl dl
 ; X64-NEXT:    mov edx, 0x0
 ; X64-NEXT:    test dl, 0x1

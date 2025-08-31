@@ -474,8 +474,9 @@ struct CompilerX64 : BaseTy<Adaptor, Derived, Config> {
 
   void generate_raw_jump(Jump jmp, Label target) noexcept;
 
-  /// Set dst to 1 if cc is true, otherwise set it to zero
-  void generate_raw_set(Jump cc, AsmReg dst) noexcept;
+  /// Set dst to 1 if cc is true, otherwise set it to zero. If zext is false,
+  /// only the lowest 8 bit are set. Flags are not clobbered.
+  void generate_raw_set(Jump cc, AsmReg dst, bool zext = true) noexcept;
   /// Set all bits of dst to 1 if cc is true, otherwise set it to zero
   void generate_raw_mask(Jump cc, AsmReg dst) noexcept;
   /// Move src into dst if cc is true, otherwise do nothing
@@ -1512,8 +1513,10 @@ template <IRAdaptor Adaptor,
           template <typename, typename, typename> class BaseTy,
           typename Config>
 void CompilerX64<Adaptor, Derived, BaseTy, Config>::generate_raw_set(
-    Jump cc, AsmReg dst) noexcept {
-  ASM(MOV32ri, dst, 0);
+    Jump cc, AsmReg dst, bool zext) noexcept {
+  if (zext) {
+    ASM(MOV32ri, dst, 0);
+  }
   ASMF(SETcc8r, jump_to_cond(cc), dst);
 }
 

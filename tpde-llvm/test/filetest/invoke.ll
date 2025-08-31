@@ -123,7 +123,6 @@ define void @invoke_landingpad_phi() personality ptr @__gxx_personality_v0 {
 ; X64-NEXT:    shl eax, 0x0
 ; X64-NEXT:    mov ebx, eax
 ; X64-NEXT:    test r13d, r13d
-; X64-NEXT:    mov eax, 0x0
 ; X64-NEXT:    setl al
 ; X64-NEXT:    mov edi, 0x0
 ; X64-NEXT:    mov esi, 0x0

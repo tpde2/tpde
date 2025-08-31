@@ -422,7 +422,8 @@ bool LLVMCompilerX64::compile_icmp(const llvm::Instruction *inst,
   if (fuse_br) {
     if (!single_use) {
       (void)result_ref(cmp); // ref-count for branch
-      generate_raw_set(jump, result_ref(cmp).part(0).alloc_reg());
+      generate_raw_set(
+          jump, result_ref(cmp).part(0).alloc_reg(), /*zext=*/false);
     }
     auto true_block = adaptor->block_lookup_idx(fuse_br->getSuccessor(0));
     auto false_block = adaptor->block_lookup_idx(fuse_br->getSuccessor(1));
@@ -431,14 +432,14 @@ bool LLVMCompilerX64::compile_icmp(const llvm::Instruction *inst,
   } else if (fuse_ext) {
     auto [_, res_ref] = result_ref_single(fuse_ext);
     if (llvm::isa<llvm::ZExtInst>(fuse_ext)) {
-      generate_raw_set(jump, res_ref.alloc_reg());
+      generate_raw_set(jump, res_ref.alloc_reg(), /*zext=*/true);
     } else {
       generate_raw_mask(jump, res_ref.alloc_reg());
     }
     this->adaptor->inst_set_fused(fuse_ext, true);
   } else {
     auto [_, res_ref] = result_ref_single(cmp);
-    generate_raw_set(jump, res_ref.alloc_reg());
+    generate_raw_set(jump, res_ref.alloc_reg(), /*zext=*/false);
   }
 
   return true;
