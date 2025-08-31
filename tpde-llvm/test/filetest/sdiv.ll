@@ -467,7 +467,7 @@ define i64 @sdiv_i64_1(i64 %0) {
 ; X64-NEXT:    sub rsp, 0x30
 ; X64-NEXT:    mov rax, rdi
 ; X64-NEXT:    cqo
-; X64-NEXT:    mov rcx, 0x1
+; X64-NEXT:    mov ecx, 0x1
 ; X64-NEXT:    idiv rcx
 ; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
@@ -525,7 +525,7 @@ define i64 @sdiv_i64_28(i64 %0) {
 ; X64-NEXT:    sub rsp, 0x30
 ; X64-NEXT:    mov rax, rdi
 ; X64-NEXT:    cqo
-; X64-NEXT:    mov rcx, 0x1c
+; X64-NEXT:    mov ecx, 0x1c
 ; X64-NEXT:    idiv rcx
 ; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
@@ -554,7 +554,7 @@ define i64 @sdiv_i64_32(i64 %0) {
 ; X64-NEXT:    sub rsp, 0x30
 ; X64-NEXT:    mov rax, rdi
 ; X64-NEXT:    cqo
-; X64-NEXT:    mov rcx, 0x20
+; X64-NEXT:    mov ecx, 0x20
 ; X64-NEXT:    idiv rcx
 ; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp

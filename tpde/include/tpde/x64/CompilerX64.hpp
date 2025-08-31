@@ -1217,7 +1217,7 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::materialize_constant(
       return;
     }
 
-    if (size <= 4) {
+    if (size <= 4 || u32(const_u64) == const_u64) {
       ASM(MOV32ri, dst, const_u64);
     } else {
       ASM(MOV64ri, dst, const_u64);

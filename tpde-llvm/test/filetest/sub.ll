@@ -622,7 +622,7 @@ define void @sub_i64_1_reorder(i64 %0) {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:    mov rax, 0x1
+; X64-NEXT:    mov eax, 0x1
 ; X64-NEXT:    sub rax, rdi
 ; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
@@ -649,7 +649,7 @@ define void @sub_i64_1001_reorder(i64 %0) {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:    mov rax, 0x1001
+; X64-NEXT:    mov eax, 0x1001
 ; X64-NEXT:    sub rax, rdi
 ; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
@@ -732,7 +732,7 @@ define void @sub_i128_1_reorder(i128 %0) {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:    mov rax, 0x1
+; X64-NEXT:    mov eax, 0x1
 ; X64-NEXT:    sub rax, rdi
 ; X64-NEXT:    mov ecx, 0x0
 ; X64-NEXT:    sbb rcx, rsi

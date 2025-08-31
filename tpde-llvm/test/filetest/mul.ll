@@ -249,7 +249,7 @@ define void @mul_i37_1(i37 %0) {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:    mov rax, 0x1
+; X64-NEXT:    mov eax, 0x1
 ; X64-NEXT:    imul rdi, rax
 ; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
@@ -328,7 +328,7 @@ define void @mul_i64_1(i64 %0) {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:    mov rax, 0x1
+; X64-NEXT:    mov eax, 0x1
 ; X64-NEXT:    imul rdi, rax
 ; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
@@ -407,7 +407,7 @@ define void @mul_i128_1(i128 %0) {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:    mov rcx, 0x1
+; X64-NEXT:    mov ecx, 0x1
 ; X64-NEXT:    imul rsi, rcx
 ; X64-NEXT:    mov rax, rcx
 ; X64-NEXT:    mul rdi
@@ -444,7 +444,7 @@ define void @mul_i128_1_reorder(i128 %0) {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:    mov rcx, 0x1
+; X64-NEXT:    mov ecx, 0x1
 ; X64-NEXT:    imul rsi, rcx
 ; X64-NEXT:    mov rax, rcx
 ; X64-NEXT:    mul rdi
@@ -481,12 +481,12 @@ define void @mul_i128_1001_1002(i128 %0) {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:    mov rcx, 0x1002
+; X64-NEXT:    mov ecx, 0x1002
 ; X64-NEXT:    imul rsi, rcx
 ; X64-NEXT:    mov rax, rcx
 ; X64-NEXT:    mul rdi
 ; X64-NEXT:    add rdx, rsi
-; X64-NEXT:    mov rcx, 0x1001
+; X64-NEXT:    mov ecx, 0x1001
 ; X64-NEXT:    imul rcx, rdi
 ; X64-NEXT:    add rdx, rcx
 ; X64-NEXT:    add rsp, 0x30
@@ -557,7 +557,7 @@ define void @mul_i128_salvage_imm(i128 %0) {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:    mov rcx, 0x1
+; X64-NEXT:    mov ecx, 0x1
 ; X64-NEXT:    imul rsi, rcx
 ; X64-NEXT:    mov rax, rcx
 ; X64-NEXT:    mul rdi
@@ -632,7 +632,7 @@ define void @mul_i64_no_salvage_imm(i64 %0) {
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
 ; X64-NEXT:    mov rax, rdi
-; X64-NEXT:    mov rcx, 0x1
+; X64-NEXT:    mov ecx, 0x1
 ; X64-NEXT:    imul rax, rcx
 ; X64-NEXT:    imul rdi, rax
 ; X64-NEXT:    add rsp, 0x30
@@ -692,7 +692,7 @@ define void @mul_i37_no_salvage_imm(i37 %0) {
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
 ; X64-NEXT:    mov rax, rdi
-; X64-NEXT:    mov rcx, 0x3
+; X64-NEXT:    mov ecx, 0x3
 ; X64-NEXT:    imul rax, rcx
 ; X64-NEXT:    imul rdi, rax
 ; X64-NEXT:    add rsp, 0x30
@@ -753,7 +753,7 @@ define void @mul_i128_no_salvage_imm_1(i128 %0) {
 ; X64-NEXT:    nop dword ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x38
 ; X64-NEXT:    mov rcx, rsi
-; X64-NEXT:    mov rbx, 0x1
+; X64-NEXT:    mov ebx, 0x1
 ; X64-NEXT:    imul rcx, rbx
 ; X64-NEXT:    mov rax, rbx
 ; X64-NEXT:    mul rdi
@@ -808,12 +808,12 @@ define void @mul_i128_no_salvage_imm_1001_1002(i128 %0) {
 ; X64-NEXT:    nop dword ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x38
 ; X64-NEXT:    mov rcx, rsi
-; X64-NEXT:    mov rbx, 0x1002
+; X64-NEXT:    mov ebx, 0x1002
 ; X64-NEXT:    imul rcx, rbx
 ; X64-NEXT:    mov rax, rbx
 ; X64-NEXT:    mul rdi
 ; X64-NEXT:    add rdx, rcx
-; X64-NEXT:    mov rbx, 0x1001
+; X64-NEXT:    mov ebx, 0x1001
 ; X64-NEXT:    imul rbx, rdi
 ; X64-NEXT:    add rdx, rbx
 ; X64-NEXT:    mov qword ptr [rbp - 0x40], rax

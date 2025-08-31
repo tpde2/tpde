@@ -795,33 +795,33 @@ define i64 @switch_i64_noreuse(i64 %p) {
 ; X64-NEXT:    488: 0f 84 0f 00 00 00 je <L1>
 ; X64-NEXT:    48e: e9 00 00 00 00 jmp <L2>
 ; X64-NEXT:  <L2>:
-; X64-NEXT:    493: e9 3c 00 00 00 jmp <L3>
+; X64-NEXT:    493: e9 38 00 00 00 jmp <L3>
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    498: e9 05 00 00 00 jmp <L4>
 ; X64-NEXT:  <L1>:
-; X64-NEXT:    49d: e9 19 00 00 00 jmp <L5>
+; X64-NEXT:    49d: e9 17 00 00 00 jmp <L5>
 ; X64-NEXT:  <L4>:
-; X64-NEXT:    4a2: 48 c7 c0 01 00 00 00 mov rax, 0x1
-; X64-NEXT:    4a9: 48 83 c4 28 add rsp, 0x28
-; X64-NEXT:    4ad: 5b pop rbx
-; X64-NEXT:    4ae: 5d pop rbp
-; X64-NEXT:    4af: c3 ret
-; X64-NEXT:    4b0: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
-; X64-NEXT:    4b9: 66 90 nop
+; X64-NEXT:    4a2: b8 01 00 00 00 mov eax, 0x1
+; X64-NEXT:    4a7: 48 83 c4 28 add rsp, 0x28
+; X64-NEXT:    4ab: 5b pop rbx
+; X64-NEXT:    4ac: 5d pop rbp
+; X64-NEXT:    4ad: c3 ret
+; X64-NEXT:    4ae: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
+; X64-NEXT:    4b7: 66 90 nop
 ; X64-NEXT:  <L5>:
-; X64-NEXT:    4bb: 48 c7 c0 02 00 00 00 mov rax, 0x2
-; X64-NEXT:    4c2: 48 83 c4 28 add rsp, 0x28
-; X64-NEXT:    4c6: 5b pop rbx
-; X64-NEXT:    4c7: 5d pop rbp
-; X64-NEXT:    4c8: c3 ret
-; X64-NEXT:    4c9: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
-; X64-NEXT:    4d2: 66 90 nop
+; X64-NEXT:    4b9: b8 02 00 00 00 mov eax, 0x2
+; X64-NEXT:    4be: 48 83 c4 28 add rsp, 0x28
+; X64-NEXT:    4c2: 5b pop rbx
+; X64-NEXT:    4c3: 5d pop rbp
+; X64-NEXT:    4c4: c3 ret
+; X64-NEXT:    4c5: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
+; X64-NEXT:    4ce: 66 90 nop
 ; X64-NEXT:  <L3>:
-; X64-NEXT:    4d4: 48 89 d8 mov rax, rbx
-; X64-NEXT:    4d7: 48 83 c4 28 add rsp, 0x28
-; X64-NEXT:    4db: 5b pop rbx
-; X64-NEXT:    4dc: 5d pop rbp
-; X64-NEXT:    4dd: c3 ret
+; X64-NEXT:    4d0: 48 89 d8 mov rax, rbx
+; X64-NEXT:    4d3: 48 83 c4 28 add rsp, 0x28
+; X64-NEXT:    4d7: 5b pop rbx
+; X64-NEXT:    4d8: 5d pop rbp
+; X64-NEXT:    4d9: c3 ret
 ;
 ; ARM64-LABEL: <switch_i64_noreuse>:
 ; ARM64:         sub sp, sp, #0xa0

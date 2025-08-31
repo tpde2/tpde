@@ -369,7 +369,7 @@ define i8 @ext_v5i8_dyn(ptr %p, i32 %i) {
 ; X64-NEXT:    mov byte ptr [rbp - 0x2d], bl
 ; X64-NEXT:    mov byte ptr [rbp - 0x2c], r8b
 ; X64-NEXT:    xor edx, edx
-; X64-NEXT:    mov rdi, 0x5
+; X64-NEXT:    mov edi, 0x5
 ; X64-NEXT:    mov rax, rsi
 ; X64-NEXT:    div rdi
 ; X64-NEXT:    movzx eax, byte ptr [rbp + rdx - 0x30]

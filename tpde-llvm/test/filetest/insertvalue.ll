@@ -964,18 +964,18 @@ define void @insert_many_nested() {
 ; X64-NEXT:    lea rax, [rax + 0x4]
 ; X64-NEXT:    mov ecx, 0x0
 ; X64-NEXT:    lea rcx, [rcx + 0x4]
-; X64-NEXT:    mov rdx, 0x1
+; X64-NEXT:    mov edx, 0x1
 ; X64-NEXT:    mov ebx, 0x0
 ; X64-NEXT:    mov esi, 0x0
-; X64-NEXT:    mov rdi, 0x9
+; X64-NEXT:    mov edi, 0x9
 ; X64-NEXT:    mov ebx, 0x0
 ; X64-NEXT:    lea rbx, [rbx + 0x4]
-; X64-NEXT:    mov rsi, 0x9
+; X64-NEXT:    mov esi, 0x9
 ; X64-NEXT:    imul rbx, rsi
-; X64-NEXT:    mov rsi, 0x1
+; X64-NEXT:    mov esi, 0x1
 ; X64-NEXT:    mov r8d, 0x0
 ; X64-NEXT:    mov r9d, 0x0
-; X64-NEXT:    mov r10, 0x9
+; X64-NEXT:    mov r10d, 0x9
 ; X64-NEXT:    mov r8d, 0x0
 ; X64-NEXT:    mov r9d, 0x0
 ; X64-NEXT:    mov r11d, 0x0
@@ -1046,26 +1046,26 @@ define void @insert_many_nested() {
 ; X64-NEXT:    lea rax, [rax + 0x4]
 ; X64-NEXT:    mov ecx, 0x0
 ; X64-NEXT:    lea rcx, [rcx + 0x4]
-; X64-NEXT:    mov rdx, 0x1
+; X64-NEXT:    mov edx, 0x1
 ; X64-NEXT:    mov ebx, 0x0
 ; X64-NEXT:    mov esi, 0x0
-; X64-NEXT:    mov rdi, 0x9
+; X64-NEXT:    mov edi, 0x9
 ; X64-NEXT:    mov ebx, 0x0
 ; X64-NEXT:    lea rbx, [rbx + 0x4]
-; X64-NEXT:    mov rsi, 0x9
+; X64-NEXT:    mov esi, 0x9
 ; X64-NEXT:    imul rbx, rsi
-; X64-NEXT:    mov rsi, 0x1
+; X64-NEXT:    mov esi, 0x1
 ; X64-NEXT:    mov r8d, 0x0
 ; X64-NEXT:    mov r9d, 0x0
-; X64-NEXT:    mov r10, 0x9
+; X64-NEXT:    mov r10d, 0x9
 ; X64-NEXT:    mov r8d, 0x0
 ; X64-NEXT:    lea r8, [r8 + 0x4]
-; X64-NEXT:    mov r9, 0x51
+; X64-NEXT:    mov r9d, 0x51
 ; X64-NEXT:    imul r8, r9
-; X64-NEXT:    mov r9, 0x1
+; X64-NEXT:    mov r9d, 0x1
 ; X64-NEXT:    mov r11d, 0x0
 ; X64-NEXT:    mov r12d, 0x0
-; X64-NEXT:    mov r13, 0x9
+; X64-NEXT:    mov r13d, 0x9
 ; X64-NEXT:    mov r11d, 0x0
 ; X64-NEXT:    mov r12d, 0x0
 ; X64-NEXT:    mov r14d, 0x0

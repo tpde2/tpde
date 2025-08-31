@@ -617,7 +617,7 @@ define i64 @fshl_i64_3(i64 %a, i64 %b) {
 ; X64-NEXT:    sub rsp, 0x30
 ; X64-NEXT:    shl rdi, 0x3
 ; X64-NEXT:    shr rsi
-; X64-NEXT:    mov rax, 0x3
+; X64-NEXT:    mov eax, 0x3
 ; X64-NEXT:    mov ecx, eax
 ; X64-NEXT:    not cl
 ; X64-NEXT:    shr rsi, cl
@@ -653,7 +653,7 @@ define i64 @fshl_i64_221(i64 %a, i64 %b) {
 ; X64-NEXT:    sub rsp, 0x30
 ; X64-NEXT:    shl rdi, 0xdd
 ; X64-NEXT:    shr rsi
-; X64-NEXT:    mov rax, 0xdd
+; X64-NEXT:    mov eax, 0xdd
 ; X64-NEXT:    mov ecx, eax
 ; X64-NEXT:    not cl
 ; X64-NEXT:    shr rsi, cl

@@ -617,7 +617,7 @@ define void @ins_v5i8_dyn(ptr %p, i8 %e, i32 %i) {
 ; X64-NEXT:    mov byte ptr [rbp - 0x2c], r9b
 ; X64-NEXT:    mov dword ptr [rbp - 0x34], edx
 ; X64-NEXT:    xor edx, edx
-; X64-NEXT:    mov rcx, 0x5
+; X64-NEXT:    mov ecx, 0x5
 ; X64-NEXT:    mov ebx, dword ptr [rbp - 0x34]
 ; X64-NEXT:    mov rax, rbx
 ; X64-NEXT:    div rcx
