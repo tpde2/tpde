@@ -45,7 +45,7 @@ define i64 @condbr0(i64 %0, i1 %1) {
 ; X64-NEXT:    nop dword ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x28
 ; X64-NEXT:    mov rbx, rdi
-; X64-NEXT:    test esi, 0x1
+; X64-NEXT:    test sil, 0x1
 ; X64-NEXT:    je <L0>
 ; X64-NEXT:    mov rax, rbx
 ; X64-NEXT:    add rsp, 0x28
@@ -99,7 +99,7 @@ define i64 @condbr1(i64 %0, i1 %1) {
 ; X64-NEXT:    nop dword ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x28
 ; X64-NEXT:    mov rbx, rdi
-; X64-NEXT:    test esi, 0x1
+; X64-NEXT:    test sil, 0x1
 ; X64-NEXT:    jne <L0>
 ; X64-NEXT:    lea rax, [rbx + 0xa]
 ; X64-NEXT:    add rsp, 0x28

@@ -694,7 +694,7 @@ define i8 @icmp_eq_i32_0_br_no_salvage(i32 %0) {
 ; X64-NEXT:    test edi, edi
 ; X64-NEXT:    mov ebx, 0x0
 ; X64-NEXT:    sete bl
-; X64-NEXT:    test ebx, 0x1
+; X64-NEXT:    test bl, 0x1
 ; X64-NEXT:    je <L0>
 ; X64-NEXT:    and ebx, 0x1
 ; X64-NEXT:    mov eax, ebx

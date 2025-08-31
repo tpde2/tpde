@@ -383,7 +383,7 @@ define void @phi_const_float(ptr %ptr) {
 ; X64-NEXT:    movd dword ptr [rbp - 0x2c], xmm0
 ; X64-NEXT:  <L1>:
 ; X64-NEXT:    mov eax, 0x0
-; X64-NEXT:    test eax, 0x1
+; X64-NEXT:    test al, 0x1
 ; X64-NEXT:    je <L0>
 ; X64-NEXT:    mov eax, 0x41800000
 ; X64-NEXT:    movd xmm0, eax
@@ -512,7 +512,7 @@ define void @phi_const_float_regpressure(ptr %ptr) {
 ; X64-NEXT:    movd dword ptr [rbp - 0x48], xmm0
 ; X64-NEXT:  <L1>:
 ; X64-NEXT:    mov eax, 0x0
-; X64-NEXT:    test eax, 0x1
+; X64-NEXT:    test al, 0x1
 ; X64-NEXT:    je <L0>
 ; X64-NEXT:    mov eax, 0x41800000
 ; X64-NEXT:    movd xmm0, eax
@@ -835,9 +835,9 @@ define void @phi_glob(ptr %ptr) {
 ; X64-NEXT:    mov r12, rax
 ; X64-NEXT:  <L1>:
 ; X64-NEXT:    mov eax, 0x0
-; X64-NEXT:    test eax, 0x1
+; X64-NEXT:    test al, 0x1
 ; X64-NEXT:    je <L0>
-; X64-NEXT:    lea rax, <phi_glob+0x30>
+; X64-NEXT:    lea rax, <phi_glob+0x2d>
 ; X64-NEXT:     R_X86_64_PC32 glob-0x4
 ; X64-NEXT:    mov r12, rax
 ; X64-NEXT:    jmp <L1>
@@ -900,7 +900,7 @@ define void @phi_ptrtoint(ptr %ptr) {
 ; X64-NEXT:    lea rax, <phi_ptrtoint+0x20>
 ; X64-NEXT:     R_X86_64_PC32 glob-0x4
 ; X64-NEXT:    mov ecx, 0x0
-; X64-NEXT:    test ecx, 0x1
+; X64-NEXT:    test cl, 0x1
 ; X64-NEXT:    je <L0>
 ; X64-NEXT:    mov r12, rax
 ; X64-NEXT:    jmp <L1>
@@ -958,17 +958,17 @@ define void @phi_ptrtoint_multiedge(i1 %cond, ptr %ptr) {
 ; X64-NEXT:    mov rbx, rsi
 ; X64-NEXT:    lea rax, <phi_ptrtoint_multiedge+0x16>
 ; X64-NEXT:     R_X86_64_PC32 glob-0x4
-; X64-NEXT:    test edi, 0x1
+; X64-NEXT:    test dil, 0x1
 ; X64-NEXT:    jne <L0>
 ; X64-NEXT:    mov r12, rax
 ; X64-NEXT:    jmp <L1>
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    mov r12, rax
 ; X64-NEXT:  <L1>:
-; X64-NEXT:    lea rax, <phi_ptrtoint_multiedge+0x34>
+; X64-NEXT:    lea rax, <phi_ptrtoint_multiedge+0x32>
 ; X64-NEXT:     R_X86_64_PC32 glob-0x4
 ; X64-NEXT:    mov ecx, 0x0
-; X64-NEXT:    test ecx, 0x1
+; X64-NEXT:    test cl, 0x1
 ; X64-NEXT:    je <L2>
 ; X64-NEXT:    mov r12, rax
 ; X64-NEXT:    jmp <L1>
@@ -1037,7 +1037,7 @@ define void @phi_ptrtoint_trunc_add(ptr %ptr) {
 ; X64-NEXT:     R_X86_64_PC32 glob-0x4
 ; X64-NEXT:    lea eax, [rax + 0x20]
 ; X64-NEXT:    mov ecx, 0x0
-; X64-NEXT:    test ecx, 0x1
+; X64-NEXT:    test cl, 0x1
 ; X64-NEXT:    je <L0>
 ; X64-NEXT:    mov r12d, eax
 ; X64-NEXT:    jmp <L1>
@@ -1100,7 +1100,7 @@ define void @phi_struct1(ptr %ptr) {
 ; X64-NEXT:    mov dword ptr [rbp - 0x2c], eax
 ; X64-NEXT:  <L1>:
 ; X64-NEXT:    mov eax, 0x0
-; X64-NEXT:    test eax, 0x1
+; X64-NEXT:    test al, 0x1
 ; X64-NEXT:    je <L0>
 ; X64-NEXT:    mov eax, 0x0
 ; X64-NEXT:    mov dword ptr [rbp - 0x30], eax
@@ -1168,11 +1168,11 @@ define void @phi_struct2(ptr %ptr) {
 ; X64-NEXT:    mov qword ptr [rbp - 0x38], rax
 ; X64-NEXT:  <L1>:
 ; X64-NEXT:    mov eax, 0x0
-; X64-NEXT:    test eax, 0x1
+; X64-NEXT:    test al, 0x1
 ; X64-NEXT:    je <L0>
 ; X64-NEXT:    mov eax, 0x0
 ; X64-NEXT:    mov dword ptr [rbp - 0x40], eax
-; X64-NEXT:    lea rax, <phi_struct2+0x41>
+; X64-NEXT:    lea rax, <phi_struct2+0x3e>
 ; X64-NEXT:     R_X86_64_PC32 glob-0x4
 ; X64-NEXT:    mov qword ptr [rbp - 0x38], rax
 ; X64-NEXT:    jmp <L1>
@@ -1250,7 +1250,7 @@ define void @phi_struct3(ptr %ptr) {
 ; X64-NEXT:    mov ecx, 0x0
 ; X64-NEXT:    mov edx, 0x0
 ; X64-NEXT:    mov edx, 0x0
-; X64-NEXT:    test edx, 0x1
+; X64-NEXT:    test dl, 0x1
 ; X64-NEXT:    je <L0>
 ; X64-NEXT:    mov dword ptr [rbp - 0x30], ecx
 ; X64-NEXT:    mov dword ptr [rbp - 0x2c], eax
@@ -1322,7 +1322,7 @@ define i32 @phi_gep_before_icmp(i32 %0) {
 ; X64-NEXT:    sub rsp, 0x18
 ; X64-NEXT:    mov ebx, edi
 ; X64-NEXT:    mov eax, 0x0
-; X64-NEXT:    test eax, 0x1
+; X64-NEXT:    test al, 0x1
 ; X64-NEXT:    jne <L0>
 ; X64-NEXT:    mov eax, 0x0
 ; X64-NEXT:    mov r12d, eax
@@ -1339,7 +1339,7 @@ define i32 @phi_gep_before_icmp(i32 %0) {
 ; X64-NEXT:    mov r13, rax
 ; X64-NEXT:  <L4>:
 ; X64-NEXT:    mov eax, 0x0
-; X64-NEXT:    test eax, 0x1
+; X64-NEXT:    test al, 0x1
 ; X64-NEXT:    jne <L3>
 ; X64-NEXT:    mov eax, 0x0
 ; X64-NEXT:    mov r13, rax
@@ -1424,7 +1424,7 @@ define void @phi_gep_before_icmp_twice() {
 ; X64-NEXT:    mov edx, 0x0
 ; X64-NEXT:    setl dl
 ; X64-NEXT:    mov edx, 0x0
-; X64-NEXT:    test edx, 0x1
+; X64-NEXT:    test dl, 0x1
 ; X64-NEXT:    je <L0>
 ; X64-NEXT:    mov rbx, rcx
 ; X64-NEXT:    jmp <L1>
@@ -1432,7 +1432,7 @@ define void @phi_gep_before_icmp_twice() {
 ; X64-NEXT:    mov r12, rax
 ; X64-NEXT:  <L3>:
 ; X64-NEXT:    mov eax, 0x0
-; X64-NEXT:    test eax, 0x1
+; X64-NEXT:    test al, 0x1
 ; X64-NEXT:    jne <L2>
 ; X64-NEXT:    mov eax, 0x0
 ; X64-NEXT:    mov r12, rax

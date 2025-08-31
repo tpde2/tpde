@@ -217,7 +217,7 @@ bool LLVMCompilerX64::compile_br(const llvm::Instruction *inst,
   {
     auto [_, cond_ref] = this->val_ref_single(br->getCondition());
     const auto cond_reg = cond_ref.load_to_reg();
-    ASM(TEST32ri, cond_reg, 1);
+    ASM(TEST8ri, cond_reg, 1);
   }
 
   generate_conditional_branch(Jump::jne, true_block, false_block);
