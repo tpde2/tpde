@@ -13,7 +13,7 @@ define i8 @icmp_eq_i8_0_br(i8 %0) {
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
 ; X64-NEXT:    movzx edi, dil
-; X64-NEXT:    cmp edi, 0x0
+; X64-NEXT:    test edi, edi
 ; X64-NEXT:    jne <L0>
 ; X64-NEXT:    mov eax, 0x1
 ; X64-NEXT:    add rsp, 0x30
@@ -58,7 +58,7 @@ define i8 @icmp_eq_i32_0_br(i32 %0) {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:    cmp edi, 0x0
+; X64-NEXT:    test edi, edi
 ; X64-NEXT:    jne <L0>
 ; X64-NEXT:    mov eax, 0x1
 ; X64-NEXT:    add rsp, 0x30
@@ -102,7 +102,7 @@ define i8 @icmp_ne_i32_0_br(i32 %0) {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:    cmp edi, 0x0
+; X64-NEXT:    test edi, edi
 ; X64-NEXT:    je <L0>
 ; X64-NEXT:    mov eax, 0x1
 ; X64-NEXT:    add rsp, 0x30
@@ -146,7 +146,7 @@ define i8 @icmp_ne_i64_0_br(i64 %0) {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:    cmp rdi, 0x0
+; X64-NEXT:    test rdi, rdi
 ; X64-NEXT:    je <L0>
 ; X64-NEXT:    mov eax, 0x1
 ; X64-NEXT:    add rsp, 0x30
@@ -691,7 +691,7 @@ define i8 @icmp_eq_i32_0_br_no_salvage(i32 %0) {
 ; X64-NEXT:    push rbx
 ; X64-NEXT:    nop dword ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x28
-; X64-NEXT:    cmp edi, 0x0
+; X64-NEXT:    test edi, edi
 ; X64-NEXT:    mov ebx, 0x0
 ; X64-NEXT:    sete bl
 ; X64-NEXT:    test ebx, 0x1
@@ -762,7 +762,7 @@ define void @cbz_nophi(i32 %param) {
 ; X64-NEXT:    mov eax, 0x0
 ; X64-NEXT:    lea eax, [1*rax]
 ; X64-NEXT:    mov eax, dword ptr [rbp - 0x2c]
-; X64-NEXT:    cmp eax, 0x0
+; X64-NEXT:    test eax, eax
 ; X64-NEXT:    jne <L0>
 ; X64-NEXT:    mov ecx, 0x0
 ; X64-NEXT:    mov dword ptr [rbp - 0x30], ecx
@@ -824,7 +824,7 @@ define void @cbz_phi() {
 ; X64-NEXT:    mov eax, 0x0
 ; X64-NEXT:    lea eax, [1*rax]
 ; X64-NEXT:    mov eax, dword ptr [rbp - 0x2c]
-; X64-NEXT:    cmp eax, 0x0
+; X64-NEXT:    test eax, eax
 ; X64-NEXT:    jne <L0>
 ; X64-NEXT:    mov ecx, 0x0
 ; X64-NEXT:    mov dword ptr [rbp - 0x2c], ecx

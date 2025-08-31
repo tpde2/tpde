@@ -13,7 +13,7 @@ define void @icmp_eq_i8_0(i8 %0) {
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
 ; X64-NEXT:    movzx edi, dil
-; X64-NEXT:    cmp edi, 0x0
+; X64-NEXT:    test edi, edi
 ; X64-NEXT:    mov eax, 0x0
 ; X64-NEXT:    sete al
 ; X64-NEXT:    add rsp, 0x30
@@ -43,7 +43,7 @@ define void @icmp_ne_i8_0(i8 %0) {
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
 ; X64-NEXT:    movzx edi, dil
-; X64-NEXT:    cmp edi, 0x0
+; X64-NEXT:    test edi, edi
 ; X64-NEXT:    mov eax, 0x0
 ; X64-NEXT:    setne al
 ; X64-NEXT:    add rsp, 0x30
@@ -469,7 +469,7 @@ define void @icmp_eq_i16_0(i16 %0) {
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
 ; X64-NEXT:    movzx edi, di
-; X64-NEXT:    cmp edi, 0x0
+; X64-NEXT:    test edi, edi
 ; X64-NEXT:    mov eax, 0x0
 ; X64-NEXT:    sete al
 ; X64-NEXT:    add rsp, 0x30
@@ -499,7 +499,7 @@ define void @icmp_ne_i16_0(i16 %0) {
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
 ; X64-NEXT:    movzx edi, di
-; X64-NEXT:    cmp edi, 0x0
+; X64-NEXT:    test edi, edi
 ; X64-NEXT:    mov eax, 0x0
 ; X64-NEXT:    setne al
 ; X64-NEXT:    add rsp, 0x30
@@ -987,7 +987,7 @@ define void @icmp_eq_i32_0(i32 %0) {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:    cmp edi, 0x0
+; X64-NEXT:    test edi, edi
 ; X64-NEXT:    mov eax, 0x0
 ; X64-NEXT:    sete al
 ; X64-NEXT:    add rsp, 0x30
@@ -1015,7 +1015,7 @@ define void @icmp_ne_i32_0(i32 %0) {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:    cmp edi, 0x0
+; X64-NEXT:    test edi, edi
 ; X64-NEXT:    mov eax, 0x0
 ; X64-NEXT:    setne al
 ; X64-NEXT:    add rsp, 0x30
@@ -1439,7 +1439,7 @@ define void @icmp_eq_i64_0(i64 %0) {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:    cmp rdi, 0x0
+; X64-NEXT:    test rdi, rdi
 ; X64-NEXT:    mov eax, 0x0
 ; X64-NEXT:    sete al
 ; X64-NEXT:    add rsp, 0x30
@@ -1467,7 +1467,7 @@ define void @icmp_ne_i64_0(i64 %0) {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:    cmp rdi, 0x0
+; X64-NEXT:    test rdi, rdi
 ; X64-NEXT:    mov eax, 0x0
 ; X64-NEXT:    setne al
 ; X64-NEXT:    add rsp, 0x30
@@ -1892,7 +1892,7 @@ define void @icmp_eq_i37_0(i37 %0) {
 ; X64-NEXT:    sub rsp, 0x30
 ; X64-NEXT:    movabs rax, 0x1fffffffff
 ; X64-NEXT:    and rdi, rax
-; X64-NEXT:    cmp rdi, 0x0
+; X64-NEXT:    test rdi, rdi
 ; X64-NEXT:    mov eax, 0x0
 ; X64-NEXT:    sete al
 ; X64-NEXT:    add rsp, 0x30
@@ -1923,7 +1923,7 @@ define void @icmp_ne_i37_0(i37 %0) {
 ; X64-NEXT:    sub rsp, 0x30
 ; X64-NEXT:    movabs rax, 0x1fffffffff
 ; X64-NEXT:    and rdi, rax
-; X64-NEXT:    cmp rdi, 0x0
+; X64-NEXT:    test rdi, rdi
 ; X64-NEXT:    mov eax, 0x0
 ; X64-NEXT:    setne al
 ; X64-NEXT:    add rsp, 0x30

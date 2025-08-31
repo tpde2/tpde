@@ -1331,7 +1331,7 @@ define i32 @phi_gep_before_icmp(i32 %0) {
 ; X64-NEXT:    mov eax, 0x0
 ; X64-NEXT:    lea rax, [rax + 0x1200]
 ; X64-NEXT:    mov ecx, 0x0
-; X64-NEXT:    cmp ecx, 0x0
+; X64-NEXT:    test ecx, ecx
 ; X64-NEXT:    jne <L2>
 ; X64-NEXT:    mov r12d, ebx
 ; X64-NEXT:    jmp <L1>
@@ -1420,7 +1420,7 @@ define void @phi_gep_before_icmp_twice() {
 ; X64-NEXT:    mov ecx, 0x0
 ; X64-NEXT:    lea rcx, [rcx + 0xa]
 ; X64-NEXT:    mov edx, 0x0
-; X64-NEXT:    cmp rdx, 0x0
+; X64-NEXT:    test rdx, rdx
 ; X64-NEXT:    mov edx, 0x0
 ; X64-NEXT:    setl dl
 ; X64-NEXT:    mov edx, 0x0

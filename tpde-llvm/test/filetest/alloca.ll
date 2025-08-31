@@ -1259,14 +1259,14 @@ define void @alloca_manyregs(i32 %0, ptr %1, ptr %2, ptr %3, i64 %4, i32 %5, ptr
 ; X64-NEXT:    mov r11, qword ptr [rbp - 0x407e8]
 ; X64-NEXT:    mov r12, r11
 ; X64-NEXT:    mov r12, qword ptr [rbp - 0x40820]
-; X64-NEXT:    cmp r12, 0x0
+; X64-NEXT:    test r12, r12
 ; X64-NEXT:    mov r13d, 0x0
 ; X64-NEXT:    sete r13b
 ; X64-NEXT:    mov r13d, dword ptr [rbp - 0x407f8]
 ; X64-NEXT:    mov r14d, r13d
 ; X64-NEXT:    and r14d, 0x0
 ; X64-NEXT:    mov r14, qword ptr [rbp - 0x38]
-; X64-NEXT:    cmp r14, 0x0
+; X64-NEXT:    test r14, r14
 ; X64-NEXT:    mov r15d, 0x0
 ; X64-NEXT:    sete r15b
 ; X64-NEXT:    mov r15, qword ptr [rbp - 0x40]
@@ -1280,7 +1280,7 @@ define void @alloca_manyregs(i32 %0, ptr %1, ptr %2, ptr %3, i64 %4, i32 %5, ptr
 ; X64-NEXT:    mov ecx, dword ptr [rbp - 0x54]
 ; X64-NEXT:    mov dword ptr [0x0], ecx
 ; X64-NEXT:    mov rcx, qword ptr [rbp - 0x60]
-; X64-NEXT:    cmp rcx, 0x0
+; X64-NEXT:    test rcx, rcx
 ; X64-NEXT:    mov ecx, 0x0
 ; X64-NEXT:    sete cl
 ; X64-NEXT:    mov rcx, qword ptr [rbp - 0x407d8]

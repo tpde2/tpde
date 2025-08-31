@@ -389,7 +389,11 @@ bool LLVMCompilerX64::compile_icmp(const llvm::Instruction *inst,
     AsmReg lhs_reg = lhs_op.has_reg() ? lhs_op.cur_reg() : lhs_op.load_to_reg();
     if (int_width <= 32) {
       if (rhs_op.is_const()) {
-        ASM(CMP32ri, lhs_reg, i32(rhs_op.const_data()[0]));
+        if (i32 rhs_val = i32(rhs_op.const_data()[0])) {
+          ASM(CMP32ri, lhs_reg, rhs_val);
+        } else {
+          ASM(TEST32rr, lhs_reg, lhs_reg);
+        }
       } else {
         AsmReg rhs_reg =
             rhs_op.has_reg() ? rhs_op.cur_reg() : rhs_op.load_to_reg();
@@ -398,7 +402,11 @@ bool LLVMCompilerX64::compile_icmp(const llvm::Instruction *inst,
     } else {
       if (rhs_op.is_const() &&
           i32(rhs_op.const_data()[0]) == i64(rhs_op.const_data()[0])) {
-        ASM(CMP64ri, lhs_reg, rhs_op.const_data()[0]);
+        if (i64 rhs_val = rhs_op.const_data()[0]) {
+          ASM(CMP64ri, lhs_reg, rhs_val);
+        } else {
+          ASM(TEST64rr, lhs_reg, lhs_reg);
+        }
       } else {
         AsmReg rhs_reg =
             rhs_op.has_reg() ? rhs_op.cur_reg() : rhs_op.load_to_reg();

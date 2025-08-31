@@ -344,7 +344,7 @@ define i32 @phi_last_use(i1 %c, i32 %a, i32 %b) {
 ; X64-NEXT:    jmp <L1>
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    lea eax, [rbx + 0x1]
-; X64-NEXT:    cmp eax, 0x0
+; X64-NEXT:    test eax, eax
 ; X64-NEXT:    jne <L0>
 ; X64-NEXT:    mov r12d, eax
 ; X64-NEXT:  <L1>:
