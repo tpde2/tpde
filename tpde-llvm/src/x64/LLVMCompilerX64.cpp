@@ -322,16 +322,16 @@ bool LLVMCompilerX64::compile_icmp(const llvm::Instruction *inst,
 
   const llvm::BranchInst *fuse_br = nullptr;
   const llvm::Instruction *fuse_ext = nullptr;
-  if (!cmp->user_empty() && *cmp->user_begin() == cmp->getNextNode() &&
-      (analyzer.liveness_info(val_idx(cmp)).ref_count <= 2)) {
-    auto *fuse_inst = cmp->getNextNode();
-    assert(cmp->hasNUses(1));
-    if (auto *br = llvm::dyn_cast<llvm::BranchInst>(fuse_inst)) {
-      assert(br->isConditional() && br->getCondition() == cmp);
-      fuse_br = br;
-    } else if (llvm::isa<llvm::ZExtInst, llvm::SExtInst>(fuse_inst) &&
-               fuse_inst->getType()->getIntegerBitWidth() <= 64) {
-      fuse_ext = fuse_inst;
+
+  bool single_use = cmp->hasNUses(1);
+  const llvm::Instruction *next = cmp->getNextNode();
+  if (auto *br = llvm::dyn_cast<llvm::BranchInst>(next);
+      br && br->isConditional() && br->getCondition() == cmp) {
+    fuse_br = br;
+  } else if (single_use && *cmp->user_begin() == next) {
+    if (llvm::isa<llvm::ZExtInst, llvm::SExtInst>(next) &&
+        next->getType()->getIntegerBitWidth() <= 64) {
+      fuse_ext = next;
     }
   }
 
@@ -420,6 +420,10 @@ bool LLVMCompilerX64::compile_icmp(const llvm::Instruction *inst,
   rhs.reset();
 
   if (fuse_br) {
+    if (!single_use) {
+      (void)result_ref(cmp); // ref-count for branch
+      generate_raw_set(jump, result_ref(cmp).part(0).alloc_reg());
+    }
     auto true_block = adaptor->block_lookup_idx(fuse_br->getSuccessor(0));
     auto false_block = adaptor->block_lookup_idx(fuse_br->getSuccessor(1));
     generate_conditional_branch(jump, true_block, false_block);

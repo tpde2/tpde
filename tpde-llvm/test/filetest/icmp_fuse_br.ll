@@ -694,8 +694,7 @@ define i8 @icmp_eq_i32_0_br_no_salvage(i32 %0) {
 ; X64-NEXT:    test edi, edi
 ; X64-NEXT:    mov ebx, 0x0
 ; X64-NEXT:    sete bl
-; X64-NEXT:    test bl, 0x1
-; X64-NEXT:    je <L0>
+; X64-NEXT:    jne <L0>
 ; X64-NEXT:    and ebx, 0x1
 ; X64-NEXT:    mov eax, ebx
 ; X64-NEXT:    add rsp, 0x28
@@ -718,8 +717,7 @@ define i8 @icmp_eq_i32_0_br_no_salvage(i32 %0) {
 ; ARM64-NEXT:    str x19, [sp, #0x10]
 ; ARM64-NEXT:    cmp w0, #0x0
 ; ARM64-NEXT:    cset w19, eq
-; ARM64-NEXT:    tst w19, #0x1
-; ARM64-NEXT:    b.eq 0x7f8 <icmp_eq_i32_0_br_no_salvage+0x58>
+; ARM64-NEXT:    b.ne 0x7f4 <icmp_eq_i32_0_br_no_salvage+0x54>
 ; ARM64-NEXT:    ubfx w19, w19, #0, #1
 ; ARM64-NEXT:    mov w0, w19
 ; ARM64-NEXT:    ldp x29, x30, [sp]
