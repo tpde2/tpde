@@ -99,24 +99,23 @@ define void @invoke_landingpad_phi() personality ptr @__gxx_personality_v0 {
 ; X64-NEXT:    mov qword ptr [rbp - 0x38], rax
 ; X64-NEXT:  <L3>:
 ; X64-NEXT:    xor eax, eax
-; X64-NEXT:    lea eax, [1*rax]
-; X64-NEXT:    mov ebx, eax
+; X64-NEXT:    lea ebx, [1*rax]
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    lea rax, [rax + 0x28]
 ; X64-NEXT:    mov r12, rax
 ; X64-NEXT:    mov eax, 0x0
 ; X64-NEXT:    test al, 0x1
 ; X64-NEXT:    mov eax, 0x0
-; X64-NEXT:    mov ecx, 0x0
-; X64-NEXT:    cmove eax, ecx
 ; X64-NEXT:    mov r13d, eax
+; X64-NEXT:    mov ecx, 0x0
+; X64-NEXT:    cmove r13d, ecx
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov qword ptr [rbp - 0x40], rax
 ; X64-NEXT:    mov ebx, ebx
 ; X64-NEXT:    mov r12, qword ptr [r12]
 ; X64-NEXT:    xor eax, eax
-; X64-NEXT:    shl eax, 0x0
 ; X64-NEXT:    mov ebx, eax
+; X64-NEXT:    shl ebx, 0x0
 ; X64-NEXT:    test r13d, r13d
 ; X64-NEXT:    setl al
 ; X64-NEXT:    xor edi, edi
@@ -151,8 +150,7 @@ define void @invoke_landingpad_phi() personality ptr @__gxx_personality_v0 {
 ; ARM64-NEXT:    mov w0, #0x0 // =0
 ; ARM64-NEXT:    str x0, [x29, #0xa8]
 ; ARM64-NEXT:    mov w0, #0x0 // =0
-; ARM64-NEXT:    add w0, w0, #0x0
-; ARM64-NEXT:    mov w19, w0
+; ARM64-NEXT:    add w19, w0, #0x0
 ; ARM64-NEXT:    mov w0, #0x0 // =0
 ; ARM64-NEXT:    add x0, x0, #0x28
 ; ARM64-NEXT:    mov x20, x0
@@ -160,32 +158,30 @@ define void @invoke_landingpad_phi() personality ptr @__gxx_personality_v0 {
 ; ARM64-NEXT:    tst w0, #0x1
 ; ARM64-NEXT:    mov w0, #0x0 // =0
 ; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    csel w0, w0, w1, eq
-; ARM64-NEXT:    mov w21, w0
+; ARM64-NEXT:    csel w21, w0, w1, eq
 ; ARM64-NEXT:    mov w0, #0x0 // =0
 ; ARM64-NEXT:    str x0, [x29, #0xb0]
 ; ARM64-NEXT:    ubfx x19, x19, #0, #32
 ; ARM64-NEXT:    ldr x20, [x20]
 ; ARM64-NEXT:    mov w0, #0x0 // =0
-; ARM64-NEXT:    lsr w0, w0, #0
-; ARM64-NEXT:    mov w19, w0
+; ARM64-NEXT:    lsr w19, w0, #0
 ; ARM64-NEXT:    cmp w21, #0x0
 ; ARM64-NEXT:    cset w0, lt
 ; ARM64-NEXT:    mov w0, #0x0 // =0
 ; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    bl 0xdc <invoke_landingpad_phi+0x7c>
+; ARM64-NEXT:    bl 0xd0 <invoke_landingpad_phi+0x70>
 ; ARM64-NEXT:     R_AARCH64_CALL26 foo
 ; ARM64-NEXT:    mov x20, x0
-; ARM64-NEXT:    b 0xf4 <invoke_landingpad_phi+0x94>
+; ARM64-NEXT:    b 0xe8 <invoke_landingpad_phi+0x88>
 ; ARM64-NEXT:    mov w2, #0x0 // =0
 ; ARM64-NEXT:    str x2, [x29, #0xb0]
-; ARM64-NEXT:    b 0x100 <invoke_landingpad_phi+0xa0>
+; ARM64-NEXT:    b 0xf4 <invoke_landingpad_phi+0x94>
 ; ARM64-NEXT:    str w19, [x29, #0xa0]
 ; ARM64-NEXT:    str x20, [x29, #0xa8]
 ; ARM64-NEXT:    b 0x80 <invoke_landingpad_phi+0x20>
 ; ARM64-NEXT:    mov w0, #0x0 // =0
 ; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    bl 0x108 <invoke_landingpad_phi+0xa8>
+; ARM64-NEXT:    bl 0xfc <invoke_landingpad_phi+0x9c>
 ; ARM64-NEXT:     R_AARCH64_CALL26 _Unwind_Resume
 ; ARM64-NEXT:    brk #0x1
   br label %1

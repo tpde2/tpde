@@ -175,9 +175,18 @@ private:
 
 public:
   /// Allocate and lock a register for the value part, *without* reloading the
-  /// value. Does nothing if a register is already allocated.
+  /// value. Asserts that no register is currently allocated.
   AsmReg alloc_reg(CompilerBase *compiler, u64 exclusion_mask = 0) noexcept {
     return alloc_reg_impl(compiler, exclusion_mask, /*reload=*/false);
+  }
+
+  /// Allocate and lock a register for the value part, *without* reloading the
+  /// value. Does nothing if a register is already allocated.
+  AsmReg cur_reg_or_alloc(CompilerBase *compiler) noexcept {
+    if (!has_reg()) {
+      alloc_reg_impl(compiler, 0, /*reload=*/false);
+    }
+    return cur_reg();
   }
 
   /// Allocate register, but try to reuse the register from ref first. This
@@ -589,6 +598,7 @@ void CompilerBase<Adaptor, Derived, Config>::ValuePart::unlock(
 template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>
 void CompilerBase<Adaptor, Derived, Config>::ValuePart::set_value(
     CompilerBase *compiler, ValuePart &&other) noexcept {
+  assert(this != &other && "cannot assign ValuePart to itself");
   auto &reg_file = compiler->register_file;
   if (!has_assignment()) {
     assert(!is_const()); // probably don't want to allow mutating constants
@@ -864,6 +874,10 @@ struct CompilerBase<Adaptor, Derived, Config>::ValuePartRef : ValuePart {
 
   AsmReg alloc_reg(u64 exclusion_mask = 0) noexcept {
     return ValuePart::alloc_reg(compiler, exclusion_mask);
+  }
+
+  AsmReg cur_reg_or_alloc() noexcept {
+    return ValuePart::cur_reg_or_alloc(compiler);
   }
 
   AsmReg alloc_try_reuse(ValuePart &ref) noexcept {

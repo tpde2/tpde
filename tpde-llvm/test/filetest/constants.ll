@@ -310,14 +310,10 @@ define void @phi_const_float_regpressure(ptr %ptr) {
 ; X64-NEXT:    push r14
 ; X64-NEXT:    push r15
 ; X64-NEXT:    mov rbx, rdi
-; X64-NEXT:    movzx eax, byte ptr [rbx]
-; X64-NEXT:    mov r12d, eax
-; X64-NEXT:    movzx eax, byte ptr [rbx]
-; X64-NEXT:    mov r13d, eax
-; X64-NEXT:    movzx eax, byte ptr [rbx]
-; X64-NEXT:    mov r14d, eax
-; X64-NEXT:    movzx eax, byte ptr [rbx]
-; X64-NEXT:    mov r15d, eax
+; X64-NEXT:    movzx r12d, byte ptr [rbx]
+; X64-NEXT:    movzx r13d, byte ptr [rbx]
+; X64-NEXT:    movzx r14d, byte ptr [rbx]
+; X64-NEXT:    movzx r15d, byte ptr [rbx]
 ; X64-NEXT:    movzx eax, byte ptr [rbx]
 ; X64-NEXT:    movzx ecx, byte ptr [rbx]
 ; X64-NEXT:    movzx edx, byte ptr [rbx]
@@ -374,7 +370,7 @@ define void @phi_const_float_regpressure(ptr %ptr) {
 ; X64-NEXT:    mov byte ptr [rbp - 0x42], r9b
 ; X64-NEXT:    mov byte ptr [rbp - 0x43], r10b
 ; X64-NEXT:    mov byte ptr [rbp - 0x44], r11b
-; X64-NEXT:    movss xmm0, dword ptr <phi_const_float_regpressure+0xd9>
+; X64-NEXT:    movss xmm0, dword ptr <phi_const_float_regpressure+0xd1>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    movd dword ptr [rbp - 0x48], xmm0
 ; X64-NEXT:  <L1>:
@@ -466,14 +462,10 @@ define void @phi_const_float_regpressure(ptr %ptr) {
 ; ARM64-NEXT:    stp x27, x28, [sp, #0x50]
 ; ARM64-NEXT:    str d8, [sp, #0x60]
 ; ARM64-NEXT:    mov x19, x0
-; ARM64-NEXT:    ldrb w0, [x19]
-; ARM64-NEXT:    mov w20, w0
-; ARM64-NEXT:    ldrb w0, [x19]
-; ARM64-NEXT:    mov w21, w0
-; ARM64-NEXT:    ldrb w0, [x19]
-; ARM64-NEXT:    mov w22, w0
-; ARM64-NEXT:    ldrb w0, [x19]
-; ARM64-NEXT:    mov w23, w0
+; ARM64-NEXT:    ldrb w20, [x19]
+; ARM64-NEXT:    ldrb w21, [x19]
+; ARM64-NEXT:    ldrb w22, [x19]
+; ARM64-NEXT:    ldrb w23, [x19]
 ; ARM64-NEXT:    ldrb w0, [x19]
 ; ARM64-NEXT:    ldrb w1, [x19]
 ; ARM64-NEXT:    ldrb w2, [x19]
@@ -534,9 +526,9 @@ define void @phi_const_float_regpressure(ptr %ptr) {
 ; ARM64-NEXT:    fmov s8, w16
 ; ARM64-NEXT:    mov w0, #0x0 // =0
 ; ARM64-NEXT:    tst w0, #0x1
-; ARM64-NEXT:    b.eq 0x2f0 <phi_const_float_regpressure+0x140>
+; ARM64-NEXT:    b.eq 0x2e0 <phi_const_float_regpressure+0x130>
 ; ARM64-NEXT:    fmov s8, #16.00000000
-; ARM64-NEXT:    b 0x2dc <phi_const_float_regpressure+0x12c>
+; ARM64-NEXT:    b 0x2cc <phi_const_float_regpressure+0x11c>
 ; ARM64-NEXT:    strb w20, [x19]
 ; ARM64-NEXT:    strb w21, [x19]
 ; ARM64-NEXT:    strb w22, [x19]
@@ -714,12 +706,12 @@ define void @phi_glob(ptr %ptr) {
 ; ARM64-NEXT:     R_AARCH64_ADD_ABS_LO12_NC glob
 ; ARM64-NEXT:    mov w0, #0x0 // =0
 ; ARM64-NEXT:    tst w0, #0x1
-; ARM64-NEXT:    b.eq 0x440 <phi_glob+0x30>
+; ARM64-NEXT:    b.eq 0x430 <phi_glob+0x30>
 ; ARM64-NEXT:    adrp x20, 0x0 <store_glob>
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21 glob
 ; ARM64-NEXT:    add x20, x20, #0x0
 ; ARM64-NEXT:     R_AARCH64_ADD_ABS_LO12_NC glob
-; ARM64-NEXT:    b 0x428 <phi_glob+0x18>
+; ARM64-NEXT:    b 0x418 <phi_glob+0x18>
 ; ARM64-NEXT:    str x20, [x19]
 ; ARM64-NEXT:    ldp x19, x20, [sp, #0x10]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -775,9 +767,9 @@ define void @phi_ptrtoint(ptr %ptr) {
 ; ARM64-NEXT:     R_AARCH64_ADD_ABS_LO12_NC glob
 ; ARM64-NEXT:    mov w1, #0x0 // =0
 ; ARM64-NEXT:    tst w1, #0x1
-; ARM64-NEXT:    b.eq 0x488 <phi_ptrtoint+0x38>
+; ARM64-NEXT:    b.eq 0x478 <phi_ptrtoint+0x38>
 ; ARM64-NEXT:    mov x20, x0
-; ARM64-NEXT:    b 0x46c <phi_ptrtoint+0x1c>
+; ARM64-NEXT:    b 0x45c <phi_ptrtoint+0x1c>
 ; ARM64-NEXT:    str x20, [x19]
 ; ARM64-NEXT:    ldp x19, x20, [sp, #0x10]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -832,9 +824,9 @@ define void @phi_ptrtoint_multiedge(i1 %cond, ptr %ptr) {
 ; ARM64-NEXT:    add x1, x1, #0x0
 ; ARM64-NEXT:     R_AARCH64_ADD_ABS_LO12_NC glob
 ; ARM64-NEXT:    tst w0, #0x1
-; ARM64-NEXT:    b.ne 0x4c8 <phi_ptrtoint_multiedge+0x28>
+; ARM64-NEXT:    b.ne 0x4b8 <phi_ptrtoint_multiedge+0x28>
 ; ARM64-NEXT:    mov x20, x1
-; ARM64-NEXT:    b 0x4cc <phi_ptrtoint_multiedge+0x2c>
+; ARM64-NEXT:    b 0x4bc <phi_ptrtoint_multiedge+0x2c>
 ; ARM64-NEXT:    mov x20, x1
 ; ARM64-NEXT:    adrp x0, 0x0 <store_glob>
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21 glob
@@ -842,9 +834,9 @@ define void @phi_ptrtoint_multiedge(i1 %cond, ptr %ptr) {
 ; ARM64-NEXT:     R_AARCH64_ADD_ABS_LO12_NC glob
 ; ARM64-NEXT:    mov w1, #0x0 // =0
 ; ARM64-NEXT:    tst w1, #0x1
-; ARM64-NEXT:    b.eq 0x4e8 <phi_ptrtoint_multiedge+0x48>
+; ARM64-NEXT:    b.eq 0x4d8 <phi_ptrtoint_multiedge+0x48>
 ; ARM64-NEXT:    mov x20, x0
-; ARM64-NEXT:    b 0x4cc <phi_ptrtoint_multiedge+0x2c>
+; ARM64-NEXT:    b 0x4bc <phi_ptrtoint_multiedge+0x2c>
 ; ARM64-NEXT:    str x20, [x19]
 ; ARM64-NEXT:    ldp x19, x20, [sp, #0x10]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -904,9 +896,9 @@ define void @phi_ptrtoint_trunc_add(ptr %ptr) {
 ; ARM64-NEXT:    add w0, w0, #0x20
 ; ARM64-NEXT:    mov w1, #0x0 // =0
 ; ARM64-NEXT:    tst w1, #0x1
-; ARM64-NEXT:    b.eq 0x540 <phi_ptrtoint_trunc_add+0x40>
+; ARM64-NEXT:    b.eq 0x530 <phi_ptrtoint_trunc_add+0x40>
 ; ARM64-NEXT:    mov w20, w0
-; ARM64-NEXT:    b 0x520 <phi_ptrtoint_trunc_add+0x20>
+; ARM64-NEXT:    b 0x510 <phi_ptrtoint_trunc_add+0x20>
 ; ARM64-NEXT:    str w20, [x19]
 ; ARM64-NEXT:    ldp x19, x20, [sp, #0x10]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -960,12 +952,12 @@ define void @phi_struct1(ptr %ptr) {
 ; ARM64-NEXT:    str w0, [x29, #0xa4]
 ; ARM64-NEXT:    mov w0, #0x0 // =0
 ; ARM64-NEXT:    tst w0, #0x1
-; ARM64-NEXT:    b.eq 0x590 <phi_struct1+0x40>
+; ARM64-NEXT:    b.eq 0x580 <phi_struct1+0x40>
 ; ARM64-NEXT:    mov w0, #0x0 // =0
 ; ARM64-NEXT:    str w0, [x29, #0xa0]
 ; ARM64-NEXT:    mov x0, #0x1 // =1
 ; ARM64-NEXT:    str w0, [x29, #0xa4]
-; ARM64-NEXT:    b 0x570 <phi_struct1+0x20>
+; ARM64-NEXT:    b 0x560 <phi_struct1+0x20>
 ; ARM64-NEXT:    ldr w0, [x29, #0xa0]
 ; ARM64-NEXT:    str w0, [x19]
 ; ARM64-NEXT:    ldr w0, [x29, #0xa4]
@@ -1027,7 +1019,7 @@ define void @phi_struct2(ptr %ptr) {
 ; ARM64-NEXT:    str x0, [x29, #0xa8]
 ; ARM64-NEXT:    mov w0, #0x0 // =0
 ; ARM64-NEXT:    tst w0, #0x1
-; ARM64-NEXT:    b.eq 0x5f8 <phi_struct2+0x48>
+; ARM64-NEXT:    b.eq 0x5e8 <phi_struct2+0x48>
 ; ARM64-NEXT:    mov w0, #0x0 // =0
 ; ARM64-NEXT:    str w0, [x29, #0xa0]
 ; ARM64-NEXT:    adrp x0, 0x0 <store_glob>
@@ -1035,7 +1027,7 @@ define void @phi_struct2(ptr %ptr) {
 ; ARM64-NEXT:    add x0, x0, #0x0
 ; ARM64-NEXT:     R_AARCH64_ADD_ABS_LO12_NC glob
 ; ARM64-NEXT:    str x0, [x29, #0xa8]
-; ARM64-NEXT:    b 0x5d4 <phi_struct2+0x24>
+; ARM64-NEXT:    b 0x5c4 <phi_struct2+0x24>
 ; ARM64-NEXT:    ldr w0, [x29, #0xa0]
 ; ARM64-NEXT:    str w0, [x19]
 ; ARM64-NEXT:    ldr x0, [x29, #0xa8]
@@ -1106,10 +1098,10 @@ define void @phi_struct3(ptr %ptr) {
 ; ARM64-NEXT:    mov w1, #0x0 // =0
 ; ARM64-NEXT:    mov w2, #0x0 // =0
 ; ARM64-NEXT:    tst w2, #0x1
-; ARM64-NEXT:    b.eq 0x670 <phi_struct3+0x50>
+; ARM64-NEXT:    b.eq 0x660 <phi_struct3+0x50>
 ; ARM64-NEXT:    str w1, [x29, #0xa0]
 ; ARM64-NEXT:    str w0, [x29, #0xa4]
-; ARM64-NEXT:    b 0x648 <phi_struct3+0x28>
+; ARM64-NEXT:    b 0x638 <phi_struct3+0x28>
 ; ARM64-NEXT:    ldr w0, [x29, #0xa0]
 ; ARM64-NEXT:    str w0, [x19]
 ; ARM64-NEXT:    ldr w0, [x29, #0xa4]
@@ -1174,22 +1166,22 @@ define i32 @phi_gep_before_icmp(i32 %0) {
 ; ARM64-NEXT:    mov w19, w0
 ; ARM64-NEXT:    mov w0, #0x0 // =0
 ; ARM64-NEXT:    tst w0, #0x1
-; ARM64-NEXT:    b.ne 0x6b8 <phi_gep_before_icmp+0x28>
+; ARM64-NEXT:    b.ne 0x6a8 <phi_gep_before_icmp+0x28>
 ; ARM64-NEXT:    mov w20, #0x0 // =0
-; ARM64-NEXT:    b 0x6f0 <phi_gep_before_icmp+0x60>
+; ARM64-NEXT:    b 0x6e0 <phi_gep_before_icmp+0x60>
 ; ARM64-NEXT:    mov w0, #0x0 // =0
 ; ARM64-NEXT:    mov x16, #0x1200 // =4608
 ; ARM64-NEXT:    add x0, x0, x16
 ; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    cbnz w1, 0x6d4 <phi_gep_before_icmp+0x44>
+; ARM64-NEXT:    cbnz w1, 0x6c4 <phi_gep_before_icmp+0x44>
 ; ARM64-NEXT:    mov w20, w19
-; ARM64-NEXT:    b 0x6f0 <phi_gep_before_icmp+0x60>
+; ARM64-NEXT:    b 0x6e0 <phi_gep_before_icmp+0x60>
 ; ARM64-NEXT:    mov x21, x0
 ; ARM64-NEXT:    mov w0, #0x0 // =0
 ; ARM64-NEXT:    tst w0, #0x1
-; ARM64-NEXT:    b.ne 0x6ec <phi_gep_before_icmp+0x5c>
+; ARM64-NEXT:    b.ne 0x6dc <phi_gep_before_icmp+0x5c>
 ; ARM64-NEXT:    mov w21, #0x0 // =0
-; ARM64-NEXT:    b 0x6d8 <phi_gep_before_icmp+0x48>
+; ARM64-NEXT:    b 0x6c8 <phi_gep_before_icmp+0x48>
 ; ARM64-NEXT:    mov w20, w19
 ; ARM64-NEXT:    mov w0, #0x0 // =0
 ; ARM64-NEXT:    ldp x19, x20, [sp, #0x10]
@@ -1255,17 +1247,17 @@ define void @phi_gep_before_icmp_twice() {
 ; ARM64-NEXT:    cset w2, lt
 ; ARM64-NEXT:    mov w2, #0x0 // =0
 ; ARM64-NEXT:    tst w2, #0x1
-; ARM64-NEXT:    b.eq 0x74c <phi_gep_before_icmp_twice+0x3c>
+; ARM64-NEXT:    b.eq 0x73c <phi_gep_before_icmp_twice+0x3c>
 ; ARM64-NEXT:    mov x19, x1
-; ARM64-NEXT:    b 0x768 <phi_gep_before_icmp_twice+0x58>
+; ARM64-NEXT:    b 0x758 <phi_gep_before_icmp_twice+0x58>
 ; ARM64-NEXT:    mov x20, x0
 ; ARM64-NEXT:    mov w0, #0x0 // =0
 ; ARM64-NEXT:    tst w0, #0x1
-; ARM64-NEXT:    b.ne 0x764 <phi_gep_before_icmp_twice+0x54>
+; ARM64-NEXT:    b.ne 0x754 <phi_gep_before_icmp_twice+0x54>
 ; ARM64-NEXT:    mov w20, #0x0 // =0
-; ARM64-NEXT:    b 0x750 <phi_gep_before_icmp_twice+0x40>
+; ARM64-NEXT:    b 0x740 <phi_gep_before_icmp_twice+0x40>
 ; ARM64-NEXT:    mov w19, #0x0 // =0
-; ARM64-NEXT:    b 0x768 <phi_gep_before_icmp_twice+0x58>
+; ARM64-NEXT:    b 0x758 <phi_gep_before_icmp_twice+0x58>
   br label %1
 
 1:                                                ; No predecessors!
@@ -1323,14 +1315,14 @@ define i32 @phi_gep_insert_after_earlier_phi() {
 ; ARM64-NEXT:    add x0, x0, #0x28
 ; ARM64-NEXT:    mov w1, #0x0 // =0
 ; ARM64-NEXT:    cmp w1, #0x0
-; ARM64-NEXT:    b.eq 0x7b4 <phi_gep_insert_after_earlier_phi+0x44>
+; ARM64-NEXT:    b.eq 0x7a4 <phi_gep_insert_after_earlier_phi+0x44>
 ; ARM64-NEXT:    cmp w1, #0x1
-; ARM64-NEXT:    b.eq 0x7ac <phi_gep_insert_after_earlier_phi+0x3c>
-; ARM64-NEXT:    b 0x7a4 <phi_gep_insert_after_earlier_phi+0x34>
-; ARM64-NEXT:    b 0x7b4 <phi_gep_insert_after_earlier_phi+0x44>
+; ARM64-NEXT:    b.eq 0x79c <phi_gep_insert_after_earlier_phi+0x3c>
+; ARM64-NEXT:    b 0x794 <phi_gep_insert_after_earlier_phi+0x34>
+; ARM64-NEXT:    b 0x7a4 <phi_gep_insert_after_earlier_phi+0x44>
 ; ARM64-NEXT:    udf #0x0
 ; ARM64-NEXT:    mov x19, x0
-; ARM64-NEXT:    b 0x7b8 <phi_gep_insert_after_earlier_phi+0x48>
+; ARM64-NEXT:    b 0x7a8 <phi_gep_insert_after_earlier_phi+0x48>
 ; ARM64-NEXT:    mov w19, #0x0 // =0
 ; ARM64-NEXT:    mov w0, #0x0 // =0
 ; ARM64-NEXT:    ldr x19, [sp, #0x10]

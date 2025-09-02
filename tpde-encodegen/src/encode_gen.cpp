@@ -52,7 +52,9 @@ struct GenerationState {
   llvm::MachineFunction *func;
   EncodingTarget *target;
   std::vector<std::string> param_names{};
-  std::set<unsigned> used_regs{};
+  /// Map from (used) register ID to result index (or none for ScratchReg).
+  /// Used to reuse result ValueParts and distinguish these. Stored off-by-one.
+  llvm::DenseMap<unsigned, unsigned> used_regs{};
   llvm::DenseMap<unsigned, std::string> asm_operand_refs{};
   std::unordered_map<std::string, unsigned> operand_ref_counts{};
   /// Mapping from register id to the last instruction defining the return
@@ -348,7 +350,7 @@ bool generate_inst(std::string &buf,
       }
 
       defs_allocated.emplace_back(def.isImplicit(), &def);
-      state.used_regs.insert(state.target->reg_id_from_mc_reg(reg));
+      state.used_regs.try_emplace(state.target->reg_id_from_mc_reg(reg), 0);
     }
 
     const auto def_idx = [inst, &state](const llvm::MachineOperand *op) {
@@ -421,7 +423,7 @@ bool generate_inst(std::string &buf,
              (!use.isImplicit() && "implicit tied use not implemented"));
 
       auto reg_id = state.target->reg_id_from_mc_reg(use.getReg());
-      state.used_regs.insert(reg_id);
+      state.used_regs.try_emplace(reg_id, 0);
 
       // Don't allocate the same register twice
       auto it = allocated_regs.find(reg_id);
@@ -437,14 +439,24 @@ bool generate_inst(std::string &buf,
           state.fmt_line(buf, 8, "// undef tied");
         } else {
           state.fmt_line(buf, 8, "// undef allocate scratch");
-          state.fmt_line(buf,
-                         8,
-                         "AsmReg inst{}_op{} = "
-                         "scratch_{}.alloc(RegBank({}));\n",
-                         inst_id,
-                         op_idx,
-                         state.target->reg_name_lower(reg_id),
-                         state.target->reg_bank(reg_id));
+          if (state.used_regs[reg_id] > 0) {
+            state.fmt_line(buf,
+                           8,
+                           "AsmReg inst{}_op{} = "
+                           "scratch_{}.cur_reg_or_alloc(derived());\n",
+                           inst_id,
+                           op_idx,
+                           state.target->reg_name_lower(reg_id));
+          } else {
+            state.fmt_line(buf,
+                           8,
+                           "AsmReg inst{}_op{} = "
+                           "scratch_{}.alloc(RegBank({}));\n",
+                           inst_id,
+                           op_idx,
+                           state.target->reg_name_lower(reg_id),
+                           state.target->reg_bank(reg_id));
+          }
           use_ops.push_back(std::format("inst{}_op{}", inst_id, op_idx));
           allocated_regs[reg_id] = use_ops.back();
         }
@@ -563,15 +575,26 @@ bool generate_inst(std::string &buf,
                          state.target->reg_bank(reg_id),
                          reg_size_bytes(state.func, use.getReg()));
         } else {
-          std::format_to(std::back_inserter(buf),
-                         "{:>{}}AsmReg inst{}_op{} = "
-                         "scratch_{}.alloc(RegBank({}));\n",
-                         "",
-                         8,
-                         inst_id,
-                         op_idx,
-                         state.target->reg_name_lower(reg_id),
-                         state.target->reg_bank(reg_id));
+          if (state.used_regs[reg_id] > 0) {
+            std::format_to(std::back_inserter(buf),
+                           "{:>{}}AsmReg inst{}_op{} = "
+                           "scratch_{}.cur_reg_or_alloc(derived());\n",
+                           "",
+                           8,
+                           inst_id,
+                           op_idx,
+                           state.target->reg_name_lower(reg_id));
+          } else {
+            std::format_to(std::back_inserter(buf),
+                           "{:>{}}AsmReg inst{}_op{} = "
+                           "scratch_{}.alloc(RegBank({}));\n",
+                           "",
+                           8,
+                           inst_id,
+                           op_idx,
+                           state.target->reg_name_lower(reg_id),
+                           state.target->reg_bank(reg_id));
+          }
           std::format_to(std::back_inserter(buf),
                          "{:>{}}AsmReg inst{}_op{}_tmp = "
                          "derived()->gval_as_reg({});\n",
@@ -619,10 +642,16 @@ bool generate_inst(std::string &buf,
         std::format_to(std::back_inserter(buf),
                        "        // def {} has not been allocated yet\n",
                        state.target->reg_name_lower(reg_id));
-        std::format_to(std::back_inserter(buf),
-                       "        scratch_{}.alloc(RegBank({}));\n",
-                       state.target->reg_name_lower(reg_id),
-                       state.target->reg_bank(reg_id));
+        if (state.used_regs[reg_id] > 0) {
+          std::format_to(std::back_inserter(buf),
+                         "        scratch_{}.cur_reg_or_alloc(derived());\n",
+                         state.target->reg_name_lower(reg_id));
+        } else {
+          std::format_to(std::back_inserter(buf),
+                         "        scratch_{}.alloc(RegBank({}));\n",
+                         state.target->reg_name_lower(reg_id),
+                         state.target->reg_bank(reg_id));
+        }
       }
 
       if (def.isImplicit()) {
@@ -741,7 +770,7 @@ void GenerationState::handle_end_of_block(llvm::raw_ostream &os,
 
           const auto reg_id = target->reg_id_from_mc_reg(op.getReg());
           func_used_regs.try_emplace(reg_id, 0);
-          used_regs.insert(reg_id);
+          used_regs.try_emplace(reg_id, 0);
         }
       }
     }
@@ -752,12 +781,14 @@ void GenerationState::handle_end_of_block(llvm::raw_ostream &os,
       auto name = target->reg_name_lower(reg);
       auto bank = target->reg_bank(reg);
       auto asm_op_ref_it = asm_operand_refs.find(reg);
-      if (asm_op_ref_it == asm_operand_refs.end()) {
-        os << "  scratch_" << name << ".alloc(RegBank(" << bank << "));\n";
-      } else {
+      if (asm_op_ref_it != asm_operand_refs.end()) {
         auto param = asm_op_ref_it->second;
         os << "  try_salvage_or_materialize(" << param << ", scratch_" << name
            << ", " << bank << ", " << size << ");\n";
+      } else if (used_regs[reg] > 0) {
+        os << "  scratch_" << name << ".cur_reg_or_alloc(derived());\n";
+      } else {
+        os << "  scratch_" << name << ".alloc(RegBank(" << bank << "));\n";
       }
     }
 
@@ -989,9 +1020,11 @@ bool create_encode_function(llvm::MachineFunction *func,
   auto &mach_reg_info = func->getRegInfo();
   // const auto &target_reg_info = func->getSubtarget().getRegisterInfo();
 
-  // Mark return registers as used.
-  for (auto reg_id : state.return_regs) {
-    state.used_regs.insert(reg_id);
+  // Mark return registers as used. Try to reuse result ValueParts for regs.
+  for (auto [idx, reg_id] : llvm::enumerate(state.return_regs)) {
+    if (!state.maybe_fixed_regs.contains(reg_id)) {
+      state.used_regs.try_emplace(reg_id, idx + 1);
+    }
   }
 
   // map inputs
@@ -1005,7 +1038,7 @@ bool create_encode_function(llvm::MachineFunction *func,
       state.param_names.push_back(std::move(name));
 
       const auto reg_id = target->reg_id_from_mc_reg(it->first);
-      state.used_regs.insert(reg_id);
+      state.used_regs.try_emplace(reg_id, 0);
       state.asm_operand_refs[reg_id] = state.param_names[idx++];
       state.operand_ref_counts[state.param_names.back()] = 1;
 
@@ -1087,10 +1120,18 @@ bool create_encode_function(llvm::MachineFunction *func,
   }
 
   // create ScratchRegs
-  for (const auto reg : state.used_regs) {
-    std::format_to(std::back_inserter(write_buf),
-                   "    ScratchReg scratch_{}{{derived()}};\n",
-                   state.target->reg_name_lower(reg));
+  for (const auto &entry : state.used_regs) {
+    auto name = state.target->reg_name_lower(entry.first);
+    if (!entry.second) {
+      std::format_to(std::back_inserter(write_buf),
+                     "    ScratchReg scratch_{}{{derived()}};\n",
+                     name);
+    } else {
+      std::format_to(std::back_inserter(write_buf),
+                     "    ValuePart &scratch_{} = result_{};\n",
+                     name,
+                     entry.second - 1);
+    }
   }
 
   // create param conditions
@@ -1175,6 +1216,11 @@ bool create_encode_function(llvm::MachineFunction *func,
   // backups
   for (unsigned idx = 0; idx < state.num_ret_regs; ++idx) {
     const auto reg = state.return_regs[idx];
+    if (state.used_regs[reg] > 0) {
+      os << "  if (result_" << idx << ".has_assignment())\n";
+      os << "    result_" << idx << ".unlock(derived());\n";
+      continue;
+    }
     auto name = state.target->reg_name_lower(reg);
 
     if (auto it = state.asm_operand_refs.find(reg);

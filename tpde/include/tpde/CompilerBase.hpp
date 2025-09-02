@@ -431,6 +431,11 @@ public:
   /// ValuePartRef), store it in dst.
   AsmReg gval_as_reg_reuse(GenericValuePart &gv, ScratchReg &dst) noexcept;
 
+  /// Like gval_as_reg; if the GenericValuePart owns a reusable register
+  /// (either a ScratchReg, possibly due to materialization, or a reusable
+  /// ValuePartRef), store it in dst.
+  AsmReg gval_as_reg_reuse(GenericValuePart &gv, ValuePart &dst) noexcept;
+
 private:
   /// @internal Select register when a value needs to be evicted.
   Reg select_reg_evict(RegBank bank, u64 exclusion_mask) noexcept;
@@ -1355,6 +1360,27 @@ typename CompilerBase<Adaptor, Derived, Config>::AsmReg
       if (val_ref->can_salvage()) {
         dst.alloc_specific(val_ref->salvage());
         assert(dst.cur_reg() == reg && "salvaging unsuccessful");
+      }
+    }
+  }
+  return reg;
+}
+
+template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>
+typename CompilerBase<Adaptor, Derived, Config>::AsmReg
+    CompilerBase<Adaptor, Derived, Config>::gval_as_reg_reuse(
+        GenericValuePart &gv, ValuePart &dst) noexcept {
+  AsmReg reg = gval_as_reg(gv);
+  if (!dst.has_reg() &&
+      (!dst.has_assignment() || !dst.assignment().fixed_assignment())) {
+    // TODO: make this less expensive
+    if (auto *scratch = std::get_if<ScratchReg>(&gv.state)) {
+      dst.set_value(this, std::move(*scratch));
+      dst.cur_reg_or_alloc(this);
+    } else if (auto *val_ref = std::get_if<ValuePartRef>(&gv.state)) {
+      if (val_ref->can_salvage()) {
+        dst.set_value(this, std::move(*val_ref));
+        dst.cur_reg_or_alloc(this);
       }
     }
   }

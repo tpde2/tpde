@@ -62,6 +62,10 @@ struct EncodeCompiler {
                                              ScratchReg     &dst_scratch,
                                              u8              bank,
                                              u32             size) noexcept;
+    void          try_salvage_or_materialize(GenericValuePart &gv,
+                                             ValuePart      &dst_scratch,
+                                             u8              bank,
+                                             u32             size) noexcept;
 
     CompilerX64 *derived() noexcept {
         return static_cast<CompilerX64 *>(static_cast<Derived *>(this));
@@ -240,6 +244,25 @@ void EncodeCompiler<Adaptor, Derived, BaseTy, Config>::
     AsmReg reg = derived()->gval_as_reg_reuse(gv, dst_scratch);
     if (!dst_scratch.has_reg()) {
         dst_scratch.alloc(RegBank(bank));
+    }
+    if (dst_scratch.cur_reg() != reg) {
+        derived()->mov(dst_scratch.cur_reg(), reg, size);
+    }
+}
+
+template <typename Adaptor,
+          typename Derived,
+          template <typename, typename, typename>
+          class BaseTy,
+          typename Config>
+void EncodeCompiler<Adaptor, Derived, BaseTy, Config>::
+    try_salvage_or_materialize(GenericValuePart &gv,
+                               ValuePart      &dst_scratch,
+                               u8              ,
+                               u32             size) noexcept {
+    AsmReg reg = derived()->gval_as_reg_reuse(gv, dst_scratch);
+    if (!dst_scratch.has_reg()) {
+        dst_scratch.alloc_reg(derived());
     }
     if (dst_scratch.cur_reg() != reg) {
         derived()->mov(dst_scratch.cur_reg(), reg, size);

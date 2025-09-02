@@ -780,8 +780,7 @@ define i32 @call_indirect3(ptr %m) {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
 ; X64-NEXT:    sub rsp, 0x28
-; X64-NEXT:    mov rdi, qword ptr [rdi]
-; X64-NEXT:    mov rbx, rdi
+; X64-NEXT:    mov rbx, qword ptr [rdi]
 ; X64-NEXT:    xor edi, edi
 ; X64-NEXT:    call rbx
 ; X64-NEXT:    xor eax, eax
@@ -794,8 +793,7 @@ define i32 @call_indirect3(ptr %m) {
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    str x19, [sp, #0x10]
-; ARM64-NEXT:    ldr x0, [x0]
-; ARM64-NEXT:    mov x19, x0
+; ARM64-NEXT:    ldr x19, [x0]
 ; ARM64-NEXT:    mov w0, #0x0 // =0
 ; ARM64-NEXT:    blr x19
 ; ARM64-NEXT:    mov w0, #0x0 // =0
