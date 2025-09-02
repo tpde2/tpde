@@ -787,6 +787,7 @@ typename CompilerBase<Adaptor, Derived, Config>::AsmReg
   assert(ap.fixed_assignment() || !compiler->register_file.is_fixed(cur_reg));
   if (ap.fixed_assignment()) {
     compiler->register_file.dec_lock_count(cur_reg); // release fixed register
+    --compiler->assignments.cur_fixed_assignment_count[ap.bank().id()];
   }
 
   ap.set_register_valid(false);
@@ -815,6 +816,9 @@ void CompilerBase<Adaptor, Derived, Config>::ValuePart::reset(
       ap.set_register_valid(false);
       ap.set_fixed_assignment(false);
       compiler->register_file.dec_lock_count_must_zero(reg, fixed ? 2 : 1);
+      if (fixed) {
+        --compiler->assignments.cur_fixed_assignment_count[ap.bank().id()];
+      }
     } else {
       compiler->register_file.unmark_fixed(reg);
     }
