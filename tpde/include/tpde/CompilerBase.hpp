@@ -1841,9 +1841,6 @@ void CompilerBase<Adaptor, Derived, Config>::move_to_phi_nodes_impl(
   ScratchWrapper scratch{derived()};
   const auto move_to_phi = [this, &scratch](IRValueRef phi,
                                             IRValueRef incoming_val) {
-    // TODO(ts): if phi==incoming_val, we should be able to elide the move
-    // even if the phi is in a fixed register, no?
-
     auto phi_vr = derived()->result_ref(phi);
     auto val_vr = derived()->val_ref(incoming_val);
     if (phi == incoming_val) {
@@ -1853,23 +1850,20 @@ void CompilerBase<Adaptor, Derived, Config>::move_to_phi_nodes_impl(
     u32 part_count = phi_vr.assignment()->part_count;
     for (u32 i = 0; i < part_count; ++i) {
       AssignmentPartRef phi_ap{phi_vr.assignment(), i};
-
-      AsmReg reg{};
       ValuePartRef val_vpr = val_vr.part(i);
-      if (val_vpr.is_const()) {
-        reg = scratch.alloc_from_bank(val_vpr.bank());
-        val_vpr.reload_into_specific_fixed(reg);
-      } else if (val_vpr.assignment().register_valid() ||
-                 val_vpr.assignment().fixed_assignment()) {
-        reg = val_vpr.assignment().get_reg();
-      } else {
-        reg = val_vpr.reload_into_specific_fixed(
-            this, scratch.alloc_from_bank(phi_ap.bank()));
-      }
 
       if (phi_ap.fixed_assignment()) {
-        derived()->mov(phi_ap.get_reg(), reg, phi_ap.part_size());
+        if (AsmReg reg = val_vpr.cur_reg_unlocked(); reg.valid()) {
+          derived()->mov(phi_ap.get_reg(), reg, phi_ap.part_size());
+        } else {
+          val_vpr.reload_into_specific_fixed(phi_ap.get_reg());
+        }
       } else {
+        AsmReg reg = val_vpr.cur_reg_unlocked();
+        if (!reg.valid()) {
+          reg = scratch.alloc_from_bank(val_vpr.bank());
+          val_vpr.reload_into_specific_fixed(reg);
+        }
         allocate_spill_slot(phi_ap);
         derived()->spill_reg(reg, phi_ap.frame_off(), phi_ap.part_size());
         phi_ap.set_stack_valid();
