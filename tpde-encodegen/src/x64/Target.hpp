@@ -110,6 +110,15 @@ struct EncodingTargetX64 : EncodingTarget {
             name == "SSP" || name == "RIP");
   }
 
+  bool reg_is_flags(const llvm::MCRegister reg) override {
+    if (!reg.isValid()) {
+      return false;
+    }
+    const auto name =
+        std::string_view{func->getSubtarget().getRegisterInfo()->getName(reg)};
+    return name == "EFLAGS";
+  }
+
   void generate_copy(std::string &buf,
                      unsigned indent,
                      unsigned bank,

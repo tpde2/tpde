@@ -920,44 +920,44 @@ define void @f2(ptr %0, ptr %1, ptr %2, ptr %3, ptr %4, ptr %5, ptr %6, ptr %7, 
 ; X64-NEXT:    mov qword ptr [rbp - 0x78], rax
 ; X64-NEXT:    mov rax, qword ptr [rbp - 0x80]
 ; X64-NEXT:    mov qword ptr [rbp - 0x80], rax
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov qword ptr [rbp - 0x9cc8], rax
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov qword ptr [rbp - 0x9cd0], rax
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov qword ptr [rbp - 0x9cd8], rax
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov qword ptr [rbp - 0x9ce0], rdi
-; X64-NEXT:    mov edi, 0x0
+; X64-NEXT:    xor edi, edi
 ; X64-NEXT:    mov qword ptr [rbp - 0x9ce8], rsi
-; X64-NEXT:    mov esi, 0x0
+; X64-NEXT:    xor esi, esi
 ; X64-NEXT:    mov qword ptr [rbp - 0x9cf0], rdx
-; X64-NEXT:    mov edx, 0x0
+; X64-NEXT:    xor edx, edx
 ; X64-NEXT:    mov qword ptr [rbp - 0x9cf8], rcx
-; X64-NEXT:    mov ecx, 0x0
+; X64-NEXT:    xor ecx, ecx
 ; X64-NEXT:    mov qword ptr [rbp - 0x9d00], r8
-; X64-NEXT:    mov r8d, 0x0
+; X64-NEXT:    xor r8d, r8d
 ; X64-NEXT:    mov qword ptr [rbp - 0x9d08], r9
-; X64-NEXT:    mov r9d, 0x0
+; X64-NEXT:    xor r9d, r9d
 ; X64-NEXT:    sub rsp, 0x130
 ; X64-NEXT:    mov qword ptr [rbp - 0x9d10], rax
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov qword ptr [rsp], rax
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov qword ptr [rsp + 0x8], rax
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov qword ptr [rsp + 0x10], rax
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov qword ptr [rsp + 0x18], rax
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov qword ptr [rsp + 0x20], rax
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov qword ptr [rsp + 0x28], rax
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov qword ptr [rsp + 0x30], rax
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov qword ptr [rsp + 0x38], rax
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov qword ptr [rsp + 0x40], rax
 ; X64-NEXT:    mov rax, qword ptr [rbp - 0x9ce8]
 ; X64-NEXT:    mov qword ptr [rsp + 0x48], rax
@@ -1008,7 +1008,7 @@ define void @f2(ptr %0, ptr %1, ptr %2, ptr %3, ptr %4, ptr %5, ptr %6, ptr %7, 
 ; X64-NEXT:    mov qword ptr [rsp + 0x118], rax
 ; X64-NEXT:    mov rax, qword ptr [rbp - 0x9d10]
 ; X64-NEXT:    mov qword ptr [rsp + 0x120], rax
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    call <L0>
 ; X64-NEXT:     R_X86_64_PLT32 f1-0x4
@@ -1234,7 +1234,7 @@ define void @alloca_manyregs(i32 %0, ptr %1, ptr %2, ptr %3, i64 %4, i32 %5, ptr
 ; X64-NEXT:    mov qword ptr [rbp - 0x40818], r13
 ; X64-NEXT:    mov qword ptr [rbp - 0x40820], r14
 ; X64-NEXT:    mov dword ptr [rbp - 0x407f8], r15d
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov dword ptr [rbp - 0x40824], eax
 ; X64-NEXT:    mov eax, dword ptr [rbp - 0x407c4]
 ; X64-NEXT:  <L0>:
@@ -1269,7 +1269,7 @@ define void @alloca_manyregs(i32 %0, ptr %1, ptr %2, ptr %3, i64 %4, i32 %5, ptr
 ; X64-NEXT:    sete r15b
 ; X64-NEXT:    mov r15, qword ptr [rbp - 0x40]
 ; X64-NEXT:    mov eax, dword ptr [r15]
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    lea eax, [1*rax]
 ; X64-NEXT:    mov rcx, qword ptr [rbp - 0x48]
 ; X64-NEXT:    mov edx, dword ptr [rcx]
@@ -1282,7 +1282,7 @@ define void @alloca_manyregs(i32 %0, ptr %1, ptr %2, ptr %3, i64 %4, i32 %5, ptr
 ; X64-NEXT:    sete cl
 ; X64-NEXT:    mov rcx, qword ptr [rbp - 0x407d8]
 ; X64-NEXT:    lea rdx, [rcx + 0x4]
-; X64-NEXT:    mov edx, 0x0
+; X64-NEXT:    xor edx, edx
 ; X64-NEXT:    mov ebx, dword ptr [rbp - 0x58]
 ; X64-NEXT:    mov ecx, ebx
 ; X64-NEXT:    shr edx, cl

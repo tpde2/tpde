@@ -2443,8 +2443,8 @@ define void @icmp_eq_i128_0(i128 %0) {
 ; X64-NEXT:    push rbx
 ; X64-NEXT:    nop dword ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x28
-; X64-NEXT:    mov eax, 0x0
-; X64-NEXT:    mov ecx, 0x0
+; X64-NEXT:    xor eax, eax
+; X64-NEXT:    xor ecx, ecx
 ; X64-NEXT:    mov rdx, rdi
 ; X64-NEXT:    mov rbx, rsi
 ; X64-NEXT:    xor rdx, rax

@@ -33,7 +33,7 @@ define i32 @invoke_manyargs() personality ptr @__gxx_personality_v0 {
 ; X64-NEXT:    call <L0>
 ; X64-NEXT:     R_X86_64_PLT32 mayThrow-0x4
 ; X64-NEXT:    add rsp, 0x20
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov rsp, rbp
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -98,15 +98,15 @@ define void @invoke_landingpad_phi() personality ptr @__gxx_personality_v0 {
 ; X64-NEXT:    push r13
 ; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    sub rsp, 0x28
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov dword ptr [rbp - 0x2c], eax
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov qword ptr [rbp - 0x38], rax
 ; X64-NEXT:  <L3>:
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    lea eax, [1*rax]
 ; X64-NEXT:    mov ebx, eax
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    lea rax, [rax + 0x28]
 ; X64-NEXT:    mov r12, rax
 ; X64-NEXT:    mov eax, 0x0
@@ -115,23 +115,23 @@ define void @invoke_landingpad_phi() personality ptr @__gxx_personality_v0 {
 ; X64-NEXT:    mov ecx, 0x0
 ; X64-NEXT:    cmove eax, ecx
 ; X64-NEXT:    mov r13d, eax
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov qword ptr [rbp - 0x40], rax
 ; X64-NEXT:    mov ebx, ebx
 ; X64-NEXT:    mov r12, qword ptr [r12]
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    shl eax, 0x0
 ; X64-NEXT:    mov ebx, eax
 ; X64-NEXT:    test r13d, r13d
 ; X64-NEXT:    setl al
-; X64-NEXT:    mov edi, 0x0
-; X64-NEXT:    mov esi, 0x0
+; X64-NEXT:    xor edi, edi
+; X64-NEXT:    xor esi, esi
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    call <L0>
 ; X64-NEXT:     R_X86_64_PLT32 foo-0x4
 ; X64-NEXT:    mov r12, rax
 ; X64-NEXT:    jmp <L1>
-; X64-NEXT:    mov ecx, 0x0
+; X64-NEXT:    xor ecx, ecx
 ; X64-NEXT:    mov qword ptr [rbp - 0x40], rcx
 ; X64-NEXT:    jmp <L2>
 ; X64-NEXT:  <L1>:
@@ -139,8 +139,8 @@ define void @invoke_landingpad_phi() personality ptr @__gxx_personality_v0 {
 ; X64-NEXT:    mov qword ptr [rbp - 0x38], r12
 ; X64-NEXT:    jmp <L3>
 ; X64-NEXT:  <L2>:
-; X64-NEXT:    mov edi, 0x0
-; X64-NEXT:    mov esi, 0x0
+; X64-NEXT:    xor edi, edi
+; X64-NEXT:    xor esi, esi
 ; X64-NEXT:  <L4>:
 ; X64-NEXT:    call <L4>
 ; X64-NEXT:     R_X86_64_PLT32 _Unwind_Resume-0x4
@@ -246,13 +246,13 @@ define i32 @invoke_catch_symbol() personality ptr @__gxx_personality_v0 {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:    mov edi, 0x0
+; X64-NEXT:    xor edi, edi
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    call <L0>
 ; X64-NEXT:     R_X86_64_PLT32 _Znwm-0x4
 ; X64-NEXT:    jmp <L1>
 ; X64-NEXT:  <L1>:
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov rsp, rbp
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -297,13 +297,13 @@ define i32 @main(ptr %0, i64 %1) personality ptr @__gxx_personality_v0 {
 ; X64-NEXT:    sub rsp, 0x20
 ; X64-NEXT:    mov rbx, rdi
 ; X64-NEXT:    mov r12, rsi
-; X64-NEXT:    mov edi, 0x0
+; X64-NEXT:    xor edi, edi
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    call <L0>
 ; X64-NEXT:     R_X86_64_PLT32 fn_ptr_i64-0x4
 ; X64-NEXT:    mov qword ptr [rbp - 0x30], rax
 ; X64-NEXT:    jmp <L1>
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    lea rsp, [rbp - 0x10]
 ; X64-NEXT:    pop r12
 ; X64-NEXT:    pop rbx
@@ -314,7 +314,7 @@ define i32 @main(ptr %0, i64 %1) personality ptr @__gxx_personality_v0 {
 ; X64-NEXT:    mov rax, qword ptr [rbp - 0x30]
 ; X64-NEXT:    lea rax, [rax + 0x8]
 ; X64-NEXT:  <L2>:
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    movzx eax, byte ptr [rbx + r12]
 ; X64-NEXT:    jmp <L2>
 ;

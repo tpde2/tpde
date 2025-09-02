@@ -88,6 +88,7 @@ struct EncodingTarget {
   virtual unsigned reg_bank(unsigned id) = 0;
   // some registers, e.g. flags should be ignored for generation purposes
   virtual bool reg_should_be_ignored(llvm::MCRegister) = 0;
+  virtual bool reg_is_flags(llvm::MCRegister) = 0;
   virtual void generate_copy(std::string &buf,
                              unsigned indent,
                              unsigned bank,

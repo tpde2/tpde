@@ -13,7 +13,7 @@ define void @fcmp_false_f32_br(float, float, ptr %p) {
 ; X64-NEXT:    nop dword ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x28
 ; X64-NEXT:    mov rbx, rdi
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    test al, 0x1
 ; X64-NEXT:    movd dword ptr [rbp - 0x2c], xmm1
 ; X64-NEXT:    je <L0>
@@ -988,7 +988,7 @@ define void @fcmp_false_f64_br(double, double, ptr %p) {
 ; X64-NEXT:    nop dword ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x28
 ; X64-NEXT:    mov rbx, rdi
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    test al, 0x1
 ; X64-NEXT:    movq qword ptr [rbp - 0x30], xmm1
 ; X64-NEXT:    je <L0>

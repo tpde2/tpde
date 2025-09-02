@@ -78,6 +78,10 @@ struct EncodingTargetArm64 : EncodingTarget {
            name == "NZCV" || name == "FPCR";
   }
 
+  bool reg_is_flags(const llvm::MCRegister) override {
+    return false; // Flag preservation is not needed on AArch64.
+  }
+
   void generate_copy(std::string &buf,
                      unsigned indent,
                      unsigned bank,

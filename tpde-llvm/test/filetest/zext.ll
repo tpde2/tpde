@@ -143,7 +143,7 @@ define i128 @zext_i8_to_i128(i8 %0) {
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x40
 ; X64-NEXT:    movzx edi, dil
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov qword ptr [rbp - 0x38], rax
 ; X64-NEXT:    mov rax, rdi
 ; X64-NEXT:    mov rdx, qword ptr [rbp - 0x38]
@@ -278,7 +278,7 @@ define i128 @zext_i16_to_i128(i16 %0) {
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x40
 ; X64-NEXT:    movzx edi, di
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov qword ptr [rbp - 0x38], rax
 ; X64-NEXT:    mov rax, rdi
 ; X64-NEXT:    mov rdx, qword ptr [rbp - 0x38]
@@ -387,7 +387,7 @@ define i128 @zext_i21_to_i128(i21 %0) {
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x40
 ; X64-NEXT:    and edi, 0x1fffff
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov qword ptr [rbp - 0x38], rax
 ; X64-NEXT:    mov rax, rdi
 ; X64-NEXT:    mov rdx, qword ptr [rbp - 0x38]
@@ -470,7 +470,7 @@ define i128 @zext_i32_to_i128(i32 %0) {
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x40
 ; X64-NEXT:    mov edi, edi
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov qword ptr [rbp - 0x38], rax
 ; X64-NEXT:    mov rax, rdi
 ; X64-NEXT:    mov rdx, qword ptr [rbp - 0x38]
@@ -529,7 +529,7 @@ define i128 @zext_i37_to_i128(i37 %0) {
 ; X64-NEXT:    sub rsp, 0x40
 ; X64-NEXT:    movabs rax, 0x1fffffffff
 ; X64-NEXT:    and rdi, rax
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov qword ptr [rbp - 0x38], rax
 ; X64-NEXT:    mov rax, rdi
 ; X64-NEXT:    mov rdx, qword ptr [rbp - 0x38]
@@ -559,7 +559,7 @@ define i128 @zext_i64_to_i128(i64 %0) {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x40
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov qword ptr [rbp - 0x38], rax
 ; X64-NEXT:    mov rax, rdi
 ; X64-NEXT:    mov rdx, qword ptr [rbp - 0x38]

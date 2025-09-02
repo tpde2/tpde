@@ -747,21 +747,21 @@ define void @cbz_nophi(i32 %param) {
 ; X64-NEXT:    sub rsp, 0x30
 ; X64-NEXT:    mov dword ptr [rbp - 0x2c], edi
 ; X64-NEXT:  <L0>:
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov dword ptr [rbp - 0x30], eax
 ; X64-NEXT:  <L1>:
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    shr eax, 0x0
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    lea eax, [1*rax]
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    lea eax, [1*rax]
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    lea eax, [1*rax]
 ; X64-NEXT:    mov eax, dword ptr [rbp - 0x2c]
 ; X64-NEXT:    test eax, eax
 ; X64-NEXT:    jne <L0>
-; X64-NEXT:    mov ecx, 0x0
+; X64-NEXT:    xor ecx, ecx
 ; X64-NEXT:    mov dword ptr [rbp - 0x30], ecx
 ; X64-NEXT:    jmp <L1>
 ;
@@ -809,21 +809,21 @@ define void @cbz_phi() {
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
 ; X64-NEXT:  <L0>:
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov dword ptr [rbp - 0x2c], eax
 ; X64-NEXT:  <L1>:
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    shr eax, 0x0
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    lea eax, [1*rax]
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    lea eax, [1*rax]
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    lea eax, [1*rax]
 ; X64-NEXT:    mov eax, dword ptr [rbp - 0x2c]
 ; X64-NEXT:    test eax, eax
 ; X64-NEXT:    jne <L0>
-; X64-NEXT:    mov ecx, 0x0
+; X64-NEXT:    xor ecx, ecx
 ; X64-NEXT:    mov dword ptr [rbp - 0x2c], ecx
 ; X64-NEXT:    jmp <L1>
 ;

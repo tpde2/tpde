@@ -12,7 +12,7 @@ define i1 @is_snan_float(float %p) {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    movd ecx, xmm0
 ; X64-NEXT:    and ecx, 0x7fffffff
 ; X64-NEXT:    cmp ecx, 0x7fc00000
@@ -54,7 +54,7 @@ define i1 @is_snan_double(double %p) {
 ; X64-NEXT:    push rbx
 ; X64-NEXT:    nop dword ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x28
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    movq rcx, xmm0
 ; X64-NEXT:    movabs rdx, 0x7fffffffffffffff
 ; X64-NEXT:    and rdx, rcx
@@ -99,7 +99,7 @@ define i1 @is_qnan_float(float %p) {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    movd ecx, xmm0
 ; X64-NEXT:    and ecx, 0x7fffffff
 ; X64-NEXT:    cmp ecx, 0x7fc00000
@@ -135,7 +135,7 @@ define i1 @is_qnan_double(double %p) {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    movq rcx, xmm0
 ; X64-NEXT:    movabs rdx, 0x7fffffffffffffff
 ; X64-NEXT:    and rdx, rcx
@@ -173,8 +173,8 @@ define i1 @is_ninf_float(float %p) {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:    mov eax, 0x0
-; X64-NEXT:    movss xmm1, dword ptr <is_ninf_float+0x19>
+; X64-NEXT:    xor eax, eax
+; X64-NEXT:    movss xmm1, dword ptr <is_ninf_float+0x16>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    ucomiss xmm1, xmm0
 ; X64-NEXT:    setae cl
@@ -208,8 +208,8 @@ define i1 @is_ninf_double(double %p) {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:    mov eax, 0x0
-; X64-NEXT:    movsd xmm1, qword ptr <is_ninf_double+0x19>
+; X64-NEXT:    xor eax, eax
+; X64-NEXT:    movsd xmm1, qword ptr <is_ninf_double+0x16>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    ucomisd xmm1, xmm0
 ; X64-NEXT:    setae cl
@@ -243,7 +243,7 @@ define i1 @is_nnorm_float(float %p) {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    movd ecx, xmm0
 ; X64-NEXT:    test ecx, ecx
 ; X64-NEXT:    sets dl
@@ -286,7 +286,7 @@ define i1 @is_nnorm_double(double %p) {
 ; X64-NEXT:    push rbx
 ; X64-NEXT:    nop dword ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x28
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    movq rcx, xmm0
 ; X64-NEXT:    movabs rdx, 0x7fffffffffffffff
 ; X64-NEXT:    and rdx, rcx
@@ -333,7 +333,7 @@ define i1 @is_nsnorm_float(float %p) {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    movd ecx, xmm0
 ; X64-NEXT:    test ecx, ecx
 ; X64-NEXT:    sets dl
@@ -376,7 +376,7 @@ define i1 @is_nsnorm_double(double %p) {
 ; X64-NEXT:    push rbx
 ; X64-NEXT:    nop dword ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x28
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    movq rcx, xmm0
 ; X64-NEXT:    movabs rdx, 0x7fffffffffffffff
 ; X64-NEXT:    and rdx, rcx
@@ -421,7 +421,7 @@ define i1 @is_nzero_float(float %p) {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    movd ecx, xmm0
 ; X64-NEXT:    neg ecx
 ; X64-NEXT:    seto cl
@@ -455,7 +455,7 @@ define i1 @is_nzero_double(double %p) {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    movq rcx, xmm0
 ; X64-NEXT:    neg rcx
 ; X64-NEXT:    seto cl
@@ -489,7 +489,7 @@ define i1 @is_pzero_float(float %p) {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    movd ecx, xmm0
 ; X64-NEXT:    test ecx, ecx
 ; X64-NEXT:    sete cl
@@ -522,7 +522,7 @@ define i1 @is_pzero_double(double %p) {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    movq rcx, xmm0
 ; X64-NEXT:    test rcx, rcx
 ; X64-NEXT:    sete cl
@@ -555,7 +555,7 @@ define i1 @is_psnorm_float(float %p) {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    movd ecx, xmm0
 ; X64-NEXT:    dec ecx
 ; X64-NEXT:    cmp ecx, 0x7fffff
@@ -591,7 +591,7 @@ define i1 @is_psnorm_double(double %p) {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    movq rcx, xmm0
 ; X64-NEXT:    dec rcx
 ; X64-NEXT:    movabs rdx, 0xfffffffffffff
@@ -628,7 +628,7 @@ define i1 @is_pnorm_float(float %p) {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    movd ecx, xmm0
 ; X64-NEXT:    test ecx, ecx
 ; X64-NEXT:    setns dl
@@ -671,7 +671,7 @@ define i1 @is_pnorm_double(double %p) {
 ; X64-NEXT:    push rbx
 ; X64-NEXT:    nop dword ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x28
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    movq rcx, xmm0
 ; X64-NEXT:    movabs rdx, 0x7fffffffffffffff
 ; X64-NEXT:    and rdx, rcx
@@ -718,8 +718,8 @@ define i1 @is_pinf_float(float %p) {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:    mov eax, 0x0
-; X64-NEXT:    ucomiss xmm0, dword ptr <is_pinf_float+0x19>
+; X64-NEXT:    xor eax, eax
+; X64-NEXT:    ucomiss xmm0, dword ptr <is_pinf_float+0x16>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    setae cl
 ; X64-NEXT:    or cl, al
@@ -751,8 +751,8 @@ define i1 @is_pinf_double(double %p) {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:    mov eax, 0x0
-; X64-NEXT:    ucomisd xmm0, qword ptr <is_pinf_double+0x19>
+; X64-NEXT:    xor eax, eax
+; X64-NEXT:    ucomisd xmm0, qword ptr <is_pinf_double+0x16>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    setae cl
 ; X64-NEXT:    or cl, al
@@ -994,7 +994,7 @@ define i1 @is_snan_psnorm_float(float %p) {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    movd ecx, xmm0
 ; X64-NEXT:    and ecx, 0x7fffffff
 ; X64-NEXT:    cmp ecx, 0x7fc00000
@@ -1045,7 +1045,7 @@ define i1 @is_snan_psnorm_double(double %p) {
 ; X64-NEXT:    push rbx
 ; X64-NEXT:    nop dword ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x28
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    movq rcx, xmm0
 ; X64-NEXT:    movabs rdx, 0x7fffffffffffffff
 ; X64-NEXT:    and rdx, rcx

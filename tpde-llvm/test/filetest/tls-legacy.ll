@@ -99,7 +99,7 @@ define void @legacy_use() {
 ; X64-NEXT:     R_X86_64_TLSGD t1-0x4
 ; X64-NEXT:    call <L1>
 ; X64-NEXT:     R_X86_64_PLT32 __tls_get_addr-0x4
-; X64-NEXT:    mov edi, 0x0
+; X64-NEXT:    xor edi, edi
 ; X64-NEXT:    mov rsi, rax
 ; X64-NEXT:    mov rdx, qword ptr [rbp - 0x30]
 ; X64-NEXT:  <L2>:

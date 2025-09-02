@@ -415,6 +415,9 @@ bool LLVMCompilerX64::compile_icmp(const llvm::Instruction *inst,
     }
   }
 
+  // No need for set_preserve_flags; we don't call helpers that could
+  // potentially clobber them.
+
   // ref-count, otherwise phi assignment will think that value is still used
   lhs.reset();
   rhs.reset();

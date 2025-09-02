@@ -412,7 +412,7 @@ define void @mul_i128_1(i128 %0) {
 ; X64-NEXT:    mov rax, rcx
 ; X64-NEXT:    mul rdi
 ; X64-NEXT:    add rdx, rsi
-; X64-NEXT:    mov ecx, 0x0
+; X64-NEXT:    xor ecx, ecx
 ; X64-NEXT:    imul rcx, rdi
 ; X64-NEXT:    add rdx, rcx
 ; X64-NEXT:    add rsp, 0x30
@@ -449,7 +449,7 @@ define void @mul_i128_1_reorder(i128 %0) {
 ; X64-NEXT:    mov rax, rcx
 ; X64-NEXT:    mul rdi
 ; X64-NEXT:    add rdx, rsi
-; X64-NEXT:    mov ecx, 0x0
+; X64-NEXT:    xor ecx, ecx
 ; X64-NEXT:    imul rcx, rdi
 ; X64-NEXT:    add rdx, rcx
 ; X64-NEXT:    add rsp, 0x30
@@ -562,7 +562,7 @@ define void @mul_i128_salvage_imm(i128 %0) {
 ; X64-NEXT:    mov rax, rcx
 ; X64-NEXT:    mul rdi
 ; X64-NEXT:    add rdx, rsi
-; X64-NEXT:    mov ecx, 0x0
+; X64-NEXT:    xor ecx, ecx
 ; X64-NEXT:    imul rcx, rdi
 ; X64-NEXT:    add rdx, rcx
 ; X64-NEXT:    add rsp, 0x30
@@ -758,7 +758,7 @@ define void @mul_i128_no_salvage_imm_1(i128 %0) {
 ; X64-NEXT:    mov rax, rbx
 ; X64-NEXT:    mul rdi
 ; X64-NEXT:    add rdx, rcx
-; X64-NEXT:    mov ebx, 0x0
+; X64-NEXT:    xor ebx, ebx
 ; X64-NEXT:    imul rbx, rdi
 ; X64-NEXT:    add rdx, rbx
 ; X64-NEXT:    mov qword ptr [rbp - 0x40], rax

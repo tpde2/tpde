@@ -74,6 +74,8 @@ struct GenerationState {
   // knowledge about this
   std::unordered_set<unsigned> maybe_fixed_regs{};
 
+  bool needs_preserve_flags = false;
+
   template <typename... T>
   void fmt_line(std::string &buf,
                 unsigned indent,
@@ -822,6 +824,13 @@ bool encode_prepass(llvm::MachineFunction *func, GenerationState &state) {
         continue;
       }
 
+      for (const auto &mo : inst.all_defs()) {
+        if (!mo.isReg() || !state.target->reg_is_flags(mo.getReg())) {
+          continue;
+        }
+        state.needs_preserve_flags |= !mo.isDead();
+      }
+
       if (inst.isReturn()) {
         if (!ret_regs_defined) {
           for (const auto &mo : inst.all_uses()) {
@@ -1007,6 +1016,11 @@ bool create_encode_function(llvm::MachineFunction *func,
   std::string write_buf_inner{};
   llvm::raw_string_ostream os(write_buf_inner);
 
+  // TODO: set this more fine-grained
+  if (state.needs_preserve_flags) {
+    os << "  derived()->set_preserve_flags(true);\n";
+  }
+
   const auto multiple_bbs = func->size() > 1;
 
   if (multiple_bbs) {
@@ -1168,6 +1182,10 @@ bool create_encode_function(llvm::MachineFunction *func,
 
     os << "  result_" << idx << ".set_value(derived(), std::move(scratch_"
        << name << "));\n";
+  }
+
+  if (state.needs_preserve_flags) {
+    os << "  derived()->set_preserve_flags(false);\n";
   }
 
   // TODO

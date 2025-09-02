@@ -169,7 +169,7 @@ define i128 @load_i8_zext_i128(ptr %a) {
 ; X64-NEXT:    sub rsp, 0x40
 ; X64-NEXT:    movzx edi, byte ptr [rdi]
 ; X64-NEXT:    movzx edi, dil
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov qword ptr [rbp - 0x38], rax
 ; X64-NEXT:    mov rax, rdi
 ; X64-NEXT:    mov rdx, qword ptr [rbp - 0x38]
@@ -390,7 +390,7 @@ define i128 @load_i16_zext_i128(ptr %a) {
 ; X64-NEXT:    sub rsp, 0x40
 ; X64-NEXT:    movzx edi, word ptr [rdi]
 ; X64-NEXT:    movzx edi, di
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov qword ptr [rbp - 0x38], rax
 ; X64-NEXT:    mov rax, rdi
 ; X64-NEXT:    mov rdx, qword ptr [rbp - 0x38]
@@ -665,7 +665,7 @@ define i128 @load_i24_zext_i128(ptr %a) {
 ; X64-NEXT:    shl edi, 0x10
 ; X64-NEXT:    or edi, eax
 ; X64-NEXT:    and edi, 0xffffff
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov qword ptr [rbp - 0x38], rax
 ; X64-NEXT:    mov rax, rdi
 ; X64-NEXT:    mov rdx, qword ptr [rbp - 0x38]
@@ -848,7 +848,7 @@ define i128 @load_i32_zext_i128(ptr %a) {
 ; X64-NEXT:    sub rsp, 0x40
 ; X64-NEXT:    mov edi, dword ptr [rdi]
 ; X64-NEXT:    mov edi, edi
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov qword ptr [rbp - 0x38], rax
 ; X64-NEXT:    mov rax, rdi
 ; X64-NEXT:    mov rdx, qword ptr [rbp - 0x38]
@@ -1057,7 +1057,7 @@ define i128 @load_i33_zext_i128(ptr %a) {
 ; X64-NEXT:    or rdi, rax
 ; X64-NEXT:    movabs rax, 0x1ffffffff
 ; X64-NEXT:    and rdi, rax
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov qword ptr [rbp - 0x38], rax
 ; X64-NEXT:    mov rax, rdi
 ; X64-NEXT:    mov rdx, qword ptr [rbp - 0x38]

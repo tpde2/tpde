@@ -162,7 +162,7 @@ define void @store_v37i1_zero(ptr %p) {
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
 ; X64-NEXT:    mov dword ptr [rdi], 0x0
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    shr rax, 0x20
 ; X64-NEXT:    mov byte ptr [rdi + 0x4], al
 ; X64-NEXT:    add rsp, 0x30

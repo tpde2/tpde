@@ -98,7 +98,7 @@ define i128 @icmp_fuse_zexti128(i32, i32) {
 ; X64-NEXT:    cmp edi, esi
 ; X64-NEXT:    setl al
 ; X64-NEXT:    and eax, 0x1
-; X64-NEXT:    mov ecx, 0x0
+; X64-NEXT:    xor ecx, ecx
 ; X64-NEXT:    mov rdx, rcx
 ; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp

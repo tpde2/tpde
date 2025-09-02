@@ -350,6 +350,9 @@ struct CompilerX64 : BaseTy<Adaptor, Derived, Config> {
   u32 var_arg_stack_off = 0;
   util::SmallVector<u32, 8> func_ret_offs = {};
 
+  /// Whether flags must be preserved when materializing constants etc.
+  bool preserve_flags;
+
   /// Symbol for __tls_get_addr.
   SymRef sym_tls_get_addr;
 
@@ -404,6 +407,9 @@ struct CompilerX64 : BaseTy<Adaptor, Derived, Config> {
   // helpers
 
   void gen_func_epilog() noexcept;
+
+  void set_preserve_flags(bool preserve) noexcept { preserve_flags = preserve; }
+  bool may_clobber_flags() noexcept { return !preserve_flags; }
 
   void
       spill_reg(const AsmReg reg, const i32 frame_off, const u32 size) noexcept;
@@ -517,6 +523,7 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::start_func(
     const u32 /*func_idx*/) noexcept {
   this->text_writer.align(16);
   this->assembler.except_begin_func();
+  this->preserve_flags = false;
 }
 
 template <IRAdaptor Adaptor,
@@ -1068,6 +1075,7 @@ AsmReg CompilerX64<Adaptor, Derived, BaseTy, Config>::gval_expr_as_reg(
         ASM(LEA64rm, dst, FE_MEM(FE_NOREG, sc, idx, 0));
       }
     } else {
+      assert(may_clobber_flags());
       u64 scale = expr.scale;
       if (base == idx) {
         base = AsmReg::make_invalid();
@@ -1126,7 +1134,11 @@ AsmReg CompilerX64<Adaptor, Derived, BaseTy, Config>::gval_expr_as_reg(
     ScratchReg scratch2{derived()};
     auto tmp2 = scratch2.alloc_gp();
     ASM(MOV64ri, tmp2, expr.disp);
-    ASM(ADD64rr, dst, tmp2);
+    if (may_clobber_flags()) {
+      ASM(ADD64rr, dst, tmp2);
+    } else {
+      ASM(LEA64rm, dst, FE_MEM(dst, 1, tmp2, 0));
+    }
   }
   gv.state = std::move(scratch);
   return dst;
@@ -1139,6 +1151,7 @@ template <IRAdaptor Adaptor,
 void CompilerX64<Adaptor, Derived, BaseTy, Config>::alloca_fixed(
     u64 size, u32 align, ValuePart &res) noexcept {
   assert(align != 0 && (align & (align - 1)) == 0 && "invalid alignment");
+  assert(may_clobber_flags());
   size = tpde::util::align_up(size, 16);
   if (size > 0) {
     assert(size < 0x8000'0000);
@@ -1158,6 +1171,7 @@ template <IRAdaptor Adaptor,
 void CompilerX64<Adaptor, Derived, BaseTy, Config>::alloca_dynamic(
     u64 elem_size, ValuePart &&count, u32 align, ValuePart &res) noexcept {
   assert(align != 0 && (align & (align - 1)) == 0 && "invalid alignment");
+  assert(may_clobber_flags());
   AsmReg size_reg = count.has_reg() ? count.cur_reg() : count.load_to_reg(this);
   AsmReg res_reg = res.alloc_try_reuse(this, count);
 
@@ -1211,10 +1225,11 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::materialize_constant(
   if (bank == Config::GP_BANK) {
     assert(size <= 8);
     if (const_u64 == 0) {
-      // note: cannot use XOR here since this might be called in-between
-      // instructions that rely on the flags being preserved
-      // ASM(XOR32rr, dst, dst);
-      ASM(MOV32ri, dst, 0);
+      if (may_clobber_flags()) {
+        ASM(XOR32rr, dst, dst);
+      } else {
+        ASM(MOV32ri, dst, 0);
+      }
       return;
     }
 
@@ -1550,6 +1565,7 @@ template <IRAdaptor Adaptor,
 void CompilerX64<Adaptor, Derived, BaseTy, Config>::generate_raw_intext(
     AsmReg dst, AsmReg src, bool sign, u32 from, u32 to) noexcept {
   assert(from < to && to <= 64);
+  assert(may_clobber_flags());
   if (!sign) {
     switch (from) {
     case 8: ASM(MOVZXr32r8, dst, src); break;
@@ -1739,7 +1755,11 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::CallBuilder::call_impl(
     if (next_xmm.valid() && next_xmm.id() - AsmReg::XMM0 < 8) {
       xmm_cnt = next_xmm.id() - AsmReg::XMM0;
     }
-    ASMC(&this->compiler, MOV32ri, FE_AX, xmm_cnt);
+    if (xmm_cnt != 0) {
+      ASMC(&this->compiler, MOV32ri, FE_AX, xmm_cnt);
+    } else {
+      ASMC(&this->compiler, XOR32rr, FE_AX, FE_AX);
+    }
   }
 
   u32 sub = 0;
@@ -1809,6 +1829,7 @@ CompilerX64<Adaptor, Derived, BaseTy, Config>::ScratchReg
   case TLSModel::GlobalDynamic: {
     // Generate function call to __tls_get_addr; on x86-64, this takes a single
     // parameter in rdi.
+    assert(may_clobber_flags());
     auto csr = CCAssignerSysV::Info.callee_saved_regs;
     for (auto reg : util::BitSetIterator<>{this->register_file.used & ~csr}) {
       this->evict_reg(Reg{reg});

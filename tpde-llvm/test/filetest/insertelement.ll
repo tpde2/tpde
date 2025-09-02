@@ -91,7 +91,7 @@ define void @ins_v5i1_chain(ptr %p, i1 %e0, i1 %e1, i1 %e2, i1 %e3, i1 %e4) {
 ; X64-NEXT:    sub rsp, 0x30
 ; X64-NEXT:    mov byte ptr [rbp - 0x29], cl
 ; X64-NEXT:    mov ecx, 0x0
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    btr rax, rcx
 ; X64-NEXT:    mov esi, esi
 ; X64-NEXT:    shl rsi, cl
@@ -295,7 +295,7 @@ define void @ins_v16i1_chain(ptr %p, i1 %e0, i1 %e1, i1 %e2, i1 %e3, i1 %e4) {
 ; X64-NEXT:    sub rsp, 0x30
 ; X64-NEXT:    mov byte ptr [rbp - 0x29], cl
 ; X64-NEXT:    mov ecx, 0x0
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    btr rax, rcx
 ; X64-NEXT:    mov esi, esi
 ; X64-NEXT:    shl rsi, cl
@@ -525,11 +525,11 @@ define void @ins_v5i8_chain(ptr %p, i8 %e0, i8 %e1, i8 %e2, i8 %e3, i8 %e4) {
 ; X64-NEXT:    push r12
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x20
-; X64-NEXT:    mov eax, 0x0
-; X64-NEXT:    mov ebx, 0x0
-; X64-NEXT:    mov r10d, 0x0
-; X64-NEXT:    mov r11d, 0x0
-; X64-NEXT:    mov r12d, 0x0
+; X64-NEXT:    xor eax, eax
+; X64-NEXT:    xor ebx, ebx
+; X64-NEXT:    xor r10d, r10d
+; X64-NEXT:    xor r11d, r11d
+; X64-NEXT:    xor r12d, r12d
 ; X64-NEXT:    mov byte ptr [rbp - 0x30], al
 ; X64-NEXT:    mov byte ptr [rbp - 0x30], sil
 ; X64-NEXT:    movzx eax, byte ptr [rbp - 0x30]

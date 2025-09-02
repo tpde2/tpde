@@ -169,8 +169,8 @@ define void @store_struct3(ptr %ptr) {
 ; X64-NEXT:    lea rax, <store_struct3+0x13>
 ; X64-NEXT:     R_X86_64_PC32 glob-0x4
 ; X64-NEXT:    lea eax, [rax + 0x20]
-; X64-NEXT:    mov ecx, 0x0
-; X64-NEXT:    mov edx, 0x0
+; X64-NEXT:    xor ecx, ecx
+; X64-NEXT:    xor edx, edx
 ; X64-NEXT:    mov dword ptr [rdi], ecx
 ; X64-NEXT:    mov dword ptr [rdi + 0x4], eax
 ; X64-NEXT:    add rsp, 0x30
@@ -252,12 +252,12 @@ define void @vector_ptrs(ptr %ptr) {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x50
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    lea rax, [rax + 0x28]
 ; X64-NEXT:    pxor xmm0, xmm0
 ; X64-NEXT:    pxor xmm1, xmm1
 ; X64-NEXT:    movapd xmmword ptr [rbp - 0x50], xmm0
-; X64-NEXT:    lea rcx, <vector_ptrs+0x29>
+; X64-NEXT:    lea rcx, <vector_ptrs+0x26>
 ; X64-NEXT:     R_X86_64_PC32 glob-0x4
 ; X64-NEXT:    mov qword ptr [rbp - 0x50], rcx
 ; X64-NEXT:    movapd xmm0, xmmword ptr [rbp - 0x50]
@@ -382,7 +382,7 @@ define void @phi_const_float(ptr %ptr) {
 ; X64-NEXT:    movd xmm0, eax
 ; X64-NEXT:    movd dword ptr [rbp - 0x2c], xmm0
 ; X64-NEXT:  <L1>:
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    test al, 0x1
 ; X64-NEXT:    je <L0>
 ; X64-NEXT:    mov eax, 0x41800000
@@ -511,7 +511,7 @@ define void @phi_const_float_regpressure(ptr %ptr) {
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    movd dword ptr [rbp - 0x48], xmm0
 ; X64-NEXT:  <L1>:
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    test al, 0x1
 ; X64-NEXT:    je <L0>
 ; X64-NEXT:    mov eax, 0x41800000
@@ -834,10 +834,10 @@ define void @phi_glob(ptr %ptr) {
 ; X64-NEXT:     R_X86_64_PC32 glob-0x4
 ; X64-NEXT:    mov r12, rax
 ; X64-NEXT:  <L1>:
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    test al, 0x1
 ; X64-NEXT:    je <L0>
-; X64-NEXT:    lea rax, <phi_glob+0x2d>
+; X64-NEXT:    lea rax, <phi_glob+0x2a>
 ; X64-NEXT:     R_X86_64_PC32 glob-0x4
 ; X64-NEXT:    mov r12, rax
 ; X64-NEXT:    jmp <L1>
@@ -899,7 +899,7 @@ define void @phi_ptrtoint(ptr %ptr) {
 ; X64-NEXT:  <L1>:
 ; X64-NEXT:    lea rax, <phi_ptrtoint+0x20>
 ; X64-NEXT:     R_X86_64_PC32 glob-0x4
-; X64-NEXT:    mov ecx, 0x0
+; X64-NEXT:    xor ecx, ecx
 ; X64-NEXT:    test cl, 0x1
 ; X64-NEXT:    je <L0>
 ; X64-NEXT:    mov r12, rax
@@ -967,7 +967,7 @@ define void @phi_ptrtoint_multiedge(i1 %cond, ptr %ptr) {
 ; X64-NEXT:  <L1>:
 ; X64-NEXT:    lea rax, <phi_ptrtoint_multiedge+0x32>
 ; X64-NEXT:     R_X86_64_PC32 glob-0x4
-; X64-NEXT:    mov ecx, 0x0
+; X64-NEXT:    xor ecx, ecx
 ; X64-NEXT:    test cl, 0x1
 ; X64-NEXT:    je <L2>
 ; X64-NEXT:    mov r12, rax
@@ -1036,7 +1036,7 @@ define void @phi_ptrtoint_trunc_add(ptr %ptr) {
 ; X64-NEXT:    lea rax, <phi_ptrtoint_trunc_add+0x23>
 ; X64-NEXT:     R_X86_64_PC32 glob-0x4
 ; X64-NEXT:    lea eax, [rax + 0x20]
-; X64-NEXT:    mov ecx, 0x0
+; X64-NEXT:    xor ecx, ecx
 ; X64-NEXT:    test cl, 0x1
 ; X64-NEXT:    je <L0>
 ; X64-NEXT:    mov r12d, eax
@@ -1094,15 +1094,15 @@ define void @phi_struct1(ptr %ptr) {
 ; X64-NEXT:    nop dword ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x28
 ; X64-NEXT:    mov rbx, rdi
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov dword ptr [rbp - 0x30], eax
 ; X64-NEXT:    mov eax, 0x1
 ; X64-NEXT:    mov dword ptr [rbp - 0x2c], eax
 ; X64-NEXT:  <L1>:
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    test al, 0x1
 ; X64-NEXT:    je <L0>
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov dword ptr [rbp - 0x30], eax
 ; X64-NEXT:    mov eax, 0x1
 ; X64-NEXT:    mov dword ptr [rbp - 0x2c], eax
@@ -1161,18 +1161,18 @@ define void @phi_struct2(ptr %ptr) {
 ; X64-NEXT:    nop dword ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x38
 ; X64-NEXT:    mov rbx, rdi
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov dword ptr [rbp - 0x40], eax
-; X64-NEXT:    lea rax, <phi_struct2+0x1e>
+; X64-NEXT:    lea rax, <phi_struct2+0x1b>
 ; X64-NEXT:     R_X86_64_PC32 glob-0x4
 ; X64-NEXT:    mov qword ptr [rbp - 0x38], rax
 ; X64-NEXT:  <L1>:
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    test al, 0x1
 ; X64-NEXT:    je <L0>
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov dword ptr [rbp - 0x40], eax
-; X64-NEXT:    lea rax, <phi_struct2+0x3e>
+; X64-NEXT:    lea rax, <phi_struct2+0x35>
 ; X64-NEXT:     R_X86_64_PC32 glob-0x4
 ; X64-NEXT:    mov qword ptr [rbp - 0x38], rax
 ; X64-NEXT:    jmp <L1>
@@ -1239,17 +1239,17 @@ define void @phi_struct3(ptr %ptr) {
 ; X64-NEXT:    lea rax, <phi_struct3+0x16>
 ; X64-NEXT:     R_X86_64_PC32 glob-0x4
 ; X64-NEXT:    lea eax, [rax + 0x20]
-; X64-NEXT:    mov ecx, 0x0
-; X64-NEXT:    mov edx, 0x0
+; X64-NEXT:    xor ecx, ecx
+; X64-NEXT:    xor edx, edx
 ; X64-NEXT:    mov dword ptr [rbp - 0x30], ecx
 ; X64-NEXT:    mov dword ptr [rbp - 0x2c], eax
 ; X64-NEXT:  <L1>:
-; X64-NEXT:    lea rax, <phi_struct3+0x30>
+; X64-NEXT:    lea rax, <phi_struct3+0x2a>
 ; X64-NEXT:     R_X86_64_PC32 glob-0x4
 ; X64-NEXT:    lea eax, [rax + 0x20]
-; X64-NEXT:    mov ecx, 0x0
-; X64-NEXT:    mov edx, 0x0
-; X64-NEXT:    mov edx, 0x0
+; X64-NEXT:    xor ecx, ecx
+; X64-NEXT:    xor edx, edx
+; X64-NEXT:    xor edx, edx
 ; X64-NEXT:    test dl, 0x1
 ; X64-NEXT:    je <L0>
 ; X64-NEXT:    mov dword ptr [rbp - 0x30], ecx
@@ -1321,16 +1321,16 @@ define i32 @phi_gep_before_icmp(i32 %0) {
 ; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    sub rsp, 0x18
 ; X64-NEXT:    mov ebx, edi
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    test al, 0x1
 ; X64-NEXT:    jne <L0>
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov r12d, eax
 ; X64-NEXT:    jmp <L1>
 ; X64-NEXT:  <L0>:
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    lea rax, [rax + 0x1200]
-; X64-NEXT:    mov ecx, 0x0
+; X64-NEXT:    xor ecx, ecx
 ; X64-NEXT:    test ecx, ecx
 ; X64-NEXT:    jne <L2>
 ; X64-NEXT:    mov r12d, ebx
@@ -1338,16 +1338,16 @@ define i32 @phi_gep_before_icmp(i32 %0) {
 ; X64-NEXT:  <L2>:
 ; X64-NEXT:    mov r13, rax
 ; X64-NEXT:  <L4>:
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    test al, 0x1
 ; X64-NEXT:    jne <L3>
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov r13, rax
 ; X64-NEXT:    jmp <L4>
 ; X64-NEXT:  <L3>:
 ; X64-NEXT:    mov r12d, ebx
 ; X64-NEXT:  <L1>:
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    add rsp, 0x18
 ; X64-NEXT:    pop r13
 ; X64-NEXT:    pop r12
@@ -1415,14 +1415,14 @@ define void @phi_gep_before_icmp_twice() {
 ; X64-NEXT:    push r12
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x20
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    lea rax, [rax + 0xa]
-; X64-NEXT:    mov ecx, 0x0
+; X64-NEXT:    xor ecx, ecx
 ; X64-NEXT:    lea rcx, [rcx + 0xa]
-; X64-NEXT:    mov edx, 0x0
+; X64-NEXT:    xor edx, edx
 ; X64-NEXT:    test rdx, rdx
 ; X64-NEXT:    setl dl
-; X64-NEXT:    mov edx, 0x0
+; X64-NEXT:    xor edx, edx
 ; X64-NEXT:    test dl, 0x1
 ; X64-NEXT:    je <L0>
 ; X64-NEXT:    mov rbx, rcx
@@ -1430,14 +1430,14 @@ define void @phi_gep_before_icmp_twice() {
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    mov r12, rax
 ; X64-NEXT:  <L3>:
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    test al, 0x1
 ; X64-NEXT:    jne <L2>
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov r12, rax
 ; X64-NEXT:    jmp <L3>
 ; X64-NEXT:  <L2>:
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov rbx, rax
 ; X64-NEXT:  <L1>:
 ; X64-NEXT:    jmp <L1>
@@ -1494,11 +1494,11 @@ define i32 @phi_gep_insert_after_earlier_phi() {
 ; X64-NEXT:    push rbx
 ; X64-NEXT:    nop dword ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x28
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov dword ptr [rbp - 0x2c], eax
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    lea rax, [rax + 0x28]
-; X64-NEXT:    mov ecx, 0x0
+; X64-NEXT:    xor ecx, ecx
 ; X64-NEXT:    cmp ecx, 0x0
 ; X64-NEXT:    je <L0>
 ; X64-NEXT:    cmp ecx, 0x1
@@ -1512,10 +1512,10 @@ define i32 @phi_gep_insert_after_earlier_phi() {
 ; X64-NEXT:    mov rbx, rax
 ; X64-NEXT:    jmp <L4>
 ; X64-NEXT:  <L3>:
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov rbx, rax
 ; X64-NEXT:  <L4>:
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    add rsp, 0x28
 ; X64-NEXT:    pop rbx
 ; X64-NEXT:    pop rbp

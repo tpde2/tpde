@@ -844,7 +844,7 @@ define i32 @call_i32_vararg(ptr %0, i32 %1, i128 %2) {
 ; X64-NEXT:    mov rsi, rdx
 ; X64-NEXT:    mov rdx, rcx
 ; X64-NEXT:    mov ecx, dword ptr [rbp - 0x2c]
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    call <L0>
 ; X64-NEXT:     R_X86_64_PLT32 fn_var_arg-0x4
@@ -931,9 +931,9 @@ define i32 @call_indirect3(ptr %m) {
 ; X64-NEXT:    sub rsp, 0x28
 ; X64-NEXT:    mov rdi, qword ptr [rdi]
 ; X64-NEXT:    mov rbx, rdi
-; X64-NEXT:    mov edi, 0x0
+; X64-NEXT:    xor edi, edi
 ; X64-NEXT:    call rbx
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    add rsp, 0x28
 ; X64-NEXT:    pop rbx
 ; X64-NEXT:    pop rbp
@@ -1509,25 +1509,25 @@ define void @call_sret_manyargs() {
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x50
 ; X64-NEXT:    lea rdi, [rbp - 0x50]
-; X64-NEXT:    mov esi, 0x0
-; X64-NEXT:    mov edx, 0x0
-; X64-NEXT:    mov ecx, 0x0
-; X64-NEXT:    mov r8d, 0x0
-; X64-NEXT:    mov r9d, 0x0
+; X64-NEXT:    xor esi, esi
+; X64-NEXT:    xor edx, edx
+; X64-NEXT:    xor ecx, ecx
+; X64-NEXT:    xor r8d, r8d
+; X64-NEXT:    xor r9d, r9d
 ; X64-NEXT:    sub rsp, 0x40
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov qword ptr [rsp], rax
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov qword ptr [rsp + 0x8], rax
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov qword ptr [rsp + 0x10], rax
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov qword ptr [rsp + 0x18], rax
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov qword ptr [rsp + 0x20], rax
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov qword ptr [rsp + 0x28], rax
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov qword ptr [rsp + 0x30], rax
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    call <L0>
@@ -1638,7 +1638,7 @@ define i32 @ind_call(ptr %call, i32 %a, i32 %b) {
 ; X64-NEXT:    mov qword ptr [rbp - 0x30], rdi
 ; X64-NEXT:    call qword ptr [rbp - 0x30]
 ; X64-NEXT:    call qword ptr [rbp - 0x30]
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -1790,19 +1790,19 @@ define void @call_fn_v_stack_i1z_i1s_i37z_i37s(i1 %a, i1 %b, i37 %c, i37 %d) {
 ; X64-NEXT:    nop dword ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x38
 ; X64-NEXT:    mov byte ptr [rbp - 0x29], dil
-; X64-NEXT:    mov edi, 0x0
+; X64-NEXT:    xor edi, edi
 ; X64-NEXT:    mov byte ptr [rbp - 0x2a], sil
-; X64-NEXT:    mov esi, 0x0
+; X64-NEXT:    xor esi, esi
 ; X64-NEXT:    mov qword ptr [rbp - 0x38], rdx
-; X64-NEXT:    mov edx, 0x0
+; X64-NEXT:    xor edx, edx
 ; X64-NEXT:    mov qword ptr [rbp - 0x40], rcx
-; X64-NEXT:    mov ecx, 0x0
-; X64-NEXT:    mov r8d, 0x0
-; X64-NEXT:    mov r9d, 0x0
+; X64-NEXT:    xor ecx, ecx
+; X64-NEXT:    xor r8d, r8d
+; X64-NEXT:    xor r9d, r9d
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov qword ptr [rsp], rax
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov qword ptr [rsp + 0x8], rax
 ; X64-NEXT:    movzx eax, byte ptr [rbp - 0x29]
 ; X64-NEXT:    and eax, 0x1
@@ -1911,7 +1911,7 @@ define void @call_vararg_ind(i64 %a) {
 ; X64-NEXT:     R_X86_64_PLT32 fn_ptr-0x4
 ; X64-NEXT:    mov rdi, qword ptr [rbp - 0x30]
 ; X64-NEXT:    mov qword ptr [rbp - 0x30], rax
-; X64-NEXT:    mov eax, 0x0
+; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    call qword ptr [rbp - 0x30]
 ; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
