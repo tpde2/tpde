@@ -229,13 +229,7 @@ bool generate_inst(std::string &buf,
       return true;
     }
     if (src_op.isKill() && state.ret_defs.lookup(dst_id) == inst) {
-      state.fmt_line(buf, 4, "// optimized move to returned register");
-      state.fmt_line(buf,
-                     4,
-                     "scratch_{} = std::move(scratch_{});",
-                     state.target->reg_name_lower(dst_id),
-                     state.target->reg_name_lower(src_id));
-
+      state.fmt_line(buf, 4, "// move to returned register optimized out");
       llvm::raw_string_ostream os(buf);
       state.kill_reg(os, dst_id);
       return true;
@@ -897,6 +891,22 @@ bool encode_prepass(llvm::MachineFunction *func, GenerationState &state) {
       }
       if (!missing_defs) {
         break;
+      }
+    }
+
+    // Find actual return register
+    for (const llvm::MachineInstr &mi : llvm::reverse(mbb)) {
+      auto move_ops = state.target->is_move(mi);
+      if (!move_ops) {
+        continue;
+      }
+      auto &src_op = mi.getOperand(move_ops->second);
+      auto &dst_op = mi.getOperand(move_ops->first);
+      auto src_id = state.target->reg_id_from_mc_reg(src_op.getReg());
+      auto dst_id = state.target->reg_id_from_mc_reg(dst_op.getReg());
+      if (src_op.isKill() && state.ret_defs.lookup(dst_id) == &mi) {
+        std::replace(
+            state.return_regs.begin(), state.return_regs.end(), dst_id, src_id);
       }
     }
   }
