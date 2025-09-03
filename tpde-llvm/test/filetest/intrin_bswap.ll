@@ -109,3 +109,33 @@ define i64 @bswapi64(i64 %x) {
   ret i64 %res
 }
 
+define i128 @bswapi128(i128 %x) {
+; X64-LABEL: <bswapi128>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    bswap rsi
+; X64-NEXT:    bswap rdi
+; X64-NEXT:    mov rax, rsi
+; X64-NEXT:    mov rdx, rdi
+; X64-NEXT:    add rsp, 0x30
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <bswapi128>:
+; ARM64:         sub sp, sp, #0xb0
+; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
+; ARM64-NEXT:    rev x1, x1
+; ARM64-NEXT:    rev x0, x0
+; ARM64-NEXT:    str x0, [x29, #0xa8]
+; ARM64-NEXT:    mov x0, x1
+; ARM64-NEXT:    ldr x1, [x29, #0xa8]
+; ARM64-NEXT:    ldp x29, x30, [sp]
+; ARM64-NEXT:    add sp, sp, #0xb0
+; ARM64-NEXT:    ret
+  %res = call i128 @llvm.bswap(i128 %x)
+  ret i128 %res
+}

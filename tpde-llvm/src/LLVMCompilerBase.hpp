@@ -4803,6 +4803,12 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_intrin(
       return false;
     }
     const auto width = val->getType()->getIntegerBitWidth();
+    if (width == 128) {
+      ValueRef src = this->val_ref(val);
+      ValueRef dst = this->result_ref(inst);
+      return derived()->encode_bswapi128(
+          src.part(0), src.part(1), dst.part(0), dst.part(1));
+    }
     if (width % 16 || width > 64) {
       return false;
     }
