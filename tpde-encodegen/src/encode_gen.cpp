@@ -977,6 +977,10 @@ bool create_encode_function(llvm::MachineFunction *func,
   auto &mach_reg_info = func->getRegInfo();
   // const auto &target_reg_info = func->getSubtarget().getRegisterInfo();
 
+  // Mark return registers as used.
+  for (auto reg_id : state.return_regs) {
+    state.used_regs.insert(reg_id);
+  }
 
   // map inputs
   {
@@ -989,7 +993,6 @@ bool create_encode_function(llvm::MachineFunction *func,
       state.param_names.push_back(std::move(name));
 
       const auto reg_id = target->reg_id_from_mc_reg(it->first);
-      assert(!state.used_regs.contains(reg_id));
       state.used_regs.insert(reg_id);
       state.asm_operand_refs[reg_id] = state.param_names[idx++];
       state.operand_ref_counts[state.param_names.back()] = 1;
