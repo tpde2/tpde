@@ -2089,7 +2089,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_int_binary_op(
       bool (Derived::*)(GenericValuePart &&, GenericValuePart &&, ValuePart &);
   // fns[op.index()][idx]
   static constexpr auto fns = []() constexpr {
-    std::array<EncodeFnTy[10], IntBinaryOp::num_ops> res{};
+    std::array<EncodeFnTy[12], IntBinaryOp::num_ops> res{};
     auto entry = [&res](IntBinaryOp op) { return res[op.index()]; };
 
     // TODO: more consistent naming of encode functions
@@ -2123,6 +2123,30 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_int_binary_op(
 #undef FN_ENTRY_VEC
 #undef FN_ENTRY_INT
 
+    // i1 is special.
+    entry(IntBinaryOp::add)[10] = &Derived::encode_lxori32;
+    entry(IntBinaryOp::add)[11] = &Derived::encode_lxori64;
+    entry(IntBinaryOp::sub)[10] = &Derived::encode_lxori32;
+    entry(IntBinaryOp::sub)[11] = &Derived::encode_lxori64;
+    entry(IntBinaryOp::mul)[10] = &Derived::encode_landi32;
+    entry(IntBinaryOp::mul)[11] = &Derived::encode_landi64;
+    // udiv: x/1 = x; x/0 = UB => and is equivalent
+    entry(IntBinaryOp::udiv)[10] = &Derived::encode_landi32;
+    entry(IntBinaryOp::udiv)[11] = &Derived::encode_landi64;
+    // sdiv: 0/-1 = 0; -1/-1 = UB; x/0 = UB => and is equivalent
+    entry(IntBinaryOp::sdiv)[10] = &Derived::encode_landi32;
+    entry(IntBinaryOp::sdiv)[11] = &Derived::encode_landi64;
+    // urem/srem are always zero, but we have no encode function to return zero.
+    // For now, keep them unassigned.
+    entry(IntBinaryOp::land)[10] = &Derived::encode_landi32;
+    entry(IntBinaryOp::land)[11] = &Derived::encode_landi64;
+    entry(IntBinaryOp::lxor)[10] = &Derived::encode_lxori32;
+    entry(IntBinaryOp::lxor)[11] = &Derived::encode_lxori64;
+    entry(IntBinaryOp::lor)[10] = &Derived::encode_lori32;
+    entry(IntBinaryOp::lor)[11] = &Derived::encode_lori64;
+    // shl/lshr/ashr are always poison, so we could use any operation... for
+    // now, keep them unassigned.
+
     return res;
   }();
   auto get_encode_fn =
@@ -2140,6 +2164,10 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_int_binary_op(
       res[unsigned(LLVMBasicValType::v8i16)] = 7;
       res[unsigned(LLVMBasicValType::v4i32)] = 8;
       res[unsigned(LLVMBasicValType::v2i64)] = 9;
+      res[unsigned(LLVMBasicValType::v8i1)] = 10;
+      res[unsigned(LLVMBasicValType::v16i1)] = 10;
+      res[unsigned(LLVMBasicValType::v32i1)] = 10;
+      res[unsigned(LLVMBasicValType::v64i1)] = 11;
       return res;
     }();
     unsigned ty_idx = bvt_lut[unsigned(bvt)];
