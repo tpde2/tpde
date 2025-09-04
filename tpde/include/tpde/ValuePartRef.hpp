@@ -626,6 +626,13 @@ void CompilerBase<Adaptor, Derived, Config>::ValuePart::set_value(
   assert(!ap.variable_ref() && "cannot update variable ref");
 
   if (ap.fixed_assignment() || !other.can_salvage()) {
+#ifndef NDEBUG
+    // alloc_reg has the assertion that stack_valid must be false to prevent
+    // accidental loss of information. set_value behaves more like an explicit
+    // assignment, so we permit this overwrite -- but need to disable the
+    // assertion.
+    ap.set_modified(true);
+#endif
     // Source value owns no register or it is not reusable: copy value
     AsmReg cur_reg = alloc_reg(compiler);
     other.reload_into_specific_fixed(compiler, cur_reg, ap.part_size());
@@ -705,6 +712,7 @@ void CompilerBase<Adaptor, Derived, Config>::ValuePart::set_value(
   reg_file.update_reg_assignment(value_reg, local_idx(), part());
   ap.set_reg(value_reg);
   ap.set_register_valid(true);
+  ap.set_modified(true);
   other.force_set_reg(AsmReg::make_invalid());
 }
 

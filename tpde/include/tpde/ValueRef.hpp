@@ -101,6 +101,9 @@ public:
     return state.a.assignment;
   }
 
+  /// Returns whether the value is destroyed after this use.
+  bool is_owned() noexcept { return state.a.mode == 2; }
+
   /// Convert into an unowned reference; must be called before first part is
   /// accessed.
   void disown() noexcept {
@@ -125,7 +128,7 @@ public:
   ValuePartRef part(unsigned part) noexcept TPDE_LIFETIMEBOUND {
     if (has_assignment()) {
       return ValuePartRef{
-          compiler, local_idx(), state.a.assignment, part, state.a.mode == 2};
+          compiler, local_idx(), state.a.assignment, part, is_owned()};
     }
     return ValuePartRef{
         compiler, compiler->derived()->val_part_ref_special(state.s, part)};

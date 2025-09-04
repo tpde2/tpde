@@ -2754,6 +2754,14 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_insert_value(
 
   ValueRef agg_ref = this->val_ref(agg);
   ValueRef ins_ref = this->val_ref(ins);
+  if (agg_ref.is_owned()) {
+    ValueRef res_ref = this->result_ref_alias(insert, std::move(agg_ref));
+    for (unsigned i = first_part; i <= last_part; i++) {
+      res_ref.part(i).set_value(ins_ref.part(i - first_part));
+    }
+    return true;
+  }
+
   ValueRef res_ref = this->result_ref(insert);
   for (unsigned i = 0; i < part_count; i++) {
     ValuePartRef val_ref{this};

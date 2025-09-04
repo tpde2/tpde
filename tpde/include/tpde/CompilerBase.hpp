@@ -343,6 +343,12 @@ public:
   std::pair<ValueRef, ValuePartRef>
       result_ref_single(IRValueRef value) noexcept;
 
+  /// Make dst an alias for src, which must be a non-constant value with an
+  /// identical part configuration. src must be in its last use (is_owned()),
+  /// and the assignment will be repurposed for dst, keeping all assigned
+  /// registers and stack slots.
+  ValueRef result_ref_alias(IRValueRef dst, ValueRef &&src) noexcept;
+
   [[deprecated("Use ValuePartRef::set_value")]]
   void set_value(ValuePartRef &val_ref, ScratchReg &scratch) noexcept;
   [[deprecated("Use ValuePartRef::set_value")]]
@@ -1118,6 +1124,60 @@ std::pair<typename CompilerBase<Adaptor, Derived, Config>::ValueRef,
   std::pair<ValueRef, ValuePartRef> res{result_ref(value), this};
   res.second = res.first.part(0);
   return res;
+}
+
+template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>
+typename CompilerBase<Adaptor, Derived, Config>::ValueRef
+    CompilerBase<Adaptor, Derived, Config>::result_ref_alias(
+        IRValueRef dst, ValueRef &&src) noexcept {
+  const ValLocalIdx local_idx = analyzer.adaptor->val_local_idx(dst);
+  assert(!val_assignment(local_idx) && "alias target already defined");
+  assert(src.has_assignment() && "alias src must have an assignment");
+  // Consider implementing aliases where multiple values share the same
+  // assignment, e.g. for implementing trunc as a no-op sharing registers. Live
+  // ranges can be merged and reference counts added. However, this needs
+  // additional infrastructure to clear one of the value_ptrs.
+  assert(src.is_owned() && "alias src must be owned");
+
+  ValueAssignment *assignment = src.assignment();
+  u32 part_count = assignment->part_count;
+  assert(!assignment->pending_free);
+  assert(!assignment->variable_ref);
+  assert(!assignment->pending_free);
+#ifndef NDEBUG
+  {
+    const auto &src_liveness = analyzer.liveness_info(src.local_idx());
+    assert(!src_liveness.last_full);          // implied by is_owned()
+    assert(assignment->references_left == 1); // implied by is_owned()
+
+    // Validate that part configuration is identical.
+    const auto parts = derived()->val_parts(dst);
+    assert(parts.count() == part_count);
+    for (u32 part_idx = 0; part_idx < part_count; ++part_idx) {
+      AssignmentPartRef ap{assignment, part_idx};
+      assert(parts.reg_bank(part_idx) == ap.bank());
+      assert(parts.size_bytes(part_idx) == ap.part_size());
+    }
+  }
+#endif
+
+  // Update local_idx of registers.
+  for (u32 part_idx = 0; part_idx < part_count; ++part_idx) {
+    AssignmentPartRef ap{assignment, part_idx};
+    if (ap.register_valid()) {
+      register_file.update_reg_assignment(ap.get_reg(), local_idx, part_idx);
+    }
+  }
+
+  const auto &liveness = analyzer.liveness_info(local_idx);
+  assignment->delay_free = liveness.last_full;
+  assignment->references_left = liveness.ref_count;
+  assignments.value_ptrs[static_cast<u32>(src.local_idx())] = nullptr;
+  assignments.value_ptrs[static_cast<u32>(local_idx)] = assignment;
+  src.disown();
+  src.reset();
+
+  return ValueRef{this, local_idx};
 }
 
 template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>
