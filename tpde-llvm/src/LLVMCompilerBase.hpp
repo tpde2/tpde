@@ -508,6 +508,8 @@ public:
                                OverflowOp) noexcept;
   bool compile_saturating_intrin(const llvm::IntrinsicInst *,
                                  OverflowOp) noexcept;
+  bool compile_vector_reduce(const llvm::IntrinsicInst *,
+                             const ValInfo &) noexcept;
 
 
   bool compile_br(const llvm::Instruction *, const ValInfo &, u64) noexcept {
@@ -4753,6 +4755,18 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_intrin(
     return compile_float_to_int(inst, info, /*flags=!sign|sat*/ 0b10);
   case llvm::Intrinsic::fptosi_sat:
     return compile_float_to_int(inst, info, /*flags=sign|sat*/ 0b11);
+  case llvm::Intrinsic::vector_reduce_add:
+  case llvm::Intrinsic::vector_reduce_fadd:
+  case llvm::Intrinsic::vector_reduce_mul:
+  case llvm::Intrinsic::vector_reduce_fmul:
+  case llvm::Intrinsic::vector_reduce_and:
+  case llvm::Intrinsic::vector_reduce_or:
+  case llvm::Intrinsic::vector_reduce_xor:
+  case llvm::Intrinsic::vector_reduce_smax:
+  case llvm::Intrinsic::vector_reduce_smin:
+  case llvm::Intrinsic::vector_reduce_umax:
+  case llvm::Intrinsic::vector_reduce_umin:
+    return compile_vector_reduce(inst, info);
   case llvm::Intrinsic::fshl:
   case llvm::Intrinsic::fshr: {
     if (!inst->getType()->isIntegerTy()) {
@@ -5269,6 +5283,105 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_saturating_intrin(
   ValueRef rhs = this->val_ref(inst->getOperand(1));
   ValueRef res = this->result_ref(inst);
   return (derived()->*encode_fn)(lhs.part(0), rhs.part(0), res.part(0));
+}
+
+template <typename Adaptor, typename Derived, typename Config>
+bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_vector_reduce(
+    const llvm::IntrinsicInst *inst, const ValInfo &info) noexcept {
+  if (inst->getType()->isIntegerTy(1)) {
+    // i1 needs special handling
+    // and/mul/umin/smax = all bits one
+    // or/umax/smin = any bit one
+    // xor/add = parity
+    return false;
+  }
+
+  LLVMBasicValType elem_ty = info.type;
+
+  using EncodeFnTy =
+      bool (Derived::*)(GenericValuePart &&, GenericValuePart &&, ValuePart &);
+  EncodeFnTy fn;
+  bool has_start_elem = false;
+  switch (inst->getIntrinsicID()) {
+  case llvm::Intrinsic::vector_reduce_add:
+    if (elem_ty == LLVMBasicValType::i64) {
+      fn = &Derived::encode_addi64;
+    } else {
+      fn = &Derived::encode_addi32;
+    }
+    break;
+  case llvm::Intrinsic::vector_reduce_fadd:
+    if (elem_ty == LLVMBasicValType::f64) {
+      fn = &Derived::encode_addf64;
+    } else {
+      fn = &Derived::encode_addf32;
+    }
+    has_start_elem = true;
+    break;
+  case llvm::Intrinsic::vector_reduce_mul:
+    if (elem_ty == LLVMBasicValType::i64) {
+      fn = &Derived::encode_muli64;
+    } else {
+      fn = &Derived::encode_muli32;
+    }
+    break;
+  case llvm::Intrinsic::vector_reduce_fmul:
+    if (elem_ty == LLVMBasicValType::f64) {
+      fn = &Derived::encode_mulf64;
+    } else {
+      fn = &Derived::encode_mulf32;
+    }
+    has_start_elem = true;
+    break;
+  case llvm::Intrinsic::vector_reduce_and:
+    if (elem_ty == LLVMBasicValType::i64) {
+      fn = &Derived::encode_landi64;
+    } else {
+      fn = &Derived::encode_landi32;
+    }
+    break;
+  case llvm::Intrinsic::vector_reduce_or:
+    if (elem_ty == LLVMBasicValType::i64) {
+      fn = &Derived::encode_lori64;
+    } else {
+      fn = &Derived::encode_lori32;
+    }
+    break;
+  case llvm::Intrinsic::vector_reduce_xor:
+    if (elem_ty == LLVMBasicValType::i64) {
+      fn = &Derived::encode_lxori64;
+    } else {
+      fn = &Derived::encode_lxori32;
+    }
+    break;
+  default:
+    // Still missing: smin/smax/umin/umix/fmin/fmax/fminimum/fmaximum
+    return false;
+  }
+
+  llvm::Value *src_op = inst->getOperand(has_start_elem ? 1 : 0);
+  ValueRef src_ref = this->val_ref(src_op);
+  ValueRef src_ref_disowned = src_ref.disowned();
+
+  ValuePartRef elem{this, LLVMAdaptor::basic_ty_part_bank(elem_ty)};
+  ValuePartRef acc{this, LLVMAdaptor::basic_ty_part_bank(elem_ty)};
+
+  if (has_start_elem) {
+    acc.set_value(this->val_ref(inst->getOperand(0)).part(0));
+  } else {
+    derived()->extract_element(src_ref_disowned, 0, elem_ty, acc);
+  }
+
+  auto *vec_ty = llvm::cast<llvm::FixedVectorType>(src_op->getType());
+  unsigned nelem = vec_ty->getNumElements();
+  for (unsigned i = has_start_elem ? 0 : 1; i != nelem; i++) {
+    derived()->extract_element(src_ref_disowned, i, elem_ty, elem);
+    (derived()->*fn)(std::move(acc), std::move(elem), acc);
+  }
+
+  this->result_ref(inst).part(0).set_value(std::move(acc));
+
+  return true;
 }
 
 template <typename Adaptor, typename Derived, typename Config>
