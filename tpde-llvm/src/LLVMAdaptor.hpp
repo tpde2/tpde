@@ -259,6 +259,10 @@ struct LLVMAdaptor {
   }
 
   [[nodiscard]] static bool func_only_local(const IRFuncRef func) noexcept {
+    if (!func->hasName() && !func->hasLocalLinkage()) [[unlikely]] {
+      TPDE_LOG_WARN("unnamed functions converted to internal linkage");
+      return true;
+    }
     return func->hasLocalLinkage();
   }
 

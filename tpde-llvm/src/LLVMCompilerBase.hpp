@@ -304,10 +304,10 @@ struct LLVMCompilerBase : public LLVMCompiler,
 
 private:
   static typename Assembler::SymBinding
-      convert_linkage(const llvm::GlobalValue *gv) noexcept {
-    if (gv->hasLocalLinkage()) {
+      convert_linkage(llvm::GlobalValue::LinkageTypes linkage) noexcept {
+    if (llvm::GlobalValue::isLocalLinkage(linkage)) {
       return Assembler::SymBinding::LOCAL;
-    } else if (gv->isWeakForLinker()) {
+    } else if (llvm::GlobalValue::isWeakForLinker(linkage)) {
       return Assembler::SymBinding::WEAK;
     }
     return Assembler::SymBinding::GLOBAL;
@@ -872,15 +872,18 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::
   global_syms.reserve(2 * llvm_mod.global_size());
 
   auto declare_global = [&, this](const llvm::GlobalValue &gv) {
-    // TODO: name mangling
-    if (!gv.hasName()) {
-      TPDE_LOG_ERR("unnamed globals are not implemented");
-      return false;
+    llvm::GlobalValue::LinkageTypes linkage = gv.getLinkage();
+    if (!gv.hasName() && !gv.hasLocalLinkage()) [[unlikely]] {
+      // This is unspecified by LangRef at least up to LLVM 21. LLVM mangles
+      // the name into "__unnamed_<number>".
+      TPDE_LOG_WARN("unnamed global converted to internal linkage");
+      linkage = llvm::GlobalValue::InternalLinkage;
     }
 
+    // TODO: name mangling
     llvm::StringRef name = gv.getName();
 
-    if (gv.hasAppendingLinkage()) [[unlikely]] {
+    if (linkage == llvm::GlobalValue::AppendingLinkage) [[unlikely]] {
       if (name == "llvm.used") {
         auto init = llvm::cast<llvm::GlobalVariable>(gv).getInitializer();
         if (auto used_array = llvm::cast_or_null<llvm::ConstantArray>(init)) {
@@ -901,7 +904,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::
       return true;
     }
 
-    auto binding = convert_linkage(&gv);
+    auto binding = convert_linkage(linkage);
     SymRef sym;
     if (gv.isThreadLocal()) {
       sym = this->assembler.sym_predef_tls(name, binding);
