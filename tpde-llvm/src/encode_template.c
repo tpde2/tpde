@@ -446,6 +446,10 @@ v2u64 TARGET_V1 shlv2u64(v2u64 a, v2u64 b) { return (a << b); }
 v2u64 TARGET_V1 shrv2u64(v2u64 a, v2u64 b) { return (a >> b); }
 v2i64 TARGET_V1 ashrv2i64(v2i64 a, v2i64 b) { return (a >> b); }
 
+#define ICMP_SCALAR(pred, cmp, sign, bits)                                     \
+    bool TARGET_V1 icmp_##pred##i##bits(sign##bits a, sign##bits b) { return a cmp b; } \
+    u64 TARGET_V1 icmpmask_##pred##i##bits(sign##bits a, sign##bits b) { return -(u64)(a cmp b); } \
+    u64 TARGET_V1 icmpset_##pred##i##bits(sign##bits a, sign##bits b) { return a cmp b; }
 #define ICMP_VEC(pred, cmp, sign, resty, nelem, bits)                          \
     resty TARGET_V1 icmp_##pred##v##nelem##sign##bits(v##nelem##sign##bits a, v##nelem##sign##bits b) { \
       return trunc_##v##nelem##i##bits##_1(a cmp b);                           \
@@ -468,6 +472,8 @@ v2i64 TARGET_V1 ashrv2i64(v2i64 a, v2i64 b) { return (a >> b); }
     fn(slt, <, i, __VA_ARGS__) \
     fn(sle, <=, i, __VA_ARGS__)
 
+ICMP_ALL(ICMP_SCALAR, 32)
+ICMP_ALL(ICMP_SCALAR, 64)
 ICMP_ALL(ICMP_VEC, u8, 8, 8)
 ICMP_ALL(ICMP_VEC, u8, 4, 16)
 ICMP_ALL(ICMP_VEC, u8, 2, 32)

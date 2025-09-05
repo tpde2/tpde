@@ -3185,7 +3185,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_icmp_vector(
   static constexpr auto fns = []() constexpr {
     constexpr unsigned NumPreds = llvm::ICmpInst::LAST_ICMP_PREDICATE -
                                   llvm::ICmpInst::FIRST_ICMP_PREDICATE + 1;
-    std::array<EncodeFnTy[7][3], NumPreds> res{};
+    std::array<EncodeFnTy[9][3], NumPreds> res{};
     auto entry = [&res](llvm::ICmpInst::Predicate pred) {
       return res[pred - llvm::ICmpInst::FIRST_ICMP_PREDICATE];
     };
@@ -3212,7 +3212,13 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_icmp_vector(
   entry(predval)[5][2] = &Derived::encode_icmpset_##predname##v4##sign##32;    \
   entry(predval)[6][0] = &Derived::encode_icmp_##predname##v2##sign##64;       \
   entry(predval)[6][1] = &Derived::encode_icmpmask_##predname##v2##sign##64;   \
-  entry(predval)[6][2] = &Derived::encode_icmpset_##predname##v2##sign##64;
+  entry(predval)[6][2] = &Derived::encode_icmpset_##predname##v2##sign##64;    \
+  entry(predval)[7][0] = &Derived::encode_icmp_##predname##i32;                \
+  entry(predval)[7][1] = &Derived::encode_icmpmask_##predname##i32;            \
+  entry(predval)[7][2] = &Derived::encode_icmpset_##predname##i32;             \
+  entry(predval)[8][0] = &Derived::encode_icmp_##predname##i64;                \
+  entry(predval)[8][1] = &Derived::encode_icmpmask_##predname##i64;            \
+  entry(predval)[8][2] = &Derived::encode_icmpset_##predname##i64;
 
     FN_ENTRY(llvm::ICmpInst::ICMP_EQ, eq, u)
     FN_ENTRY(llvm::ICmpInst::ICMP_NE, ne, u)
@@ -3233,15 +3239,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_icmp_vector(
   llvm::Value *lhs = icmp->getOperand(0);
   llvm::Value *rhs = icmp->getOperand(1);
 
-  const llvm::Instruction *fuse_ext = nullptr;
-  if (icmp->hasNUses(1) && *icmp->user_begin() == icmp->getNextNode()) {
-    auto *fuse_inst = icmp->getNextNode();
-    if (llvm::isa<llvm::SExtInst, llvm::ZExtInst>(fuse_inst) &&
-        fuse_inst->getType() == lhs->getType()) {
-      fuse_ext = fuse_inst;
-      this->adaptor->inst_set_fused(fuse_ext, true);
-    }
-  }
+  u32 pred_idx = icmp->getPredicate() - llvm::ICmpInst::FIRST_ICMP_PREDICATE;
 
   auto [ty, _] = this->adaptor->lower_type(lhs);
   unsigned ty_idx;
@@ -3253,16 +3251,56 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_icmp_vector(
   case LLVMBasicValType::v8i16: ty_idx = 4; break;
   case LLVMBasicValType::v4i32: ty_idx = 5; break;
   case LLVMBasicValType::v2i64: ty_idx = 6; break;
+  case LLVMBasicValType::complex: {
+    auto *vec_ty = llvm::cast<llvm::FixedVectorType>(lhs->getType());
+    unsigned nelem = vec_ty->getNumElements();
+    auto [elem_ty, _] = this->adaptor->lower_type(vec_ty->getElementType());
+    switch (elem_ty) {
+    case LLVMBasicValType::i8:
+    case LLVMBasicValType::i16:
+      // TODO: support i1/i8/i16 vector icmp, needs element extension.
+      return false;
+    case LLVMBasicValType::i32: ty_idx = 7; break;
+    case LLVMBasicValType::i64:
+    case LLVMBasicValType::ptr: ty_idx = 8; break;
+    default: TPDE_UNREACHABLE("unexpected legal icmp vector type");
+    }
+
+    EncodeFnTy fn = fns[pred_idx][ty_idx][0];
+
+    ValueRef lhs_vr = this->val_ref(lhs);
+    ValueRef rhs_vr = this->val_ref(rhs);
+    ValueRef lhs_vr_disowned = lhs_vr.disowned();
+    ValueRef rhs_vr_disowned = rhs_vr.disowned();
+    ValueRef res = this->result_ref(inst);
+
+    ValuePartRef tmp{this, Config::GP_BANK};
+    ValuePartRef e_lhs{this, LLVMAdaptor::basic_ty_part_bank(elem_ty)};
+    ValuePartRef e_rhs{this, LLVMAdaptor::basic_ty_part_bank(elem_ty)};
+    for (unsigned i = 0; i != nelem; i++) {
+      derived()->extract_element(lhs_vr_disowned, i, elem_ty, e_lhs);
+      derived()->extract_element(rhs_vr_disowned, i, elem_ty, e_rhs);
+      (derived()->*fn)(std::move(e_lhs), std::move(e_rhs), std::move(tmp));
+      derived()->insert_element(res, i, LLVMBasicValType::i1, std::move(tmp));
+    }
+    return true;
+  }
   default: return false;
   }
 
-  u32 pred_idx = icmp->getPredicate() - llvm::ICmpInst::FIRST_ICMP_PREDICATE;
-  u32 res_type_idx = fuse_ext ? llvm::isa<llvm::ZExtInst>(fuse_ext) ? 2 : 1 : 0;
-  EncodeFnTy encode_fn = fns[pred_idx][ty_idx][res_type_idx];
-  if (!encode_fn) {
-    return false;
+  const llvm::Instruction *fuse_ext = nullptr;
+  u32 res_type_idx = 0;
+  if (icmp->hasNUses(1) && *icmp->user_begin() == icmp->getNextNode()) {
+    auto *fuse_inst = icmp->getNextNode();
+    if (llvm::isa<llvm::SExtInst, llvm::ZExtInst>(fuse_inst) &&
+        fuse_inst->getType() == lhs->getType()) {
+      fuse_ext = fuse_inst;
+      res_type_idx = llvm::isa<llvm::ZExtInst>(fuse_ext) ? 2 : 1;
+      this->adaptor->inst_set_fused(fuse_ext, true);
+    }
   }
 
+  EncodeFnTy encode_fn = fns[pred_idx][ty_idx][res_type_idx];
   auto lhs_vr = this->val_ref(lhs);
   auto rhs_vr = this->val_ref(rhs);
   auto res = this->result_ref(fuse_ext ? fuse_ext : inst);

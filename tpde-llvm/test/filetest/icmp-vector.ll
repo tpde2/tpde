@@ -5422,3 +5422,211 @@ define void @icmp_sle_v2i64_0(ptr %p, <2 x i64> %a) {
   store <2 x i1> %r, ptr %p
   ret void
 }
+
+define void @icmp_sle_v1i64(ptr %p, ptr %pa, ptr %pb) {
+; X64-LABEL: <icmp_sle_v1i64>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    push rbx
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    mov rax, qword ptr [rsi]
+; X64-NEXT:    mov rcx, qword ptr [rdx]
+; X64-NEXT:    mov rdx, rax
+; X64-NEXT:    mov rbx, rcx
+; X64-NEXT:    cmp rdx, rbx
+; X64-NEXT:    setle dl
+; X64-NEXT:    mov ebx, edx
+; X64-NEXT:    and ebx, 0x1
+; X64-NEXT:    mov byte ptr [rdi], bl
+; X64-NEXT:    pop rbx
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <icmp_sle_v1i64>:
+; ARM64:         sub sp, sp, #0xa0
+; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
+; ARM64-NEXT:    ldr x3, [x1]
+; ARM64-NEXT:    ldr x1, [x2]
+; ARM64-NEXT:    mov x2, x3
+; ARM64-NEXT:    mov x4, x1
+; ARM64-NEXT:    cmp x2, x4
+; ARM64-NEXT:    cset w2, le
+; ARM64-NEXT:    ubfx x4, x2, #0, #1
+; ARM64-NEXT:    strb w4, [x0]
+; ARM64-NEXT:    ldp x29, x30, [sp]
+; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ret
+  %a = load <1 x i64>, ptr %pa
+  %b = load <1 x i64>, ptr %pb
+  %r = icmp sle <1 x i64> %a, %b
+  store <1 x i1> %r, ptr %p
+  ret void
+}
+
+define void @icmp_sle_v3i64(ptr %p, ptr %pa, ptr %pb) {
+; X64-LABEL: <icmp_sle_v3i64>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    push rbx
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    mov rax, qword ptr [rsi]
+; X64-NEXT:    mov rcx, qword ptr [rsi + 0x8]
+; X64-NEXT:    mov rbx, qword ptr [rsi + 0x10]
+; X64-NEXT:    mov rsi, qword ptr [rdx]
+; X64-NEXT:    mov r8, qword ptr [rdx + 0x8]
+; X64-NEXT:    mov r9, qword ptr [rdx + 0x10]
+; X64-NEXT:    mov rdx, rax
+; X64-NEXT:    mov r10, rsi
+; X64-NEXT:    cmp rdx, r10
+; X64-NEXT:    setle dl
+; X64-NEXT:    mov r10d, edx
+; X64-NEXT:    and r10d, 0x1
+; X64-NEXT:    mov rdx, rcx
+; X64-NEXT:    mov r11, r8
+; X64-NEXT:    cmp rdx, r11
+; X64-NEXT:    setle dl
+; X64-NEXT:    btr r10, 0x1
+; X64-NEXT:    mov r11d, edx
+; X64-NEXT:    and r11d, 0x1
+; X64-NEXT:    lea r10, [r10 + 2*r11]
+; X64-NEXT:    mov rdx, rbx
+; X64-NEXT:    mov r11, r9
+; X64-NEXT:    cmp rdx, r11
+; X64-NEXT:    setle dl
+; X64-NEXT:    btr r10, 0x2
+; X64-NEXT:    mov r11d, edx
+; X64-NEXT:    and r11d, 0x1
+; X64-NEXT:    lea r10, [r10 + 4*r11]
+; X64-NEXT:    mov byte ptr [rdi], r10b
+; X64-NEXT:    pop rbx
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <icmp_sle_v3i64>:
+; ARM64:         sub sp, sp, #0xa0
+; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
+; ARM64-NEXT:    ldr x3, [x1]
+; ARM64-NEXT:    ldr x4, [x1, #0x8]
+; ARM64-NEXT:    ldr x5, [x1, #0x10]
+; ARM64-NEXT:    ldr x1, [x2]
+; ARM64-NEXT:    ldr x6, [x2, #0x8]
+; ARM64-NEXT:    ldr x7, [x2, #0x10]
+; ARM64-NEXT:    mov x2, x3
+; ARM64-NEXT:    mov x8, x1
+; ARM64-NEXT:    cmp x2, x8
+; ARM64-NEXT:    cset w2, le
+; ARM64-NEXT:    ubfx x8, x2, #0, #1
+; ARM64-NEXT:    mov x2, x4
+; ARM64-NEXT:    mov x9, x6
+; ARM64-NEXT:    cmp x2, x9
+; ARM64-NEXT:    cset w2, le
+; ARM64-NEXT:    bfi x8, x2, #1, #1
+; ARM64-NEXT:    mov x2, x5
+; ARM64-NEXT:    mov x9, x7
+; ARM64-NEXT:    cmp x2, x9
+; ARM64-NEXT:    cset w2, le
+; ARM64-NEXT:    bfi x8, x2, #2, #1
+; ARM64-NEXT:    strb w8, [x0]
+; ARM64-NEXT:    ldp x29, x30, [sp]
+; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ret
+  %a = load <3 x i64>, ptr %pa
+  %b = load <3 x i64>, ptr %pb
+  %r = icmp sle <3 x i64> %a, %b
+  store <3 x i1> %r, ptr %p
+  ret void
+}
+
+define void @icmp_sle_v4i64(ptr %p, ptr %pa, ptr %pb) {
+; X64-LABEL: <icmp_sle_v4i64>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop dword ptr [rax]
+; X64-NEXT:    movups xmm0, xmmword ptr [rsi]
+; X64-NEXT:    movups xmm1, xmmword ptr [rsi + 0x10]
+; X64-NEXT:    movups xmm2, xmmword ptr [rdx]
+; X64-NEXT:    movups xmm3, xmmword ptr [rdx + 0x10]
+; X64-NEXT:    movapd xmmword ptr [rbp - 0x50], xmm0
+; X64-NEXT:    mov rax, qword ptr [rbp - 0x50]
+; X64-NEXT:    movapd xmmword ptr [rbp - 0x70], xmm2
+; X64-NEXT:    mov rcx, qword ptr [rbp - 0x70]
+; X64-NEXT:    cmp rax, rcx
+; X64-NEXT:    setle al
+; X64-NEXT:    mov ecx, eax
+; X64-NEXT:    and ecx, 0x1
+; X64-NEXT:    mov rax, qword ptr [rbp - 0x48]
+; X64-NEXT:    mov rdx, qword ptr [rbp - 0x68]
+; X64-NEXT:    cmp rax, rdx
+; X64-NEXT:    setle al
+; X64-NEXT:    btr rcx, 0x1
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    lea rcx, [rcx + 2*rdx]
+; X64-NEXT:    movapd xmmword ptr [rbp - 0x40], xmm1
+; X64-NEXT:    mov rax, qword ptr [rbp - 0x40]
+; X64-NEXT:    movapd xmmword ptr [rbp - 0x60], xmm3
+; X64-NEXT:    mov rdx, qword ptr [rbp - 0x60]
+; X64-NEXT:    cmp rax, rdx
+; X64-NEXT:    setle al
+; X64-NEXT:    btr rcx, 0x2
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    lea rcx, [rcx + 4*rdx]
+; X64-NEXT:    mov rax, qword ptr [rbp - 0x38]
+; X64-NEXT:    mov rdx, qword ptr [rbp - 0x58]
+; X64-NEXT:    cmp rax, rdx
+; X64-NEXT:    setle al
+; X64-NEXT:    btr rcx, 0x3
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    lea rcx, [rcx + 8*rdx]
+; X64-NEXT:    mov byte ptr [rdi], cl
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <icmp_sle_v4i64>:
+; ARM64:         sub sp, sp, #0xa0
+; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
+; ARM64-NEXT:    ldr q0, [x1]
+; ARM64-NEXT:    ldr q1, [x1, #0x10]
+; ARM64-NEXT:    ldr q2, [x2]
+; ARM64-NEXT:    ldr q3, [x2, #0x10]
+; ARM64-NEXT:    mov x1, v0.d[0]
+; ARM64-NEXT:    mov x2, v2.d[0]
+; ARM64-NEXT:    cmp x1, x2
+; ARM64-NEXT:    cset w1, le
+; ARM64-NEXT:    ubfx x2, x1, #0, #1
+; ARM64-NEXT:    mov x1, v0.d[1]
+; ARM64-NEXT:    mov x3, v2.d[1]
+; ARM64-NEXT:    cmp x1, x3
+; ARM64-NEXT:    cset w1, le
+; ARM64-NEXT:    bfi x2, x1, #1, #1
+; ARM64-NEXT:    mov x1, v1.d[0]
+; ARM64-NEXT:    mov x3, v3.d[0]
+; ARM64-NEXT:    cmp x1, x3
+; ARM64-NEXT:    cset w1, le
+; ARM64-NEXT:    bfi x2, x1, #2, #1
+; ARM64-NEXT:    mov x1, v1.d[1]
+; ARM64-NEXT:    mov x3, v3.d[1]
+; ARM64-NEXT:    cmp x1, x3
+; ARM64-NEXT:    cset w1, le
+; ARM64-NEXT:    bfi x2, x1, #3, #1
+; ARM64-NEXT:    strb w2, [x0]
+; ARM64-NEXT:    ldp x29, x30, [sp]
+; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ret
+  %a = load <4 x i64>, ptr %pa
+  %b = load <4 x i64>, ptr %pb
+  %r = icmp sle <4 x i64> %a, %b
+  store <4 x i1> %r, ptr %p
+  ret void
+}
