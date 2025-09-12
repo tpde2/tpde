@@ -81,13 +81,15 @@ int main(int argc, char *argv[]) {
       RunTestUntil::full);
 
   std::unordered_map<std::string_view, Arch> arch_map{
-      {"x64", Arch::x64},
-      {"a64", Arch::a64}
+      {    "x64", Arch::x64},
+      { "x86_64", Arch::x64},
+      {    "a64", Arch::a64},
+      {"aarch64", Arch::a64},
   };
   args::MapFlag<std::string_view, Arch> arch(parser,
                                              "arch",
                                              "Which architecture to compile to",
-                                             {"arch"},
+                                             {"arch", "target"},
                                              arch_map,
                                              Arch::x64);
 
