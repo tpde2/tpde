@@ -393,6 +393,17 @@ private:
     if (name.empty()) {
       return false;
     }
+    bool is_declaration = false;
+    if (name == "define" || name == "declare") {
+      is_declaration = (name == "declare");
+      // LLVM-IR compatibility for update_test_checks
+      skip_whitespace();
+      if (!try_read('@')) {
+        TPDE_LOG_ERR("expected @ after LLVM-IR-compatible function definition");
+        return false;
+      }
+      name = parse_name();
+    }
     TPDE_LOG_TRACE("parsing function '{}'", name);
     if (funcs.contains(name)) {
       TPDE_LOG_ERR("Duplicate function {}", name);
@@ -433,7 +444,7 @@ private:
     ir.functions.back().arg_end_idx = ir.values.size();
 
     skip_whitespace();
-    if (try_read('!')) {
+    if (is_declaration || try_read('!')) {
       ir.functions.back().declaration = true;
       return true;
     }

@@ -12,9 +12,31 @@
 ; CHECK-NEXT: Argument b
 my_func(%a, %b)!
 
+; CHECK-LABEL: Extern function my_func_llvm
+; CHECK-NEXT: Argument a
+; CHECK-NEXT: Argument b
+declare @my_func_llvm(%a, %b)
+
 ; CHECK-LABEL: Local function local_func
 ; CHECK-NEXT: Argument d
 local_func(%d) local {
+; CHECK-NEXT: Block entry
+entry:
+; CHECK-NEXT: Value a
+  %a =
+; CHECK-NEXT: Value b
+  %b =
+; CHECK-NEXT: Value c (add)
+; CHECK-NEXT: Op a
+; CHECK-NEXT: Op b
+  %c = add %a, %b
+; CHECK-NEXT: Value (terminate)
+  terminate
+}
+
+; CHECK-LABEL: Local function local_func_llvm
+; CHECK-NEXT: Argument d
+define @local_func_llvm(%d) local {
 ; CHECK-NEXT: Block entry
 entry:
 ; CHECK-NEXT: Value a
