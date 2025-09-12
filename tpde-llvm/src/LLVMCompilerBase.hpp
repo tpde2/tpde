@@ -3764,13 +3764,13 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_gep(
   // index. GEP components are sign-extended, but we must use an unsigned
   // integer here to correctly handle overflows.
   u64 displacement = 0;
+  // If set, the base is actually a stack variable reference and expr.base is
+  // still uninitialized.
+  bool base_is_stack_var = false;
 
   auto [ptr_ref, base] = this->val_ref_single(gep->getPointerOperand());
   if (base.has_assignment() && base.assignment().is_stack_variable()) {
-    addr = derived()->create_addr_for_alloca(base.assignment());
-    assert(addr.is_expr());
-    displacement = expr.disp;
-    expr.disp = 0;
+    base_is_stack_var = true;
   } else {
     expr.base = base.load_to_reg();
     if (base.can_salvage()) {
@@ -3820,6 +3820,14 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_gep(
         // index == 0) or an array traversal
         if (!first_idx) {
           cur_ty = cur_ty->getArrayElementType();
+        }
+
+        if (base_is_stack_var) {
+          addr = derived()->create_addr_for_alloca(base.assignment());
+          assert(addr.is_expr());
+          displacement += expr.disp;
+          expr.disp = 0;
+          base_is_stack_var = false;
         }
 
         if (expr.scale) {
@@ -3875,7 +3883,19 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_gep(
     gep = next_gep;
   } while (true);
 
-  expr.disp = displacement;
+  if (base_is_stack_var) {
+    if (!next_val) {
+      // Create a new stack variable reference to avoid materializing this
+      // simple addition.
+      (void)this->result_ref_stack_slot(gep, base.assignment(), displacement);
+      return true;
+    }
+
+    addr = derived()->create_addr_for_alloca(base.assignment());
+    expr.disp += displacement;
+  } else {
+    expr.disp = displacement;
+  }
 
   if (auto *store = llvm::dyn_cast_if_present<llvm::StoreInst>(next_val);
       store && store->getPointerOperand() == gep) {

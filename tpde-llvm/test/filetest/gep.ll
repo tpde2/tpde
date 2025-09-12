@@ -2302,32 +2302,26 @@ define dso_local ptr @gep_array(ptr noundef %0) #0 {
   ret ptr %gep
 }
 
-define i32 @gep_alloca_nofuse(i32 %a) {
-; X64-LABEL: <gep_alloca_nofuse>:
+define i32 @gep_alloca_dist(i32 %a) {
+; X64-LABEL: <gep_alloca_dist>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    nop dword ptr [rax]
-; X64-NEXT:    lea rax, [rbp - 0x34]
 ; X64-NEXT:    lea edi, [rdi + 0x1]
-; X64-NEXT:    lea rcx, [rbp - 0x34]
-; X64-NEXT:    mov dword ptr [rax], edi
-; X64-NEXT:    mov ecx, dword ptr [rcx]
-; X64-NEXT:    mov eax, ecx
+; X64-NEXT:    mov dword ptr [rbp - 0x34], edi
+; X64-NEXT:    mov eax, dword ptr [rbp - 0x34]
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
-; ARM64-LABEL: <gep_alloca_nofuse>:
+; ARM64-LABEL: <gep_alloca_dist>:
 ; ARM64:         sub sp, sp, #0xc0
 ; ARM64-NEXT:    stp x29, x30, [sp]
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
-; ARM64-NEXT:    add x1, x29, #0xbc
 ; ARM64-NEXT:    add w0, w0, #0x1
-; ARM64-NEXT:    add x2, x29, #0xbc
-; ARM64-NEXT:    str w0, [x1]
-; ARM64-NEXT:    ldr w2, [x2]
-; ARM64-NEXT:    mov w0, w2
+; ARM64-NEXT:    str w0, [x29, #0xbc]
+; ARM64-NEXT:    ldr w0, [x29, #0xbc]
 ; ARM64-NEXT:    ldp x29, x30, [sp]
 ; ARM64-NEXT:    add sp, sp, #0xc0
 ; ARM64-NEXT:    ret
@@ -2346,9 +2340,8 @@ define i32 @gep_alloca_mult(i32 %a) {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    nop dword ptr [rax]
-; X64-NEXT:    lea rax, [rbp - 0x34]
-; X64-NEXT:    mov dword ptr [rax], edi
-; X64-NEXT:    mov eax, dword ptr [rax]
+; X64-NEXT:    mov dword ptr [rbp - 0x34], edi
+; X64-NEXT:    mov eax, dword ptr [rbp - 0x34]
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -2357,10 +2350,8 @@ define i32 @gep_alloca_mult(i32 %a) {
 ; ARM64-NEXT:    stp x29, x30, [sp]
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
-; ARM64-NEXT:    add x1, x29, #0xbc
-; ARM64-NEXT:    str w0, [x1]
-; ARM64-NEXT:    ldr w1, [x1]
-; ARM64-NEXT:    mov w0, w1
+; ARM64-NEXT:    str w0, [x29, #0xbc]
+; ARM64-NEXT:    ldr w0, [x29, #0xbc]
 ; ARM64-NEXT:    ldp x29, x30, [sp]
 ; ARM64-NEXT:    add sp, sp, #0xc0
 ; ARM64-NEXT:    ret

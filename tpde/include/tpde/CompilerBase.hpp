@@ -362,6 +362,13 @@ public:
   /// registers and stack slots.
   ValueRef result_ref_alias(IRValueRef dst, ValueRef &&src) noexcept;
 
+  /// Initialize value as a pointer into a stack variable (i.e., a value
+  /// allocated from cur_static_allocas() or similar) with an offset. The
+  /// result value will be a stack variable itself.
+  ValueRef result_ref_stack_slot(IRValueRef value,
+                                 AssignmentPartRef base,
+                                 i32 off) noexcept;
+
   [[deprecated("Use ValuePartRef::set_value")]]
   void set_value(ValuePartRef &val_ref, ScratchReg &scratch) noexcept;
   [[deprecated("Use ValuePartRef::set_value")]]
@@ -1192,6 +1199,19 @@ typename CompilerBase<Adaptor, Derived, Config>::ValueRef
   src.disown();
   src.reset();
 
+  return ValueRef{this, local_idx};
+}
+
+template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>
+typename CompilerBase<Adaptor, Derived, Config>::ValueRef
+    CompilerBase<Adaptor, Derived, Config>::result_ref_stack_slot(
+        IRValueRef dst, AssignmentPartRef base, i32 off) noexcept {
+  const ValLocalIdx local_idx = analyzer.adaptor->val_local_idx(dst);
+  assert(!val_assignment(local_idx) && "new value already defined");
+  init_variable_ref(local_idx, 0);
+  ValueAssignment *assignment = this->val_assignment(local_idx);
+  assignment->stack_variable = true;
+  assignment->frame_off = base.variable_stack_off() + off;
   return ValueRef{this, local_idx};
 }
 
