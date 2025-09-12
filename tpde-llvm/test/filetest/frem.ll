@@ -10,8 +10,9 @@ define float @frem_f32_1(float %0) {
 ; X64-LABEL: <frem_f32_1>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov eax, 0x3f800000
 ; X64-NEXT:    movd xmm1, eax
 ; X64-NEXT:  <L0>:
@@ -41,8 +42,9 @@ define float @frem_f32_5_32(float %0) {
 ; X64-LABEL: <frem_f32_5_32>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov eax, 0x40aa3d71
 ; X64-NEXT:    movd xmm1, eax
 ; X64-NEXT:  <L0>:
@@ -74,8 +76,9 @@ define float @frem_f32_f32(float %0, float %1) {
 ; X64-LABEL: <frem_f32_f32>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    call <L0>
 ; X64-NEXT:     R_X86_64_PLT32 fmodf-0x4
@@ -102,8 +105,9 @@ define double @frem_f64_1(double %0) {
 ; X64-LABEL: <frem_f64_1>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movabs rax, 0x3ff0000000000000
 ; X64-NEXT:    movq xmm1, rax
 ; X64-NEXT:  <L0>:
@@ -133,8 +137,9 @@ define double @frem_f64_5_32(double %0) {
 ; X64-LABEL: <frem_f64_5_32>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movabs rax, 0x401547ae147ae148
 ; X64-NEXT:    movq xmm1, rax
 ; X64-NEXT:  <L0>:
@@ -168,8 +173,9 @@ define double @frem_f64_f64(double %0, double %1) {
 ; X64-LABEL: <frem_f64_f64>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    call <L0>
 ; X64-NEXT:     R_X86_64_PLT32 fmod-0x4
@@ -196,8 +202,9 @@ define float @frem_f32_no_salvage_imm(float %0) {
 ; X64-LABEL: <frem_f32_no_salvage_imm>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movd dword ptr [rbp - 0x2c], xmm0
 ; X64-NEXT:    mov eax, 0x3f800000
 ; X64-NEXT:    movd xmm1, eax
@@ -241,8 +248,9 @@ define float @frem_f32_no_salvage_reg(float %0, float %1) {
 ; X64-LABEL: <frem_f32_no_salvage_reg>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movd dword ptr [rbp - 0x2c], xmm0
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    call <L0>
@@ -283,8 +291,9 @@ define double @frem_f64_no_salvage_imm(double %0) {
 ; X64-LABEL: <frem_f64_no_salvage_imm>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x40
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movq qword ptr [rbp - 0x30], xmm0
 ; X64-NEXT:    movabs rax, 0x3ff0000000000000
 ; X64-NEXT:    movq xmm1, rax
@@ -328,8 +337,9 @@ define double @frem_f64_no_salvage_reg(double %0, double %1) {
 ; X64-LABEL: <frem_f64_no_salvage_reg>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x40
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movq qword ptr [rbp - 0x30], xmm0
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    call <L0>

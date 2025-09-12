@@ -10,9 +10,8 @@ define void @store_v1i8(ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov byte ptr [rdi], 0x7b
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -35,9 +34,8 @@ define void @store_v1i16(ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov word ptr [rdi], 0x7b
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -60,9 +58,8 @@ define void @store_v1i32(ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov dword ptr [rdi], 0x7b
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -85,9 +82,8 @@ define void @store_v1i64(ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov qword ptr [rdi], 0x7b
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -110,9 +106,8 @@ define void @store_v1ptr(ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov qword ptr [rdi], 0x0
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -135,11 +130,10 @@ define void @store_v1f32(ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov eax, 0x42800000
 ; X64-NEXT:    movd xmm0, eax
 ; X64-NEXT:    movss dword ptr [rdi], xmm0
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -163,11 +157,10 @@ define void @store_v1f64(ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movabs rax, 0x4050000000000000
 ; X64-NEXT:    movq xmm0, rax
 ; X64-NEXT:    movsd qword ptr [rdi], xmm0
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -191,10 +184,9 @@ define void @store_v2i8(ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov byte ptr [rdi], 0x7b
 ; X64-NEXT:    mov byte ptr [rdi + 0x1], 0xc
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -219,10 +211,9 @@ define void @store_v2i16(ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov word ptr [rdi], 0x7b
 ; X64-NEXT:    mov word ptr [rdi + 0x2], 0xc
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -247,11 +238,10 @@ define void @store_v2i32(ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movabs rax, 0xc0000007b
 ; X64-NEXT:    movq xmm0, rax
 ; X64-NEXT:    movsd qword ptr [rdi], xmm0
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -276,11 +266,10 @@ define void @store_v2i64(ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movaps xmm0, xmmword ptr <store_v2i64+0x13>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    movups xmmword ptr [rdi], xmm0
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -306,10 +295,9 @@ define void @store_v2ptr(ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm0, xmm0
 ; X64-NEXT:    movups xmmword ptr [rdi], xmm0
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -332,11 +320,10 @@ define void @store_v2f32(ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movabs rax, 0x4280000042800000
 ; X64-NEXT:    movq xmm0, rax
 ; X64-NEXT:    movsd qword ptr [rdi], xmm0
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -361,11 +348,10 @@ define void @store_v2f64(ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movaps xmm0, xmmword ptr <store_v2f64+0x13>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    movups xmmword ptr [rdi], xmm0
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -391,11 +377,10 @@ define void @store_v3i8(ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov byte ptr [rdi], 0x0
 ; X64-NEXT:    mov byte ptr [rdi + 0x1], 0x0
 ; X64-NEXT:    mov byte ptr [rdi + 0x2], 0x0
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -422,11 +407,10 @@ define void @store_v3i16(ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov word ptr [rdi], 0x0
 ; X64-NEXT:    mov word ptr [rdi + 0x2], 0x0
 ; X64-NEXT:    mov word ptr [rdi + 0x4], 0x0
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -453,11 +437,10 @@ define void @store_v3i32(ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov dword ptr [rdi], 0x0
 ; X64-NEXT:    mov dword ptr [rdi + 0x4], 0x0
 ; X64-NEXT:    mov dword ptr [rdi + 0x8], 0x0
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -484,11 +467,10 @@ define void @store_v3i64(ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov qword ptr [rdi], 0x0
 ; X64-NEXT:    mov qword ptr [rdi + 0x8], 0x0
 ; X64-NEXT:    mov qword ptr [rdi + 0x10], 0x0
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -515,11 +497,10 @@ define void @store_v3ptr(ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov qword ptr [rdi], 0x0
 ; X64-NEXT:    mov qword ptr [rdi + 0x8], 0x0
 ; X64-NEXT:    mov qword ptr [rdi + 0x10], 0x0
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -546,14 +527,13 @@ define void @store_v3f32(ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm0, xmm0
 ; X64-NEXT:    movss dword ptr [rdi], xmm0
 ; X64-NEXT:    pxor xmm0, xmm0
 ; X64-NEXT:    movss dword ptr [rdi + 0x4], xmm0
 ; X64-NEXT:    pxor xmm0, xmm0
 ; X64-NEXT:    movss dword ptr [rdi + 0x8], xmm0
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -580,14 +560,13 @@ define void @store_v3f64(ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm0, xmm0
 ; X64-NEXT:    movsd qword ptr [rdi], xmm0
 ; X64-NEXT:    pxor xmm0, xmm0
 ; X64-NEXT:    movsd qword ptr [rdi + 0x8], xmm0
 ; X64-NEXT:    pxor xmm0, xmm0
 ; X64-NEXT:    movsd qword ptr [rdi + 0x10], xmm0
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -614,12 +593,11 @@ define void @store_v4i8(ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov byte ptr [rdi], 0x0
 ; X64-NEXT:    mov byte ptr [rdi + 0x1], 0x0
 ; X64-NEXT:    mov byte ptr [rdi + 0x2], 0x0
 ; X64-NEXT:    mov byte ptr [rdi + 0x3], 0x0
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -648,10 +626,9 @@ define void @store_v4i16(ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm0, xmm0
 ; X64-NEXT:    movsd qword ptr [rdi], xmm0
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -674,10 +651,9 @@ define void @store_v4i32(ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm0, xmm0
 ; X64-NEXT:    movups xmmword ptr [rdi], xmm0
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -700,12 +676,11 @@ define void @store_v4i64(ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm0, xmm0
 ; X64-NEXT:    movups xmmword ptr [rdi], xmm0
 ; X64-NEXT:    pxor xmm0, xmm0
 ; X64-NEXT:    movups xmmword ptr [rdi + 0x10], xmm0
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -730,12 +705,11 @@ define void @store_v4ptr(ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm0, xmm0
 ; X64-NEXT:    movups xmmword ptr [rdi], xmm0
 ; X64-NEXT:    pxor xmm0, xmm0
 ; X64-NEXT:    movups xmmword ptr [rdi + 0x10], xmm0
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -760,10 +734,9 @@ define void @store_v4f32(ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm0, xmm0
 ; X64-NEXT:    movups xmmword ptr [rdi], xmm0
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -786,12 +759,11 @@ define void @store_v4f64(ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm0, xmm0
 ; X64-NEXT:    movups xmmword ptr [rdi], xmm0
 ; X64-NEXT:    pxor xmm0, xmm0
 ; X64-NEXT:    movups xmmword ptr [rdi + 0x10], xmm0
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -816,7 +788,7 @@ define void @store_v64i8(ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm0, xmm0
 ; X64-NEXT:    movups xmmword ptr [rdi], xmm0
 ; X64-NEXT:    pxor xmm0, xmm0
@@ -825,7 +797,6 @@ define void @store_v64i8(ptr %p) {
 ; X64-NEXT:    movups xmmword ptr [rdi + 0x20], xmm0
 ; X64-NEXT:    pxor xmm0, xmm0
 ; X64-NEXT:    movups xmmword ptr [rdi + 0x30], xmm0
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -854,7 +825,7 @@ define void @store_v64i16(ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm0, xmm0
 ; X64-NEXT:    movups xmmword ptr [rdi], xmm0
 ; X64-NEXT:    pxor xmm0, xmm0
@@ -871,7 +842,6 @@ define void @store_v64i16(ptr %p) {
 ; X64-NEXT:    movups xmmword ptr [rdi + 0x60], xmm0
 ; X64-NEXT:    pxor xmm0, xmm0
 ; X64-NEXT:    movups xmmword ptr [rdi + 0x70], xmm0
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -908,7 +878,7 @@ define void @store_v64i32(ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm0, xmm0
 ; X64-NEXT:    movups xmmword ptr [rdi], xmm0
 ; X64-NEXT:    pxor xmm0, xmm0
@@ -941,7 +911,6 @@ define void @store_v64i32(ptr %p) {
 ; X64-NEXT:    movups xmmword ptr [rdi + 0xe0], xmm0
 ; X64-NEXT:    pxor xmm0, xmm0
 ; X64-NEXT:    movups xmmword ptr [rdi + 0xf0], xmm0
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -994,7 +963,7 @@ define void @store_v64i64(ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm0, xmm0
 ; X64-NEXT:    movups xmmword ptr [rdi], xmm0
 ; X64-NEXT:    pxor xmm0, xmm0
@@ -1059,7 +1028,6 @@ define void @store_v64i64(ptr %p) {
 ; X64-NEXT:    movups xmmword ptr [rdi + 0x1e0], xmm0
 ; X64-NEXT:    pxor xmm0, xmm0
 ; X64-NEXT:    movups xmmword ptr [rdi + 0x1f0], xmm0
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -1144,7 +1112,7 @@ define void @store_v64ptr(ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm0, xmm0
 ; X64-NEXT:    movups xmmword ptr [rdi], xmm0
 ; X64-NEXT:    pxor xmm0, xmm0
@@ -1209,7 +1177,6 @@ define void @store_v64ptr(ptr %p) {
 ; X64-NEXT:    movups xmmword ptr [rdi + 0x1e0], xmm0
 ; X64-NEXT:    pxor xmm0, xmm0
 ; X64-NEXT:    movups xmmword ptr [rdi + 0x1f0], xmm0
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -1294,7 +1261,7 @@ define void @store_v64f32(ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm0, xmm0
 ; X64-NEXT:    movups xmmword ptr [rdi], xmm0
 ; X64-NEXT:    pxor xmm0, xmm0
@@ -1327,7 +1294,6 @@ define void @store_v64f32(ptr %p) {
 ; X64-NEXT:    movups xmmword ptr [rdi + 0xe0], xmm0
 ; X64-NEXT:    pxor xmm0, xmm0
 ; X64-NEXT:    movups xmmword ptr [rdi + 0xf0], xmm0
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -1380,7 +1346,7 @@ define void @store_v64f64(ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm0, xmm0
 ; X64-NEXT:    movups xmmword ptr [rdi], xmm0
 ; X64-NEXT:    pxor xmm0, xmm0
@@ -1445,7 +1411,6 @@ define void @store_v64f64(ptr %p) {
 ; X64-NEXT:    movups xmmword ptr [rdi + 0x1e0], xmm0
 ; X64-NEXT:    pxor xmm0, xmm0
 ; X64-NEXT:    movups xmmword ptr [rdi + 0x1f0], xmm0
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;

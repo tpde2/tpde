@@ -10,7 +10,7 @@ define float @minnumf32(float %0, float %1) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movapd xmm2, xmm0
 ; X64-NEXT:    cmpunordss xmm2, xmm0
 ; X64-NEXT:    movaps xmm3, xmm2
@@ -19,7 +19,6 @@ define float @minnumf32(float %0, float %1) {
 ; X64-NEXT:    andnps xmm2, xmm1
 ; X64-NEXT:    orps xmm2, xmm3
 ; X64-NEXT:    movapd xmm0, xmm2
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -41,7 +40,7 @@ define double @minnumf64(double %0, double %1) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movapd xmm2, xmm0
 ; X64-NEXT:    cmpunordsd xmm2, xmm0
 ; X64-NEXT:    movapd xmm3, xmm2
@@ -50,7 +49,6 @@ define double @minnumf64(double %0, double %1) {
 ; X64-NEXT:    andnpd xmm2, xmm1
 ; X64-NEXT:    orpd xmm2, xmm3
 ; X64-NEXT:    movapd xmm0, xmm2
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -72,7 +70,7 @@ define float @minnumf32_noreuse(float %0, float %1) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movapd xmm2, xmm0
 ; X64-NEXT:    cmpunordss xmm2, xmm0
 ; X64-NEXT:    movaps xmm3, xmm2
@@ -81,7 +79,6 @@ define float @minnumf32_noreuse(float %0, float %1) {
 ; X64-NEXT:    andnps xmm2, xmm1
 ; X64-NEXT:    orps xmm2, xmm3
 ; X64-NEXT:    addss xmm0, xmm2
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -105,7 +102,7 @@ define double @minnumf64_noreuse(double %0, double %1) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movapd xmm2, xmm0
 ; X64-NEXT:    cmpunordsd xmm2, xmm0
 ; X64-NEXT:    movapd xmm3, xmm2
@@ -114,7 +111,6 @@ define double @minnumf64_noreuse(double %0, double %1) {
 ; X64-NEXT:    andnpd xmm2, xmm1
 ; X64-NEXT:    orpd xmm2, xmm3
 ; X64-NEXT:    addsd xmm0, xmm2
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;

@@ -17,10 +17,9 @@ define void @cttz_i8(i8 %0) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    or edi, 0x100
 ; X64-NEXT:    bsf eax, edi
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -45,9 +44,8 @@ define void @cttz_i8_zero_poison(i8 %0) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    bsf edi, edi
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -71,10 +69,9 @@ define void @cttz_i16(i16 %0) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    or edi, 0x10000
 ; X64-NEXT:    bsf eax, edi
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -99,9 +96,8 @@ define void @cttz_i16_zero_poison(i16 %0) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    bsf edi, edi
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -125,10 +121,9 @@ define void @cttz_i32(i32 %0) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov eax, 0x20
 ; X64-NEXT:    bsf eax, edi
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -152,9 +147,8 @@ define void @cttz_i32_zero_poison(i32 %0) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    bsf edi, edi
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -178,10 +172,9 @@ define void @cttz_i64(i64 %0) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov eax, 0x40
 ; X64-NEXT:    bsf rax, rdi
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -205,9 +198,8 @@ define void @cttz_i64_zero_poison(i64 %0) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    bsf rdi, rdi
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -231,12 +223,11 @@ define void @cttz_i32_no_salvage(i32 %0) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov eax, 0x20
 ; X64-NEXT:    bsf eax, edi
 ; X64-NEXT:    mov eax, 0x20
 ; X64-NEXT:    bsf eax, edi
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -263,12 +254,11 @@ define void @cttz_i64_no_salvage(i64 %0) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov eax, 0x40
 ; X64-NEXT:    bsf rax, rdi
 ; X64-NEXT:    mov eax, 0x40
 ; X64-NEXT:    bsf rax, rdi
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -295,13 +285,12 @@ define void @cttz_i16_no_salvage(i16 %0) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov eax, edi
 ; X64-NEXT:    or eax, 0x10000
 ; X64-NEXT:    bsf ecx, eax
 ; X64-NEXT:    or edi, 0x10000
 ; X64-NEXT:    bsf eax, edi
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;

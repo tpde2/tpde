@@ -10,7 +10,7 @@ define void @ashr_v1i8(ptr %p, ptr %q) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movzx eax, byte ptr [rdi]
 ; X64-NEXT:    movzx ecx, byte ptr [rsi]
 ; X64-NEXT:    movsx eax, al
@@ -19,7 +19,6 @@ define void @ashr_v1i8(ptr %p, ptr %q) {
 ; X64-NEXT:    mov ecx, edx
 ; X64-NEXT:    sar eax, cl
 ; X64-NEXT:    mov byte ptr [rdi], al
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -48,12 +47,11 @@ define void @ashr_v1i8_3(ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movzx eax, byte ptr [rdi]
 ; X64-NEXT:    movsx eax, al
 ; X64-NEXT:    sar eax, 0x3
 ; X64-NEXT:    mov byte ptr [rdi], al
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -82,8 +80,8 @@ define void @ashr_v5i8(ptr %p, ptr %q) {
 ; X64-NEXT:    push rbx
 ; X64-NEXT:    push r12
 ; X64-NEXT:    push r13
-; X64-NEXT:    nop dword ptr [rax]
-; X64-NEXT:    sub rsp, 0x18
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop
 ; X64-NEXT:    movzx eax, byte ptr [rdi]
 ; X64-NEXT:    movzx ecx, byte ptr [rdi + 0x1]
 ; X64-NEXT:    movzx edx, byte ptr [rdi + 0x2]
@@ -117,7 +115,6 @@ define void @ashr_v5i8(ptr %p, ptr %q) {
 ; X64-NEXT:    mov byte ptr [rdi + 0x2], dl
 ; X64-NEXT:    mov byte ptr [rdi + 0x3], bl
 ; X64-NEXT:    mov byte ptr [rdi + 0x4], r8b
-; X64-NEXT:    add rsp, 0x18
 ; X64-NEXT:    pop r13
 ; X64-NEXT:    pop r12
 ; X64-NEXT:    pop rbx
@@ -169,8 +166,8 @@ define void @ashr_v5i8_3(ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop dword ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x28
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    movzx eax, byte ptr [rdi]
 ; X64-NEXT:    movzx ecx, byte ptr [rdi + 0x1]
 ; X64-NEXT:    movzx edx, byte ptr [rdi + 0x2]
@@ -191,7 +188,6 @@ define void @ashr_v5i8_3(ptr %p) {
 ; X64-NEXT:    mov byte ptr [rdi + 0x2], dl
 ; X64-NEXT:    mov byte ptr [rdi + 0x3], bl
 ; X64-NEXT:    mov byte ptr [rdi + 0x4], sil
-; X64-NEXT:    add rsp, 0x28
 ; X64-NEXT:    pop rbx
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -235,7 +231,7 @@ define <8 x i8> @ashr_v8i8(<8 x i8> %a, <8 x i8> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    punpcklbw {{.*#+}} xmm0 = xmm0[0,0,1,1,2,2,3,3,4,4,5,5,6,6,7,7]
 ; X64-NEXT:    psllw xmm1, 0x5
 ; X64-NEXT:    punpcklbw {{.*#+}} xmm1 = xmm1[0,0,1,1,2,2,3,3,4,4,5,5,6,6,7,7]
@@ -264,7 +260,6 @@ define <8 x i8> @ashr_v8i8(<8 x i8> %a, <8 x i8> %b) {
 ; X64-NEXT:    por xmm0, xmm1
 ; X64-NEXT:    psrlw xmm0, 0x8
 ; X64-NEXT:    packuswb xmm0, xmm0
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -287,7 +282,7 @@ define <8 x i8> @ashr_v8i8_3(<8 x i8> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    punpcklbw {{.*#+}} xmm0 = xmm0[0,0,1,1,2,2,3,3,4,4,5,5,6,6,7,7]
 ; X64-NEXT:    movabs rax, 0x303030303030303
 ; X64-NEXT:    movq xmm1, rax
@@ -318,7 +313,6 @@ define <8 x i8> @ashr_v8i8_3(<8 x i8> %a) {
 ; X64-NEXT:    por xmm0, xmm1
 ; X64-NEXT:    psrlw xmm0, 0x8
 ; X64-NEXT:    packuswb xmm0, xmm0
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -342,7 +336,7 @@ define <16 x i8> @ashr_v16i8(<16 x i8> %a, <16 x i8> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    punpckhbw {{.*#+}} xmm2 = xmm2[8],xmm0[8],xmm2[9],xmm0[9],xmm2[10],xmm0[10],xmm2[11],xmm0[11],xmm2[12],xmm0[12],xmm2[13],xmm0[13],xmm2[14],xmm0[14],xmm2[15],xmm0[15]
 ; X64-NEXT:    psllw xmm1, 0x5
 ; X64-NEXT:    punpckhbw {{.*#+}} xmm3 = xmm3[8],xmm1[8],xmm3[9],xmm1[9],xmm3[10],xmm1[10],xmm3[11],xmm1[11],xmm3[12],xmm1[12],xmm3[13],xmm1[13],xmm3[14],xmm1[14],xmm3[15],xmm1[15]
@@ -397,7 +391,6 @@ define <16 x i8> @ashr_v16i8(<16 x i8> %a, <16 x i8> %b) {
 ; X64-NEXT:    por xmm0, xmm1
 ; X64-NEXT:    psrlw xmm0, 0x8
 ; X64-NEXT:    packuswb xmm0, xmm2
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -420,7 +413,7 @@ define <16 x i8> @ashr_v16i8_3(<16 x i8> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    punpckhbw {{.*#+}} xmm1 = xmm1[8],xmm0[8],xmm1[9],xmm0[9],xmm1[10],xmm0[10],xmm1[11],xmm0[11],xmm1[12],xmm0[12],xmm1[13],xmm0[13],xmm1[14],xmm0[14],xmm1[15],xmm0[15]
 ; X64-NEXT:    movaps xmm2, xmmword ptr <ashr_v16i8_3+0x17>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
@@ -477,7 +470,6 @@ define <16 x i8> @ashr_v16i8_3(<16 x i8> %a) {
 ; X64-NEXT:    por xmm0, xmm2
 ; X64-NEXT:    psrlw xmm0, 0x8
 ; X64-NEXT:    packuswb xmm0, xmm1
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -501,7 +493,7 @@ define void @ashr_v32i8(ptr %p, ptr %q) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movups xmm0, xmmword ptr [rdi]
 ; X64-NEXT:    movups xmm1, xmmword ptr [rdi + 0x10]
 ; X64-NEXT:    movups xmm2, xmmword ptr [rsi]
@@ -616,7 +608,6 @@ define void @ashr_v32i8(ptr %p, ptr %q) {
 ; X64-NEXT:    packuswb xmm1, xmm2
 ; X64-NEXT:    movups xmmword ptr [rdi], xmm0
 ; X64-NEXT:    movups xmmword ptr [rdi + 0x10], xmm1
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -650,7 +641,7 @@ define void @ashr_v32i8_3(ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movups xmm0, xmmword ptr [rdi]
 ; X64-NEXT:    movups xmm1, xmmword ptr [rdi + 0x10]
 ; X64-NEXT:    punpckhbw {{.*#+}} xmm2 = xmm2[8],xmm0[8],xmm2[9],xmm0[9],xmm2[10],xmm0[10],xmm2[11],xmm0[11],xmm2[12],xmm0[12],xmm2[13],xmm0[13],xmm2[14],xmm0[14],xmm2[15],xmm0[15]
@@ -767,7 +758,6 @@ define void @ashr_v32i8_3(ptr %p) {
 ; X64-NEXT:    packuswb xmm1, xmm2
 ; X64-NEXT:    movups xmmword ptr [rdi], xmm0
 ; X64-NEXT:    movups xmmword ptr [rdi + 0x10], xmm1
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -800,7 +790,7 @@ define <4 x i16> @ashr_v4i16(<4 x i16> %a, <4 x i16> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    psllw xmm1, 0xc
 ; X64-NEXT:    movdqa xmm2, xmm1
 ; X64-NEXT:    psraw xmm2, 0xf
@@ -832,7 +822,6 @@ define <4 x i16> @ashr_v4i16(<4 x i16> %a, <4 x i16> %b) {
 ; X64-NEXT:    psraw xmm0, 0x1
 ; X64-NEXT:    pand xmm0, xmm1
 ; X64-NEXT:    por xmm0, xmm2
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -855,7 +844,7 @@ define <4 x i16> @ashr_v4i16_3(<4 x i16> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movabs rax, 0x3000300030003
 ; X64-NEXT:    movq xmm1, rax
 ; X64-NEXT:    psllw xmm1, 0xc
@@ -889,7 +878,6 @@ define <4 x i16> @ashr_v4i16_3(<4 x i16> %a) {
 ; X64-NEXT:    psraw xmm0, 0x1
 ; X64-NEXT:    pand xmm0, xmm1
 ; X64-NEXT:    por xmm0, xmm2
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -913,7 +901,7 @@ define <8 x i16> @ashr_v8i16(<8 x i16> %a, <8 x i16> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    psllw xmm1, 0xc
 ; X64-NEXT:    movdqa xmm2, xmm1
 ; X64-NEXT:    psraw xmm2, 0xf
@@ -945,7 +933,6 @@ define <8 x i16> @ashr_v8i16(<8 x i16> %a, <8 x i16> %b) {
 ; X64-NEXT:    psraw xmm0, 0x1
 ; X64-NEXT:    pand xmm0, xmm1
 ; X64-NEXT:    por xmm0, xmm2
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -968,7 +955,7 @@ define <8 x i16> @ashr_v8i16_3(<8 x i16> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movaps xmm1, xmmword ptr <ashr_v8i16_3+0x13>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    psllw xmm1, 0xc
@@ -1002,7 +989,6 @@ define <8 x i16> @ashr_v8i16_3(<8 x i16> %a) {
 ; X64-NEXT:    psraw xmm0, 0x1
 ; X64-NEXT:    pand xmm0, xmm1
 ; X64-NEXT:    por xmm0, xmm2
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -1026,7 +1012,7 @@ define <2 x i32> @ashr_v2i32(<2 x i32> %a, <2 x i32> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pshuflw {{.*#+}} xmm2 = xmm1[2,3,3,3,4,5,6,7]
 ; X64-NEXT:    movapd xmm3, xmm0
 ; X64-NEXT:    shufps {{.*#+}} xmm3 = xmm3[1,1],xmm0[1,1]
@@ -1034,7 +1020,6 @@ define <2 x i32> @ashr_v2i32(<2 x i32> %a, <2 x i32> %b) {
 ; X64-NEXT:    pshuflw {{.*#+}} xmm1 = xmm1[0,1,1,1,4,5,6,7]
 ; X64-NEXT:    psrad xmm0, xmm1
 ; X64-NEXT:    punpckldq {{.*#+}} xmm0 = xmm0[0],xmm3[0],xmm0[1],xmm3[1]
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -1057,7 +1042,7 @@ define <2 x i32> @ashr_v2i32_3(<2 x i32> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movabs rax, 0x300000003
 ; X64-NEXT:    movq xmm1, rax
 ; X64-NEXT:    pshuflw {{.*#+}} xmm2 = xmm1[2,3,3,3,4,5,6,7]
@@ -1067,7 +1052,6 @@ define <2 x i32> @ashr_v2i32_3(<2 x i32> %a) {
 ; X64-NEXT:    pshuflw {{.*#+}} xmm1 = xmm1[0,1,1,1,4,5,6,7]
 ; X64-NEXT:    psrad xmm0, xmm1
 ; X64-NEXT:    punpckldq {{.*#+}} xmm0 = xmm0[0],xmm3[0],xmm0[1],xmm3[1]
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -1091,7 +1075,7 @@ define <4 x i32> @ashr_v4i32(<4 x i32> %a, <4 x i32> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pshuflw {{.*#+}} xmm2 = xmm1[2,3,3,3,4,5,6,7]
 ; X64-NEXT:    movapd xmm3, xmm0
 ; X64-NEXT:    psrad xmm3, xmm2
@@ -1108,7 +1092,6 @@ define <4 x i32> @ashr_v4i32(<4 x i32> %a, <4 x i32> %b) {
 ; X64-NEXT:    punpckhqdq {{.*#+}} xmm0 = xmm0[1],xmm4[1]
 ; X64-NEXT:    shufps {{.*#+}} xmm2 = xmm2[0,3],xmm0[0,3]
 ; X64-NEXT:    movapd xmm0, xmm2
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -1131,7 +1114,7 @@ define <4 x i32> @ashr_v4i32_3(<4 x i32> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movaps xmm1, xmmword ptr <ashr_v4i32_3+0x13>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    pshuflw {{.*#+}} xmm2 = xmm1[2,3,3,3,4,5,6,7]
@@ -1150,7 +1133,6 @@ define <4 x i32> @ashr_v4i32_3(<4 x i32> %a) {
 ; X64-NEXT:    punpckhqdq {{.*#+}} xmm0 = xmm0[1],xmm4[1]
 ; X64-NEXT:    shufps {{.*#+}} xmm2 = xmm2[0,3],xmm0[0,3]
 ; X64-NEXT:    movapd xmm0, xmm2
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -1174,7 +1156,7 @@ define <2 x i64> @ashr_v2i64(<2 x i64> %a, <2 x i64> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movdqa xmm2, xmmword ptr <ashr_v2i64+0x14>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    movdqa xmm3, xmm2
@@ -1188,7 +1170,6 @@ define <2 x i64> @ashr_v2i64(<2 x i64> %a, <2 x i64> %b) {
 ; X64-NEXT:    movsd {{.*#+}} xmm0 = xmm3[0],xmm0[1]
 ; X64-NEXT:    xorpd xmm0, xmm2
 ; X64-NEXT:    psubq xmm0, xmm2
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -1211,7 +1192,7 @@ define <2 x i64> @ashr_v2i64_3(<2 x i64> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movdqa xmm1, xmmword ptr <ashr_v2i64_3+0x14>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    movdqa xmm2, xmm1
@@ -1227,7 +1208,6 @@ define <2 x i64> @ashr_v2i64_3(<2 x i64> %a) {
 ; X64-NEXT:    movsd {{.*#+}} xmm0 = xmm2[0],xmm0[1]
 ; X64-NEXT:    xorpd xmm0, xmm1
 ; X64-NEXT:    psubq xmm0, xmm1
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;

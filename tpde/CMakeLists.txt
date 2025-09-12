@@ -66,11 +66,7 @@ target_sources(tpde PRIVATE
 
 # fadec
 if (TPDE_X64)
-    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-        set(FADEC_DECODE ON BOOL "fadec decode for asserts")
-    else ()
-        set(FADEC_DECODE OFF BOOL "no fadec decode")
-    endif ()
+    set(FADEC_DECODE OFF BOOL "no fadec decode")
     set(FADEC_ENCODE OFF BOOL "no fadec encode")
     set(FADEC_ENCODE2 ON BOOL "fadec encode2 support")
     add_subdirectory(../deps/fadec ${CMAKE_CURRENT_BINARY_DIR}/deps/fadec)

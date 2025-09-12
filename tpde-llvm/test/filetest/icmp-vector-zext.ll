@@ -11,11 +11,10 @@ define <8 x i8> @icmp_eq_v8i8(<8 x i8> %a, <8 x i8> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pcmpeqb xmm0, xmm1
 ; X64-NEXT:    pand xmm0, xmmword ptr <icmp_eq_v8i8+0x18>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -40,12 +39,11 @@ define <8 x i8> @icmp_eq_v8i8_0(<8 x i8> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm1, xmm1
 ; X64-NEXT:    pcmpeqb xmm0, xmm1
 ; X64-NEXT:    pand xmm0, xmmword ptr <icmp_eq_v8i8_0+0x1c>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -71,11 +69,10 @@ define <16 x i8> @icmp_eq_v16i8(<16 x i8> %a, <16 x i8> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pcmpeqb xmm0, xmm1
 ; X64-NEXT:    pand xmm0, xmmword ptr <icmp_eq_v16i8+0x18>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -100,12 +97,11 @@ define <16 x i8> @icmp_eq_v16i8_0(<16 x i8> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm1, xmm1
 ; X64-NEXT:    pcmpeqb xmm0, xmm1
 ; X64-NEXT:    pand xmm0, xmmword ptr <icmp_eq_v16i8_0+0x1c>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -131,10 +127,9 @@ define <4 x i16> @icmp_eq_v4i16(<4 x i16> %a, <4 x i16> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pcmpeqw xmm0, xmm1
 ; X64-NEXT:    psrlw xmm0, 0xf
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -159,11 +154,10 @@ define <4 x i16> @icmp_eq_v4i16_0(<4 x i16> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm1, xmm1
 ; X64-NEXT:    pcmpeqw xmm0, xmm1
 ; X64-NEXT:    psrlw xmm0, 0xf
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -189,10 +183,9 @@ define <8 x i16> @icmp_eq_v8i16(<8 x i16> %a, <8 x i16> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pcmpeqw xmm0, xmm1
 ; X64-NEXT:    psrlw xmm0, 0xf
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -217,11 +210,10 @@ define <8 x i16> @icmp_eq_v8i16_0(<8 x i16> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm1, xmm1
 ; X64-NEXT:    pcmpeqw xmm0, xmm1
 ; X64-NEXT:    psrlw xmm0, 0xf
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -247,10 +239,9 @@ define <2 x i32> @icmp_eq_v2i32(<2 x i32> %a, <2 x i32> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pcmpeqd xmm0, xmm1
 ; X64-NEXT:    psrld xmm0, 0x1f
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -275,11 +266,10 @@ define <2 x i32> @icmp_eq_v2i32_0(<2 x i32> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm1, xmm1
 ; X64-NEXT:    pcmpeqd xmm0, xmm1
 ; X64-NEXT:    psrld xmm0, 0x1f
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -305,10 +295,9 @@ define <4 x i32> @icmp_eq_v4i32(<4 x i32> %a, <4 x i32> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pcmpeqd xmm0, xmm1
 ; X64-NEXT:    psrld xmm0, 0x1f
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -333,11 +322,10 @@ define <4 x i32> @icmp_eq_v4i32_0(<4 x i32> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm1, xmm1
 ; X64-NEXT:    pcmpeqd xmm0, xmm1
 ; X64-NEXT:    psrld xmm0, 0x1f
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -363,13 +351,12 @@ define <2 x i64> @icmp_eq_v2i64(<2 x i64> %a, <2 x i64> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pcmpeqd xmm0, xmm1
 ; X64-NEXT:    pshufd {{.*#+}} xmm1 = xmm0[1,0,3,2]
 ; X64-NEXT:    pand xmm0, xmm1
 ; X64-NEXT:    pand xmm0, xmmword ptr <icmp_eq_v2i64+0x21>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -395,14 +382,13 @@ define <2 x i64> @icmp_eq_v2i64_0(<2 x i64> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm1, xmm1
 ; X64-NEXT:    pcmpeqd xmm0, xmm1
 ; X64-NEXT:    pshufd {{.*#+}} xmm1 = xmm0[1,0,3,2]
 ; X64-NEXT:    pand xmm0, xmm1
 ; X64-NEXT:    pand xmm0, xmmword ptr <icmp_eq_v2i64_0+0x25>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -429,11 +415,10 @@ define <8 x i8> @icmp_ne_v8i8(<8 x i8> %a, <8 x i8> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pcmpeqb xmm0, xmm1
 ; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_ne_v8i8+0x18>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -458,12 +443,11 @@ define <8 x i8> @icmp_ne_v8i8_0(<8 x i8> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm1, xmm1
 ; X64-NEXT:    pcmpeqb xmm0, xmm1
 ; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_ne_v8i8_0+0x1c>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -489,11 +473,10 @@ define <16 x i8> @icmp_ne_v16i8(<16 x i8> %a, <16 x i8> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pcmpeqb xmm0, xmm1
 ; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_ne_v16i8+0x18>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -518,12 +501,11 @@ define <16 x i8> @icmp_ne_v16i8_0(<16 x i8> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm1, xmm1
 ; X64-NEXT:    pcmpeqb xmm0, xmm1
 ; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_ne_v16i8_0+0x1c>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -549,11 +531,10 @@ define <4 x i16> @icmp_ne_v4i16(<4 x i16> %a, <4 x i16> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pcmpeqw xmm0, xmm1
 ; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_ne_v4i16+0x18>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -578,12 +559,11 @@ define <4 x i16> @icmp_ne_v4i16_0(<4 x i16> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm1, xmm1
 ; X64-NEXT:    pcmpeqw xmm0, xmm1
 ; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_ne_v4i16_0+0x1c>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -609,11 +589,10 @@ define <8 x i16> @icmp_ne_v8i16(<8 x i16> %a, <8 x i16> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pcmpeqw xmm0, xmm1
 ; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_ne_v8i16+0x18>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -638,12 +617,11 @@ define <8 x i16> @icmp_ne_v8i16_0(<8 x i16> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm1, xmm1
 ; X64-NEXT:    pcmpeqw xmm0, xmm1
 ; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_ne_v8i16_0+0x1c>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -669,11 +647,10 @@ define <2 x i32> @icmp_ne_v2i32(<2 x i32> %a, <2 x i32> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pcmpeqd xmm0, xmm1
 ; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_ne_v2i32+0x18>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -698,12 +675,11 @@ define <2 x i32> @icmp_ne_v2i32_0(<2 x i32> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm1, xmm1
 ; X64-NEXT:    pcmpeqd xmm0, xmm1
 ; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_ne_v2i32_0+0x1c>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -729,11 +705,10 @@ define <4 x i32> @icmp_ne_v4i32(<4 x i32> %a, <4 x i32> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pcmpeqd xmm0, xmm1
 ; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_ne_v4i32+0x18>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -758,12 +733,11 @@ define <4 x i32> @icmp_ne_v4i32_0(<4 x i32> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm1, xmm1
 ; X64-NEXT:    pcmpeqd xmm0, xmm1
 ; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_ne_v4i32_0+0x1c>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -789,13 +763,12 @@ define <2 x i64> @icmp_ne_v2i64(<2 x i64> %a, <2 x i64> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pcmpeqd xmm0, xmm1
 ; X64-NEXT:    pshufd {{.*#+}} xmm1 = xmm0[1,0,3,2]
 ; X64-NEXT:    pand xmm0, xmm1
 ; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_ne_v2i64+0x21>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -821,14 +794,13 @@ define <2 x i64> @icmp_ne_v2i64_0(<2 x i64> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm1, xmm1
 ; X64-NEXT:    pcmpeqd xmm0, xmm1
 ; X64-NEXT:    pshufd {{.*#+}} xmm1 = xmm0[1,0,3,2]
 ; X64-NEXT:    pand xmm0, xmm1
 ; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_ne_v2i64_0+0x25>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -855,12 +827,11 @@ define <8 x i8> @icmp_ugt_v8i8(<8 x i8> %a, <8 x i8> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pminub xmm1, xmm0
 ; X64-NEXT:    pcmpeqb xmm0, xmm1
 ; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_ugt_v8i8+0x1c>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -885,13 +856,12 @@ define <8 x i8> @icmp_ugt_v8i8_0(<8 x i8> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm1, xmm1
 ; X64-NEXT:    pminub xmm1, xmm0
 ; X64-NEXT:    pcmpeqb xmm0, xmm1
 ; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_ugt_v8i8_0+0x20>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -917,12 +887,11 @@ define <16 x i8> @icmp_ugt_v16i8(<16 x i8> %a, <16 x i8> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pminub xmm1, xmm0
 ; X64-NEXT:    pcmpeqb xmm0, xmm1
 ; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_ugt_v16i8+0x1c>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -947,13 +916,12 @@ define <16 x i8> @icmp_ugt_v16i8_0(<16 x i8> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm1, xmm1
 ; X64-NEXT:    pminub xmm1, xmm0
 ; X64-NEXT:    pcmpeqb xmm0, xmm1
 ; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_ugt_v16i8_0+0x20>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -979,14 +947,13 @@ define <4 x i16> @icmp_ugt_v4i16(<4 x i16> %a, <4 x i16> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movdqa xmm2, xmmword ptr <icmp_ugt_v4i16+0x14>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    pxor xmm1, xmm2
 ; X64-NEXT:    pxor xmm0, xmm2
 ; X64-NEXT:    pcmpgtw xmm0, xmm1
 ; X64-NEXT:    psrlw xmm0, 0xf
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -1011,7 +978,7 @@ define <4 x i16> @icmp_ugt_v4i16_0(<4 x i16> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movdqa xmm1, xmmword ptr <icmp_ugt_v4i16_0+0x14>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    pxor xmm2, xmm2
@@ -1019,7 +986,6 @@ define <4 x i16> @icmp_ugt_v4i16_0(<4 x i16> %a) {
 ; X64-NEXT:    pxor xmm0, xmm1
 ; X64-NEXT:    pcmpgtw xmm0, xmm2
 ; X64-NEXT:    psrlw xmm0, 0xf
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -1045,14 +1011,13 @@ define <8 x i16> @icmp_ugt_v8i16(<8 x i16> %a, <8 x i16> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movdqa xmm2, xmmword ptr <icmp_ugt_v8i16+0x14>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    pxor xmm1, xmm2
 ; X64-NEXT:    pxor xmm0, xmm2
 ; X64-NEXT:    pcmpgtw xmm0, xmm1
 ; X64-NEXT:    psrlw xmm0, 0xf
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -1077,7 +1042,7 @@ define <8 x i16> @icmp_ugt_v8i16_0(<8 x i16> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movdqa xmm1, xmmword ptr <icmp_ugt_v8i16_0+0x14>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    pxor xmm2, xmm2
@@ -1085,7 +1050,6 @@ define <8 x i16> @icmp_ugt_v8i16_0(<8 x i16> %a) {
 ; X64-NEXT:    pxor xmm0, xmm1
 ; X64-NEXT:    pcmpgtw xmm0, xmm2
 ; X64-NEXT:    psrlw xmm0, 0xf
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -1111,14 +1075,13 @@ define <2 x i32> @icmp_ugt_v2i32(<2 x i32> %a, <2 x i32> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movdqa xmm2, xmmword ptr <icmp_ugt_v2i32+0x14>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    pxor xmm1, xmm2
 ; X64-NEXT:    pxor xmm0, xmm2
 ; X64-NEXT:    pcmpgtd xmm0, xmm1
 ; X64-NEXT:    psrld xmm0, 0x1f
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -1143,7 +1106,7 @@ define <2 x i32> @icmp_ugt_v2i32_0(<2 x i32> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movdqa xmm1, xmmword ptr <icmp_ugt_v2i32_0+0x14>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    pxor xmm2, xmm2
@@ -1151,7 +1114,6 @@ define <2 x i32> @icmp_ugt_v2i32_0(<2 x i32> %a) {
 ; X64-NEXT:    pxor xmm0, xmm1
 ; X64-NEXT:    pcmpgtd xmm0, xmm2
 ; X64-NEXT:    psrld xmm0, 0x1f
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -1177,14 +1139,13 @@ define <4 x i32> @icmp_ugt_v4i32(<4 x i32> %a, <4 x i32> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movdqa xmm2, xmmword ptr <icmp_ugt_v4i32+0x14>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    pxor xmm1, xmm2
 ; X64-NEXT:    pxor xmm0, xmm2
 ; X64-NEXT:    pcmpgtd xmm0, xmm1
 ; X64-NEXT:    psrld xmm0, 0x1f
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -1209,7 +1170,7 @@ define <4 x i32> @icmp_ugt_v4i32_0(<4 x i32> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movdqa xmm1, xmmword ptr <icmp_ugt_v4i32_0+0x14>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    pxor xmm2, xmm2
@@ -1217,7 +1178,6 @@ define <4 x i32> @icmp_ugt_v4i32_0(<4 x i32> %a) {
 ; X64-NEXT:    pxor xmm0, xmm1
 ; X64-NEXT:    pcmpgtd xmm0, xmm2
 ; X64-NEXT:    psrld xmm0, 0x1f
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -1243,7 +1203,7 @@ define <2 x i64> @icmp_ugt_v2i64(<2 x i64> %a, <2 x i64> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movdqa xmm2, xmmword ptr <icmp_ugt_v2i64+0x14>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    pxor xmm1, xmm2
@@ -1257,7 +1217,6 @@ define <2 x i64> @icmp_ugt_v2i64(<2 x i64> %a, <2 x i64> %b) {
 ; X64-NEXT:    por xmm0, xmm1
 ; X64-NEXT:    pand xmm0, xmmword ptr <icmp_ugt_v2i64+0x42>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -1283,7 +1242,7 @@ define <2 x i64> @icmp_ugt_v2i64_0(<2 x i64> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movdqa xmm1, xmmword ptr <icmp_ugt_v2i64_0+0x14>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    pxor xmm2, xmm2
@@ -1298,7 +1257,6 @@ define <2 x i64> @icmp_ugt_v2i64_0(<2 x i64> %a) {
 ; X64-NEXT:    por xmm0, xmm2
 ; X64-NEXT:    pand xmm0, xmmword ptr <icmp_ugt_v2i64_0+0x46>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -1325,12 +1283,11 @@ define <8 x i8> @icmp_uge_v8i8(<8 x i8> %a, <8 x i8> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pmaxub xmm1, xmm0
 ; X64-NEXT:    pcmpeqb xmm0, xmm1
 ; X64-NEXT:    pand xmm0, xmmword ptr <icmp_uge_v8i8+0x1c>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -1355,13 +1312,12 @@ define <8 x i8> @icmp_uge_v8i8_0(<8 x i8> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm1, xmm1
 ; X64-NEXT:    pmaxub xmm1, xmm0
 ; X64-NEXT:    pcmpeqb xmm0, xmm1
 ; X64-NEXT:    pand xmm0, xmmword ptr <icmp_uge_v8i8_0+0x20>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -1387,12 +1343,11 @@ define <16 x i8> @icmp_uge_v16i8(<16 x i8> %a, <16 x i8> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pmaxub xmm1, xmm0
 ; X64-NEXT:    pcmpeqb xmm0, xmm1
 ; X64-NEXT:    pand xmm0, xmmword ptr <icmp_uge_v16i8+0x1c>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -1417,13 +1372,12 @@ define <16 x i8> @icmp_uge_v16i8_0(<16 x i8> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm1, xmm1
 ; X64-NEXT:    pmaxub xmm1, xmm0
 ; X64-NEXT:    pcmpeqb xmm0, xmm1
 ; X64-NEXT:    pand xmm0, xmmword ptr <icmp_uge_v16i8_0+0x20>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -1449,12 +1403,11 @@ define <4 x i16> @icmp_uge_v4i16(<4 x i16> %a, <4 x i16> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    psubusw xmm1, xmm0
 ; X64-NEXT:    pxor xmm0, xmm0
 ; X64-NEXT:    pcmpeqw xmm0, xmm1
 ; X64-NEXT:    psrlw xmm0, 0xf
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -1479,13 +1432,12 @@ define <4 x i16> @icmp_uge_v4i16_0(<4 x i16> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm1, xmm1
 ; X64-NEXT:    psubusw xmm1, xmm0
 ; X64-NEXT:    pxor xmm0, xmm0
 ; X64-NEXT:    pcmpeqw xmm0, xmm1
 ; X64-NEXT:    psrlw xmm0, 0xf
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -1511,12 +1463,11 @@ define <8 x i16> @icmp_uge_v8i16(<8 x i16> %a, <8 x i16> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    psubusw xmm1, xmm0
 ; X64-NEXT:    pxor xmm0, xmm0
 ; X64-NEXT:    pcmpeqw xmm0, xmm1
 ; X64-NEXT:    psrlw xmm0, 0xf
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -1541,13 +1492,12 @@ define <8 x i16> @icmp_uge_v8i16_0(<8 x i16> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm1, xmm1
 ; X64-NEXT:    psubusw xmm1, xmm0
 ; X64-NEXT:    pxor xmm0, xmm0
 ; X64-NEXT:    pcmpeqw xmm0, xmm1
 ; X64-NEXT:    psrlw xmm0, 0xf
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -1573,7 +1523,7 @@ define <2 x i32> @icmp_uge_v2i32(<2 x i32> %a, <2 x i32> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movdqa xmm2, xmmword ptr <icmp_uge_v2i32+0x14>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    pxor xmm0, xmm2
@@ -1582,7 +1532,6 @@ define <2 x i32> @icmp_uge_v2i32(<2 x i32> %a, <2 x i32> %b) {
 ; X64-NEXT:    pandn xmm2, xmmword ptr <icmp_uge_v2i32+0x28>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    movapd xmm0, xmm2
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -1607,7 +1556,7 @@ define <2 x i32> @icmp_uge_v2i32_0(<2 x i32> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movdqa xmm1, xmmword ptr <icmp_uge_v2i32_0+0x14>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    pxor xmm0, xmm1
@@ -1617,7 +1566,6 @@ define <2 x i32> @icmp_uge_v2i32_0(<2 x i32> %a) {
 ; X64-NEXT:    pandn xmm1, xmmword ptr <icmp_uge_v2i32_0+0x2c>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    movapd xmm0, xmm1
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -1643,7 +1591,7 @@ define <4 x i32> @icmp_uge_v4i32(<4 x i32> %a, <4 x i32> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movdqa xmm2, xmmword ptr <icmp_uge_v4i32+0x14>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    pxor xmm0, xmm2
@@ -1652,7 +1600,6 @@ define <4 x i32> @icmp_uge_v4i32(<4 x i32> %a, <4 x i32> %b) {
 ; X64-NEXT:    pandn xmm2, xmmword ptr <icmp_uge_v4i32+0x28>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    movapd xmm0, xmm2
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -1677,7 +1624,7 @@ define <4 x i32> @icmp_uge_v4i32_0(<4 x i32> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movdqa xmm1, xmmword ptr <icmp_uge_v4i32_0+0x14>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    pxor xmm0, xmm1
@@ -1687,7 +1634,6 @@ define <4 x i32> @icmp_uge_v4i32_0(<4 x i32> %a) {
 ; X64-NEXT:    pandn xmm1, xmmword ptr <icmp_uge_v4i32_0+0x2c>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    movapd xmm0, xmm1
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -1713,7 +1659,7 @@ define <2 x i64> @icmp_uge_v2i64(<2 x i64> %a, <2 x i64> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movdqa xmm2, xmmword ptr <icmp_uge_v2i64+0x14>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    pxor xmm0, xmm2
@@ -1727,7 +1673,6 @@ define <2 x i64> @icmp_uge_v2i64(<2 x i64> %a, <2 x i64> %b) {
 ; X64-NEXT:    por xmm0, xmm1
 ; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_uge_v2i64+0x42>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -1753,7 +1698,7 @@ define <2 x i64> @icmp_uge_v2i64_0(<2 x i64> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movdqa xmm1, xmmword ptr <icmp_uge_v2i64_0+0x14>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    pxor xmm0, xmm1
@@ -1768,7 +1713,6 @@ define <2 x i64> @icmp_uge_v2i64_0(<2 x i64> %a) {
 ; X64-NEXT:    por xmm0, xmm2
 ; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_uge_v2i64_0+0x46>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -1795,12 +1739,11 @@ define <8 x i8> @icmp_ult_v8i8(<8 x i8> %a, <8 x i8> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pmaxub xmm1, xmm0
 ; X64-NEXT:    pcmpeqb xmm0, xmm1
 ; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_ult_v8i8+0x1c>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -1826,13 +1769,12 @@ define <8 x i8> @icmp_ult_v8i8_0(<8 x i8> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm1, xmm1
 ; X64-NEXT:    pmaxub xmm1, xmm0
 ; X64-NEXT:    pcmpeqb xmm0, xmm1
 ; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_ult_v8i8_0+0x20>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -1859,12 +1801,11 @@ define <16 x i8> @icmp_ult_v16i8(<16 x i8> %a, <16 x i8> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pmaxub xmm1, xmm0
 ; X64-NEXT:    pcmpeqb xmm0, xmm1
 ; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_ult_v16i8+0x1c>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -1890,13 +1831,12 @@ define <16 x i8> @icmp_ult_v16i8_0(<16 x i8> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm1, xmm1
 ; X64-NEXT:    pmaxub xmm1, xmm0
 ; X64-NEXT:    pcmpeqb xmm0, xmm1
 ; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_ult_v16i8_0+0x20>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -1923,7 +1863,7 @@ define <4 x i16> @icmp_ult_v4i16(<4 x i16> %a, <4 x i16> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movdqa xmm2, xmmword ptr <icmp_ult_v4i16+0x14>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    pxor xmm0, xmm2
@@ -1931,7 +1871,6 @@ define <4 x i16> @icmp_ult_v4i16(<4 x i16> %a, <4 x i16> %b) {
 ; X64-NEXT:    pcmpgtw xmm2, xmm0
 ; X64-NEXT:    psrlw xmm2, 0xf
 ; X64-NEXT:    movapd xmm0, xmm2
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -1957,7 +1896,7 @@ define <4 x i16> @icmp_ult_v4i16_0(<4 x i16> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movdqa xmm1, xmmword ptr <icmp_ult_v4i16_0+0x14>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    pxor xmm0, xmm1
@@ -1966,7 +1905,6 @@ define <4 x i16> @icmp_ult_v4i16_0(<4 x i16> %a) {
 ; X64-NEXT:    pcmpgtw xmm1, xmm0
 ; X64-NEXT:    psrlw xmm1, 0xf
 ; X64-NEXT:    movapd xmm0, xmm1
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -1993,7 +1931,7 @@ define <8 x i16> @icmp_ult_v8i16(<8 x i16> %a, <8 x i16> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movdqa xmm2, xmmword ptr <icmp_ult_v8i16+0x14>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    pxor xmm0, xmm2
@@ -2001,7 +1939,6 @@ define <8 x i16> @icmp_ult_v8i16(<8 x i16> %a, <8 x i16> %b) {
 ; X64-NEXT:    pcmpgtw xmm2, xmm0
 ; X64-NEXT:    psrlw xmm2, 0xf
 ; X64-NEXT:    movapd xmm0, xmm2
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -2027,7 +1964,7 @@ define <8 x i16> @icmp_ult_v8i16_0(<8 x i16> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movdqa xmm1, xmmword ptr <icmp_ult_v8i16_0+0x14>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    pxor xmm0, xmm1
@@ -2036,7 +1973,6 @@ define <8 x i16> @icmp_ult_v8i16_0(<8 x i16> %a) {
 ; X64-NEXT:    pcmpgtw xmm1, xmm0
 ; X64-NEXT:    psrlw xmm1, 0xf
 ; X64-NEXT:    movapd xmm0, xmm1
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -2063,7 +1999,7 @@ define <2 x i32> @icmp_ult_v2i32(<2 x i32> %a, <2 x i32> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movdqa xmm2, xmmword ptr <icmp_ult_v2i32+0x14>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    pxor xmm0, xmm2
@@ -2071,7 +2007,6 @@ define <2 x i32> @icmp_ult_v2i32(<2 x i32> %a, <2 x i32> %b) {
 ; X64-NEXT:    pcmpgtd xmm2, xmm0
 ; X64-NEXT:    psrld xmm2, 0x1f
 ; X64-NEXT:    movapd xmm0, xmm2
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -2097,7 +2032,7 @@ define <2 x i32> @icmp_ult_v2i32_0(<2 x i32> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movdqa xmm1, xmmword ptr <icmp_ult_v2i32_0+0x14>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    pxor xmm0, xmm1
@@ -2106,7 +2041,6 @@ define <2 x i32> @icmp_ult_v2i32_0(<2 x i32> %a) {
 ; X64-NEXT:    pcmpgtd xmm1, xmm0
 ; X64-NEXT:    psrld xmm1, 0x1f
 ; X64-NEXT:    movapd xmm0, xmm1
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -2133,7 +2067,7 @@ define <4 x i32> @icmp_ult_v4i32(<4 x i32> %a, <4 x i32> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movdqa xmm2, xmmword ptr <icmp_ult_v4i32+0x14>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    pxor xmm0, xmm2
@@ -2141,7 +2075,6 @@ define <4 x i32> @icmp_ult_v4i32(<4 x i32> %a, <4 x i32> %b) {
 ; X64-NEXT:    pcmpgtd xmm2, xmm0
 ; X64-NEXT:    psrld xmm2, 0x1f
 ; X64-NEXT:    movapd xmm0, xmm2
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -2167,7 +2100,7 @@ define <4 x i32> @icmp_ult_v4i32_0(<4 x i32> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movdqa xmm1, xmmword ptr <icmp_ult_v4i32_0+0x14>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    pxor xmm0, xmm1
@@ -2176,7 +2109,6 @@ define <4 x i32> @icmp_ult_v4i32_0(<4 x i32> %a) {
 ; X64-NEXT:    pcmpgtd xmm1, xmm0
 ; X64-NEXT:    psrld xmm1, 0x1f
 ; X64-NEXT:    movapd xmm0, xmm1
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -2203,7 +2135,7 @@ define <2 x i64> @icmp_ult_v2i64(<2 x i64> %a, <2 x i64> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movdqa xmm2, xmmword ptr <icmp_ult_v2i64+0x14>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    pxor xmm0, xmm2
@@ -2217,7 +2149,6 @@ define <2 x i64> @icmp_ult_v2i64(<2 x i64> %a, <2 x i64> %b) {
 ; X64-NEXT:    por xmm0, xmm1
 ; X64-NEXT:    pand xmm0, xmmword ptr <icmp_ult_v2i64+0x42>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -2244,7 +2175,7 @@ define <2 x i64> @icmp_ult_v2i64_0(<2 x i64> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movdqa xmm1, xmmword ptr <icmp_ult_v2i64_0+0x14>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    pxor xmm0, xmm1
@@ -2259,7 +2190,6 @@ define <2 x i64> @icmp_ult_v2i64_0(<2 x i64> %a) {
 ; X64-NEXT:    por xmm0, xmm2
 ; X64-NEXT:    pand xmm0, xmmword ptr <icmp_ult_v2i64_0+0x46>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -2287,12 +2217,11 @@ define <8 x i8> @icmp_ule_v8i8(<8 x i8> %a, <8 x i8> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pminub xmm1, xmm0
 ; X64-NEXT:    pcmpeqb xmm0, xmm1
 ; X64-NEXT:    pand xmm0, xmmword ptr <icmp_ule_v8i8+0x1c>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -2318,13 +2247,12 @@ define <8 x i8> @icmp_ule_v8i8_0(<8 x i8> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm1, xmm1
 ; X64-NEXT:    pminub xmm1, xmm0
 ; X64-NEXT:    pcmpeqb xmm0, xmm1
 ; X64-NEXT:    pand xmm0, xmmword ptr <icmp_ule_v8i8_0+0x20>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -2351,12 +2279,11 @@ define <16 x i8> @icmp_ule_v16i8(<16 x i8> %a, <16 x i8> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pminub xmm1, xmm0
 ; X64-NEXT:    pcmpeqb xmm0, xmm1
 ; X64-NEXT:    pand xmm0, xmmword ptr <icmp_ule_v16i8+0x1c>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -2382,13 +2309,12 @@ define <16 x i8> @icmp_ule_v16i8_0(<16 x i8> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm1, xmm1
 ; X64-NEXT:    pminub xmm1, xmm0
 ; X64-NEXT:    pcmpeqb xmm0, xmm1
 ; X64-NEXT:    pand xmm0, xmmword ptr <icmp_ule_v16i8_0+0x20>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -2415,12 +2341,11 @@ define <4 x i16> @icmp_ule_v4i16(<4 x i16> %a, <4 x i16> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    psubusw xmm0, xmm1
 ; X64-NEXT:    pxor xmm1, xmm1
 ; X64-NEXT:    pcmpeqw xmm0, xmm1
 ; X64-NEXT:    psrlw xmm0, 0xf
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -2446,13 +2371,12 @@ define <4 x i16> @icmp_ule_v4i16_0(<4 x i16> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm1, xmm1
 ; X64-NEXT:    psubusw xmm0, xmm1
 ; X64-NEXT:    pxor xmm1, xmm1
 ; X64-NEXT:    pcmpeqw xmm0, xmm1
 ; X64-NEXT:    psrlw xmm0, 0xf
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -2479,12 +2403,11 @@ define <8 x i16> @icmp_ule_v8i16(<8 x i16> %a, <8 x i16> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    psubusw xmm0, xmm1
 ; X64-NEXT:    pxor xmm1, xmm1
 ; X64-NEXT:    pcmpeqw xmm0, xmm1
 ; X64-NEXT:    psrlw xmm0, 0xf
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -2510,13 +2433,12 @@ define <8 x i16> @icmp_ule_v8i16_0(<8 x i16> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm1, xmm1
 ; X64-NEXT:    psubusw xmm0, xmm1
 ; X64-NEXT:    pxor xmm1, xmm1
 ; X64-NEXT:    pcmpeqw xmm0, xmm1
 ; X64-NEXT:    psrlw xmm0, 0xf
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -2543,7 +2465,7 @@ define <2 x i32> @icmp_ule_v2i32(<2 x i32> %a, <2 x i32> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movdqa xmm2, xmmword ptr <icmp_ule_v2i32+0x14>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    pxor xmm1, xmm2
@@ -2551,7 +2473,6 @@ define <2 x i32> @icmp_ule_v2i32(<2 x i32> %a, <2 x i32> %b) {
 ; X64-NEXT:    pcmpgtd xmm0, xmm1
 ; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_ule_v2i32+0x28>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -2577,7 +2498,7 @@ define <2 x i32> @icmp_ule_v2i32_0(<2 x i32> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movdqa xmm1, xmmword ptr <icmp_ule_v2i32_0+0x14>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    pxor xmm2, xmm2
@@ -2586,7 +2507,6 @@ define <2 x i32> @icmp_ule_v2i32_0(<2 x i32> %a) {
 ; X64-NEXT:    pcmpgtd xmm0, xmm2
 ; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_ule_v2i32_0+0x2c>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -2613,7 +2533,7 @@ define <4 x i32> @icmp_ule_v4i32(<4 x i32> %a, <4 x i32> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movdqa xmm2, xmmword ptr <icmp_ule_v4i32+0x14>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    pxor xmm1, xmm2
@@ -2621,7 +2541,6 @@ define <4 x i32> @icmp_ule_v4i32(<4 x i32> %a, <4 x i32> %b) {
 ; X64-NEXT:    pcmpgtd xmm0, xmm1
 ; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_ule_v4i32+0x28>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -2647,7 +2566,7 @@ define <4 x i32> @icmp_ule_v4i32_0(<4 x i32> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movdqa xmm1, xmmword ptr <icmp_ule_v4i32_0+0x14>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    pxor xmm2, xmm2
@@ -2656,7 +2575,6 @@ define <4 x i32> @icmp_ule_v4i32_0(<4 x i32> %a) {
 ; X64-NEXT:    pcmpgtd xmm0, xmm2
 ; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_ule_v4i32_0+0x2c>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -2683,7 +2601,7 @@ define <2 x i64> @icmp_ule_v2i64(<2 x i64> %a, <2 x i64> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movdqa xmm2, xmmword ptr <icmp_ule_v2i64+0x14>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    pxor xmm1, xmm2
@@ -2697,7 +2615,6 @@ define <2 x i64> @icmp_ule_v2i64(<2 x i64> %a, <2 x i64> %b) {
 ; X64-NEXT:    por xmm0, xmm1
 ; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_ule_v2i64+0x42>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -2724,7 +2641,7 @@ define <2 x i64> @icmp_ule_v2i64_0(<2 x i64> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movdqa xmm1, xmmword ptr <icmp_ule_v2i64_0+0x14>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    pxor xmm2, xmm2
@@ -2739,7 +2656,6 @@ define <2 x i64> @icmp_ule_v2i64_0(<2 x i64> %a) {
 ; X64-NEXT:    por xmm0, xmm2
 ; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_ule_v2i64_0+0x46>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -2767,11 +2683,10 @@ define <8 x i8> @icmp_sgt_v8i8(<8 x i8> %a, <8 x i8> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pcmpgtb xmm0, xmm1
 ; X64-NEXT:    pand xmm0, xmmword ptr <icmp_sgt_v8i8+0x18>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -2796,12 +2711,11 @@ define <8 x i8> @icmp_sgt_v8i8_0(<8 x i8> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm1, xmm1
 ; X64-NEXT:    pcmpgtb xmm0, xmm1
 ; X64-NEXT:    pand xmm0, xmmword ptr <icmp_sgt_v8i8_0+0x1c>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -2827,11 +2741,10 @@ define <16 x i8> @icmp_sgt_v16i8(<16 x i8> %a, <16 x i8> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pcmpgtb xmm0, xmm1
 ; X64-NEXT:    pand xmm0, xmmword ptr <icmp_sgt_v16i8+0x18>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -2856,12 +2769,11 @@ define <16 x i8> @icmp_sgt_v16i8_0(<16 x i8> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm1, xmm1
 ; X64-NEXT:    pcmpgtb xmm0, xmm1
 ; X64-NEXT:    pand xmm0, xmmword ptr <icmp_sgt_v16i8_0+0x1c>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -2887,10 +2799,9 @@ define <4 x i16> @icmp_sgt_v4i16(<4 x i16> %a, <4 x i16> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pcmpgtw xmm0, xmm1
 ; X64-NEXT:    psrlw xmm0, 0xf
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -2915,11 +2826,10 @@ define <4 x i16> @icmp_sgt_v4i16_0(<4 x i16> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm1, xmm1
 ; X64-NEXT:    pcmpgtw xmm0, xmm1
 ; X64-NEXT:    psrlw xmm0, 0xf
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -2945,10 +2855,9 @@ define <8 x i16> @icmp_sgt_v8i16(<8 x i16> %a, <8 x i16> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pcmpgtw xmm0, xmm1
 ; X64-NEXT:    psrlw xmm0, 0xf
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -2973,11 +2882,10 @@ define <8 x i16> @icmp_sgt_v8i16_0(<8 x i16> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm1, xmm1
 ; X64-NEXT:    pcmpgtw xmm0, xmm1
 ; X64-NEXT:    psrlw xmm0, 0xf
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -3003,10 +2911,9 @@ define <2 x i32> @icmp_sgt_v2i32(<2 x i32> %a, <2 x i32> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pcmpgtd xmm0, xmm1
 ; X64-NEXT:    psrld xmm0, 0x1f
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -3031,11 +2938,10 @@ define <2 x i32> @icmp_sgt_v2i32_0(<2 x i32> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm1, xmm1
 ; X64-NEXT:    pcmpgtd xmm0, xmm1
 ; X64-NEXT:    psrld xmm0, 0x1f
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -3061,10 +2967,9 @@ define <4 x i32> @icmp_sgt_v4i32(<4 x i32> %a, <4 x i32> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pcmpgtd xmm0, xmm1
 ; X64-NEXT:    psrld xmm0, 0x1f
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -3089,11 +2994,10 @@ define <4 x i32> @icmp_sgt_v4i32_0(<4 x i32> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm1, xmm1
 ; X64-NEXT:    pcmpgtd xmm0, xmm1
 ; X64-NEXT:    psrld xmm0, 0x1f
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -3119,7 +3023,7 @@ define <2 x i64> @icmp_sgt_v2i64(<2 x i64> %a, <2 x i64> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movdqa xmm2, xmmword ptr <icmp_sgt_v2i64+0x14>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    pxor xmm1, xmm2
@@ -3133,7 +3037,6 @@ define <2 x i64> @icmp_sgt_v2i64(<2 x i64> %a, <2 x i64> %b) {
 ; X64-NEXT:    por xmm0, xmm1
 ; X64-NEXT:    pand xmm0, xmmword ptr <icmp_sgt_v2i64+0x42>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -3159,7 +3062,7 @@ define <2 x i64> @icmp_sgt_v2i64_0(<2 x i64> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movdqa xmm1, xmmword ptr <icmp_sgt_v2i64_0+0x14>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    pxor xmm2, xmm2
@@ -3174,7 +3077,6 @@ define <2 x i64> @icmp_sgt_v2i64_0(<2 x i64> %a) {
 ; X64-NEXT:    por xmm0, xmm2
 ; X64-NEXT:    pand xmm0, xmmword ptr <icmp_sgt_v2i64_0+0x46>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -3201,12 +3103,11 @@ define <8 x i8> @icmp_sge_v8i8(<8 x i8> %a, <8 x i8> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pcmpgtb xmm1, xmm0
 ; X64-NEXT:    pandn xmm1, xmmword ptr <icmp_sge_v8i8+0x18>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    movapd xmm0, xmm1
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -3231,13 +3132,12 @@ define <8 x i8> @icmp_sge_v8i8_0(<8 x i8> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm1, xmm1
 ; X64-NEXT:    pcmpgtb xmm1, xmm0
 ; X64-NEXT:    pandn xmm1, xmmword ptr <icmp_sge_v8i8_0+0x1c>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    movapd xmm0, xmm1
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -3263,12 +3163,11 @@ define <16 x i8> @icmp_sge_v16i8(<16 x i8> %a, <16 x i8> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pcmpgtb xmm1, xmm0
 ; X64-NEXT:    pandn xmm1, xmmword ptr <icmp_sge_v16i8+0x18>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    movapd xmm0, xmm1
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -3293,13 +3192,12 @@ define <16 x i8> @icmp_sge_v16i8_0(<16 x i8> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm1, xmm1
 ; X64-NEXT:    pcmpgtb xmm1, xmm0
 ; X64-NEXT:    pandn xmm1, xmmword ptr <icmp_sge_v16i8_0+0x1c>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    movapd xmm0, xmm1
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -3325,12 +3223,11 @@ define <4 x i16> @icmp_sge_v4i16(<4 x i16> %a, <4 x i16> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pcmpgtw xmm1, xmm0
 ; X64-NEXT:    pandn xmm1, xmmword ptr <icmp_sge_v4i16+0x18>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    movapd xmm0, xmm1
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -3355,13 +3252,12 @@ define <4 x i16> @icmp_sge_v4i16_0(<4 x i16> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm1, xmm1
 ; X64-NEXT:    pcmpgtw xmm1, xmm0
 ; X64-NEXT:    pandn xmm1, xmmword ptr <icmp_sge_v4i16_0+0x1c>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    movapd xmm0, xmm1
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -3387,12 +3283,11 @@ define <8 x i16> @icmp_sge_v8i16(<8 x i16> %a, <8 x i16> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pcmpgtw xmm1, xmm0
 ; X64-NEXT:    pandn xmm1, xmmword ptr <icmp_sge_v8i16+0x18>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    movapd xmm0, xmm1
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -3417,13 +3312,12 @@ define <8 x i16> @icmp_sge_v8i16_0(<8 x i16> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm1, xmm1
 ; X64-NEXT:    pcmpgtw xmm1, xmm0
 ; X64-NEXT:    pandn xmm1, xmmword ptr <icmp_sge_v8i16_0+0x1c>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    movapd xmm0, xmm1
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -3449,12 +3343,11 @@ define <2 x i32> @icmp_sge_v2i32(<2 x i32> %a, <2 x i32> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pcmpgtd xmm1, xmm0
 ; X64-NEXT:    pandn xmm1, xmmword ptr <icmp_sge_v2i32+0x18>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    movapd xmm0, xmm1
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -3479,13 +3372,12 @@ define <2 x i32> @icmp_sge_v2i32_0(<2 x i32> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm1, xmm1
 ; X64-NEXT:    pcmpgtd xmm1, xmm0
 ; X64-NEXT:    pandn xmm1, xmmword ptr <icmp_sge_v2i32_0+0x1c>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    movapd xmm0, xmm1
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -3511,12 +3403,11 @@ define <4 x i32> @icmp_sge_v4i32(<4 x i32> %a, <4 x i32> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pcmpgtd xmm1, xmm0
 ; X64-NEXT:    pandn xmm1, xmmword ptr <icmp_sge_v4i32+0x18>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    movapd xmm0, xmm1
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -3541,13 +3432,12 @@ define <4 x i32> @icmp_sge_v4i32_0(<4 x i32> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm1, xmm1
 ; X64-NEXT:    pcmpgtd xmm1, xmm0
 ; X64-NEXT:    pandn xmm1, xmmword ptr <icmp_sge_v4i32_0+0x1c>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    movapd xmm0, xmm1
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -3573,7 +3463,7 @@ define <2 x i64> @icmp_sge_v2i64(<2 x i64> %a, <2 x i64> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movdqa xmm2, xmmword ptr <icmp_sge_v2i64+0x14>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    pxor xmm0, xmm2
@@ -3587,7 +3477,6 @@ define <2 x i64> @icmp_sge_v2i64(<2 x i64> %a, <2 x i64> %b) {
 ; X64-NEXT:    por xmm0, xmm1
 ; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_sge_v2i64+0x42>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -3613,7 +3502,7 @@ define <2 x i64> @icmp_sge_v2i64_0(<2 x i64> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movdqa xmm1, xmmword ptr <icmp_sge_v2i64_0+0x14>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    pxor xmm0, xmm1
@@ -3628,7 +3517,6 @@ define <2 x i64> @icmp_sge_v2i64_0(<2 x i64> %a) {
 ; X64-NEXT:    por xmm0, xmm2
 ; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_sge_v2i64_0+0x46>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -3655,12 +3543,11 @@ define <8 x i8> @icmp_slt_v8i8(<8 x i8> %a, <8 x i8> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pcmpgtb xmm1, xmm0
 ; X64-NEXT:    pand xmm1, xmmword ptr <icmp_slt_v8i8+0x18>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    movapd xmm0, xmm1
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -3686,13 +3573,12 @@ define <8 x i8> @icmp_slt_v8i8_0(<8 x i8> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm1, xmm1
 ; X64-NEXT:    pcmpgtb xmm1, xmm0
 ; X64-NEXT:    pand xmm1, xmmword ptr <icmp_slt_v8i8_0+0x1c>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    movapd xmm0, xmm1
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -3719,12 +3605,11 @@ define <16 x i8> @icmp_slt_v16i8(<16 x i8> %a, <16 x i8> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pcmpgtb xmm1, xmm0
 ; X64-NEXT:    pand xmm1, xmmword ptr <icmp_slt_v16i8+0x18>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    movapd xmm0, xmm1
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -3750,13 +3635,12 @@ define <16 x i8> @icmp_slt_v16i8_0(<16 x i8> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm1, xmm1
 ; X64-NEXT:    pcmpgtb xmm1, xmm0
 ; X64-NEXT:    pand xmm1, xmmword ptr <icmp_slt_v16i8_0+0x1c>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    movapd xmm0, xmm1
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -3783,11 +3667,10 @@ define <4 x i16> @icmp_slt_v4i16(<4 x i16> %a, <4 x i16> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pcmpgtw xmm1, xmm0
 ; X64-NEXT:    psrlw xmm1, 0xf
 ; X64-NEXT:    movapd xmm0, xmm1
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -3813,12 +3696,11 @@ define <4 x i16> @icmp_slt_v4i16_0(<4 x i16> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm1, xmm1
 ; X64-NEXT:    pcmpgtw xmm1, xmm0
 ; X64-NEXT:    psrlw xmm1, 0xf
 ; X64-NEXT:    movapd xmm0, xmm1
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -3845,11 +3727,10 @@ define <8 x i16> @icmp_slt_v8i16(<8 x i16> %a, <8 x i16> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pcmpgtw xmm1, xmm0
 ; X64-NEXT:    psrlw xmm1, 0xf
 ; X64-NEXT:    movapd xmm0, xmm1
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -3875,12 +3756,11 @@ define <8 x i16> @icmp_slt_v8i16_0(<8 x i16> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm1, xmm1
 ; X64-NEXT:    pcmpgtw xmm1, xmm0
 ; X64-NEXT:    psrlw xmm1, 0xf
 ; X64-NEXT:    movapd xmm0, xmm1
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -3907,11 +3787,10 @@ define <2 x i32> @icmp_slt_v2i32(<2 x i32> %a, <2 x i32> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pcmpgtd xmm1, xmm0
 ; X64-NEXT:    psrld xmm1, 0x1f
 ; X64-NEXT:    movapd xmm0, xmm1
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -3937,12 +3816,11 @@ define <2 x i32> @icmp_slt_v2i32_0(<2 x i32> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm1, xmm1
 ; X64-NEXT:    pcmpgtd xmm1, xmm0
 ; X64-NEXT:    psrld xmm1, 0x1f
 ; X64-NEXT:    movapd xmm0, xmm1
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -3969,11 +3847,10 @@ define <4 x i32> @icmp_slt_v4i32(<4 x i32> %a, <4 x i32> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pcmpgtd xmm1, xmm0
 ; X64-NEXT:    psrld xmm1, 0x1f
 ; X64-NEXT:    movapd xmm0, xmm1
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -3999,12 +3876,11 @@ define <4 x i32> @icmp_slt_v4i32_0(<4 x i32> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm1, xmm1
 ; X64-NEXT:    pcmpgtd xmm1, xmm0
 ; X64-NEXT:    psrld xmm1, 0x1f
 ; X64-NEXT:    movapd xmm0, xmm1
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -4031,7 +3907,7 @@ define <2 x i64> @icmp_slt_v2i64(<2 x i64> %a, <2 x i64> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movdqa xmm2, xmmword ptr <icmp_slt_v2i64+0x14>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    pxor xmm0, xmm2
@@ -4045,7 +3921,6 @@ define <2 x i64> @icmp_slt_v2i64(<2 x i64> %a, <2 x i64> %b) {
 ; X64-NEXT:    por xmm0, xmm1
 ; X64-NEXT:    pand xmm0, xmmword ptr <icmp_slt_v2i64+0x42>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -4072,7 +3947,7 @@ define <2 x i64> @icmp_slt_v2i64_0(<2 x i64> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movdqa xmm1, xmmword ptr <icmp_slt_v2i64_0+0x14>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    pxor xmm0, xmm1
@@ -4087,7 +3962,6 @@ define <2 x i64> @icmp_slt_v2i64_0(<2 x i64> %a) {
 ; X64-NEXT:    por xmm0, xmm2
 ; X64-NEXT:    pand xmm0, xmmword ptr <icmp_slt_v2i64_0+0x46>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -4115,11 +3989,10 @@ define <8 x i8> @icmp_sle_v8i8(<8 x i8> %a, <8 x i8> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pcmpgtb xmm0, xmm1
 ; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_sle_v8i8+0x18>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -4145,12 +4018,11 @@ define <8 x i8> @icmp_sle_v8i8_0(<8 x i8> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm1, xmm1
 ; X64-NEXT:    pcmpgtb xmm0, xmm1
 ; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_sle_v8i8_0+0x1c>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -4177,11 +4049,10 @@ define <16 x i8> @icmp_sle_v16i8(<16 x i8> %a, <16 x i8> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pcmpgtb xmm0, xmm1
 ; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_sle_v16i8+0x18>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -4207,12 +4078,11 @@ define <16 x i8> @icmp_sle_v16i8_0(<16 x i8> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm1, xmm1
 ; X64-NEXT:    pcmpgtb xmm0, xmm1
 ; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_sle_v16i8_0+0x1c>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -4239,11 +4109,10 @@ define <4 x i16> @icmp_sle_v4i16(<4 x i16> %a, <4 x i16> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pcmpgtw xmm0, xmm1
 ; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_sle_v4i16+0x18>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -4269,12 +4138,11 @@ define <4 x i16> @icmp_sle_v4i16_0(<4 x i16> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm1, xmm1
 ; X64-NEXT:    pcmpgtw xmm0, xmm1
 ; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_sle_v4i16_0+0x1c>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -4301,11 +4169,10 @@ define <8 x i16> @icmp_sle_v8i16(<8 x i16> %a, <8 x i16> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pcmpgtw xmm0, xmm1
 ; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_sle_v8i16+0x18>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -4331,12 +4198,11 @@ define <8 x i16> @icmp_sle_v8i16_0(<8 x i16> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm1, xmm1
 ; X64-NEXT:    pcmpgtw xmm0, xmm1
 ; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_sle_v8i16_0+0x1c>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -4363,11 +4229,10 @@ define <2 x i32> @icmp_sle_v2i32(<2 x i32> %a, <2 x i32> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pcmpgtd xmm0, xmm1
 ; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_sle_v2i32+0x18>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -4393,12 +4258,11 @@ define <2 x i32> @icmp_sle_v2i32_0(<2 x i32> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm1, xmm1
 ; X64-NEXT:    pcmpgtd xmm0, xmm1
 ; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_sle_v2i32_0+0x1c>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -4425,11 +4289,10 @@ define <4 x i32> @icmp_sle_v4i32(<4 x i32> %a, <4 x i32> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pcmpgtd xmm0, xmm1
 ; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_sle_v4i32+0x18>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -4455,12 +4318,11 @@ define <4 x i32> @icmp_sle_v4i32_0(<4 x i32> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pxor xmm1, xmm1
 ; X64-NEXT:    pcmpgtd xmm0, xmm1
 ; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_sle_v4i32_0+0x1c>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -4487,7 +4349,7 @@ define <2 x i64> @icmp_sle_v2i64(<2 x i64> %a, <2 x i64> %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movdqa xmm2, xmmword ptr <icmp_sle_v2i64+0x14>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    pxor xmm1, xmm2
@@ -4501,7 +4363,6 @@ define <2 x i64> @icmp_sle_v2i64(<2 x i64> %a, <2 x i64> %b) {
 ; X64-NEXT:    por xmm0, xmm1
 ; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_sle_v2i64+0x42>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -4528,7 +4389,7 @@ define <2 x i64> @icmp_sle_v2i64_0(<2 x i64> %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movdqa xmm1, xmmword ptr <icmp_sle_v2i64_0+0x14>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    pxor xmm2, xmm2
@@ -4543,7 +4404,6 @@ define <2 x i64> @icmp_sle_v2i64_0(<2 x i64> %a) {
 ; X64-NEXT:    por xmm0, xmm2
 ; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_sle_v2i64_0+0x46>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;

@@ -11,10 +11,9 @@ define ptr @ret_dec_glob_external() {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov rax, qword ptr <ret_dec_glob_external+0x13>
 ; X64-NEXT:     R_X86_64_GOTPCREL dec_glob_external-0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -39,10 +38,9 @@ define ptr @ret_dec_glob_external_dso_local() {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    lea rax, <ret_dec_glob_external_dso_local+0x13>
 ; X64-NEXT:     R_X86_64_PC32 dec_glob_external_dso_local-0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -67,10 +65,9 @@ define ptr @ret_dec_glob_extern_weak() {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov rax, qword ptr <ret_dec_glob_extern_weak+0x13>
 ; X64-NEXT:     R_X86_64_GOTPCREL dec_glob_extern_weak-0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -95,10 +92,9 @@ define ptr @ret_dec_glob_extern_weak_dso_local() {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov rax, qword ptr <ret_dec_glob_extern_weak_dso_local+0x13>
 ; X64-NEXT:     R_X86_64_GOTPCREL dec_glob_extern_weak_dso_local-0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -123,10 +119,9 @@ define ptr @ret_def_glob_external() {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov rax, qword ptr <ret_def_glob_external+0x13>
 ; X64-NEXT:     R_X86_64_GOTPCREL def_glob_external-0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -151,10 +146,9 @@ define ptr @ret_def_glob_external_dso_local() {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov rax, qword ptr <ret_def_glob_external_dso_local+0x13>
 ; X64-NEXT:     R_X86_64_GOTPCREL def_glob_external_dso_local-0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -179,10 +173,9 @@ define ptr @ret_def_glob_external_dso_local_hidden() {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    lea rax, <ret_def_glob_external_dso_local_hidden+0x13>
 ; X64-NEXT:     R_X86_64_PC32 def_glob_external_dso_local_hidden-0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -207,10 +200,9 @@ define ptr @ret_def_glob_private() {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    lea rax, <ret_def_glob_private+0x13>
 ; X64-NEXT:     R_X86_64_PC32 def_glob_private-0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -235,10 +227,9 @@ define ptr @ret_def_glob_private_dso_local() {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    lea rax, <ret_def_glob_private_dso_local+0x13>
 ; X64-NEXT:     R_X86_64_PC32 def_glob_private_dso_local-0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -263,10 +254,9 @@ define ptr @ret_def_glob_internal() {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    lea rax, <ret_def_glob_internal+0x13>
 ; X64-NEXT:     R_X86_64_PC32 def_glob_internal-0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -291,10 +281,9 @@ define ptr @ret_def_glob_internal_dso_local() {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    lea rax, <ret_def_glob_internal_dso_local+0x13>
 ; X64-NEXT:     R_X86_64_PC32 def_glob_internal_dso_local-0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -319,10 +308,9 @@ define ptr @ret_def_glob_available_externally() {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov rax, qword ptr <ret_def_glob_available_externally+0x13>
 ; X64-NEXT:     R_X86_64_GOTPCREL def_glob_available_externally-0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -347,10 +335,9 @@ define ptr @ret_def_glob_available_externally_dso_local() {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    lea rax, <ret_def_glob_available_externally_dso_local+0x13>
 ; X64-NEXT:     R_X86_64_PC32 def_glob_available_externally_dso_local-0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -375,10 +362,9 @@ define ptr @ret_def_glob_linkonce() {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov rax, qword ptr <ret_def_glob_linkonce+0x13>
 ; X64-NEXT:     R_X86_64_GOTPCREL def_glob_linkonce-0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -403,10 +389,9 @@ define ptr @ret_def_glob_linkonce_dso_local() {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    lea rax, <ret_def_glob_linkonce_dso_local+0x13>
 ; X64-NEXT:     R_X86_64_PC32 def_glob_linkonce_dso_local-0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -431,10 +416,9 @@ define ptr @ret_def_glob_weak() {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov rax, qword ptr <ret_def_glob_weak+0x13>
 ; X64-NEXT:     R_X86_64_GOTPCREL def_glob_weak-0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -459,10 +443,9 @@ define ptr @ret_def_glob_weak_dso_local() {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    lea rax, <ret_def_glob_weak_dso_local+0x13>
 ; X64-NEXT:     R_X86_64_PC32 def_glob_weak_dso_local-0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -487,10 +470,9 @@ define ptr @ret_def_glob_common() {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov rax, qword ptr <ret_def_glob_common+0x13>
 ; X64-NEXT:     R_X86_64_GOTPCREL def_glob_common-0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -515,10 +497,9 @@ define ptr @ret_def_glob_common_dso_local() {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    lea rax, <ret_def_glob_common_dso_local+0x13>
 ; X64-NEXT:     R_X86_64_PC32 def_glob_common_dso_local-0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -543,10 +524,9 @@ define ptr @ret_def_glob_linkonce_odr() {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov rax, qword ptr <ret_def_glob_linkonce_odr+0x13>
 ; X64-NEXT:     R_X86_64_GOTPCREL def_glob_linkonce_odr-0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -571,10 +551,9 @@ define ptr @ret_def_glob_linkonce_odr_dso_local() {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    lea rax, <ret_def_glob_linkonce_odr_dso_local+0x13>
 ; X64-NEXT:     R_X86_64_PC32 def_glob_linkonce_odr_dso_local-0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -599,10 +578,9 @@ define ptr @ret_def_glob_weak_odr() {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov rax, qword ptr <ret_def_glob_weak_odr+0x13>
 ; X64-NEXT:     R_X86_64_GOTPCREL def_glob_weak_odr-0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -627,10 +605,9 @@ define ptr @ret_def_glob_weak_odr_dso_local() {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    lea rax, <ret_def_glob_weak_odr_dso_local+0x13>
 ; X64-NEXT:     R_X86_64_PC32 def_glob_weak_odr_dso_local-0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;

@@ -11,16 +11,16 @@ define i32 @empty_switch(i32 %0) {
 ; X64:         0: 55 push rbp
 ; X64-NEXT:    1: 48 89 e5 mov rbp, rsp
 ; X64-NEXT:    4: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
-; X64-NEXT:    d: 48 81 ec 30 00 00 00 sub rsp, 0x30
+; X64-NEXT:    d: 0f 1f 80 00 00 00 00 nop dword ptr [rax]
 ; X64-NEXT:    14: e9 00 00 00 00 jmp <L0>
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    19: e9 00 00 00 00 jmp <L1>
 ; X64-NEXT:  <L1>:
 ; X64-NEXT:    1e: b8 ff ff ff ff mov eax, 0xffffffff
-; X64-NEXT:    23: 48 83 c4 30 add rsp, 0x30
-; X64-NEXT:    27: 5d pop rbp
-; X64-NEXT:    28: c3 ret
-; X64-NEXT:    29: 0f 1f 80 00 00 00 00 nop dword ptr [rax]
+; X64-NEXT:    23: 5d pop rbp
+; X64-NEXT:    24: c3 ret
+; X64-NEXT:    25: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
+; X64-NEXT:    2e: 66 90 nop
 ;
 ; ARM64-LABEL: <empty_switch>:
 ; ARM64:         sub sp, sp, #0xa0
@@ -44,7 +44,7 @@ define i32 @basic_switch(i32 %0) {
 ; X64:         30: 55 push rbp
 ; X64-NEXT:    31: 48 89 e5 mov rbp, rsp
 ; X64-NEXT:    34: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
-; X64-NEXT:    3d: 48 81 ec 30 00 00 00 sub rsp, 0x30
+; X64-NEXT:    3d: 0f 1f 80 00 00 00 00 nop dword ptr [rax]
 ; X64-NEXT:    44: 83 ff 00 cmp edi, 0x0
 ; X64-NEXT:    47: 0f 84 1c 00 00 00 je <L0>
 ; X64-NEXT:    4d: 83 ff 01 cmp edi, 0x1
@@ -53,41 +53,40 @@ define i32 @basic_switch(i32 %0) {
 ; X64-NEXT:    59: 0f 84 14 00 00 00 je <L2>
 ; X64-NEXT:    5f: e9 00 00 00 00 jmp <L3>
 ; X64-NEXT:  <L3>:
-; X64-NEXT:    64: e9 51 00 00 00 jmp <L4>
+; X64-NEXT:    64: e9 66 00 00 00 jmp <L4>
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    69: e9 0a 00 00 00 jmp <L5>
 ; X64-NEXT:  <L1>:
-; X64-NEXT:    6e: e9 19 00 00 00 jmp <L6>
+; X64-NEXT:    6e: e9 20 00 00 00 jmp <L6>
 ; X64-NEXT:  <L2>:
-; X64-NEXT:    73: e9 2b 00 00 00 jmp <L7>
+; X64-NEXT:    73: e9 39 00 00 00 jmp <L7>
 ; X64-NEXT:  <L5>:
 ; X64-NEXT:    78: 31 c0 xor eax, eax
-; X64-NEXT:    7a: 48 83 c4 30 add rsp, 0x30
-; X64-NEXT:    7e: 5d pop rbp
-; X64-NEXT:    7f: c3 ret
-; X64-NEXT:    80: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
-; X64-NEXT:    89: 0f 1f 00 nop dword ptr [rax]
+; X64-NEXT:    7a: 5d pop rbp
+; X64-NEXT:    7b: c3 ret
+; X64-NEXT:    7c: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
+; X64-NEXT:    85: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
+; X64-NEXT:    8e: 0f 1f 44 00 00 nop dword ptr [rax + rax]
 ; X64-NEXT:  <L6>:
-; X64-NEXT:    8c: b8 01 00 00 00 mov eax, 0x1
-; X64-NEXT:    91: 48 83 c4 30 add rsp, 0x30
-; X64-NEXT:    95: 5d pop rbp
-; X64-NEXT:    96: c3 ret
-; X64-NEXT:    97: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
-; X64-NEXT:    a0: 0f 1f 00 nop dword ptr [rax]
+; X64-NEXT:    93: b8 01 00 00 00 mov eax, 0x1
+; X64-NEXT:    98: 5d pop rbp
+; X64-NEXT:    99: c3 ret
+; X64-NEXT:    9a: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
+; X64-NEXT:    a3: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
+; X64-NEXT:    ac: 0f 1f 44 00 00 nop dword ptr [rax + rax]
 ; X64-NEXT:  <L7>:
-; X64-NEXT:    a3: b8 02 00 00 00 mov eax, 0x2
-; X64-NEXT:    a8: 48 83 c4 30 add rsp, 0x30
-; X64-NEXT:    ac: 5d pop rbp
-; X64-NEXT:    ad: c3 ret
-; X64-NEXT:    ae: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
-; X64-NEXT:    b7: 0f 1f 00 nop dword ptr [rax]
+; X64-NEXT:    b1: b8 02 00 00 00 mov eax, 0x2
+; X64-NEXT:    b6: 5d pop rbp
+; X64-NEXT:    b7: c3 ret
+; X64-NEXT:    b8: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
+; X64-NEXT:    c1: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
+; X64-NEXT:    ca: 0f 1f 44 00 00 nop dword ptr [rax + rax]
 ; X64-NEXT:  <L4>:
-; X64-NEXT:    ba: b8 ff ff ff ff mov eax, 0xffffffff
-; X64-NEXT:    bf: 48 83 c4 30 add rsp, 0x30
-; X64-NEXT:    c3: 5d pop rbp
-; X64-NEXT:    c4: c3 ret
-; X64-NEXT:    c5: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
-; X64-NEXT:    ce: 66 90 nop
+; X64-NEXT:    cf: b8 ff ff ff ff mov eax, 0xffffffff
+; X64-NEXT:    d4: 5d pop rbp
+; X64-NEXT:    d5: c3 ret
+; X64-NEXT:    d6: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
+; X64-NEXT:    df: 90 nop
 ;
 ; ARM64-LABEL: <basic_switch>:
 ; ARM64:         sub sp, sp, #0xa0
@@ -208,87 +207,85 @@ define i32 @switch_table(i32 %0) {
 ; x64:    1b3: c3 ret
 ; x64:     ...
 ; X64-LABEL: <switch_table>:
-; X64:         d0: 55 push rbp
-; X64-NEXT:    d1: 48 89 e5 mov rbp, rsp
-; X64-NEXT:    d4: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
-; X64-NEXT:    dd: 48 81 ec 30 00 00 00 sub rsp, 0x30
-; X64-NEXT:    e4: 83 ff 06 cmp edi, 0x6
-; X64-NEXT:    e7: 0f 87 2f 00 00 00 ja <L0>
-; X64-NEXT:    ed: 89 ff mov edi, edi
-; X64-NEXT:    ef: 48 8d 05 0a 00 00 00 lea rax, <switch_table+0x30>
-; X64-NEXT:    f6: 48 63 3c b8 movsxd rdi, dword ptr [rax + 4*rdi]
-; X64-NEXT:    fa: 48 01 f8 add rax, rdi
-; X64-NEXT:    fd: ff e0 jmp rax
-; X64-NEXT:    ff: 90 nop
-; X64-NEXT:    100: 21 00 and dword ptr [rax], eax
-; X64-NEXT:    102: 00 00 add byte ptr [rax], al
-; X64-NEXT:    104: 26 00 00 add byte ptr es:[rax], al
-; X64-NEXT:    107: 00 2b add byte ptr [rbx], ch
-; X64-NEXT:    109: 00 00 add byte ptr [rax], al
-; X64-NEXT:    10b: 00 1c 00 add byte ptr [rax + rax], bl
-; X64-NEXT:    10e: 00 00 add byte ptr [rax], al
-; X64-NEXT:    110: 30 00 xor byte ptr [rax], al
+; X64:         e0: 55 push rbp
+; X64-NEXT:    e1: 48 89 e5 mov rbp, rsp
+; X64-NEXT:    e4: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
+; X64-NEXT:    ed: 0f 1f 80 00 00 00 00 nop dword ptr [rax]
+; X64-NEXT:    f4: 83 ff 06 cmp edi, 0x6
+; X64-NEXT:    f7: 0f 87 2f 00 00 00 ja <L0>
+; X64-NEXT:    fd: 89 ff mov edi, edi
+; X64-NEXT:    ff: 48 8d 05 0a 00 00 00 lea rax, <switch_table+0x30>
+; X64-NEXT:    106: 48 63 3c b8 movsxd rdi, dword ptr [rax + 4*rdi]
+; X64-NEXT:    10a: 48 01 f8 add rax, rdi
+; X64-NEXT:    10d: ff e0 jmp rax
+; X64-NEXT:    10f: 90 nop
+; X64-NEXT:    110: 21 00 and dword ptr [rax], eax
 ; X64-NEXT:    112: 00 00 add byte ptr [rax], al
-; X64-NEXT:    114: 35 00 00 00 3a xor eax, 0x3a000000
+; X64-NEXT:    114: 26 00 00 add byte ptr es:[rax], al
+; X64-NEXT:    117: 00 2b add byte ptr [rbx], ch
 ; X64-NEXT:    119: 00 00 add byte ptr [rax], al
-; X64-NEXT:    11b: 00 e9 add cl, ch
-; X64-NEXT:    11d: a5 movsd dword ptr es:[rdi], dword ptr [rsi]
+; X64-NEXT:    11b: 00 1c 00 add byte ptr [rax + rax], bl
 ; X64-NEXT:    11e: 00 00 add byte ptr [rax], al
-; X64-NEXT:    120: 00 e9 add cl, ch
-; X64-NEXT:    122: 19 00 sbb dword ptr [rax], eax
-; X64-NEXT:    124: 00 00 add byte ptr [rax], al
-; X64-NEXT:    126: e9 28 00 00 00 jmp <L1>
-; X64-NEXT:    12b: e9 3a 00 00 00 jmp <L2>
-; X64-NEXT:    130: e9 4c 00 00 00 jmp <L3>
-; X64-NEXT:    135: e9 5e 00 00 00 jmp <L4>
-; X64-NEXT:    13a: e9 70 00 00 00 jmp <L5>
-; X64-NEXT:    13f: 31 c0 xor eax, eax
-; X64-NEXT:    141: 48 83 c4 30 add rsp, 0x30
-; X64-NEXT:    145: 5d pop rbp
-; X64-NEXT:    146: c3 ret
-; X64-NEXT:    147: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
-; X64-NEXT:    150: 0f 1f 00 nop dword ptr [rax]
+; X64-NEXT:    120: 30 00 xor byte ptr [rax], al
+; X64-NEXT:    122: 00 00 add byte ptr [rax], al
+; X64-NEXT:    124: 35 00 00 00 3a xor eax, 0x3a000000
+; X64-NEXT:    129: 00 00 add byte ptr [rax], al
+; X64-NEXT:    12b: 00 e9 add cl, ch
+; X64-NEXT:    12d: cf iretd
+; X64-NEXT:    12e: 00 00 add byte ptr [rax], al
+; X64-NEXT:    130: 00 e9 add cl, ch
+; X64-NEXT:    132: 19 00 sbb dword ptr [rax], eax
+; X64-NEXT:    134: 00 00 add byte ptr [rax], al
+; X64-NEXT:    136: e9 2f 00 00 00 jmp <L1>
+; X64-NEXT:    13b: e9 48 00 00 00 jmp <L2>
+; X64-NEXT:    140: e9 61 00 00 00 jmp <L3>
+; X64-NEXT:    145: e9 7a 00 00 00 jmp <L4>
+; X64-NEXT:    14a: e9 93 00 00 00 jmp <L5>
+; X64-NEXT:    14f: 31 c0 xor eax, eax
+; X64-NEXT:    151: 5d pop rbp
+; X64-NEXT:    152: c3 ret
+; X64-NEXT:    153: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
+; X64-NEXT:    15c: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
+; X64-NEXT:    165: 0f 1f 44 00 00 nop dword ptr [rax + rax]
 ; X64-NEXT:  <L1>:
-; X64-NEXT:    153: b8 01 00 00 00 mov eax, 0x1
-; X64-NEXT:    158: 48 83 c4 30 add rsp, 0x30
-; X64-NEXT:    15c: 5d pop rbp
-; X64-NEXT:    15d: c3 ret
-; X64-NEXT:    15e: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
-; X64-NEXT:    167: 0f 1f 00 nop dword ptr [rax]
+; X64-NEXT:    16a: b8 01 00 00 00 mov eax, 0x1
+; X64-NEXT:    16f: 5d pop rbp
+; X64-NEXT:    170: c3 ret
+; X64-NEXT:    171: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
+; X64-NEXT:    17a: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
+; X64-NEXT:    183: 0f 1f 44 00 00 nop dword ptr [rax + rax]
 ; X64-NEXT:  <L2>:
-; X64-NEXT:    16a: b8 02 00 00 00 mov eax, 0x2
-; X64-NEXT:    16f: 48 83 c4 30 add rsp, 0x30
-; X64-NEXT:    173: 5d pop rbp
-; X64-NEXT:    174: c3 ret
-; X64-NEXT:    175: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
-; X64-NEXT:    17e: 0f 1f 00 nop dword ptr [rax]
+; X64-NEXT:    188: b8 02 00 00 00 mov eax, 0x2
+; X64-NEXT:    18d: 5d pop rbp
+; X64-NEXT:    18e: c3 ret
+; X64-NEXT:    18f: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
+; X64-NEXT:    198: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
+; X64-NEXT:    1a1: 0f 1f 44 00 00 nop dword ptr [rax + rax]
 ; X64-NEXT:  <L3>:
-; X64-NEXT:    181: b8 04 00 00 00 mov eax, 0x4
-; X64-NEXT:    186: 48 83 c4 30 add rsp, 0x30
-; X64-NEXT:    18a: 5d pop rbp
-; X64-NEXT:    18b: c3 ret
-; X64-NEXT:    18c: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
-; X64-NEXT:    195: 0f 1f 00 nop dword ptr [rax]
+; X64-NEXT:    1a6: b8 04 00 00 00 mov eax, 0x4
+; X64-NEXT:    1ab: 5d pop rbp
+; X64-NEXT:    1ac: c3 ret
+; X64-NEXT:    1ad: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
+; X64-NEXT:    1b6: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
+; X64-NEXT:    1bf: 0f 1f 44 00 00 nop dword ptr [rax + rax]
 ; X64-NEXT:  <L4>:
-; X64-NEXT:    198: b8 05 00 00 00 mov eax, 0x5
-; X64-NEXT:    19d: 48 83 c4 30 add rsp, 0x30
-; X64-NEXT:    1a1: 5d pop rbp
-; X64-NEXT:    1a2: c3 ret
-; X64-NEXT:    1a3: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
-; X64-NEXT:    1ac: 0f 1f 00 nop dword ptr [rax]
+; X64-NEXT:    1c4: b8 05 00 00 00 mov eax, 0x5
+; X64-NEXT:    1c9: 5d pop rbp
+; X64-NEXT:    1ca: c3 ret
+; X64-NEXT:    1cb: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
+; X64-NEXT:    1d4: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
+; X64-NEXT:    1dd: 0f 1f 44 00 00 nop dword ptr [rax + rax]
 ; X64-NEXT:  <L5>:
-; X64-NEXT:    1af: b8 06 00 00 00 mov eax, 0x6
-; X64-NEXT:    1b4: 48 83 c4 30 add rsp, 0x30
-; X64-NEXT:    1b8: 5d pop rbp
-; X64-NEXT:    1b9: c3 ret
-; X64-NEXT:    1ba: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
-; X64-NEXT:    1c3: 0f 1f 00 nop dword ptr [rax]
-; X64-NEXT:    1c6: b8 ff ff ff ff mov eax, 0xffffffff
-; X64-NEXT:    1cb: 48 83 c4 30 add rsp, 0x30
-; X64-NEXT:    1cf: 5d pop rbp
-; X64-NEXT:    1d0: c3 ret
-; X64-NEXT:    1d1: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
-; X64-NEXT:    1da: 66 0f 1f 44 00 00 nop word ptr [rax + rax]
+; X64-NEXT:    1e2: b8 06 00 00 00 mov eax, 0x6
+; X64-NEXT:    1e7: 5d pop rbp
+; X64-NEXT:    1e8: c3 ret
+; X64-NEXT:    1e9: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
+; X64-NEXT:    1f2: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
+; X64-NEXT:    1fb: 0f 1f 44 00 00 nop dword ptr [rax + rax]
+; X64-NEXT:    200: b8 ff ff ff ff mov eax, 0xffffffff
+; X64-NEXT:    205: 5d pop rbp
+; X64-NEXT:    206: c3 ret
+; X64-NEXT:    207: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
 ;
 ; ARM64-LABEL: <switch_table>:
 ; ARM64:         sub sp, sp, #0xa0
@@ -377,86 +374,87 @@ default:
 
 define i32 @switch_table2(i32 %0) {
 ; X64-LABEL: <switch_table2>:
-; X64:         1e0: 55 push rbp
-; X64-NEXT:    1e1: 48 89 e5 mov rbp, rsp
-; X64-NEXT:    1e4: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
-; X64-NEXT:    1ed: 48 81 ec 30 00 00 00 sub rsp, 0x30
-; X64-NEXT:    1f4: 83 ff 03 cmp edi, 0x3
-; X64-NEXT:    1f7: 0f 82 3b 00 00 00 jb <L0>
-; X64-NEXT:    1fd: 83 ff 09 cmp edi, 0x9
-; X64-NEXT:    200: 0f 87 32 00 00 00 ja <L0>
-; X64-NEXT:    206: 89 ff mov edi, edi
-; X64-NEXT:    208: 48 83 ef 03 sub rdi, 0x3
-; X64-NEXT:    20c: 48 8d 05 09 00 00 00 lea rax, <switch_table2+0x3c>
-; X64-NEXT:    213: 48 63 3c b8 movsxd rdi, dword ptr [rax + 4*rdi]
-; X64-NEXT:    217: 48 01 f8 add rax, rdi
-; X64-NEXT:    21a: ff e0 jmp rax
-; X64-NEXT:    21c: 21 00 and dword ptr [rax], eax
-; X64-NEXT:    21e: 00 00 add byte ptr [rax], al
-; X64-NEXT:    220: 26 00 00 add byte ptr es:[rax], al
-; X64-NEXT:    223: 00 2b add byte ptr [rbx], ch
-; X64-NEXT:    225: 00 00 add byte ptr [rax], al
-; X64-NEXT:    227: 00 1c 00 add byte ptr [rax + rax], bl
-; X64-NEXT:    22a: 00 00 add byte ptr [rax], al
-; X64-NEXT:    22c: 30 00 xor byte ptr [rax], al
-; X64-NEXT:    22e: 00 00 add byte ptr [rax], al
-; X64-NEXT:    230: 35 00 00 00 3a xor eax, 0x3a000000
-; X64-NEXT:    235: 00 00 add byte ptr [rax], al
-; X64-NEXT:    237: 00 e9 add cl, ch
-; X64-NEXT:    239: a8 00 test al, 0x0
-; X64-NEXT:    23b: 00 00 add byte ptr [rax], al
-; X64-NEXT:    23d: e9 19 00 00 00 jmp <L1>
-; X64-NEXT:    242: e9 2b 00 00 00 jmp <L2>
-; X64-NEXT:    247: e9 3d 00 00 00 jmp <L3>
-; X64-NEXT:    24c: e9 4f 00 00 00 jmp <L4>
-; X64-NEXT:    251: e9 61 00 00 00 jmp <L5>
-; X64-NEXT:    256: e9 73 00 00 00 jmp <L6>
+; X64:         210: 55 push rbp
+; X64-NEXT:    211: 48 89 e5 mov rbp, rsp
+; X64-NEXT:    214: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
+; X64-NEXT:    21d: 0f 1f 80 00 00 00 00 nop dword ptr [rax]
+; X64-NEXT:    224: 83 ff 03 cmp edi, 0x3
+; X64-NEXT:    227: 0f 82 3b 00 00 00 jb <L0>
+; X64-NEXT:    22d: 83 ff 09 cmp edi, 0x9
+; X64-NEXT:    230: 0f 87 32 00 00 00 ja <L0>
+; X64-NEXT:    236: 89 ff mov edi, edi
+; X64-NEXT:    238: 48 83 ef 03 sub rdi, 0x3
+; X64-NEXT:    23c: 48 8d 05 09 00 00 00 lea rax, <switch_table2+0x3c>
+; X64-NEXT:    243: 48 63 3c b8 movsxd rdi, dword ptr [rax + 4*rdi]
+; X64-NEXT:    247: 48 01 f8 add rax, rdi
+; X64-NEXT:    24a: ff e0 jmp rax
+; X64-NEXT:    24c: 21 00 and dword ptr [rax], eax
+; X64-NEXT:    24e: 00 00 add byte ptr [rax], al
+; X64-NEXT:    250: 26 00 00 add byte ptr es:[rax], al
+; X64-NEXT:    253: 00 2b add byte ptr [rbx], ch
+; X64-NEXT:    255: 00 00 add byte ptr [rax], al
+; X64-NEXT:    257: 00 1c 00 add byte ptr [rax + rax], bl
+; X64-NEXT:    25a: 00 00 add byte ptr [rax], al
+; X64-NEXT:    25c: 30 00 xor byte ptr [rax], al
+; X64-NEXT:    25e: 00 00 add byte ptr [rax], al
+; X64-NEXT:    260: 35 00 00 00 3a xor eax, 0x3a000000
+; X64-NEXT:    265: 00 00 add byte ptr [rax], al
+; X64-NEXT:    267: 00 e9 add cl, ch
+; X64-NEXT:    269: d2 00 rol byte ptr [rax], cl
+; X64-NEXT:    26b: 00 00 add byte ptr [rax], al
+; X64-NEXT:    26d: e9 19 00 00 00 jmp <L1>
+; X64-NEXT:    272: e9 32 00 00 00 jmp <L2>
+; X64-NEXT:    277: e9 4b 00 00 00 jmp <L3>
+; X64-NEXT:    27c: e9 64 00 00 00 jmp <L4>
+; X64-NEXT:    281: e9 7d 00 00 00 jmp <L5>
+; X64-NEXT:    286: e9 96 00 00 00 jmp <L6>
 ; X64-NEXT:  <L1>:
-; X64-NEXT:    25b: b8 03 00 00 00 mov eax, 0x3
-; X64-NEXT:    260: 48 83 c4 30 add rsp, 0x30
-; X64-NEXT:    264: 5d pop rbp
-; X64-NEXT:    265: c3 ret
-; X64-NEXT:    266: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
-; X64-NEXT:    26f: 0f 1f 00 nop dword ptr [rax]
+; X64-NEXT:    28b: b8 03 00 00 00 mov eax, 0x3
+; X64-NEXT:    290: 5d pop rbp
+; X64-NEXT:    291: c3 ret
+; X64-NEXT:    292: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
+; X64-NEXT:    29b: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
+; X64-NEXT:    2a4: 0f 1f 44 00 00 nop dword ptr [rax + rax]
 ; X64-NEXT:  <L2>:
-; X64-NEXT:    272: b8 04 00 00 00 mov eax, 0x4
-; X64-NEXT:    277: 48 83 c4 30 add rsp, 0x30
-; X64-NEXT:    27b: 5d pop rbp
-; X64-NEXT:    27c: c3 ret
-; X64-NEXT:    27d: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
-; X64-NEXT:    286: 0f 1f 00 nop dword ptr [rax]
+; X64-NEXT:    2a9: b8 04 00 00 00 mov eax, 0x4
+; X64-NEXT:    2ae: 5d pop rbp
+; X64-NEXT:    2af: c3 ret
+; X64-NEXT:    2b0: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
+; X64-NEXT:    2b9: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
+; X64-NEXT:    2c2: 0f 1f 44 00 00 nop dword ptr [rax + rax]
 ; X64-NEXT:  <L3>:
-; X64-NEXT:    289: b8 05 00 00 00 mov eax, 0x5
-; X64-NEXT:    28e: 48 83 c4 30 add rsp, 0x30
-; X64-NEXT:    292: 5d pop rbp
-; X64-NEXT:    293: c3 ret
-; X64-NEXT:    294: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
-; X64-NEXT:    29d: 0f 1f 00 nop dword ptr [rax]
+; X64-NEXT:    2c7: b8 05 00 00 00 mov eax, 0x5
+; X64-NEXT:    2cc: 5d pop rbp
+; X64-NEXT:    2cd: c3 ret
+; X64-NEXT:    2ce: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
+; X64-NEXT:    2d7: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
+; X64-NEXT:    2e0: 0f 1f 44 00 00 nop dword ptr [rax + rax]
 ; X64-NEXT:  <L4>:
-; X64-NEXT:    2a0: b8 07 00 00 00 mov eax, 0x7
-; X64-NEXT:    2a5: 48 83 c4 30 add rsp, 0x30
-; X64-NEXT:    2a9: 5d pop rbp
-; X64-NEXT:    2aa: c3 ret
-; X64-NEXT:    2ab: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
-; X64-NEXT:    2b4: 0f 1f 00 nop dword ptr [rax]
+; X64-NEXT:    2e5: b8 07 00 00 00 mov eax, 0x7
+; X64-NEXT:    2ea: 5d pop rbp
+; X64-NEXT:    2eb: c3 ret
+; X64-NEXT:    2ec: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
+; X64-NEXT:    2f5: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
+; X64-NEXT:    2fe: 0f 1f 44 00 00 nop dword ptr [rax + rax]
 ; X64-NEXT:  <L5>:
-; X64-NEXT:    2b7: b8 08 00 00 00 mov eax, 0x8
-; X64-NEXT:    2bc: 48 83 c4 30 add rsp, 0x30
-; X64-NEXT:    2c0: 5d pop rbp
-; X64-NEXT:    2c1: c3 ret
-; X64-NEXT:    2c2: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
-; X64-NEXT:    2cb: 0f 1f 00 nop dword ptr [rax]
+; X64-NEXT:    303: b8 08 00 00 00 mov eax, 0x8
+; X64-NEXT:    308: 5d pop rbp
+; X64-NEXT:    309: c3 ret
+; X64-NEXT:    30a: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
+; X64-NEXT:    313: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
+; X64-NEXT:    31c: 0f 1f 44 00 00 nop dword ptr [rax + rax]
 ; X64-NEXT:  <L6>:
-; X64-NEXT:    2ce: b8 09 00 00 00 mov eax, 0x9
-; X64-NEXT:    2d3: 48 83 c4 30 add rsp, 0x30
-; X64-NEXT:    2d7: 5d pop rbp
-; X64-NEXT:    2d8: c3 ret
-; X64-NEXT:    2d9: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
-; X64-NEXT:    2e2: 0f 1f 00 nop dword ptr [rax]
-; X64-NEXT:    2e5: b8 ff ff ff ff mov eax, 0xffffffff
-; X64-NEXT:    2ea: 48 83 c4 30 add rsp, 0x30
-; X64-NEXT:    2ee: 5d pop rbp
-; X64-NEXT:    2ef: c3 ret
+; X64-NEXT:    321: b8 09 00 00 00 mov eax, 0x9
+; X64-NEXT:    326: 5d pop rbp
+; X64-NEXT:    327: c3 ret
+; X64-NEXT:    328: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
+; X64-NEXT:    331: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
+; X64-NEXT:    33a: 0f 1f 44 00 00 nop dword ptr [rax + rax]
+; X64-NEXT:    33f: b8 ff ff ff ff mov eax, 0xffffffff
+; X64-NEXT:    344: 5d pop rbp
+; X64-NEXT:    345: c3 ret
+; X64-NEXT:    346: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
+; X64-NEXT:    34f: 90 nop
 ;
 ; ARM64-LABEL: <switch_table2>:
 ; ARM64:         sub sp, sp, #0xa0
@@ -546,77 +544,76 @@ default:
 
 define i32 @switch_binsearch(i32 %0) {
 ; X64-LABEL: <switch_binsearch>:
-; X64:         2f0: 55 push rbp
-; X64-NEXT:    2f1: 48 89 e5 mov rbp, rsp
-; X64-NEXT:    2f4: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
-; X64-NEXT:    2fd: 48 81 ec 30 00 00 00 sub rsp, 0x30
-; X64-NEXT:    304: 83 ff 03 cmp edi, 0x3
-; X64-NEXT:    307: 0f 84 43 00 00 00 je <L0>
-; X64-NEXT:    30d: 0f 87 17 00 00 00 ja <L1>
-; X64-NEXT:    313: 83 ff 01 cmp edi, 0x1
-; X64-NEXT:    316: 0f 84 2a 00 00 00 je <L2>
-; X64-NEXT:    31c: 83 ff 02 cmp edi, 0x2
-; X64-NEXT:    31f: 0f 84 26 00 00 00 je <L3>
-; X64-NEXT:    325: e9 17 00 00 00 jmp <L4>
+; X64:         350: 55 push rbp
+; X64-NEXT:    351: 48 89 e5 mov rbp, rsp
+; X64-NEXT:    354: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
+; X64-NEXT:    35d: 0f 1f 80 00 00 00 00 nop dword ptr [rax]
+; X64-NEXT:    364: 83 ff 03 cmp edi, 0x3
+; X64-NEXT:    367: 0f 84 43 00 00 00 je <L0>
+; X64-NEXT:    36d: 0f 87 17 00 00 00 ja <L1>
+; X64-NEXT:    373: 83 ff 01 cmp edi, 0x1
+; X64-NEXT:    376: 0f 84 2a 00 00 00 je <L2>
+; X64-NEXT:    37c: 83 ff 02 cmp edi, 0x2
+; X64-NEXT:    37f: 0f 84 26 00 00 00 je <L3>
+; X64-NEXT:    385: e9 17 00 00 00 jmp <L4>
 ; X64-NEXT:  <L1>:
-; X64-NEXT:    32a: 83 ff 64 cmp edi, 0x64
-; X64-NEXT:    32d: 0f 84 22 00 00 00 je <L5>
-; X64-NEXT:    333: 83 ff 65 cmp edi, 0x65
-; X64-NEXT:    336: 0f 84 1e 00 00 00 je <L6>
-; X64-NEXT:    33c: e9 00 00 00 00 jmp <L4>
+; X64-NEXT:    38a: 83 ff 64 cmp edi, 0x64
+; X64-NEXT:    38d: 0f 84 22 00 00 00 je <L5>
+; X64-NEXT:    393: 83 ff 65 cmp edi, 0x65
+; X64-NEXT:    396: 0f 84 1e 00 00 00 je <L6>
+; X64-NEXT:    39c: e9 00 00 00 00 jmp <L4>
 ; X64-NEXT:  <L4>:
-; X64-NEXT:    341: e9 8c 00 00 00 jmp <L7>
+; X64-NEXT:    3a1: e9 af 00 00 00 jmp <L7>
 ; X64-NEXT:  <L2>:
-; X64-NEXT:    346: e9 14 00 00 00 jmp <L8>
+; X64-NEXT:    3a6: e9 14 00 00 00 jmp <L8>
 ; X64-NEXT:  <L3>:
-; X64-NEXT:    34b: e9 26 00 00 00 jmp <L9>
+; X64-NEXT:    3ab: e9 2d 00 00 00 jmp <L9>
 ; X64-NEXT:  <L0>:
-; X64-NEXT:    350: e9 38 00 00 00 jmp <L10>
+; X64-NEXT:    3b0: e9 46 00 00 00 jmp <L10>
 ; X64-NEXT:  <L5>:
-; X64-NEXT:    355: e9 4a 00 00 00 jmp <L11>
+; X64-NEXT:    3b5: e9 5f 00 00 00 jmp <L11>
 ; X64-NEXT:  <L6>:
-; X64-NEXT:    35a: e9 5c 00 00 00 jmp <L12>
+; X64-NEXT:    3ba: e9 78 00 00 00 jmp <L12>
 ; X64-NEXT:  <L8>:
-; X64-NEXT:    35f: b8 01 00 00 00 mov eax, 0x1
-; X64-NEXT:    364: 48 83 c4 30 add rsp, 0x30
-; X64-NEXT:    368: 5d pop rbp
-; X64-NEXT:    369: c3 ret
-; X64-NEXT:    36a: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
-; X64-NEXT:    373: 0f 1f 00 nop dword ptr [rax]
-; X64-NEXT:  <L9>:
-; X64-NEXT:    376: b8 02 00 00 00 mov eax, 0x2
-; X64-NEXT:    37b: 48 83 c4 30 add rsp, 0x30
-; X64-NEXT:    37f: 5d pop rbp
-; X64-NEXT:    380: c3 ret
-; X64-NEXT:    381: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
-; X64-NEXT:    38a: 0f 1f 00 nop dword ptr [rax]
-; X64-NEXT:  <L10>:
-; X64-NEXT:    38d: b8 03 00 00 00 mov eax, 0x3
-; X64-NEXT:    392: 48 83 c4 30 add rsp, 0x30
-; X64-NEXT:    396: 5d pop rbp
-; X64-NEXT:    397: c3 ret
-; X64-NEXT:    398: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
-; X64-NEXT:    3a1: 0f 1f 00 nop dword ptr [rax]
-; X64-NEXT:  <L11>:
-; X64-NEXT:    3a4: b8 64 00 00 00 mov eax, 0x64
-; X64-NEXT:    3a9: 48 83 c4 30 add rsp, 0x30
-; X64-NEXT:    3ad: 5d pop rbp
-; X64-NEXT:    3ae: c3 ret
-; X64-NEXT:    3af: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
-; X64-NEXT:    3b8: 0f 1f 00 nop dword ptr [rax]
-; X64-NEXT:  <L12>:
-; X64-NEXT:    3bb: b8 65 00 00 00 mov eax, 0x65
-; X64-NEXT:    3c0: 48 83 c4 30 add rsp, 0x30
+; X64-NEXT:    3bf: b8 01 00 00 00 mov eax, 0x1
 ; X64-NEXT:    3c4: 5d pop rbp
 ; X64-NEXT:    3c5: c3 ret
 ; X64-NEXT:    3c6: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
-; X64-NEXT:    3cf: 0f 1f 00 nop dword ptr [rax]
+; X64-NEXT:    3cf: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
+; X64-NEXT:    3d8: 0f 1f 44 00 00 nop dword ptr [rax + rax]
+; X64-NEXT:  <L9>:
+; X64-NEXT:    3dd: b8 02 00 00 00 mov eax, 0x2
+; X64-NEXT:    3e2: 5d pop rbp
+; X64-NEXT:    3e3: c3 ret
+; X64-NEXT:    3e4: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
+; X64-NEXT:    3ed: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
+; X64-NEXT:    3f6: 0f 1f 44 00 00 nop dword ptr [rax + rax]
+; X64-NEXT:  <L10>:
+; X64-NEXT:    3fb: b8 03 00 00 00 mov eax, 0x3
+; X64-NEXT:    400: 5d pop rbp
+; X64-NEXT:    401: c3 ret
+; X64-NEXT:    402: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
+; X64-NEXT:    40b: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
+; X64-NEXT:    414: 0f 1f 44 00 00 nop dword ptr [rax + rax]
+; X64-NEXT:  <L11>:
+; X64-NEXT:    419: b8 64 00 00 00 mov eax, 0x64
+; X64-NEXT:    41e: 5d pop rbp
+; X64-NEXT:    41f: c3 ret
+; X64-NEXT:    420: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
+; X64-NEXT:    429: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
+; X64-NEXT:    432: 0f 1f 44 00 00 nop dword ptr [rax + rax]
+; X64-NEXT:  <L12>:
+; X64-NEXT:    437: b8 65 00 00 00 mov eax, 0x65
+; X64-NEXT:    43c: 5d pop rbp
+; X64-NEXT:    43d: c3 ret
+; X64-NEXT:    43e: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
+; X64-NEXT:    447: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
+; X64-NEXT:    450: 0f 1f 44 00 00 nop dword ptr [rax + rax]
 ; X64-NEXT:  <L7>:
-; X64-NEXT:    3d2: b8 ff ff ff ff mov eax, 0xffffffff
-; X64-NEXT:    3d7: 48 83 c4 30 add rsp, 0x30
-; X64-NEXT:    3db: 5d pop rbp
-; X64-NEXT:    3dc: c3 ret
-; X64-NEXT:    3dd: 0f 1f 00 nop dword ptr [rax]
+; X64-NEXT:    455: b8 ff ff ff ff mov eax, 0xffffffff
+; X64-NEXT:    45a: 5d pop rbp
+; X64-NEXT:    45b: c3 ret
+; X64-NEXT:    45c: 0f 1f 40 00 nop dword ptr [rax]
 ;
 ; ARM64-LABEL: <switch_binsearch>:
 ; ARM64:         sub sp, sp, #0xa0
@@ -695,48 +692,46 @@ default:
 
 define i32 @switch_i32_noreuse(i32 %p) {
 ; X64-LABEL: <switch_i32_noreuse>:
-; X64:         3e0: 55 push rbp
-; X64-NEXT:    3e1: 48 89 e5 mov rbp, rsp
-; X64-NEXT:    3e4: 53 push rbx
-; X64-NEXT:    3e5: 0f 1f 84 00 00 00 00 00 nop dword ptr [rax + rax]
-; X64-NEXT:    3ed: 48 81 ec 28 00 00 00 sub rsp, 0x28
-; X64-NEXT:    3f4: 89 fb mov ebx, edi
-; X64-NEXT:    3f6: 89 d8 mov eax, ebx
-; X64-NEXT:    3f8: 83 f8 01 cmp eax, 0x1
-; X64-NEXT:    3fb: 0f 84 13 00 00 00 je <L0>
-; X64-NEXT:    401: 83 f8 02 cmp eax, 0x2
-; X64-NEXT:    404: 0f 84 0f 00 00 00 je <L1>
-; X64-NEXT:    40a: e9 00 00 00 00 jmp <L2>
+; X64:         460: 55 push rbp
+; X64-NEXT:    461: 48 89 e5 mov rbp, rsp
+; X64-NEXT:    464: 53 push rbx
+; X64-NEXT:    465: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
+; X64-NEXT:    46e: 66 0f 1f 44 00 00 nop word ptr [rax + rax]
+; X64-NEXT:    474: 89 fb mov ebx, edi
+; X64-NEXT:    476: 89 d8 mov eax, ebx
+; X64-NEXT:    478: 83 f8 01 cmp eax, 0x1
+; X64-NEXT:    47b: 0f 84 13 00 00 00 je <L0>
+; X64-NEXT:    481: 83 f8 02 cmp eax, 0x2
+; X64-NEXT:    484: 0f 84 0f 00 00 00 je <L1>
+; X64-NEXT:    48a: e9 00 00 00 00 jmp <L2>
 ; X64-NEXT:  <L2>:
-; X64-NEXT:    40f: e9 38 00 00 00 jmp <L3>
+; X64-NEXT:    48f: e9 46 00 00 00 jmp <L3>
 ; X64-NEXT:  <L0>:
-; X64-NEXT:    414: e9 05 00 00 00 jmp <L4>
+; X64-NEXT:    494: e9 05 00 00 00 jmp <L4>
 ; X64-NEXT:  <L1>:
-; X64-NEXT:    419: e9 17 00 00 00 jmp <L5>
+; X64-NEXT:    499: e9 1e 00 00 00 jmp <L5>
 ; X64-NEXT:  <L4>:
-; X64-NEXT:    41e: b8 01 00 00 00 mov eax, 0x1
-; X64-NEXT:    423: 48 83 c4 28 add rsp, 0x28
-; X64-NEXT:    427: 5b pop rbx
-; X64-NEXT:    428: 5d pop rbp
-; X64-NEXT:    429: c3 ret
-; X64-NEXT:    42a: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
-; X64-NEXT:    433: 66 90 nop
+; X64-NEXT:    49e: b8 01 00 00 00 mov eax, 0x1
+; X64-NEXT:    4a3: 5b pop rbx
+; X64-NEXT:    4a4: 5d pop rbp
+; X64-NEXT:    4a5: c3 ret
+; X64-NEXT:    4a6: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
+; X64-NEXT:    4af: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
+; X64-NEXT:    4b8: 0f 1f 40 00 nop dword ptr [rax]
 ; X64-NEXT:  <L5>:
-; X64-NEXT:    435: b8 02 00 00 00 mov eax, 0x2
-; X64-NEXT:    43a: 48 83 c4 28 add rsp, 0x28
-; X64-NEXT:    43e: 5b pop rbx
-; X64-NEXT:    43f: 5d pop rbp
-; X64-NEXT:    440: c3 ret
-; X64-NEXT:    441: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
-; X64-NEXT:    44a: 66 90 nop
+; X64-NEXT:    4bc: b8 02 00 00 00 mov eax, 0x2
+; X64-NEXT:    4c1: 5b pop rbx
+; X64-NEXT:    4c2: 5d pop rbp
+; X64-NEXT:    4c3: c3 ret
+; X64-NEXT:    4c4: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
+; X64-NEXT:    4cd: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
+; X64-NEXT:    4d6: 0f 1f 40 00 nop dword ptr [rax]
 ; X64-NEXT:  <L3>:
-; X64-NEXT:    44c: 89 d8 mov eax, ebx
-; X64-NEXT:    44e: 48 83 c4 28 add rsp, 0x28
-; X64-NEXT:    452: 5b pop rbx
-; X64-NEXT:    453: 5d pop rbp
-; X64-NEXT:    454: c3 ret
-; X64-NEXT:    455: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
-; X64-NEXT:    45e: 66 90 nop
+; X64-NEXT:    4da: 89 d8 mov eax, ebx
+; X64-NEXT:    4dc: 5b pop rbx
+; X64-NEXT:    4dd: 5d pop rbp
+; X64-NEXT:    4de: c3 ret
+; X64-NEXT:    4df: 90 nop
 ;
 ; ARM64-LABEL: <switch_i32_noreuse>:
 ; ARM64:         sub sp, sp, #0xa0
@@ -784,46 +779,45 @@ default:
 
 define i64 @switch_i64_noreuse(i64 %p) {
 ; X64-LABEL: <switch_i64_noreuse>:
-; X64:         460: 55 push rbp
-; X64-NEXT:    461: 48 89 e5 mov rbp, rsp
-; X64-NEXT:    464: 53 push rbx
-; X64-NEXT:    465: 0f 1f 84 00 00 00 00 00 nop dword ptr [rax + rax]
-; X64-NEXT:    46d: 48 81 ec 28 00 00 00 sub rsp, 0x28
-; X64-NEXT:    474: 48 89 fb mov rbx, rdi
-; X64-NEXT:    477: 48 89 d8 mov rax, rbx
-; X64-NEXT:    47a: 48 83 f8 01 cmp rax, 0x1
-; X64-NEXT:    47e: 0f 84 14 00 00 00 je <L0>
-; X64-NEXT:    484: 48 83 f8 02 cmp rax, 0x2
-; X64-NEXT:    488: 0f 84 0f 00 00 00 je <L1>
-; X64-NEXT:    48e: e9 00 00 00 00 jmp <L2>
+; X64:         4e0: 55 push rbp
+; X64-NEXT:    4e1: 48 89 e5 mov rbp, rsp
+; X64-NEXT:    4e4: 53 push rbx
+; X64-NEXT:    4e5: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
+; X64-NEXT:    4ee: 66 0f 1f 44 00 00 nop word ptr [rax + rax]
+; X64-NEXT:    4f4: 48 89 fb mov rbx, rdi
+; X64-NEXT:    4f7: 48 89 d8 mov rax, rbx
+; X64-NEXT:    4fa: 48 83 f8 01 cmp rax, 0x1
+; X64-NEXT:    4fe: 0f 84 14 00 00 00 je <L0>
+; X64-NEXT:    504: 48 83 f8 02 cmp rax, 0x2
+; X64-NEXT:    508: 0f 84 0f 00 00 00 je <L1>
+; X64-NEXT:    50e: e9 00 00 00 00 jmp <L2>
 ; X64-NEXT:  <L2>:
-; X64-NEXT:    493: e9 38 00 00 00 jmp <L3>
+; X64-NEXT:    513: e9 46 00 00 00 jmp <L3>
 ; X64-NEXT:  <L0>:
-; X64-NEXT:    498: e9 05 00 00 00 jmp <L4>
+; X64-NEXT:    518: e9 05 00 00 00 jmp <L4>
 ; X64-NEXT:  <L1>:
-; X64-NEXT:    49d: e9 17 00 00 00 jmp <L5>
+; X64-NEXT:    51d: e9 1e 00 00 00 jmp <L5>
 ; X64-NEXT:  <L4>:
-; X64-NEXT:    4a2: b8 01 00 00 00 mov eax, 0x1
-; X64-NEXT:    4a7: 48 83 c4 28 add rsp, 0x28
-; X64-NEXT:    4ab: 5b pop rbx
-; X64-NEXT:    4ac: 5d pop rbp
-; X64-NEXT:    4ad: c3 ret
-; X64-NEXT:    4ae: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
-; X64-NEXT:    4b7: 66 90 nop
+; X64-NEXT:    522: b8 01 00 00 00 mov eax, 0x1
+; X64-NEXT:    527: 5b pop rbx
+; X64-NEXT:    528: 5d pop rbp
+; X64-NEXT:    529: c3 ret
+; X64-NEXT:    52a: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
+; X64-NEXT:    533: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
+; X64-NEXT:    53c: 0f 1f 40 00 nop dword ptr [rax]
 ; X64-NEXT:  <L5>:
-; X64-NEXT:    4b9: b8 02 00 00 00 mov eax, 0x2
-; X64-NEXT:    4be: 48 83 c4 28 add rsp, 0x28
-; X64-NEXT:    4c2: 5b pop rbx
-; X64-NEXT:    4c3: 5d pop rbp
-; X64-NEXT:    4c4: c3 ret
-; X64-NEXT:    4c5: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
-; X64-NEXT:    4ce: 66 90 nop
+; X64-NEXT:    540: b8 02 00 00 00 mov eax, 0x2
+; X64-NEXT:    545: 5b pop rbx
+; X64-NEXT:    546: 5d pop rbp
+; X64-NEXT:    547: c3 ret
+; X64-NEXT:    548: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
+; X64-NEXT:    551: 66 0f 1f 84 00 00 00 00 00 nop word ptr [rax + rax]
+; X64-NEXT:    55a: 0f 1f 40 00 nop dword ptr [rax]
 ; X64-NEXT:  <L3>:
-; X64-NEXT:    4d0: 48 89 d8 mov rax, rbx
-; X64-NEXT:    4d3: 48 83 c4 28 add rsp, 0x28
-; X64-NEXT:    4d7: 5b pop rbx
-; X64-NEXT:    4d8: 5d pop rbp
-; X64-NEXT:    4d9: c3 ret
+; X64-NEXT:    55e: 48 89 d8 mov rax, rbx
+; X64-NEXT:    561: 5b pop rbx
+; X64-NEXT:    562: 5d pop rbp
+; X64-NEXT:    563: c3 ret
 ;
 ; ARM64-LABEL: <switch_i64_noreuse>:
 ; ARM64:         sub sp, sp, #0xa0

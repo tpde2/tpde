@@ -10,11 +10,10 @@ define float @vr_fmul_v1f32(float %s, ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movss xmm1, dword ptr [rdi]
 ; X64-NEXT:    movapd xmm2, xmm1
 ; X64-NEXT:    mulss xmm0, xmm2
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -39,7 +38,7 @@ define float @vr_fmul_v4f32(float %s, ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x40
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movups xmm1, xmmword ptr [rdi]
 ; X64-NEXT:    movapd xmmword ptr [rbp - 0x40], xmm1
 ; X64-NEXT:    movss xmm2, dword ptr [rbp - 0x40]
@@ -50,7 +49,6 @@ define float @vr_fmul_v4f32(float %s, ptr %p) {
 ; X64-NEXT:    mulss xmm0, xmm2
 ; X64-NEXT:    movss xmm2, dword ptr [rbp - 0x34]
 ; X64-NEXT:    mulss xmm0, xmm2
-; X64-NEXT:    add rsp, 0x40
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -81,7 +79,7 @@ define float @vr_fmul_v5f32(float %s, ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movss xmm1, dword ptr [rdi]
 ; X64-NEXT:    movss xmm2, dword ptr [rdi + 0x4]
 ; X64-NEXT:    movss xmm3, dword ptr [rdi + 0x8]
@@ -97,7 +95,6 @@ define float @vr_fmul_v5f32(float %s, ptr %p) {
 ; X64-NEXT:    mulss xmm0, xmm6
 ; X64-NEXT:    movapd xmm6, xmm5
 ; X64-NEXT:    mulss xmm0, xmm6
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -134,7 +131,7 @@ define float @vr_fmul_v8f32(float %s, ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x50
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movups xmm1, xmmword ptr [rdi]
 ; X64-NEXT:    movups xmm2, xmmword ptr [rdi + 0x10]
 ; X64-NEXT:    movapd xmmword ptr [rbp - 0x50], xmm1
@@ -155,7 +152,6 @@ define float @vr_fmul_v8f32(float %s, ptr %p) {
 ; X64-NEXT:    mulss xmm0, xmm3
 ; X64-NEXT:    movss xmm3, dword ptr [rbp - 0x34]
 ; X64-NEXT:    mulss xmm0, xmm3
-; X64-NEXT:    add rsp, 0x50
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -195,11 +191,10 @@ define double @vr_fmul_v1f64(double %s, ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movsd xmm1, qword ptr [rdi]
 ; X64-NEXT:    movapd xmm2, xmm1
 ; X64-NEXT:    mulsd xmm0, xmm2
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -224,14 +219,13 @@ define double @vr_fmul_v2f64(double %s, ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x40
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movups xmm1, xmmword ptr [rdi]
 ; X64-NEXT:    movapd xmmword ptr [rbp - 0x40], xmm1
 ; X64-NEXT:    movsd xmm2, qword ptr [rbp - 0x40]
 ; X64-NEXT:    mulsd xmm0, xmm2
 ; X64-NEXT:    movsd xmm2, qword ptr [rbp - 0x38]
 ; X64-NEXT:    mulsd xmm0, xmm2
-; X64-NEXT:    add rsp, 0x40
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -258,7 +252,7 @@ define double @vr_fmul_v5f64(double %s, ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movsd xmm1, qword ptr [rdi]
 ; X64-NEXT:    movsd xmm2, qword ptr [rdi + 0x8]
 ; X64-NEXT:    movsd xmm3, qword ptr [rdi + 0x10]
@@ -274,7 +268,6 @@ define double @vr_fmul_v5f64(double %s, ptr %p) {
 ; X64-NEXT:    mulsd xmm0, xmm6
 ; X64-NEXT:    movapd xmm6, xmm5
 ; X64-NEXT:    mulsd xmm0, xmm6
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;

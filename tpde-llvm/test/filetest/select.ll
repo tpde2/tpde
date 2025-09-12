@@ -11,11 +11,10 @@ define i32 @select_i32_reg(i1 %0, i32 %1, i32 %2) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    test dil, 0x1
 ; X64-NEXT:    cmove esi, edx
 ; X64-NEXT:    mov eax, esi
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -40,11 +39,10 @@ define i64 @select_i64_reg(i1 %0, i64 %1, i64 %2) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    test dil, 0x1
 ; X64-NEXT:    cmove rsi, rdx
 ; X64-NEXT:    mov rax, rsi
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -70,11 +68,10 @@ define ptr @select_ptr_reg(i1 %0, ptr %1, ptr %2) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    test dil, 0x1
 ; X64-NEXT:    cmove rsi, rdx
 ; X64-NEXT:    mov rax, rsi
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -99,12 +96,11 @@ define i128 @select_i128_reg(i1 %0, i128 %1, i128 %2) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    test dil, 0x1
 ; X64-NEXT:    cmove rsi, rcx
 ; X64-NEXT:    cmove rdx, r8
 ; X64-NEXT:    mov rax, rsi
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -131,13 +127,12 @@ define float @select_f32_reg(i1 %0, float %1, float %2) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    test dil, 0x1
 ; X64-NEXT:    je <L0>
 ; X64-NEXT:    movaps xmm1, xmm0
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    movaps xmm0, xmm1
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -162,13 +157,12 @@ define double @select_f64_reg(i1 %0, double %1, double %2) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    test dil, 0x1
 ; X64-NEXT:    je <L0>
 ; X64-NEXT:    movaps xmm1, xmm0
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    movaps xmm0, xmm1
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -196,12 +190,11 @@ define %struct.i8_i64 @select_i8_i64_0(i1 %0, %struct.i8_i64 %1, %struct.i8_i64 
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    test dil, 0x1
 ; X64-NEXT:    cmove rsi, rcx
 ; X64-NEXT:    cmove rdx, r8
 ; X64-NEXT:    mov eax, esi
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -228,13 +221,12 @@ define %struct.i8_i64 @select_i8_i64_1(i1 %0, %struct.i8_i64 %1, %struct.i8_i64 
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    test dil, 0x1
 ; X64-NEXT:    cmove rcx, rsi
 ; X64-NEXT:    cmove r8, rdx
 ; X64-NEXT:    mov eax, ecx
 ; X64-NEXT:    mov rdx, r8
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -261,12 +253,11 @@ define [2 x i64] @select_a2i64(i1 %0, [2 x i64] %1, [2 x i64] %2) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    test dil, 0x1
 ; X64-NEXT:    cmove rsi, rcx
 ; X64-NEXT:    cmove rdx, r8
 ; X64-NEXT:    mov rax, rsi
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -292,13 +283,12 @@ define <2 x i64> @select_v2i64(i1 %0, <2 x i64> %1, <2 x i64> %2) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    test dil, 0x1
 ; X64-NEXT:    je <L0>
 ; X64-NEXT:    movaps xmm1, xmm0
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    movaps xmm0, xmm1
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;

@@ -21,12 +21,11 @@ define i32 @load_basic_int() {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    lea rax, <load_basic_int+0x13>
 ; X64-NEXT:     R_X86_64_PC32 basic_int-0x4
 ; X64-NEXT:    mov ecx, dword ptr [rax]
 ; X64-NEXT:    mov eax, ecx
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -54,14 +53,13 @@ define i32 @load_basic_int_twice() {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    lea rax, <load_basic_int_twice+0x13>
 ; X64-NEXT:     R_X86_64_PC32 basic_int-0x4
 ; X64-NEXT:    mov ecx, dword ptr [rax]
 ; X64-NEXT:    mov edx, dword ptr [rax]
 ; X64-NEXT:    lea ecx, [rcx + rdx]
 ; X64-NEXT:    mov eax, ecx
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -92,12 +90,11 @@ define i32 @load_global_int() {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov rax, qword ptr <load_global_int+0x13>
 ; X64-NEXT:     R_X86_64_GOTPCREL global_int-0x4
 ; X64-NEXT:    mov ecx, dword ptr [rax]
 ; X64-NEXT:    mov eax, ecx
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -124,12 +121,11 @@ define i32 @load_global_dso_local_int() {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov rax, qword ptr <load_global_dso_local_int+0x13>
 ; X64-NEXT:     R_X86_64_GOTPCREL global_dso_local_int-0x4
 ; X64-NEXT:    mov ecx, dword ptr [rax]
 ; X64-NEXT:    mov eax, ecx
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -156,12 +152,11 @@ define ptr @load_func_ptr() {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov rax, qword ptr <load_func_ptr+0x13>
 ; X64-NEXT:     R_X86_64_GOTPCREL func_ptr-0x4
 ; X64-NEXT:    mov rcx, qword ptr [rax]
 ; X64-NEXT:    mov rax, rcx
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -189,11 +184,10 @@ define void @store_global_ptr(ptr %0) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov rax, qword ptr <store_global_ptr+0x13>
 ; X64-NEXT:     R_X86_64_GOTPCREL global_ptr-0x4
 ; X64-NEXT:    mov qword ptr [rax], rdi
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -220,10 +214,9 @@ define ptr @get_global() {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    lea rax, <get_global+0x13>
 ; X64-NEXT:     R_X86_64_PC32 basic_int-0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -248,10 +241,9 @@ define ptr @get_func1() {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov rax, qword ptr <get_func1+0x13>
 ; X64-NEXT:     R_X86_64_GOTPCREL func_ptr-0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -276,10 +268,9 @@ define ptr @get_func2() {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov rax, qword ptr <get_func2+0x13>
 ; X64-NEXT:     R_X86_64_GOTPCREL some_func-0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -304,12 +295,11 @@ define {ptr, ptr} @get_struct1() {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov rax, qword ptr <get_struct1+0x13>
 ; X64-NEXT:     R_X86_64_GOTPCREL func_ptr-0x4
 ; X64-NEXT:    lea rdx, <get_struct1+0x1a>
 ; X64-NEXT:     R_X86_64_PC32 basic_int-0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -337,12 +327,11 @@ define {ptr, ptr} @get_struct2() {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov rax, qword ptr <get_struct2+0x13>
 ; X64-NEXT:     R_X86_64_GOTPCREL some_func-0x4
 ; X64-NEXT:    mov rdx, qword ptr <get_struct2+0x1a>
 ; X64-NEXT:     R_X86_64_GOTPCREL get_struct2-0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;

@@ -10,8 +10,8 @@ define void @fcmp_false_f32_br(float, float, ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop dword ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x28
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    mov rbx, rdi
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    test al, 0x1
@@ -23,7 +23,6 @@ define void @fcmp_false_f32_br(float, float, ptr %p) {
 ; X64-NEXT:    movd xmm0, dword ptr [rbp - 0x2c]
 ; X64-NEXT:    movss dword ptr [rbx], xmm0
 ; X64-NEXT:  <L1>:
-; X64-NEXT:    add rsp, 0x28
 ; X64-NEXT:    pop rbx
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -68,8 +67,8 @@ define void @fcmp_oeq_f32_br(float, float, ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop dword ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x28
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    mov rbx, rdi
 ; X64-NEXT:    movapd xmm2, xmm0
 ; X64-NEXT:    cmpeqss xmm2, xmm1
@@ -84,7 +83,6 @@ define void @fcmp_oeq_f32_br(float, float, ptr %p) {
 ; X64-NEXT:    movd xmm0, dword ptr [rbp - 0x2c]
 ; X64-NEXT:    movss dword ptr [rbx], xmm0
 ; X64-NEXT:  <L1>:
-; X64-NEXT:    add rsp, 0x28
 ; X64-NEXT:    pop rbx
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -130,8 +128,8 @@ define void @fcmp_ogt_f32_br(float, float, ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop dword ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x28
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    mov rbx, rdi
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    ucomiss xmm0, xmm1
@@ -145,7 +143,6 @@ define void @fcmp_ogt_f32_br(float, float, ptr %p) {
 ; X64-NEXT:    movd xmm0, dword ptr [rbp - 0x2c]
 ; X64-NEXT:    movss dword ptr [rbx], xmm0
 ; X64-NEXT:  <L1>:
-; X64-NEXT:    add rsp, 0x28
 ; X64-NEXT:    pop rbx
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -191,8 +188,8 @@ define void @fcmp_oge_f32_br(float, float, ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop dword ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x28
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    mov rbx, rdi
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    ucomiss xmm0, xmm1
@@ -206,7 +203,6 @@ define void @fcmp_oge_f32_br(float, float, ptr %p) {
 ; X64-NEXT:    movd xmm0, dword ptr [rbp - 0x2c]
 ; X64-NEXT:    movss dword ptr [rbx], xmm0
 ; X64-NEXT:  <L1>:
-; X64-NEXT:    add rsp, 0x28
 ; X64-NEXT:    pop rbx
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -252,8 +248,8 @@ define void @fcmp_olt_f32_br(float, float, ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop dword ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x28
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    mov rbx, rdi
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    ucomiss xmm1, xmm0
@@ -267,7 +263,6 @@ define void @fcmp_olt_f32_br(float, float, ptr %p) {
 ; X64-NEXT:    movd xmm0, dword ptr [rbp - 0x2c]
 ; X64-NEXT:    movss dword ptr [rbx], xmm0
 ; X64-NEXT:  <L1>:
-; X64-NEXT:    add rsp, 0x28
 ; X64-NEXT:    pop rbx
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -313,8 +308,8 @@ define void @fcmp_ole_f32_br(float, float, ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop dword ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x28
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    mov rbx, rdi
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    ucomiss xmm1, xmm0
@@ -328,7 +323,6 @@ define void @fcmp_ole_f32_br(float, float, ptr %p) {
 ; X64-NEXT:    movd xmm0, dword ptr [rbp - 0x2c]
 ; X64-NEXT:    movss dword ptr [rbx], xmm0
 ; X64-NEXT:  <L1>:
-; X64-NEXT:    add rsp, 0x28
 ; X64-NEXT:    pop rbx
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -374,8 +368,8 @@ define void @fcmp_one_f32_br(float, float, ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop dword ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x28
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    mov rbx, rdi
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    ucomiss xmm0, xmm1
@@ -389,7 +383,6 @@ define void @fcmp_one_f32_br(float, float, ptr %p) {
 ; X64-NEXT:    movd xmm0, dword ptr [rbp - 0x2c]
 ; X64-NEXT:    movss dword ptr [rbx], xmm0
 ; X64-NEXT:  <L1>:
-; X64-NEXT:    add rsp, 0x28
 ; X64-NEXT:    pop rbx
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -436,8 +429,8 @@ define void @fcmp_ord_f32_br(float, float, ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop dword ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x28
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    mov rbx, rdi
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    ucomiss xmm0, xmm1
@@ -451,7 +444,6 @@ define void @fcmp_ord_f32_br(float, float, ptr %p) {
 ; X64-NEXT:    movd xmm0, dword ptr [rbp - 0x2c]
 ; X64-NEXT:    movss dword ptr [rbx], xmm0
 ; X64-NEXT:  <L1>:
-; X64-NEXT:    add rsp, 0x28
 ; X64-NEXT:    pop rbx
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -497,8 +489,8 @@ define void @fcmp_ueq_f32_br(float, float, ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop dword ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x28
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    mov rbx, rdi
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    ucomiss xmm0, xmm1
@@ -512,7 +504,6 @@ define void @fcmp_ueq_f32_br(float, float, ptr %p) {
 ; X64-NEXT:    movd xmm0, dword ptr [rbp - 0x2c]
 ; X64-NEXT:    movss dword ptr [rbx], xmm0
 ; X64-NEXT:  <L1>:
-; X64-NEXT:    add rsp, 0x28
 ; X64-NEXT:    pop rbx
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -559,8 +550,8 @@ define void @fcmp_ugt_f32_br(float, float, ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop dword ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x28
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    mov rbx, rdi
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    ucomiss xmm1, xmm0
@@ -574,7 +565,6 @@ define void @fcmp_ugt_f32_br(float, float, ptr %p) {
 ; X64-NEXT:    movd xmm0, dword ptr [rbp - 0x2c]
 ; X64-NEXT:    movss dword ptr [rbx], xmm0
 ; X64-NEXT:  <L1>:
-; X64-NEXT:    add rsp, 0x28
 ; X64-NEXT:    pop rbx
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -620,8 +610,8 @@ define void @fcmp_uge_f32_br(float, float, ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop dword ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x28
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    mov rbx, rdi
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    ucomiss xmm1, xmm0
@@ -635,7 +625,6 @@ define void @fcmp_uge_f32_br(float, float, ptr %p) {
 ; X64-NEXT:    movd xmm0, dword ptr [rbp - 0x2c]
 ; X64-NEXT:    movss dword ptr [rbx], xmm0
 ; X64-NEXT:  <L1>:
-; X64-NEXT:    add rsp, 0x28
 ; X64-NEXT:    pop rbx
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -681,8 +670,8 @@ define void @fcmp_ult_f32_br(float, float, ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop dword ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x28
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    mov rbx, rdi
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    ucomiss xmm0, xmm1
@@ -696,7 +685,6 @@ define void @fcmp_ult_f32_br(float, float, ptr %p) {
 ; X64-NEXT:    movd xmm0, dword ptr [rbp - 0x2c]
 ; X64-NEXT:    movss dword ptr [rbx], xmm0
 ; X64-NEXT:  <L1>:
-; X64-NEXT:    add rsp, 0x28
 ; X64-NEXT:    pop rbx
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -742,8 +730,8 @@ define void @fcmp_ule_f32_br(float, float, ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop dword ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x28
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    mov rbx, rdi
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    ucomiss xmm0, xmm1
@@ -757,7 +745,6 @@ define void @fcmp_ule_f32_br(float, float, ptr %p) {
 ; X64-NEXT:    movd xmm0, dword ptr [rbp - 0x2c]
 ; X64-NEXT:    movss dword ptr [rbx], xmm0
 ; X64-NEXT:  <L1>:
-; X64-NEXT:    add rsp, 0x28
 ; X64-NEXT:    pop rbx
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -803,8 +790,8 @@ define void @fcmp_une_f32_br(float, float, ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop dword ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x28
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    mov rbx, rdi
 ; X64-NEXT:    movapd xmm2, xmm0
 ; X64-NEXT:    cmpneqss xmm2, xmm1
@@ -819,7 +806,6 @@ define void @fcmp_une_f32_br(float, float, ptr %p) {
 ; X64-NEXT:    movd xmm0, dword ptr [rbp - 0x2c]
 ; X64-NEXT:    movss dword ptr [rbx], xmm0
 ; X64-NEXT:  <L1>:
-; X64-NEXT:    add rsp, 0x28
 ; X64-NEXT:    pop rbx
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -865,8 +851,8 @@ define void @fcmp_uno_f32_br(float, float, ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop dword ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x28
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    mov rbx, rdi
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    ucomiss xmm0, xmm1
@@ -880,7 +866,6 @@ define void @fcmp_uno_f32_br(float, float, ptr %p) {
 ; X64-NEXT:    movd xmm0, dword ptr [rbp - 0x2c]
 ; X64-NEXT:    movss dword ptr [rbx], xmm0
 ; X64-NEXT:  <L1>:
-; X64-NEXT:    add rsp, 0x28
 ; X64-NEXT:    pop rbx
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -926,8 +911,8 @@ define void @fcmp_true_f32_br(float, float, ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop dword ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x28
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    mov rbx, rdi
 ; X64-NEXT:    mov eax, 0x1
 ; X64-NEXT:    test al, 0x1
@@ -939,7 +924,6 @@ define void @fcmp_true_f32_br(float, float, ptr %p) {
 ; X64-NEXT:    movd xmm0, dword ptr [rbp - 0x2c]
 ; X64-NEXT:    movss dword ptr [rbx], xmm0
 ; X64-NEXT:  <L1>:
-; X64-NEXT:    add rsp, 0x28
 ; X64-NEXT:    pop rbx
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -985,8 +969,8 @@ define void @fcmp_false_f64_br(double, double, ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop dword ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x28
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    mov rbx, rdi
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    test al, 0x1
@@ -998,7 +982,6 @@ define void @fcmp_false_f64_br(double, double, ptr %p) {
 ; X64-NEXT:    movq xmm0, qword ptr [rbp - 0x30]
 ; X64-NEXT:    movsd qword ptr [rbx], xmm0
 ; X64-NEXT:  <L1>:
-; X64-NEXT:    add rsp, 0x28
 ; X64-NEXT:    pop rbx
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -1043,8 +1026,8 @@ define void @fcmp_oeq_f64_br(double, double, ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop dword ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x28
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    mov rbx, rdi
 ; X64-NEXT:    movapd xmm2, xmm0
 ; X64-NEXT:    cmpeqsd xmm2, xmm1
@@ -1059,7 +1042,6 @@ define void @fcmp_oeq_f64_br(double, double, ptr %p) {
 ; X64-NEXT:    movq xmm0, qword ptr [rbp - 0x30]
 ; X64-NEXT:    movsd qword ptr [rbx], xmm0
 ; X64-NEXT:  <L1>:
-; X64-NEXT:    add rsp, 0x28
 ; X64-NEXT:    pop rbx
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -1105,8 +1087,8 @@ define void @fcmp_ogt_f64_br(double, double, ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop dword ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x28
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    mov rbx, rdi
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    ucomisd xmm0, xmm1
@@ -1120,7 +1102,6 @@ define void @fcmp_ogt_f64_br(double, double, ptr %p) {
 ; X64-NEXT:    movq xmm0, qword ptr [rbp - 0x30]
 ; X64-NEXT:    movsd qword ptr [rbx], xmm0
 ; X64-NEXT:  <L1>:
-; X64-NEXT:    add rsp, 0x28
 ; X64-NEXT:    pop rbx
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -1166,8 +1147,8 @@ define void @fcmp_oge_f64_br(double, double, ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop dword ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x28
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    mov rbx, rdi
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    ucomisd xmm0, xmm1
@@ -1181,7 +1162,6 @@ define void @fcmp_oge_f64_br(double, double, ptr %p) {
 ; X64-NEXT:    movq xmm0, qword ptr [rbp - 0x30]
 ; X64-NEXT:    movsd qword ptr [rbx], xmm0
 ; X64-NEXT:  <L1>:
-; X64-NEXT:    add rsp, 0x28
 ; X64-NEXT:    pop rbx
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -1227,8 +1207,8 @@ define void @fcmp_olt_f64_br(double, double, ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop dword ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x28
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    mov rbx, rdi
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    ucomisd xmm1, xmm0
@@ -1242,7 +1222,6 @@ define void @fcmp_olt_f64_br(double, double, ptr %p) {
 ; X64-NEXT:    movq xmm0, qword ptr [rbp - 0x30]
 ; X64-NEXT:    movsd qword ptr [rbx], xmm0
 ; X64-NEXT:  <L1>:
-; X64-NEXT:    add rsp, 0x28
 ; X64-NEXT:    pop rbx
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -1288,8 +1267,8 @@ define void @fcmp_ole_f64_br(double, double, ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop dword ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x28
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    mov rbx, rdi
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    ucomisd xmm1, xmm0
@@ -1303,7 +1282,6 @@ define void @fcmp_ole_f64_br(double, double, ptr %p) {
 ; X64-NEXT:    movq xmm0, qword ptr [rbp - 0x30]
 ; X64-NEXT:    movsd qword ptr [rbx], xmm0
 ; X64-NEXT:  <L1>:
-; X64-NEXT:    add rsp, 0x28
 ; X64-NEXT:    pop rbx
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -1349,8 +1327,8 @@ define void @fcmp_one_f64_br(double, double, ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop dword ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x28
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    mov rbx, rdi
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    ucomisd xmm0, xmm1
@@ -1364,7 +1342,6 @@ define void @fcmp_one_f64_br(double, double, ptr %p) {
 ; X64-NEXT:    movq xmm0, qword ptr [rbp - 0x30]
 ; X64-NEXT:    movsd qword ptr [rbx], xmm0
 ; X64-NEXT:  <L1>:
-; X64-NEXT:    add rsp, 0x28
 ; X64-NEXT:    pop rbx
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -1411,8 +1388,8 @@ define void @fcmp_ord_f64_br(double, double, ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop dword ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x28
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    mov rbx, rdi
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    ucomisd xmm0, xmm1
@@ -1426,7 +1403,6 @@ define void @fcmp_ord_f64_br(double, double, ptr %p) {
 ; X64-NEXT:    movq xmm0, qword ptr [rbp - 0x30]
 ; X64-NEXT:    movsd qword ptr [rbx], xmm0
 ; X64-NEXT:  <L1>:
-; X64-NEXT:    add rsp, 0x28
 ; X64-NEXT:    pop rbx
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -1472,8 +1448,8 @@ define void @fcmp_ueq_f64_br(double, double, ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop dword ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x28
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    mov rbx, rdi
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    ucomisd xmm0, xmm1
@@ -1487,7 +1463,6 @@ define void @fcmp_ueq_f64_br(double, double, ptr %p) {
 ; X64-NEXT:    movq xmm0, qword ptr [rbp - 0x30]
 ; X64-NEXT:    movsd qword ptr [rbx], xmm0
 ; X64-NEXT:  <L1>:
-; X64-NEXT:    add rsp, 0x28
 ; X64-NEXT:    pop rbx
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -1534,8 +1509,8 @@ define void @fcmp_ugt_f64_br(double, double, ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop dword ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x28
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    mov rbx, rdi
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    ucomisd xmm1, xmm0
@@ -1549,7 +1524,6 @@ define void @fcmp_ugt_f64_br(double, double, ptr %p) {
 ; X64-NEXT:    movq xmm0, qword ptr [rbp - 0x30]
 ; X64-NEXT:    movsd qword ptr [rbx], xmm0
 ; X64-NEXT:  <L1>:
-; X64-NEXT:    add rsp, 0x28
 ; X64-NEXT:    pop rbx
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -1595,8 +1569,8 @@ define void @fcmp_uge_f64_br(double, double, ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop dword ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x28
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    mov rbx, rdi
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    ucomisd xmm1, xmm0
@@ -1610,7 +1584,6 @@ define void @fcmp_uge_f64_br(double, double, ptr %p) {
 ; X64-NEXT:    movq xmm0, qword ptr [rbp - 0x30]
 ; X64-NEXT:    movsd qword ptr [rbx], xmm0
 ; X64-NEXT:  <L1>:
-; X64-NEXT:    add rsp, 0x28
 ; X64-NEXT:    pop rbx
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -1656,8 +1629,8 @@ define void @fcmp_ult_f64_br(double, double, ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop dword ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x28
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    mov rbx, rdi
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    ucomisd xmm0, xmm1
@@ -1671,7 +1644,6 @@ define void @fcmp_ult_f64_br(double, double, ptr %p) {
 ; X64-NEXT:    movq xmm0, qword ptr [rbp - 0x30]
 ; X64-NEXT:    movsd qword ptr [rbx], xmm0
 ; X64-NEXT:  <L1>:
-; X64-NEXT:    add rsp, 0x28
 ; X64-NEXT:    pop rbx
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -1717,8 +1689,8 @@ define void @fcmp_ule_f64_br(double, double, ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop dword ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x28
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    mov rbx, rdi
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    ucomisd xmm0, xmm1
@@ -1732,7 +1704,6 @@ define void @fcmp_ule_f64_br(double, double, ptr %p) {
 ; X64-NEXT:    movq xmm0, qword ptr [rbp - 0x30]
 ; X64-NEXT:    movsd qword ptr [rbx], xmm0
 ; X64-NEXT:  <L1>:
-; X64-NEXT:    add rsp, 0x28
 ; X64-NEXT:    pop rbx
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -1778,8 +1749,8 @@ define void @fcmp_une_f64_br(double, double, ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop dword ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x28
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    mov rbx, rdi
 ; X64-NEXT:    movapd xmm2, xmm0
 ; X64-NEXT:    cmpneqsd xmm2, xmm1
@@ -1794,7 +1765,6 @@ define void @fcmp_une_f64_br(double, double, ptr %p) {
 ; X64-NEXT:    movq xmm0, qword ptr [rbp - 0x30]
 ; X64-NEXT:    movsd qword ptr [rbx], xmm0
 ; X64-NEXT:  <L1>:
-; X64-NEXT:    add rsp, 0x28
 ; X64-NEXT:    pop rbx
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -1840,8 +1810,8 @@ define void @fcmp_uno_f64_br(double, double, ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop dword ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x28
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    mov rbx, rdi
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    ucomisd xmm0, xmm1
@@ -1855,7 +1825,6 @@ define void @fcmp_uno_f64_br(double, double, ptr %p) {
 ; X64-NEXT:    movq xmm0, qword ptr [rbp - 0x30]
 ; X64-NEXT:    movsd qword ptr [rbx], xmm0
 ; X64-NEXT:  <L1>:
-; X64-NEXT:    add rsp, 0x28
 ; X64-NEXT:    pop rbx
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -1901,8 +1870,8 @@ define void @fcmp_true_f64_br(double, double, ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop dword ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x28
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    mov rbx, rdi
 ; X64-NEXT:    mov eax, 0x1
 ; X64-NEXT:    test al, 0x1
@@ -1914,7 +1883,6 @@ define void @fcmp_true_f64_br(double, double, ptr %p) {
 ; X64-NEXT:    movq xmm0, qword ptr [rbp - 0x30]
 ; X64-NEXT:    movsd qword ptr [rbx], xmm0
 ; X64-NEXT:  <L1>:
-; X64-NEXT:    add rsp, 0x28
 ; X64-NEXT:    pop rbx
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret

@@ -10,7 +10,7 @@ define float @atomicrmw_fmin_float_seq_cst(ptr %p, float %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movss xmm1, dword ptr [rdi]
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    movaps xmm2, xmm0
@@ -27,7 +27,6 @@ define float @atomicrmw_fmin_float_seq_cst(ptr %p, float %a) {
 ; X64-NEXT:    movd xmm1, eax
 ; X64-NEXT:    jne <L0>
 ; X64-NEXT:    movaps xmm0, xmm1
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -58,7 +57,7 @@ define void @atomicrmw_fmin_float_seq_cst_nouse(ptr %p, float %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movss xmm1, dword ptr [rdi]
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    movaps xmm2, xmm0
@@ -75,7 +74,6 @@ define void @atomicrmw_fmin_float_seq_cst_nouse(ptr %p, float %a) {
 ; X64-NEXT:    movd xmm1, eax
 ; X64-NEXT:    jne <L0>
 ; X64-NEXT:    movaps xmm0, xmm1
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -106,7 +104,7 @@ define double @atomicrmw_fmin_double_seq_cst(ptr %p, double %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movsd xmm1, qword ptr [rdi]
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    movapd xmm2, xmm0
@@ -123,7 +121,6 @@ define double @atomicrmw_fmin_double_seq_cst(ptr %p, double %a) {
 ; X64-NEXT:    movq xmm1, rax
 ; X64-NEXT:    jne <L0>
 ; X64-NEXT:    movapd xmm0, xmm1
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -154,7 +151,7 @@ define void @atomicrmw_fmin_double_seq_cst_nouse(ptr %p, double %a) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movsd xmm1, qword ptr [rdi]
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    movapd xmm2, xmm0
@@ -171,7 +168,6 @@ define void @atomicrmw_fmin_double_seq_cst_nouse(ptr %p, double %a) {
 ; X64-NEXT:    movq xmm1, rax
 ; X64-NEXT:    jne <L0>
 ; X64-NEXT:    movapd xmm0, xmm1
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;

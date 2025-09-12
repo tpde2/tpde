@@ -11,8 +11,7 @@ define void @empty() {
 ; X64-NEXT: push rbp
 ; X64-NEXT: mov rbp, rsp
 ; X64-NEXT: nop word ptr [rax + rax]
-; X64-NEXT: sub rsp, 0x30
-; X64-NEXT: add rsp, 0x30
+; X64-NEXT: nop dword ptr [rax]
 ; X64-NEXT: pop rbp
 ; X64-NEXT: ret
 ; ARM64-LABEL: <empty>:

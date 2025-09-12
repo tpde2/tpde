@@ -14,7 +14,7 @@ define @arg_special_case(%a!, %b!, %c!, %d!, %e!, %f!) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov r10, rdi
 ; X64-NEXT:    mov rdi, rsi
 ; X64-NEXT:    mov rsi, rdx
@@ -24,14 +24,13 @@ define @arg_special_case(%a!, %b!, %c!, %d!, %e!, %f!) {
 ; X64-NEXT:    cmp r10, 0x0
 ; X64-NEXT:    je <L0>
 ; X64-NEXT:    mov rax, r10
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop dword ptr [rax + rax]
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    mov rax, rdi
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -70,19 +69,18 @@ define @fixed_stack_arg(%a, %b, %c, %d, %e, %f, %g!) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov rsi, qword ptr [rbp + 0x10]
 ; X64-NEXT:    cmp rdi, 0x0
 ; X64-NEXT:    je <L0>
 ; X64-NEXT:    mov rax, rdi
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop dword ptr [rax + rax]
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    mov rax, rsi
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -117,8 +115,9 @@ define @fixed_with_call(%a!) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop dword ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x28
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop
 ; X64-NEXT:    mov rbx, rdi
 ; X64-NEXT:    mov rdi, rbx
 ; X64-NEXT:  <L0>:
@@ -152,21 +151,20 @@ define @salvage_from_fixed_to_nonfixed(%a!, %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov r10, rdi
 ; X64-NEXT:    add r10, rsi
 ; X64-NEXT:    mov qword ptr [rbp - 0x30], r10
 ; X64-NEXT:    cmp rsi, 0x0
 ; X64-NEXT:    je <L0>
 ; X64-NEXT:    mov rax, r10
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop dword ptr [rax + rax]
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    mov rax, qword ptr [rbp - 0x30]
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -206,20 +204,19 @@ define @salvage_from_fixed_to_fixed(%a!, %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov r10, rdi
 ; X64-NEXT:    lea rdi, [r10 + rsi]
 ; X64-NEXT:    cmp rsi, 0x0
 ; X64-NEXT:    je <L0>
 ; X64-NEXT:    mov rax, rdi
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop dword ptr [rax + rax]
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    mov rax, rdi
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -257,19 +254,18 @@ define @salvage_from_nonfixed_to_fixed(%a, %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    lea r8, [rdi + rsi]
 ; X64-NEXT:    cmp rsi, 0x0
 ; X64-NEXT:    je <L0>
 ; X64-NEXT:    mov rax, r8
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop dword ptr [rax + rax]
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    mov rax, r8
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;

@@ -10,7 +10,7 @@ define i32 @f32tou32(float %f) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    cvttss2si rax, xmm0
 ; X64-NEXT:    xor ecx, ecx
 ; X64-NEXT:    xorps xmm1, xmm1
@@ -20,7 +20,6 @@ define i32 @f32tou32(float %f) {
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    mov eax, 0xffffffff
 ; X64-NEXT:    cmovbe eax, ecx
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -42,7 +41,7 @@ define i64 @f32tou64(float %f) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    cvttss2si rax, xmm0
 ; X64-NEXT:    mov rcx, rax
 ; X64-NEXT:    sar rcx, 0x3f
@@ -60,7 +59,6 @@ define i64 @f32tou64(float %f) {
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    mov rax, -0x1
 ; X64-NEXT:    cmovbe rax, rcx
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -82,14 +80,13 @@ define i32 @f64tou32(double %f) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    xorpd xmm1, xmm1
 ; X64-NEXT:    maxsd xmm1, xmm0
 ; X64-NEXT:    movsd xmm0, qword ptr <f64tou32+0x1c>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    minsd xmm0, xmm1
 ; X64-NEXT:    cvttsd2si rax, xmm0
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -111,7 +108,7 @@ define i64 @f64tou64(double %f) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    cvttsd2si rax, xmm0
 ; X64-NEXT:    mov rcx, rax
 ; X64-NEXT:    sar rcx, 0x3f
@@ -129,7 +126,6 @@ define i64 @f64tou64(double %f) {
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    mov rax, -0x1
 ; X64-NEXT:    cmovbe rax, rcx
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;

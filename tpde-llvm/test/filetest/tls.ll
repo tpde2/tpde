@@ -11,8 +11,9 @@ define ptr @getaddr() {
 ; X64-LABEL: <getaddr>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    lea rdi, <getaddr+0x15>
 ; X64-NEXT:     R_X86_64_TLSGD t1-0x4
 ; X64-NEXT:    call <L0>
@@ -47,8 +48,9 @@ define i32 @load() {
 ; X64-LABEL: <load>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    lea rdi, <load+0x15>
 ; X64-NEXT:     R_X86_64_TLSGD t1-0x4
 ; X64-NEXT:    call <L0>
@@ -86,8 +88,9 @@ define void @store(i32 %v) {
 ; X64-LABEL: <store>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov dword ptr [rbp - 0x2c], edi
 ; X64-NEXT:    lea rdi, <store+0x18>
 ; X64-NEXT:     R_X86_64_TLSGD t1-0x4
@@ -130,8 +133,9 @@ define void @store3(i32, i32, i32 %v) {
 ; X64-LABEL: <store3>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov dword ptr [rbp - 0x2c], edx
 ; X64-NEXT:    lea rdi, <store3+0x18>
 ; X64-NEXT:     R_X86_64_TLSGD t1-0x4

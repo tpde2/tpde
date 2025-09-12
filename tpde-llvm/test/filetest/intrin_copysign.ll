@@ -10,13 +10,12 @@ define float @copysignf32(float %0, float %1) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    andps xmm1, xmmword ptr <copysignf32+0x14>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    andps xmm0, xmmword ptr <copysignf32+0x1b>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    orps xmm0, xmm1
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -39,13 +38,12 @@ define double @copysignf64(double %0, double %1) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    andps xmm1, xmmword ptr <copysignf64+0x14>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    andps xmm0, xmmword ptr <copysignf64+0x1b>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    orps xmm0, xmm1
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -69,7 +67,7 @@ define float @copysignf32_noreuse(float %0, float %1) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    andps xmm1, xmmword ptr <copysignf32_noreuse+0x14>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    movapd xmm2, xmm0
@@ -77,7 +75,6 @@ define float @copysignf32_noreuse(float %0, float %1) {
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    orps xmm2, xmm1
 ; X64-NEXT:    addss xmm0, xmm2
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -103,7 +100,7 @@ define double @copysignf64_noreuse(double %0, double %1) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    andps xmm1, xmmword ptr <copysignf64_noreuse+0x14>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    movapd xmm2, xmm0
@@ -111,7 +108,6 @@ define double @copysignf64_noreuse(double %0, double %1) {
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    orps xmm2, xmm1
 ; X64-NEXT:    addsd xmm0, xmm2
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;

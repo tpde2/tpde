@@ -10,10 +10,9 @@ define <2 x float> @fnegv2f32(<2 x float> %0) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    xorps xmm0, xmmword ptr <fnegv2f32+0x14>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -35,10 +34,9 @@ define <4 x float> @fnegv4f32(<4 x float> %0) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    xorps xmm0, xmmword ptr <fnegv4f32+0x14>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -60,10 +58,9 @@ define <2 x double> @fnegv2f64(<2 x double> %0) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    xorps xmm0, xmmword ptr <fnegv2f64+0x14>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;

@@ -10,7 +10,7 @@ define i8 @bitrev_i8(i8 %0) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    shl edi, 0x18
 ; X64-NEXT:    bswap edi
 ; X64-NEXT:    mov eax, edi
@@ -29,7 +29,6 @@ define i8 @bitrev_i8(i8 %0) {
 ; X64-NEXT:    shr eax
 ; X64-NEXT:    and eax, 0x55555555
 ; X64-NEXT:    lea eax, [rax + 2*rcx]
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -52,7 +51,7 @@ define i16 @bitrev_i16(i16 %0) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    shl edi, 0x10
 ; X64-NEXT:    bswap edi
 ; X64-NEXT:    mov eax, edi
@@ -71,7 +70,6 @@ define i16 @bitrev_i16(i16 %0) {
 ; X64-NEXT:    shr eax
 ; X64-NEXT:    and eax, 0x55555555
 ; X64-NEXT:    lea eax, [rax + 2*rcx]
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -94,7 +92,7 @@ define i23 @bitrev_i23(i23 %0) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    shl edi, 0x9
 ; X64-NEXT:    bswap edi
 ; X64-NEXT:    mov eax, edi
@@ -113,7 +111,6 @@ define i23 @bitrev_i23(i23 %0) {
 ; X64-NEXT:    shr eax
 ; X64-NEXT:    and eax, 0x55555555
 ; X64-NEXT:    lea eax, [rax + 2*rcx]
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -136,7 +133,7 @@ define i32 @bitrev_i32(i32 %0) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    bswap edi
 ; X64-NEXT:    mov eax, edi
 ; X64-NEXT:    and eax, 0xf0f0f0f
@@ -154,7 +151,6 @@ define i32 @bitrev_i32(i32 %0) {
 ; X64-NEXT:    shr eax
 ; X64-NEXT:    and eax, 0x55555555
 ; X64-NEXT:    lea eax, [rax + 2*rcx]
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -176,7 +172,7 @@ define i37 @bitrev_i37(i37 %0) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    shl rdi, 0x1b
 ; X64-NEXT:    bswap rdi
 ; X64-NEXT:    mov rax, rdi
@@ -198,7 +194,6 @@ define i37 @bitrev_i37(i37 %0) {
 ; X64-NEXT:    shr rax
 ; X64-NEXT:    and rax, rcx
 ; X64-NEXT:    lea rax, [rax + 2*rdx]
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -221,7 +216,7 @@ define i64 @bitrev_i64(i64 %0) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    bswap rdi
 ; X64-NEXT:    mov rax, rdi
 ; X64-NEXT:    shr rax, 0x4
@@ -242,7 +237,6 @@ define i64 @bitrev_i64(i64 %0) {
 ; X64-NEXT:    shr rax
 ; X64-NEXT:    and rax, rcx
 ; X64-NEXT:    lea rax, [rax + 2*rdx]
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;

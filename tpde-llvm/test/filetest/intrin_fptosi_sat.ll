@@ -10,7 +10,7 @@ define i32 @f32toi32(float %f) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    cvttss2si eax, xmm0
 ; X64-NEXT:    ucomiss xmm0, dword ptr <f32toi32+0x18>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
@@ -19,7 +19,6 @@ define i32 @f32toi32(float %f) {
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    ucomiss xmm0, xmm0
 ; X64-NEXT:    cmovnp eax, ecx
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -41,7 +40,7 @@ define i64 @f32toi64(float %f) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    cvttss2si rax, xmm0
 ; X64-NEXT:    ucomiss xmm0, dword ptr <f32toi64+0x19>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
@@ -50,7 +49,6 @@ define i64 @f32toi64(float %f) {
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    ucomiss xmm0, xmm0
 ; X64-NEXT:    cmovnp rax, rcx
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -72,7 +70,7 @@ define i32 @f64toi32(double %f) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    ucomisd xmm0, xmm0
 ; X64-NEXT:    maxsd xmm0, qword ptr <f64toi32+0x1a>
@@ -81,7 +79,6 @@ define i32 @f64toi32(double %f) {
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    cvttsd2si ecx, xmm0
 ; X64-NEXT:    cmovnp eax, ecx
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -103,7 +100,7 @@ define i64 @f64toi64(double %f) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    cvttsd2si rax, xmm0
 ; X64-NEXT:    ucomisd xmm0, qword ptr <f64toi64+0x19>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
@@ -112,7 +109,6 @@ define i64 @f64toi64(double %f) {
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    ucomisd xmm0, xmm0
 ; X64-NEXT:    cmovnp rax, rcx
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;

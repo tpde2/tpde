@@ -12,7 +12,7 @@ define i32 @phi_cycle() {
 ; X64-NEXT:    push rbx
 ; X64-NEXT:    push r12
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x20
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov eax, 0x1
 ; X64-NEXT:    mov ebx, eax
 ; X64-NEXT:    mov eax, 0x2
@@ -50,7 +50,7 @@ define i32 @phi_unicycle() {
 ; X64-NEXT:    push rbx
 ; X64-NEXT:    push r12
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x20
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov eax, 0x1
 ; X64-NEXT:    mov ebx, eax
 ; X64-NEXT:    mov eax, 0x2
@@ -83,8 +83,7 @@ define ptr @phi_twocycles() {
 ; X64-NEXT:    push r12
 ; X64-NEXT:    push r13
 ; X64-NEXT:    push r14
-; X64-NEXT:    nop
-; X64-NEXT:    sub rsp, 0x10
+; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    mov eax, 0x1
 ; X64-NEXT:    mov ebx, eax
 ; X64-NEXT:    mov eax, 0x2
@@ -143,8 +142,8 @@ define ptr @phi_cycles_selfref() {
 ; X64-NEXT:    push rbx
 ; X64-NEXT:    push r12
 ; X64-NEXT:    push r13
-; X64-NEXT:    nop dword ptr [rax]
-; X64-NEXT:    sub rsp, 0x18
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop
 ; X64-NEXT:    mov eax, 0x1
 ; X64-NEXT:    mov ebx, eax
 ; X64-NEXT:    mov eax, 0x2
@@ -190,7 +189,7 @@ define void @phi_cycle_i128(i1 %c, i128 %v1, i128 %v2) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x50
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov qword ptr [rbp - 0x40], rsi
 ; X64-NEXT:    mov qword ptr [rbp - 0x38], rdx
 ; X64-NEXT:    mov qword ptr [rbp - 0x50], rcx
@@ -237,8 +236,8 @@ define void @phi_cycle_multipart(i1 %c, [4 x i64] %v1, [4 x i64] %v2) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop dword ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x88
+; X64-NEXT:    nop dword ptr [rax + rax]
 ; X64-NEXT:    mov rax, qword ptr [rbp + 0x10]
 ; X64-NEXT:    mov rbx, qword ptr [rbp + 0x18]
 ; X64-NEXT:    mov rdi, qword ptr [rbp + 0x20]
@@ -335,7 +334,7 @@ define i32 @phi_last_use(i1 %c, i32 %a, i32 %b) {
 ; X64-NEXT:    push rbx
 ; X64-NEXT:    push r12
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x20
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov ebx, esi
 ; X64-NEXT:    test dil, 0x1
 ; X64-NEXT:    je <L0>
@@ -349,7 +348,6 @@ define i32 @phi_last_use(i1 %c, i32 %a, i32 %b) {
 ; X64-NEXT:    mov r12d, eax
 ; X64-NEXT:  <L1>:
 ; X64-NEXT:    mov eax, r12d
-; X64-NEXT:    add rsp, 0x20
 ; X64-NEXT:    pop r12
 ; X64-NEXT:    pop rbx
 ; X64-NEXT:    pop rbp

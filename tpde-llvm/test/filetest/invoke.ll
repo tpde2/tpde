@@ -12,8 +12,9 @@ define i32 @invoke_manyargs() personality ptr @__gxx_personality_v0 {
 ; X64-LABEL: <invoke_manyargs>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov edi, 0x1
 ; X64-NEXT:    mov esi, 0x2
 ; X64-NEXT:    mov edx, 0x3
@@ -38,7 +39,8 @@ define i32 @invoke_manyargs() personality ptr @__gxx_personality_v0 {
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop
 ; X64-NEXT:    mov rdi, rax
 ; X64-NEXT:    mov esi, edx
 ; X64-NEXT:  <L1>:
@@ -96,8 +98,8 @@ define void @invoke_landingpad_phi() personality ptr @__gxx_personality_v0 {
 ; X64-NEXT:    push rbx
 ; X64-NEXT:    push r12
 ; X64-NEXT:    push r13
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    sub rsp, 0x28
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov dword ptr [rbp - 0x2c], eax
 ; X64-NEXT:    xor eax, eax
@@ -244,8 +246,9 @@ define i32 @invoke_catch_symbol() personality ptr @__gxx_personality_v0 {
 ; X64-LABEL: <invoke_catch_symbol>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    xor edi, edi
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    call <L0>
@@ -293,8 +296,8 @@ define i32 @main(ptr %0, i64 %1) personality ptr @__gxx_personality_v0 {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
 ; X64-NEXT:    push r12
-; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    sub rsp, 0x20
+; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    mov rbx, rdi
 ; X64-NEXT:    mov r12, rsi
 ; X64-NEXT:    xor edi, edi
@@ -310,6 +313,7 @@ define i32 @main(ptr %0, i64 %1) personality ptr @__gxx_personality_v0 {
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:  <L1>:
 ; X64-NEXT:    mov rax, qword ptr [rbp - 0x30]
 ; X64-NEXT:    lea rax, [rax + 0x8]

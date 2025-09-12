@@ -12,11 +12,10 @@ define void @store_glob(ptr %ptr) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    lea rax, <store_glob+0x13>
 ; X64-NEXT:     R_X86_64_PC32 glob-0x4
 ; X64-NEXT:    mov qword ptr [rdi], rax
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -42,11 +41,10 @@ define void @store_glob_ptrtoint(ptr %ptr) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    lea rax, <store_glob_ptrtoint+0x13>
 ; X64-NEXT:     R_X86_64_PC32 glob-0x4
 ; X64-NEXT:    mov qword ptr [rdi], rax
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -72,12 +70,11 @@ define void @store_glob_ptrtoint_trunc_add(ptr %ptr) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    lea rax, <store_glob_ptrtoint_trunc_add+0x13>
 ; X64-NEXT:     R_X86_64_PC32 glob-0x4
 ; X64-NEXT:    lea eax, [rax + 0x20]
 ; X64-NEXT:    mov dword ptr [rdi], eax
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -104,10 +101,9 @@ define void @store_struct1(ptr %ptr) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov dword ptr [rdi], 0x0
 ; X64-NEXT:    mov dword ptr [rdi + 0x4], 0x1
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -132,12 +128,11 @@ define void @store_struct2(ptr %ptr) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov dword ptr [rdi], 0x0
 ; X64-NEXT:    lea rax, <store_struct2+0x19>
 ; X64-NEXT:     R_X86_64_PC32 glob-0x4
 ; X64-NEXT:    mov qword ptr [rdi + 0x8], rax
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -165,7 +160,7 @@ define void @store_struct3(ptr %ptr) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    lea rax, <store_struct3+0x13>
 ; X64-NEXT:     R_X86_64_PC32 glob-0x4
 ; X64-NEXT:    lea eax, [rax + 0x20]
@@ -173,7 +168,6 @@ define void @store_struct3(ptr %ptr) {
 ; X64-NEXT:    xor edx, edx
 ; X64-NEXT:    mov dword ptr [rdi], ecx
 ; X64-NEXT:    mov dword ptr [rdi + 0x4], eax
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -203,7 +197,7 @@ define void @vector_constantexpr(ptr %ptr) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    lea rax, <vector_constantexpr+0x13>
 ; X64-NEXT:     R_X86_64_PC32 glob-0x4
 ; X64-NEXT:    lea rcx, <vector_constantexpr+0x1a>
@@ -217,7 +211,6 @@ define void @vector_constantexpr(ptr %ptr) {
 ; X64-NEXT:    mov dword ptr [rbp - 0x2c], ecx
 ; X64-NEXT:    movq xmm0, qword ptr [rbp - 0x30]
 ; X64-NEXT:    movsd qword ptr [rdi], xmm0
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -251,7 +244,7 @@ define void @vector_ptrs(ptr %ptr) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x50
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    lea rax, [rax + 0x28]
 ; X64-NEXT:    pxor xmm0, xmm0
@@ -272,7 +265,6 @@ define void @vector_ptrs(ptr %ptr) {
 ; X64-NEXT:    movups xmmword ptr [rdi], xmm0
 ; X64-NEXT:    movapd xmm0, xmmword ptr [rbp - 0x40]
 ; X64-NEXT:    movups xmmword ptr [rdi + 0x10], xmm0
-; X64-NEXT:    add rsp, 0x50
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -309,12 +301,11 @@ define void @store_array1(ptr %ptr) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    lea rax, <store_array1+0x13>
 ; X64-NEXT:     R_X86_64_PC32 glob-0x4
 ; X64-NEXT:    mov qword ptr [rdi], rax
 ; X64-NEXT:    mov qword ptr [rdi + 0x8], 0x0
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -342,11 +333,10 @@ define void @store_array2(ptr %ptr) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov qword ptr [rdi], 0xbc614e
 ; X64-NEXT:    movabs rax, 0x44e6af645f07c
 ; X64-NEXT:    mov qword ptr [rdi + 0x8], rax
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -375,8 +365,8 @@ define void @phi_const_float(ptr %ptr) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop dword ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x28
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    mov rbx, rdi
 ; X64-NEXT:    mov eax, 0x42000000
 ; X64-NEXT:    movd xmm0, eax
@@ -392,7 +382,6 @@ define void @phi_const_float(ptr %ptr) {
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    movd xmm0, dword ptr [rbp - 0x2c]
 ; X64-NEXT:    movss dword ptr [rbx], xmm0
-; X64-NEXT:    add rsp, 0x28
 ; X64-NEXT:    pop rbx
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -441,7 +430,7 @@ define void @phi_const_float_regpressure(ptr %ptr) {
 ; X64-NEXT:    push r13
 ; X64-NEXT:    push r14
 ; X64-NEXT:    push r15
-; X64-NEXT:    sub rsp, 0x28
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov rbx, rdi
 ; X64-NEXT:    movzx eax, byte ptr [rbx]
 ; X64-NEXT:    mov r12d, eax
@@ -581,7 +570,6 @@ define void @phi_const_float_regpressure(ptr %ptr) {
 ; X64-NEXT:    mov byte ptr [rbx], al
 ; X64-NEXT:    movd xmm0, dword ptr [rbp - 0x48]
 ; X64-NEXT:    movss dword ptr [rbx], xmm0
-; X64-NEXT:    add rsp, 0x28
 ; X64-NEXT:    pop r15
 ; X64-NEXT:    pop r14
 ; X64-NEXT:    pop r13
@@ -828,7 +816,7 @@ define void @phi_glob(ptr %ptr) {
 ; X64-NEXT:    push rbx
 ; X64-NEXT:    push r12
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x20
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov rbx, rdi
 ; X64-NEXT:    lea rax, <phi_glob+0x16>
 ; X64-NEXT:     R_X86_64_PC32 glob-0x4
@@ -843,7 +831,6 @@ define void @phi_glob(ptr %ptr) {
 ; X64-NEXT:    jmp <L1>
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    mov qword ptr [rbx], r12
-; X64-NEXT:    add rsp, 0x20
 ; X64-NEXT:    pop r12
 ; X64-NEXT:    pop rbx
 ; X64-NEXT:    pop rbp
@@ -891,7 +878,7 @@ define void @phi_ptrtoint(ptr %ptr) {
 ; X64-NEXT:    push rbx
 ; X64-NEXT:    push r12
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x20
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov rbx, rdi
 ; X64-NEXT:    lea rax, <phi_ptrtoint+0x16>
 ; X64-NEXT:     R_X86_64_PC32 glob-0x4
@@ -906,7 +893,6 @@ define void @phi_ptrtoint(ptr %ptr) {
 ; X64-NEXT:    jmp <L1>
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    mov qword ptr [rbx], r12
-; X64-NEXT:    add rsp, 0x20
 ; X64-NEXT:    pop r12
 ; X64-NEXT:    pop rbx
 ; X64-NEXT:    pop rbp
@@ -954,7 +940,7 @@ define void @phi_ptrtoint_multiedge(i1 %cond, ptr %ptr) {
 ; X64-NEXT:    push rbx
 ; X64-NEXT:    push r12
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x20
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov rbx, rsi
 ; X64-NEXT:    lea rax, <phi_ptrtoint_multiedge+0x16>
 ; X64-NEXT:     R_X86_64_PC32 glob-0x4
@@ -974,7 +960,6 @@ define void @phi_ptrtoint_multiedge(i1 %cond, ptr %ptr) {
 ; X64-NEXT:    jmp <L1>
 ; X64-NEXT:  <L2>:
 ; X64-NEXT:    mov qword ptr [rbx], r12
-; X64-NEXT:    add rsp, 0x20
 ; X64-NEXT:    pop r12
 ; X64-NEXT:    pop rbx
 ; X64-NEXT:    pop rbp
@@ -1026,7 +1011,7 @@ define void @phi_ptrtoint_trunc_add(ptr %ptr) {
 ; X64-NEXT:    push rbx
 ; X64-NEXT:    push r12
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x20
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov rbx, rdi
 ; X64-NEXT:    lea rax, <phi_ptrtoint_trunc_add+0x16>
 ; X64-NEXT:     R_X86_64_PC32 glob-0x4
@@ -1043,7 +1028,6 @@ define void @phi_ptrtoint_trunc_add(ptr %ptr) {
 ; X64-NEXT:    jmp <L1>
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    mov dword ptr [rbx], r12d
-; X64-NEXT:    add rsp, 0x20
 ; X64-NEXT:    pop r12
 ; X64-NEXT:    pop rbx
 ; X64-NEXT:    pop rbp
@@ -1091,8 +1075,8 @@ define void @phi_struct1(ptr %ptr) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop dword ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x28
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    mov rbx, rdi
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov dword ptr [rbp - 0x30], eax
@@ -1112,7 +1096,6 @@ define void @phi_struct1(ptr %ptr) {
 ; X64-NEXT:    mov dword ptr [rbx], eax
 ; X64-NEXT:    mov eax, dword ptr [rbp - 0x2c]
 ; X64-NEXT:    mov dword ptr [rbx + 0x4], eax
-; X64-NEXT:    add rsp, 0x28
 ; X64-NEXT:    pop rbx
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -1158,8 +1141,8 @@ define void @phi_struct2(ptr %ptr) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop dword ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x38
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    mov rbx, rdi
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov dword ptr [rbp - 0x40], eax
@@ -1181,7 +1164,6 @@ define void @phi_struct2(ptr %ptr) {
 ; X64-NEXT:    mov dword ptr [rbx], eax
 ; X64-NEXT:    mov rax, qword ptr [rbp - 0x38]
 ; X64-NEXT:    mov qword ptr [rbx + 0x8], rax
-; X64-NEXT:    add rsp, 0x38
 ; X64-NEXT:    pop rbx
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -1233,8 +1215,8 @@ define void @phi_struct3(ptr %ptr) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop dword ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x28
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    mov rbx, rdi
 ; X64-NEXT:    lea rax, <phi_struct3+0x16>
 ; X64-NEXT:     R_X86_64_PC32 glob-0x4
@@ -1260,7 +1242,6 @@ define void @phi_struct3(ptr %ptr) {
 ; X64-NEXT:    mov dword ptr [rbx], eax
 ; X64-NEXT:    mov eax, dword ptr [rbp - 0x2c]
 ; X64-NEXT:    mov dword ptr [rbx + 0x4], eax
-; X64-NEXT:    add rsp, 0x28
 ; X64-NEXT:    pop rbx
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -1318,8 +1299,8 @@ define i32 @phi_gep_before_icmp(i32 %0) {
 ; X64-NEXT:    push rbx
 ; X64-NEXT:    push r12
 ; X64-NEXT:    push r13
-; X64-NEXT:    nop dword ptr [rax]
-; X64-NEXT:    sub rsp, 0x18
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop
 ; X64-NEXT:    mov ebx, edi
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    test al, 0x1
@@ -1348,7 +1329,6 @@ define i32 @phi_gep_before_icmp(i32 %0) {
 ; X64-NEXT:    mov r12d, ebx
 ; X64-NEXT:  <L1>:
 ; X64-NEXT:    xor eax, eax
-; X64-NEXT:    add rsp, 0x18
 ; X64-NEXT:    pop r13
 ; X64-NEXT:    pop r12
 ; X64-NEXT:    pop rbx
@@ -1414,7 +1394,7 @@ define void @phi_gep_before_icmp_twice() {
 ; X64-NEXT:    push rbx
 ; X64-NEXT:    push r12
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x20
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    lea rax, [rax + 0xa]
 ; X64-NEXT:    xor ecx, ecx
@@ -1492,8 +1472,8 @@ define i32 @phi_gep_insert_after_earlier_phi() {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop dword ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x28
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov dword ptr [rbp - 0x2c], eax
 ; X64-NEXT:    xor eax, eax
@@ -1516,7 +1496,6 @@ define i32 @phi_gep_insert_after_earlier_phi() {
 ; X64-NEXT:    mov rbx, rax
 ; X64-NEXT:  <L4>:
 ; X64-NEXT:    xor eax, eax
-; X64-NEXT:    add rsp, 0x28
 ; X64-NEXT:    pop rbx
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret

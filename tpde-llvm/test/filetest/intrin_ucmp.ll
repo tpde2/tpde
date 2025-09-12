@@ -11,14 +11,13 @@ define i17 @ucmpi17(i17 %0, i17 %1) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    and edi, 0x1ffff
 ; X64-NEXT:    and esi, 0x1ffff
 ; X64-NEXT:    cmp edi, esi
 ; X64-NEXT:    seta al
 ; X64-NEXT:    sbb al, 0x0
 ; X64-NEXT:    movsx rax, al
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -46,12 +45,11 @@ define i32 @ucmpi32(i32 %0, i32 %1) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    cmp edi, esi
 ; X64-NEXT:    seta al
 ; X64-NEXT:    sbb al, 0x0
 ; X64-NEXT:    movsx rax, al
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -77,7 +75,7 @@ define i37 @ucmpi37(i37 %0, i37 %1) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movabs rax, 0x1fffffffff
 ; X64-NEXT:    and rdi, rax
 ; X64-NEXT:    movabs rax, 0x1fffffffff
@@ -86,7 +84,6 @@ define i37 @ucmpi37(i37 %0, i37 %1) {
 ; X64-NEXT:    seta al
 ; X64-NEXT:    sbb al, 0x0
 ; X64-NEXT:    movsx rax, al
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -114,12 +111,11 @@ define i64 @ucmpi64(i64 %0, i64 %1) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    cmp rdi, rsi
 ; X64-NEXT:    seta al
 ; X64-NEXT:    sbb al, 0x0
 ; X64-NEXT:    movsx rax, al
-; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;

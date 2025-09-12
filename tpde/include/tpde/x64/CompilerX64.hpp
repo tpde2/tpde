@@ -11,10 +11,6 @@
 
 #include <bit>
 
-#ifdef TPDE_ASSERTS
-  #include <fadec.h>
-#endif
-
 // Helper macros for assembling in the compiler
 #if defined(ASM) || defined(ASMF) || defined(ASMNC) || defined(ASME)
   #error Got definition for ASM macros from somewhere else. Maybe you included compilers for multiple architectures?
@@ -150,6 +146,7 @@ public:
           AsmReg::XMM6,
           AsmReg::XMM7,
       }),
+      .red_zone_size = 128,
   };
 
 private:
@@ -341,8 +338,6 @@ struct CompilerX64 : BaseTy<Adaptor, Derived, Config> {
       create_bitmask({AsmReg::AX, AsmReg::DX, AsmReg::CX});
   u32 func_start_off = 0u, func_reg_save_off = 0u, func_reg_save_alloc = 0u,
       func_reg_restore_alloc = 0u;
-  /// Offset to the `sub rsp, XXX` instruction that sets up the frame
-  u32 frame_size_setup_offset = 0u;
   /// For vararg functions only: number of scalar and xmm registers used.
   // TODO: this information should be obtained from the CCAssigner.
   u32 scalar_arg_count = 0xFFFF'FFFF, vec_arg_count = 0xFFFF'FFFF;
@@ -569,8 +564,8 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::gen_func_prolog_and_args(
 
   u32 csr_logp = std::popcount((csr >> AsmReg::AX) & 0xff);
   u32 csr_higp = std::popcount((csr >> AsmReg::R8) & 0xff);
-  // R8 and higher need a REX prefix.
-  u32 reg_save_size = 1 * csr_logp + 2 * csr_higp;
+  // R8 and higher need a REX prefix; 7 bytes for sub rsp.
+  u32 reg_save_size = 1 * csr_logp + 2 * csr_higp + 7;
   this->stack.frame_size = 8 * (csr_logp + csr_higp);
   max_callee_stack_arg_size = 0;
 
@@ -581,13 +576,6 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::gen_func_prolog_and_args(
   func_reg_restore_alloc = reg_save_size;
 
   // TODO(ts): support larger stack alignments?
-
-  // placeholder for later
-  frame_size_setup_offset = this->text_writer.offset();
-  ASM(SUB64ri, FE_SP, 0x7FFF'FFFF);
-#ifdef TPDE_ASSERTS
-  assert((this->text_writer.offset() - frame_size_setup_offset) == 7);
-#endif
 
   if (this->adaptor->cur_is_vararg()) {
     this->stack.frame_size += 6 * 8 + 8 * 16;
@@ -711,7 +699,8 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::finish_func(
   this->assembler.eh_write_inst(dwarf::DW_CFA_advance_loc, 0);
 
   auto *write_ptr = this->text_writer.begin_ptr() + func_reg_save_off;
-  auto csr = derived()->cur_cc_assigner()->get_ccinfo().callee_saved_regs;
+  const CCInfo &ccinfo = derived()->cur_cc_assigner()->get_ccinfo();
+  auto csr = ccinfo.callee_saved_regs;
   u64 saved_regs = this->register_file.clobbered & csr;
   u32 num_saved_regs = 0u;
   for (auto reg : util::BitSetIterator{saved_regs}) {
@@ -746,12 +735,6 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::finish_func(
     this->assembler.eh_write_inst(dwarf::DW_CFA_offset, dwarf_reg, cfa_off);
   }
 
-  u32 prologue_size =
-      write_ptr - (this->text_writer.begin_ptr() + func_start_off);
-  assert(prologue_size < 0x44);
-  this->assembler.eh_writer.data()[fde_prologue_adv_off] =
-      dwarf::DW_CFA_advance_loc | (prologue_size - 4);
-
   assert((!this->stack.has_dynamic_alloca || max_callee_stack_arg_size == 0) &&
          "stack with dynamic alloca must adjust stack pointer at call sites");
   // The frame_size contains the reserved frame size so we need to subtract
@@ -759,22 +742,19 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::finish_func(
   u32 final_frame_size =
       util::align_up(this->stack.frame_size + max_callee_stack_arg_size, 16);
   u32 rsp_adjustment = final_frame_size - num_saved_regs * 8;
-  *reinterpret_cast<u32 *>(this->text_writer.begin_ptr() +
-                           frame_size_setup_offset + 3) = rsp_adjustment;
-#ifdef TPDE_ASSERTS
-  FdInstr instr = {};
-  assert(fd_decode(this->text_writer.begin_ptr() + frame_size_setup_offset,
-                   7,
-                   64,
-                   0,
-                   &instr) == 7);
-  assert(FD_TYPE(&instr) == FDI_SUB);
-  assert(FD_OP_TYPE(&instr, 0) == FD_OT_REG);
-  assert(FD_OP_TYPE(&instr, 1) == FD_OT_IMM);
-  assert(FD_OP_SIZE(&instr, 0) == 8);
-  assert(FD_OP_SIZE(&instr, 1) == 8);
-  assert(FD_OP_IMM(&instr, 1) == rsp_adjustment);
-#endif
+  bool needs_rsp_adjustment = this->stack.generated_call ||
+                              this->stack.has_dynamic_alloca ||
+                              rsp_adjustment > ccinfo.red_zone_size;
+
+  if (needs_rsp_adjustment) {
+    write_ptr += fe64_SUB64ri(write_ptr, 0, FE_SP, rsp_adjustment);
+  }
+
+  u32 prologue_size =
+      write_ptr - (this->text_writer.begin_ptr() + func_start_off);
+  assert(prologue_size < 0x44);
+  this->assembler.eh_writer.data()[fde_prologue_adv_off] =
+      dwarf::DW_CFA_advance_loc | (prologue_size - 4);
 
   // nop out the rest
   const auto reg_save_end =
@@ -815,7 +795,7 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::finish_func(
                          FE_SP,
                          FE_MEM(FE_BP, 0, FE_NOREG, -(i32)num_saved_regs * 8));
       }
-    } else {
+    } else if (needs_rsp_adjustment) {
       write_ptr += fe64_ADD64ri(write_ptr, 0, FE_SP, rsp_adjustment);
     }
     for (auto reg : util::BitSetIterator<true>{saved_regs}) {
@@ -1845,6 +1825,7 @@ CompilerX64<Adaptor, Derived, BaseTy, Config>::ScratchReg
     // parameter in rdi.
     assert(!this->stack.is_leaf_function);
     assert(may_clobber_flags());
+    this->stack.generated_call = true;
     auto csr = CCAssignerSysV::Info.callee_saved_regs;
     for (auto reg : util::BitSetIterator<>{this->register_file.used & ~csr}) {
       this->evict_reg(Reg{reg});
