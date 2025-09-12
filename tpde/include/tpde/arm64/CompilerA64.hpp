@@ -748,7 +748,7 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::gen_func_prolog_and_args(
     // additionally, there's an add sp, ldp x29/x30, ret (+12)
     func_epilogue_alloc = reg_save_size + 12;
     // extra mov sp, fp
-    func_epilogue_alloc += this->adaptor->cur_has_dynamic_alloca() ? 4 : 0;
+    func_epilogue_alloc += this->stack.has_dynamic_alloca ? 4 : 0;
   }
 
   // TODO(ts): support larger stack alignments?
@@ -880,9 +880,8 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::finish_func(
   auto csr = derived()->cur_cc_assigner()->get_ccinfo().callee_saved_regs;
   u64 saved_regs = this->register_file.clobbered & csr;
 
-  const auto dyn_alloca = this->adaptor->cur_has_dynamic_alloca();
   auto stack_reg = DA_SP;
-  if (dyn_alloca) {
+  if (this->stack.has_dynamic_alloca) {
     stack_reg = DA_GP(29);
   }
 
@@ -1011,7 +1010,7 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::finish_func(
   {
     u32 *write_ptr = reinterpret_cast<u32 *>(text_data + first_ret_off);
     const auto ret_start = write_ptr;
-    if (dyn_alloca) {
+    if (this->stack.has_dynamic_alloca) {
       *write_ptr++ = de64_MOV_SPx(DA_SP, DA_GP(29));
     } else {
       *write_ptr++ = de64_LDPx(DA_GP(29), DA_GP(30), DA_SP, 0);
@@ -1053,7 +1052,7 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::finish_func(
       }
     }
 
-    if (dyn_alloca) {
+    if (this->stack.has_dynamic_alloca) {
       *write_ptr++ = de64_LDPx(DA_GP(29), DA_GP(30), DA_SP, 0);
     }
 
@@ -1525,7 +1524,7 @@ AsmReg
 
   u64 possible_regs;
   auto csr = derived()->cur_cc_assigner()->get_ccinfo().callee_saved_regs;
-  if (derived()->cur_func_may_emit_calls()) {
+  if (!this->stack.is_leaf_function) {
     // we can only allocated fixed assignments from the callee-saved regs
     possible_regs = find_possible_regs(csr);
   } else {

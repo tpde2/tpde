@@ -796,7 +796,7 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::finish_func(
   {
     write_ptr = text_data + first_ret_off;
     const auto ret_start = write_ptr;
-    if (this->adaptor->cur_has_dynamic_alloca()) {
+    if (this->stack.has_dynamic_alloca) {
       if (num_saved_regs == 0) {
         write_ptr += fe64_MOV64rr(write_ptr, 0, FE_SP, FE_BP);
       } else {
@@ -1150,6 +1150,8 @@ template <IRAdaptor Adaptor,
           typename Config>
 void CompilerX64<Adaptor, Derived, BaseTy, Config>::alloca_fixed(
     u64 size, u32 align, ValuePart &res) noexcept {
+  assert(this->stack.has_dynamic_alloca &&
+         "function marked as not having dynamic allocas can't have alloca");
   assert(align != 0 && (align & (align - 1)) == 0 && "invalid alignment");
   assert(may_clobber_flags());
   size = tpde::util::align_up(size, 16);
@@ -1170,6 +1172,8 @@ template <IRAdaptor Adaptor,
           typename Config>
 void CompilerX64<Adaptor, Derived, BaseTy, Config>::alloca_dynamic(
     u64 elem_size, ValuePart &&count, u32 align, ValuePart &res) noexcept {
+  assert(this->stack.has_dynamic_alloca &&
+         "function marked as not having dynamic allocas can't have alloca");
   assert(align != 0 && (align & (align - 1)) == 0 && "invalid alignment");
   assert(may_clobber_flags());
   AsmReg size_reg = count.has_reg() ? count.cur_reg() : count.load_to_reg(this);
@@ -1341,7 +1345,7 @@ AsmReg
 
   u64 possible_regs;
   auto csr = derived()->cur_cc_assigner()->get_ccinfo().callee_saved_regs;
-  if (derived()->cur_func_may_emit_calls()) {
+  if (!this->stack.is_leaf_function) {
     // we can only allocated fixed assignments from the callee-saved regs
     possible_regs = find_possible_regs(csr);
   } else {
@@ -1829,6 +1833,7 @@ CompilerX64<Adaptor, Derived, BaseTy, Config>::ScratchReg
   case TLSModel::GlobalDynamic: {
     // Generate function call to __tls_get_addr; on x86-64, this takes a single
     // parameter in rdi.
+    assert(!this->stack.is_leaf_function);
     assert(may_clobber_flags());
     auto csr = CCAssignerSysV::Info.callee_saved_regs;
     for (auto reg : util::BitSetIterator<>{this->register_file.used & ~csr}) {

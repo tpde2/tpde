@@ -127,6 +127,12 @@ struct CompilerBase {
   struct {
     /// The current size of the stack frame
     u32 frame_size = 0;
+    /// Whether the stack frame might have dynamic alloca. Dynamic allocas may
+    /// require a different and less efficient frame setup.
+    bool has_dynamic_alloca;
+    /// Whether the function is a leaf function. Some ABIs permit a simpler
+    /// stack frame layout for leaf functions.
+    bool is_leaf_function;
     /// Free-Lists for 1/2/4/8/16 sized allocations
     // TODO(ts): make the allocations for 4/8 different from the others
     // since they are probably the one's most used?
@@ -594,6 +600,7 @@ template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>
 template <typename CBDerived>
 void CompilerBase<Adaptor, Derived, Config>::CallBuilderBase<CBDerived>::call(
     std::variant<SymRef, ValuePart> target) noexcept {
+  assert(!compiler.stack.is_leaf_function && "leaf func must not have calls");
   typename RegisterFile::RegBitSet skip_evict = arg_regs;
   if (auto *vp = std::get_if<ValuePart>(&target); vp && vp->can_salvage()) {
     // call_impl will reset vp, thereby unlock+free the register.
@@ -1942,6 +1949,9 @@ bool CompilerBase<Adaptor, Derived, Config>::compile_func(
     e.clear();
   }
   stack.dynamic_free_lists.clear();
+  // TODO: sort out the inconsistency about adaptor vs. compiler methods.
+  stack.has_dynamic_alloca = this->adaptor->cur_has_dynamic_alloca();
+  stack.is_leaf_function = !derived()->cur_func_may_emit_calls();
 
   assignments.cur_fixed_assignment_count = {};
   assert(std::ranges::none_of(assignments.value_ptrs, std::identity{}));

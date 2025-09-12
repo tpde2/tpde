@@ -3719,7 +3719,6 @@ template <typename Adaptor, typename Derived, typename Config>
 bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_alloca(
     const llvm::Instruction *inst, const ValInfo &, u64) noexcept {
   const auto *alloca = llvm::cast<llvm::AllocaInst>(inst);
-  assert(this->adaptor->cur_has_dynamic_alloca());
 
   auto [res_vr, res_ref] = this->result_ref_single(alloca);
 
