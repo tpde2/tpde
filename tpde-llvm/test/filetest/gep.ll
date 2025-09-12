@@ -2302,6 +2302,75 @@ define dso_local ptr @gep_array(ptr noundef %0) #0 {
   ret ptr %gep
 }
 
+define i32 @gep_alloca_nofuse(i32 %a) {
+; X64-LABEL: <gep_alloca_nofuse>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop dword ptr [rax]
+; X64-NEXT:    lea rax, [rbp - 0x34]
+; X64-NEXT:    lea edi, [rdi + 0x1]
+; X64-NEXT:    lea rcx, [rbp - 0x34]
+; X64-NEXT:    mov dword ptr [rax], edi
+; X64-NEXT:    mov ecx, dword ptr [rcx]
+; X64-NEXT:    mov eax, ecx
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <gep_alloca_nofuse>:
+; ARM64:         sub sp, sp, #0xc0
+; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
+; ARM64-NEXT:    add x1, x29, #0xbc
+; ARM64-NEXT:    add w0, w0, #0x1
+; ARM64-NEXT:    add x2, x29, #0xbc
+; ARM64-NEXT:    str w0, [x1]
+; ARM64-NEXT:    ldr w2, [x2]
+; ARM64-NEXT:    mov w0, w2
+; ARM64-NEXT:    ldp x29, x30, [sp]
+; ARM64-NEXT:    add sp, sp, #0xc0
+; ARM64-NEXT:    ret
+  %array = alloca [32 x i8], align 1
+  %gep1 = getelementptr inbounds [32 x i8], ptr %array, i64 0, i64 28
+  %b = add i32 %a, 1
+  %gep2 = getelementptr inbounds [32 x i8], ptr %array, i64 0, i64 28
+  store i32 %b, ptr %gep1
+  %res = load i32, ptr %gep2
+  ret i32 %res
+}
+
+define i32 @gep_alloca_mult(i32 %a) {
+; X64-LABEL: <gep_alloca_mult>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop dword ptr [rax]
+; X64-NEXT:    lea rax, [rbp - 0x34]
+; X64-NEXT:    mov dword ptr [rax], edi
+; X64-NEXT:    mov eax, dword ptr [rax]
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <gep_alloca_mult>:
+; ARM64:         sub sp, sp, #0xc0
+; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
+; ARM64-NEXT:    add x1, x29, #0xbc
+; ARM64-NEXT:    str w0, [x1]
+; ARM64-NEXT:    ldr w1, [x1]
+; ARM64-NEXT:    mov w0, w1
+; ARM64-NEXT:    ldp x29, x30, [sp]
+; ARM64-NEXT:    add sp, sp, #0xc0
+; ARM64-NEXT:    ret
+  %array = alloca [32 x i8], align 1
+  %gep = getelementptr inbounds [32 x i8], ptr %array, i64 0, i64 28
+  store i32 %a, ptr %gep
+  %res = load i32, ptr %gep
+  ret i32 %res
+}
+
 define ptr @gep_array_constoff(ptr noundef %0) {
 ; X64-LABEL: <gep_array_constoff>:
 ; X64:         push rbp
