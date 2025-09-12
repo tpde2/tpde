@@ -870,7 +870,7 @@ define void @f2(ptr %0, ptr %1, ptr %2, ptr %3, ptr %4, ptr %5, ptr %6, ptr %7, 
 ; X64-NEXT:    push r13
 ; X64-NEXT:    push r14
 ; X64-NEXT:    push r15
-; X64-NEXT:    sub rsp, 0x9ce8
+; X64-NEXT:    sub rsp, 0x9e18
 ; X64-NEXT:    mov rax, qword ptr [rbp + 0x10]
 ; X64-NEXT:    mov rbx, qword ptr [rbp + 0x18]
 ; X64-NEXT:    mov r10, qword ptr [rbp + 0x20]
@@ -939,7 +939,6 @@ define void @f2(ptr %0, ptr %1, ptr %2, ptr %3, ptr %4, ptr %5, ptr %6, ptr %7, 
 ; X64-NEXT:    xor r8d, r8d
 ; X64-NEXT:    mov qword ptr [rbp - 0x9d08], r9
 ; X64-NEXT:    xor r9d, r9d
-; X64-NEXT:    sub rsp, 0x130
 ; X64-NEXT:    mov qword ptr [rbp - 0x9d10], rax
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov qword ptr [rsp], rax
@@ -1012,8 +1011,7 @@ define void @f2(ptr %0, ptr %1, ptr %2, ptr %3, ptr %4, ptr %5, ptr %6, ptr %7, 
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    call <L0>
 ; X64-NEXT:     R_X86_64_PLT32 f1-0x4
-; X64-NEXT:    add rsp, 0x130
-; X64-NEXT:    add rsp, 0x9ce8
+; X64-NEXT:    add rsp, 0x9e18
 ; X64-NEXT:    pop r15
 ; X64-NEXT:    pop r14
 ; X64-NEXT:    pop r13

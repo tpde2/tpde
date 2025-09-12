@@ -42,9 +42,8 @@ define i32 @call_byval(i32 %0) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x40
+; X64-NEXT:    sub rsp, 0x50
 ; X64-NEXT:    lea rax, [rbp - 0x40]
-; X64-NEXT:    sub rsp, 0x10
 ; X64-NEXT:    mov rcx, qword ptr [rax]
 ; X64-NEXT:    mov qword ptr [rsp], rcx
 ; X64-NEXT:    mov rcx, qword ptr [rax + 0x8]
@@ -52,8 +51,7 @@ define i32 @call_byval(i32 %0) {
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    call <L0>
 ; X64-NEXT:     R_X86_64_PLT32 fn_i32_byval_ptr_i32_i32-0x4
-; X64-NEXT:    add rsp, 0x10
-; X64-NEXT:    add rsp, 0x40
+; X64-NEXT:    add rsp, 0x50
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -131,8 +129,7 @@ define void @call_byval2(ptr %a, ptr %b, ptr %c) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    sub rsp, 0x60
 ; X64-NEXT:    mov rax, qword ptr [rdi]
 ; X64-NEXT:    mov qword ptr [rsp], rax
 ; X64-NEXT:    mov rax, qword ptr [rdi + 0x8]
@@ -146,8 +143,7 @@ define void @call_byval2(ptr %a, ptr %b, ptr %c) {
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    call <L0>
 ; X64-NEXT:     R_X86_64_PLT32 fn_byval2-0x4
-; X64-NEXT:    add rsp, 0x30
-; X64-NEXT:    add rsp, 0x30
+; X64-NEXT:    add rsp, 0x60
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -226,8 +222,7 @@ define void @call_byval3(ptr %a, ptr %b, ptr %c, ptr %d) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:    sub rsp, 0x20
+; X64-NEXT:    sub rsp, 0x40
 ; X64-NEXT:    movzx eax, byte ptr [rdi]
 ; X64-NEXT:    mov byte ptr [rsp], al
 ; X64-NEXT:    mov eax, dword ptr [rsi]
@@ -238,8 +233,7 @@ define void @call_byval3(ptr %a, ptr %b, ptr %c, ptr %d) {
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    call <L0>
 ; X64-NEXT:     R_X86_64_PLT32 fn_byval3-0x4
-; X64-NEXT:    add rsp, 0x20
-; X64-NEXT:    add rsp, 0x30
+; X64-NEXT:    add rsp, 0x40
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;

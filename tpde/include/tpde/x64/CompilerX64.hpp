@@ -349,6 +349,11 @@ struct CompilerX64 : BaseTy<Adaptor, Derived, Config> {
   u32 reg_save_frame_off = 0;
   u32 var_arg_stack_off = 0;
   util::SmallVector<u32, 8> func_ret_offs = {};
+  /// For functions without dynamic allocas, the largest size used for arguments
+  /// passed on the stack to callees. This size is added to the stack pointer
+  /// subtraction/addition in prologue/epilogue to avoid stack pointer
+  /// adjustments at call sites.
+  u32 max_callee_stack_arg_size;
 
   /// Whether flags must be preserved when materializing constants etc.
   bool preserve_flags;
@@ -567,6 +572,7 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::gen_func_prolog_and_args(
   // R8 and higher need a REX prefix.
   u32 reg_save_size = 1 * csr_logp + 2 * csr_higp;
   this->stack.frame_size = 8 * (csr_logp + csr_higp);
+  max_callee_stack_arg_size = 0;
 
   this->text_writer.ensure_space(reg_save_size);
   this->text_writer.cur_ptr() += reg_save_size;
@@ -746,12 +752,15 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::finish_func(
   this->assembler.eh_writer.data()[fde_prologue_adv_off] =
       dwarf::DW_CFA_advance_loc | (prologue_size - 4);
 
+  assert((!this->stack.has_dynamic_alloca || max_callee_stack_arg_size == 0) &&
+         "stack with dynamic alloca must adjust stack pointer at call sites");
   // The frame_size contains the reserved frame size so we need to subtract
   // the stack space we used for the saved registers
-  const auto final_frame_size =
-      util::align_up(this->stack.frame_size, 16) - num_saved_regs * 8;
+  u32 final_frame_size =
+      util::align_up(this->stack.frame_size + max_callee_stack_arg_size, 16);
+  u32 rsp_adjustment = final_frame_size - num_saved_regs * 8;
   *reinterpret_cast<u32 *>(this->text_writer.begin_ptr() +
-                           frame_size_setup_offset + 3) = final_frame_size;
+                           frame_size_setup_offset + 3) = rsp_adjustment;
 #ifdef TPDE_ASSERTS
   FdInstr instr = {};
   assert(fd_decode(this->text_writer.begin_ptr() + frame_size_setup_offset,
@@ -764,7 +773,7 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::finish_func(
   assert(FD_OP_TYPE(&instr, 1) == FD_OT_IMM);
   assert(FD_OP_SIZE(&instr, 0) == 8);
   assert(FD_OP_SIZE(&instr, 1) == 8);
-  assert(FD_OP_IMM(&instr, 1) == final_frame_size);
+  assert(FD_OP_IMM(&instr, 1) == rsp_adjustment);
 #endif
 
   // nop out the rest
@@ -807,7 +816,7 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::finish_func(
                          FE_MEM(FE_BP, 0, FE_NOREG, -(i32)num_saved_regs * 8));
       }
     } else {
-      write_ptr += fe64_ADD64ri(write_ptr, 0, FE_SP, final_frame_size);
+      write_ptr += fe64_ADD64ri(write_ptr, 0, FE_SP, rsp_adjustment);
     }
     for (auto reg : util::BitSetIterator<true>{saved_regs}) {
       assert(reg <= AsmReg::R15);
@@ -1623,7 +1632,7 @@ template <IRAdaptor Adaptor,
           typename Config>
 void CompilerX64<Adaptor, Derived, BaseTy, Config>::CallBuilder::
     set_stack_used() noexcept {
-  if (stack_adjust_off == 0) {
+  if (this->compiler.stack.has_dynamic_alloca && stack_adjust_off == 0) {
     stack_adjust_off = this->compiler.text_writer.offset();
     // Always use 32-bit immediate
     ASMC(&this->compiler, SUB64ri, FE_SP, 0x100);
@@ -1772,7 +1781,8 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::CallBuilder::call_impl(
     sub = util::align_up(this->assigner.get_stack_size(), 0x10);
     memcpy(inst_ptr + 3, &sub, sizeof(u32));
   } else {
-    assert(this->assigner.get_stack_size() == 0);
+    auto &max_stack_size = this->compiler.max_callee_stack_arg_size;
+    max_stack_size = std::max(max_stack_size, this->assigner.get_stack_size());
   }
 
   if (auto *sym = std::get_if<SymRef>(&target)) {
