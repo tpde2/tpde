@@ -125,6 +125,7 @@ bool TestIRCompilerA64::compile_inst(IRInstRef inst_idx, InstRange) noexcept {
     auto size = ir()->value_operands[value.op_begin_idx];
     this->text_writer.ensure_space(size);
     ASM(B, size / 4);
+    std::memset(this->text_writer.cur_ptr(), 0, (size - 4) & -4u);
     this->text_writer.cur_ptr() += (size - 4) & -4u;
     return true;
   }
