@@ -109,6 +109,10 @@ def main():
                 objdump = "llvm-objdump -d -r --no-show-raw-insn --symbolize-operands --no-addresses --x86-asm-syntax=intel -"
             else:
                 objdump = commands[-2]
+            if objdump.split(" ")[0] != "llvm-objdump":
+                common.warn("Skipping non-objdump RUN line: " + l)
+                continue
+
             llc_cmd = commands[-3] + " | " + objdump
             filecheck_cmd = commands[-1]
             llc_tool = llc_cmd.split(" ")[0]
