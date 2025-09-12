@@ -133,7 +133,6 @@ int main(int argc, char *argv[]) {
   std::string buf;
 
   if (ir_path) {
-    std::cout << "GOT IR FILE\n";
     const auto file_path = args::get(ir_path);
     auto file = std::ifstream{file_path, std::ios::ate};
     if (!file.is_open()) {
@@ -226,14 +225,16 @@ int main(int argc, char *argv[]) {
       return 1;
     }
 
-    if (obj_out_path) {
-      const std::vector<u8> data = compiler.assembler.build_object_file();
+    const std::vector<u8> data = compiler.assembler.build_object_file();
+    if (obj_out_path && obj_out_path.Get() != "-") {
       std::ofstream out_file{obj_out_path.Get(), std::ios::binary};
       if (!out_file.is_open()) {
         TPDE_LOG_ERR("Failed to open output file");
         return 1;
       }
       out_file.write(reinterpret_cast<const char *>(data.data()), data.size());
+    } else {
+      std::cout.write(reinterpret_cast<const char *>(data.data()), data.size());
     }
   } else {
     assert(arch.Get() == Arch::a64);

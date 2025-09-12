@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
 #include <fstream>
+#include <iostream>
 
 #include "tpde/arm64/CompilerA64.hpp"
 
@@ -305,14 +306,16 @@ bool test::compile_ir_arm64(TestIR *ir,
     return false;
   }
 
+  const std::vector<u8> data = compiler.assembler.build_object_file();
   if (!obj_out_path.empty()) {
-    const std::vector<u8> data = compiler.assembler.build_object_file();
     std::ofstream out_file{obj_out_path, std::ios::binary};
     if (!out_file.is_open()) {
       TPDE_LOG_ERR("Failed to open output file");
       return false;
     }
     out_file.write(reinterpret_cast<const char *>(data.data()), data.size());
+  } else {
+    std::cout.write(reinterpret_cast<const char *>(data.data()), data.size());
   }
 
   return true;
