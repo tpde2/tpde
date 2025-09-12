@@ -3798,7 +3798,13 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_gep(
         if (first_idx) {
           // array index
           if (i64 idx_val = Const->getSExtValue(); idx_val != 0) {
-            off_disp = data_layout.getTypeAllocSize(cur_ty) * idx_val;
+            i64 alloc_size = 1;
+            // LLVM nowadays canonicalizes getelementptr to i8 as a preparation
+            // for a possible ptradd migration. Add a fast path for this.
+            if (!cur_ty->isIntegerTy() || cur_ty->getIntegerBitWidth() != 8) {
+              alloc_size = data_layout.getTypeAllocSize(cur_ty);
+            }
+            off_disp = alloc_size * idx_val;
           }
         } else if (auto *struct_ty = llvm::dyn_cast<llvm::StructType>(cur_ty)) {
           u64 field_idx = Const->getZExtValue();
