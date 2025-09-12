@@ -165,7 +165,6 @@ define void @store_struct3(ptr %ptr) {
 ; X64-NEXT:     R_X86_64_PC32 glob-0x4
 ; X64-NEXT:    lea eax, [rax + 0x20]
 ; X64-NEXT:    xor ecx, ecx
-; X64-NEXT:    xor edx, edx
 ; X64-NEXT:    mov dword ptr [rdi], ecx
 ; X64-NEXT:    mov dword ptr [rdi + 0x4], eax
 ; X64-NEXT:    pop rbp
@@ -182,7 +181,6 @@ define void @store_struct3(ptr %ptr) {
 ; ARM64-NEXT:     R_AARCH64_ADD_ABS_LO12_NC glob
 ; ARM64-NEXT:    add w1, w1, #0x20
 ; ARM64-NEXT:    mov w2, #0x0 // =0
-; ARM64-NEXT:    mov w3, #0x0 // =0
 ; ARM64-NEXT:    str w2, [x0]
 ; ARM64-NEXT:    str w1, [x0, #0x4]
 ; ARM64-NEXT:    ldp x29, x30, [sp]
@@ -1222,15 +1220,13 @@ define void @phi_struct3(ptr %ptr) {
 ; X64-NEXT:     R_X86_64_PC32 glob-0x4
 ; X64-NEXT:    lea eax, [rax + 0x20]
 ; X64-NEXT:    xor ecx, ecx
-; X64-NEXT:    xor edx, edx
 ; X64-NEXT:    mov dword ptr [rbp - 0x30], ecx
 ; X64-NEXT:    mov dword ptr [rbp - 0x2c], eax
 ; X64-NEXT:  <L1>:
-; X64-NEXT:    lea rax, <phi_struct3+0x2a>
+; X64-NEXT:    lea rax, <phi_struct3+0x28>
 ; X64-NEXT:     R_X86_64_PC32 glob-0x4
 ; X64-NEXT:    lea eax, [rax + 0x20]
 ; X64-NEXT:    xor ecx, ecx
-; X64-NEXT:    xor edx, edx
 ; X64-NEXT:    xor edx, edx
 ; X64-NEXT:    test dl, 0x1
 ; X64-NEXT:    je <L0>
@@ -1258,7 +1254,6 @@ define void @phi_struct3(ptr %ptr) {
 ; ARM64-NEXT:     R_AARCH64_ADD_ABS_LO12_NC glob
 ; ARM64-NEXT:    add w0, w0, #0x20
 ; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    mov w2, #0x0 // =0
 ; ARM64-NEXT:    str w1, [x29, #0xa0]
 ; ARM64-NEXT:    str w0, [x29, #0xa4]
 ; ARM64-NEXT:    adrp x0, 0x0 <.text>
@@ -1268,12 +1263,11 @@ define void @phi_struct3(ptr %ptr) {
 ; ARM64-NEXT:    add w0, w0, #0x20
 ; ARM64-NEXT:    mov w1, #0x0 // =0
 ; ARM64-NEXT:    mov w2, #0x0 // =0
-; ARM64-NEXT:    mov w2, #0x0 // =0
 ; ARM64-NEXT:    tst w2, #0x1
-; ARM64-NEXT:    b.eq 0x9dc <phi_struct3+0x5c>
+; ARM64-NEXT:    b.eq 0x9d4 <phi_struct3+0x54>
 ; ARM64-NEXT:    str w1, [x29, #0xa0]
 ; ARM64-NEXT:    str w0, [x29, #0xa4]
-; ARM64-NEXT:    b 0x9b0 <phi_struct3+0x30>
+; ARM64-NEXT:    b 0x9ac <phi_struct3+0x2c>
 ; ARM64-NEXT:    ldr w0, [x29, #0xa0]
 ; ARM64-NEXT:    str w0, [x19]
 ; ARM64-NEXT:    ldr w0, [x29, #0xa4]

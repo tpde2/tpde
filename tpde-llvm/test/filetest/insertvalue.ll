@@ -941,29 +941,23 @@ define void @insert_many_nested() {
 ; X64-NEXT:    xor ecx, ecx
 ; X64-NEXT:    lea rcx, [rcx + 0x4]
 ; X64-NEXT:    mov edx, 0x1
-; X64-NEXT:    xor ebx, ebx
-; X64-NEXT:    xor esi, esi
 ; X64-NEXT:    mov ebx, 0x9
 ; X64-NEXT:    xor esi, esi
 ; X64-NEXT:    lea rsi, [rsi + 0x4]
 ; X64-NEXT:    mov edi, 0x9
 ; X64-NEXT:    imul rsi, rdi
 ; X64-NEXT:    mov edi, 0x1
-; X64-NEXT:    xor r8d, r8d
-; X64-NEXT:    xor r9d, r9d
 ; X64-NEXT:    mov r8d, 0x9
 ; X64-NEXT:    xor r9d, r9d
 ; X64-NEXT:    xor r10d, r10d
 ; X64-NEXT:    xor r11d, r11d
 ; X64-NEXT:    xor r9d, r9d
-; X64-NEXT:    xor r10d, r10d
-; X64-NEXT:    xor r11d, r11d
-; X64-NEXT:    xor r12d, r12d
+; X64-NEXT:    mov r10d, 0x133ee23
+; X64-NEXT:    mov r11d, 0x2
+; X64-NEXT:    mov r12d, 0xe
 ; X64-NEXT:    xor r13d, r13d
 ; X64-NEXT:    xor r14d, r14d
 ; X64-NEXT:    xor r15d, r15d
-; X64-NEXT:    mov qword ptr [rbp - 0x30], rax
-; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov qword ptr [rbp - 0x50], rcx
 ; X64-NEXT:    xor ecx, ecx
 ; X64-NEXT:    mov qword ptr [rbp - 0x60], rdx
@@ -974,13 +968,7 @@ define void @insert_many_nested() {
 ; X64-NEXT:    xor esi, esi
 ; X64-NEXT:    mov qword ptr [rbp - 0x48], rdi
 ; X64-NEXT:    xor edi, edi
-; X64-NEXT:    mov r10, qword ptr [rbp - 0x30]
-; X64-NEXT:    mov r11d, 0x133ee23
-; X64-NEXT:    mov r12d, 0x2
-; X64-NEXT:    mov r13d, 0xe
-; X64-NEXT:    xor r14d, r14d
-; X64-NEXT:    xor r15d, r15d
-; X64-NEXT:    mov rax, qword ptr [rbp - 0x60]
+; X64-NEXT:    mov r15, qword ptr [rbp - 0x60]
 ; X64-NEXT:    mov rcx, qword ptr [rbp - 0x58]
 ; X64-NEXT:    mov rdx, qword ptr [rbp - 0x50]
 ; X64-NEXT:    mov rbx, qword ptr [rbp - 0x48]
@@ -991,24 +979,18 @@ define void @insert_many_nested() {
 ; X64-NEXT:    xor ecx, ecx
 ; X64-NEXT:    lea rcx, [rcx + 0x4]
 ; X64-NEXT:    mov edx, 0x1
-; X64-NEXT:    xor ebx, ebx
-; X64-NEXT:    xor esi, esi
 ; X64-NEXT:    mov ebx, 0x9
 ; X64-NEXT:    xor esi, esi
 ; X64-NEXT:    lea rsi, [rsi + 0x4]
 ; X64-NEXT:    mov edi, 0x9
 ; X64-NEXT:    imul rsi, rdi
 ; X64-NEXT:    mov edi, 0x1
-; X64-NEXT:    xor r8d, r8d
-; X64-NEXT:    xor r9d, r9d
 ; X64-NEXT:    mov r8d, 0x9
 ; X64-NEXT:    xor r9d, r9d
 ; X64-NEXT:    lea r9, [r9 + 0x4]
 ; X64-NEXT:    mov r10d, 0x51
 ; X64-NEXT:    imul r9, r10
 ; X64-NEXT:    mov r10d, 0x1
-; X64-NEXT:    xor r11d, r11d
-; X64-NEXT:    xor r12d, r12d
 ; X64-NEXT:    mov r11d, 0x9
 ; X64-NEXT:    xor r12d, r12d
 ; X64-NEXT:    xor r13d, r13d
@@ -1020,10 +1002,10 @@ define void @insert_many_nested() {
 ; X64-NEXT:    xor esi, esi
 ; X64-NEXT:    mov r14, qword ptr [rbp - 0x70]
 ; X64-NEXT:    xor eax, eax
-; X64-NEXT:    xor esi, esi
-; X64-NEXT:    xor r12d, r12d
-; X64-NEXT:    xor r13d, r13d
-; X64-NEXT:    xor r15d, r15d
+; X64-NEXT:    mov rsi, qword ptr [rbp - 0x30]
+; X64-NEXT:    mov r12d, 0x133ee23
+; X64-NEXT:    mov r13d, 0x3
+; X64-NEXT:    mov r15d, 0x9
 ; X64-NEXT:    mov qword ptr [rbp - 0xc0], rcx
 ; X64-NEXT:    xor ecx, ecx
 ; X64-NEXT:    mov qword ptr [rbp - 0xd0], rdx
@@ -1046,12 +1028,6 @@ define void @insert_many_nested() {
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov qword ptr [rbp - 0xe0], rax
 ; X64-NEXT:    xor eax, eax
-; X64-NEXT:    mov rsi, qword ptr [rbp - 0x30]
-; X64-NEXT:    mov r12d, 0x133ee23
-; X64-NEXT:    mov r13d, 0x3
-; X64-NEXT:    mov r15d, 0x9
-; X64-NEXT:    xor ecx, ecx
-; X64-NEXT:    xor edx, edx
 ; X64-NEXT:    mov rbx, qword ptr [rbp - 0xd0]
 ; X64-NEXT:    mov rdi, qword ptr [rbp - 0xc8]
 ; X64-NEXT:    mov r8, qword ptr [rbp - 0xc0]
@@ -1103,30 +1079,27 @@ define void @insert_many_nested() {
 ; ARM64-NEXT:    stp x21, x22, [sp, #0x20]
 ; ARM64-NEXT:    stp x23, x24, [sp, #0x30]
 ; ARM64-NEXT:    stp x25, x26, [sp, #0x40]
-; ARM64-NEXT:    str x27, [sp, #0x50]
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov w0, #0x0 // =0
 ; ARM64-NEXT:    add x0, x0, #0x4
 ; ARM64-NEXT:    mov w1, #0x0 // =0
 ; ARM64-NEXT:    add x1, x1, #0x4
 ; ARM64-NEXT:    mov x2, #0x1 // =1
-; ARM64-NEXT:    mov w3, #0x0 // =0
-; ARM64-NEXT:    mov w4, #0x0 // =0
 ; ARM64-NEXT:    mov x3, #0x9 // =9
 ; ARM64-NEXT:    mov w4, #0x0 // =0
 ; ARM64-NEXT:    add x4, x4, #0x4
 ; ARM64-NEXT:    mov x5, #0x9 // =9
 ; ARM64-NEXT:    mul x5, x5, x4
 ; ARM64-NEXT:    mov x4, #0x1 // =1
-; ARM64-NEXT:    mov w6, #0x0 // =0
-; ARM64-NEXT:    mov w7, #0x0 // =0
 ; ARM64-NEXT:    mov x6, #0x9 // =9
 ; ARM64-NEXT:    mov w7, #0x0 // =0
 ; ARM64-NEXT:    mov w8, #0x0 // =0
 ; ARM64-NEXT:    mov w9, #0x0 // =0
 ; ARM64-NEXT:    mov w7, #0x0 // =0
-; ARM64-NEXT:    mov w8, #0x0 // =0
-; ARM64-NEXT:    mov w9, #0x0 // =0
-; ARM64-NEXT:    mov w10, #0x0 // =0
+; ARM64-NEXT:    mov x8, #0xee23 // =60963
+; ARM64-NEXT:    movk x8, #0x133, lsl #16
+; ARM64-NEXT:    mov x9, #0x2 // =2
+; ARM64-NEXT:    mov x10, #0xe // =14
 ; ARM64-NEXT:    mov w11, #0x0 // =0
 ; ARM64-NEXT:    mov w12, #0x0 // =0
 ; ARM64-NEXT:    mov w13, #0x0 // =0
@@ -1135,37 +1108,24 @@ define void @insert_many_nested() {
 ; ARM64-NEXT:    mov w18, #0x0 // =0
 ; ARM64-NEXT:    mov w19, #0x0 // =0
 ; ARM64-NEXT:    mov w20, #0x0 // =0
-; ARM64-NEXT:    mov w21, #0x0 // =0
-; ARM64-NEXT:    mov x9, #0xee23 // =60963
-; ARM64-NEXT:    movk x9, #0x133, lsl #16
-; ARM64-NEXT:    mov x10, #0x2 // =2
-; ARM64-NEXT:    mov x11, #0xe // =14
-; ARM64-NEXT:    mov w12, #0x0 // =0
-; ARM64-NEXT:    mov w13, #0x0 // =0
 ; ARM64-NEXT:    mov w7, #0x0 // =0
 ; ARM64-NEXT:    mov w0, #0x0 // =0
 ; ARM64-NEXT:    add x0, x0, #0x4
 ; ARM64-NEXT:    mov w1, #0x0 // =0
 ; ARM64-NEXT:    add x1, x1, #0x4
 ; ARM64-NEXT:    mov x2, #0x1 // =1
-; ARM64-NEXT:    mov w3, #0x0 // =0
-; ARM64-NEXT:    mov w4, #0x0 // =0
 ; ARM64-NEXT:    mov x3, #0x9 // =9
 ; ARM64-NEXT:    mov w4, #0x0 // =0
 ; ARM64-NEXT:    add x4, x4, #0x4
 ; ARM64-NEXT:    mov x5, #0x9 // =9
 ; ARM64-NEXT:    mul x5, x5, x4
 ; ARM64-NEXT:    mov x4, #0x1 // =1
-; ARM64-NEXT:    mov w6, #0x0 // =0
-; ARM64-NEXT:    mov w7, #0x0 // =0
 ; ARM64-NEXT:    mov x6, #0x9 // =9
 ; ARM64-NEXT:    mov w7, #0x0 // =0
 ; ARM64-NEXT:    add x7, x7, #0x4
 ; ARM64-NEXT:    mov x8, #0x51 // =81
 ; ARM64-NEXT:    mul x8, x8, x7
 ; ARM64-NEXT:    mov x7, #0x1 // =1
-; ARM64-NEXT:    mov w9, #0x0 // =0
-; ARM64-NEXT:    mov w10, #0x0 // =0
 ; ARM64-NEXT:    mov x9, #0x9 // =9
 ; ARM64-NEXT:    mov w10, #0x0 // =0
 ; ARM64-NEXT:    mov w11, #0x0 // =0
@@ -1174,9 +1134,10 @@ define void @insert_many_nested() {
 ; ARM64-NEXT:    mov w14, #0x0 // =0
 ; ARM64-NEXT:    mov w15, #0x0 // =0
 ; ARM64-NEXT:    mov w10, #0x0 // =0
-; ARM64-NEXT:    mov w11, #0x0 // =0
-; ARM64-NEXT:    mov w12, #0x0 // =0
-; ARM64-NEXT:    mov w13, #0x0 // =0
+; ARM64-NEXT:    mov x11, #0xee23 // =60963
+; ARM64-NEXT:    movk x11, #0x133, lsl #16
+; ARM64-NEXT:    mov x12, #0x3 // =3
+; ARM64-NEXT:    mov x13, #0x9 // =9
 ; ARM64-NEXT:    mov w14, #0x0 // =0
 ; ARM64-NEXT:    mov w15, #0x0 // =0
 ; ARM64-NEXT:    mov w18, #0x0 // =0
@@ -1188,36 +1149,28 @@ define void @insert_many_nested() {
 ; ARM64-NEXT:    mov w24, #0x0 // =0
 ; ARM64-NEXT:    mov w25, #0x0 // =0
 ; ARM64-NEXT:    mov w26, #0x0 // =0
-; ARM64-NEXT:    mov w27, #0x0 // =0
-; ARM64-NEXT:    mov x12, #0xee23 // =60963
-; ARM64-NEXT:    movk x12, #0x133, lsl #16
-; ARM64-NEXT:    mov x13, #0x3 // =3
-; ARM64-NEXT:    mov x14, #0x9 // =9
-; ARM64-NEXT:    mov w15, #0x0 // =0
 ; ARM64-NEXT:    mov w18, #0x0 // =0
-; ARM64-NEXT:    mov w11, #0x0 // =0
-; ARM64-NEXT:    str x10, [x11]
-; ARM64-NEXT:    str x0, [x11, #0x8]
-; ARM64-NEXT:    str w12, [x11, #0x10]
-; ARM64-NEXT:    strb w13, [x11, #0x14]
-; ARM64-NEXT:    strb w14, [x11, #0x15]
-; ARM64-NEXT:    strb w15, [x11, #0x16]
-; ARM64-NEXT:    strb w18, [x11, #0x17]
-; ARM64-NEXT:    str x2, [x11, #0x18]
-; ARM64-NEXT:    str x3, [x11, #0x20]
-; ARM64-NEXT:    str x1, [x11, #0x28]
-; ARM64-NEXT:    str x4, [x11, #0x30]
-; ARM64-NEXT:    str x6, [x11, #0x38]
-; ARM64-NEXT:    str x5, [x11, #0x40]
-; ARM64-NEXT:    str x7, [x11, #0x48]
-; ARM64-NEXT:    str x9, [x11, #0x50]
-; ARM64-NEXT:    str x8, [x11, #0x58]
+; ARM64-NEXT:    str x10, [x18]
+; ARM64-NEXT:    str x0, [x18, #0x8]
+; ARM64-NEXT:    str w11, [x18, #0x10]
+; ARM64-NEXT:    strb w12, [x18, #0x14]
+; ARM64-NEXT:    strb w13, [x18, #0x15]
+; ARM64-NEXT:    strb w14, [x18, #0x16]
+; ARM64-NEXT:    strb w15, [x18, #0x17]
+; ARM64-NEXT:    str x2, [x18, #0x18]
+; ARM64-NEXT:    str x3, [x18, #0x20]
+; ARM64-NEXT:    str x1, [x18, #0x28]
+; ARM64-NEXT:    str x4, [x18, #0x30]
+; ARM64-NEXT:    str x6, [x18, #0x38]
+; ARM64-NEXT:    str x5, [x18, #0x40]
+; ARM64-NEXT:    str x7, [x18, #0x48]
+; ARM64-NEXT:    str x9, [x18, #0x50]
+; ARM64-NEXT:    str x8, [x18, #0x58]
 ; ARM64-NEXT:    ldp x29, x30, [sp]
 ; ARM64-NEXT:    ldp x19, x20, [sp, #0x10]
 ; ARM64-NEXT:    ldp x21, x22, [sp, #0x20]
 ; ARM64-NEXT:    ldp x23, x24, [sp, #0x30]
 ; ARM64-NEXT:    ldp x25, x26, [sp, #0x40]
-; ARM64-NEXT:    ldr x27, [sp, #0x50]
 ; ARM64-NEXT:    add sp, sp, #0xa0
 ; ARM64-NEXT:    ret
   %1 = insertvalue { ptr, i64, i32, i8, i8, i8, i8, [2 x [3 x i64]] } { ptr undef, i64 ptrtoint (ptr getelementptr (i32, ptr null, i32 1) to i64), i32 20180515, i8 2, i8 14, i8 0, i8 0, [2 x [3 x i64]] [[3 x i64] [i64 1, i64 9, i64 ptrtoint (ptr getelementptr (i32, ptr null, i32 1) to i64)], [3 x i64] [i64 1, i64 9, i64 mul (i64 ptrtoint (ptr getelementptr (i32, ptr null, i32 1) to i64), i64 9)]] }, ptr null, 0
@@ -1234,16 +1187,16 @@ define void @insert_chain(ptr %p, i8 %a, i64 %b, i64 %c, i64 %d, i64 %e, i64 %f,
 ; X64-NEXT:    push r13
 ; X64-NEXT:    push r14
 ; X64-NEXT:    push r15
-; X64-NEXT:    sub rsp, 0xd8
+; X64-NEXT:    sub rsp, 0xc8
 ; X64-NEXT:    mov rax, qword ptr [rbp + 0x10]
 ; X64-NEXT:    mov rbx, qword ptr [rbp + 0x18]
 ; X64-NEXT:    mov r10, qword ptr [rbp + 0x20]
 ; X64-NEXT:    xor r11d, r11d
 ; X64-NEXT:    lea r11, [r11 + 0x4]
 ; X64-NEXT:    xor r12d, r12d
-; X64-NEXT:    xor r13d, r13d
-; X64-NEXT:    xor r14d, r14d
-; X64-NEXT:    xor r15d, r15d
+; X64-NEXT:    mov r13d, 0x134d94f
+; X64-NEXT:    mov r14d, 0x3
+; X64-NEXT:    mov r15d, 0x9
 ; X64-NEXT:    mov qword ptr [rbp - 0x30], rax
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov qword ptr [rbp - 0x38], rcx
@@ -1262,65 +1215,45 @@ define void @insert_chain(ptr %p, i8 %a, i64 %b, i64 %c, i64 %d, i64 %e, i64 %f,
 ; X64-NEXT:    xor r9d, r9d
 ; X64-NEXT:    mov qword ptr [rbp - 0x70], r10
 ; X64-NEXT:    xor r10d, r10d
-; X64-NEXT:    mov qword ptr [rbp - 0x78], r11
-; X64-NEXT:    xor r11d, r11d
-; X64-NEXT:    mov byte ptr [rbp - 0xe0], al
+; X64-NEXT:    mov byte ptr [rbp - 0xc8], al
 ; X64-NEXT:    xor eax, eax
-; X64-NEXT:    mov qword ptr [rbp - 0x90], rax
+; X64-NEXT:    mov qword ptr [rbp - 0x80], rax
 ; X64-NEXT:    xor eax, eax
-; X64-NEXT:    mov r13, qword ptr [rbp - 0x78]
-; X64-NEXT:    mov r14d, 0x134d94f
-; X64-NEXT:    mov r15d, 0x3
-; X64-NEXT:    mov qword ptr [rbp - 0x88], rax
-; X64-NEXT:    mov eax, 0x9
-; X64-NEXT:    xor ecx, ecx
-; X64-NEXT:    xor edx, edx
-; X64-NEXT:    xor ebx, ebx
-; X64-NEXT:    xor esi, esi
-; X64-NEXT:    xor edi, edi
-; X64-NEXT:    xor r8d, r8d
-; X64-NEXT:    xor r9d, r9d
-; X64-NEXT:    xor r10d, r10d
-; X64-NEXT:    xor r11d, r11d
-; X64-NEXT:    mov byte ptr [rbp - 0xe0], al
-; X64-NEXT:    xor eax, eax
-; X64-NEXT:    mov qword ptr [rbp - 0x90], rax
-; X64-NEXT:    xor eax, eax
-; X64-NEXT:    movzx edx, byte ptr [rbp - 0x49]
-; X64-NEXT:    mov ebx, 0x1
-; X64-NEXT:    mov rsi, qword ptr [rbp - 0x40]
-; X64-NEXT:    mov rdi, qword ptr [rbp - 0x38]
-; X64-NEXT:    mov r8d, 0x1
-; X64-NEXT:    mov r9, qword ptr [rbp - 0x60]
-; X64-NEXT:    mov r10, qword ptr [rbp - 0x68]
-; X64-NEXT:    mov r11d, 0x1
-; X64-NEXT:    mov qword ptr [rbp - 0x88], rax
+; X64-NEXT:    movzx ecx, byte ptr [rbp - 0x49]
+; X64-NEXT:    mov edx, 0x1
+; X64-NEXT:    mov rbx, qword ptr [rbp - 0x40]
+; X64-NEXT:    mov rsi, qword ptr [rbp - 0x38]
+; X64-NEXT:    mov edi, 0x1
+; X64-NEXT:    mov r8, qword ptr [rbp - 0x60]
+; X64-NEXT:    mov r9, qword ptr [rbp - 0x68]
+; X64-NEXT:    mov r10d, 0x1
+; X64-NEXT:    mov qword ptr [rbp - 0x78], rax
 ; X64-NEXT:    mov rax, qword ptr [rbp - 0x30]
-; X64-NEXT:    mov qword ptr [rbp - 0x90], rax
+; X64-NEXT:    mov qword ptr [rbp - 0x80], rax
 ; X64-NEXT:    mov rax, qword ptr [rbp - 0x48]
 ; X64-NEXT:    mov r12, qword ptr [rbp - 0x70]
-; X64-NEXT:    mov qword ptr [rbp - 0x88], rax
+; X64-NEXT:    mov qword ptr [rbp - 0x78], rax
 ; X64-NEXT:    mov rax, qword ptr [rbp - 0x58]
 ; X64-NEXT:    mov qword ptr [rax], r12
-; X64-NEXT:    mov qword ptr [rax + 0x8], r13
-; X64-NEXT:    mov dword ptr [rax + 0x10], r14d
-; X64-NEXT:    mov byte ptr [rax + 0x14], r15b
-; X64-NEXT:    movzx r12d, byte ptr [rbp - 0xe0]
-; X64-NEXT:    mov byte ptr [rax + 0x15], r12b
-; X64-NEXT:    mov byte ptr [rax + 0x16], cl
-; X64-NEXT:    mov byte ptr [rax + 0x17], dl
-; X64-NEXT:    mov qword ptr [rax + 0x18], rbx
-; X64-NEXT:    mov qword ptr [rax + 0x20], rsi
-; X64-NEXT:    mov qword ptr [rax + 0x28], rdi
-; X64-NEXT:    mov qword ptr [rax + 0x30], r8
-; X64-NEXT:    mov qword ptr [rax + 0x38], r9
-; X64-NEXT:    mov qword ptr [rax + 0x40], r10
-; X64-NEXT:    mov qword ptr [rax + 0x48], r11
-; X64-NEXT:    mov rcx, qword ptr [rbp - 0x90]
+; X64-NEXT:    mov qword ptr [rax + 0x8], r11
+; X64-NEXT:    mov dword ptr [rax + 0x10], r13d
+; X64-NEXT:    mov byte ptr [rax + 0x14], r14b
+; X64-NEXT:    mov byte ptr [rax + 0x15], r15b
+; X64-NEXT:    movzx r11d, byte ptr [rbp - 0xc8]
+; X64-NEXT:    mov byte ptr [rax + 0x16], r11b
+; X64-NEXT:    mov byte ptr [rax + 0x17], cl
+; X64-NEXT:    mov qword ptr [rax + 0x18], rdx
+; X64-NEXT:    mov qword ptr [rax + 0x20], rbx
+; X64-NEXT:    mov qword ptr [rax + 0x28], rsi
+; X64-NEXT:    mov qword ptr [rax + 0x30], rdi
+; X64-NEXT:    mov qword ptr [rax + 0x38], r8
+; X64-NEXT:    mov qword ptr [rax + 0x40], r9
+; X64-NEXT:    mov qword ptr [rax + 0x48], r10
+; X64-NEXT:    mov rcx, qword ptr [rbp - 0x80]
 ; X64-NEXT:    mov qword ptr [rax + 0x50], rcx
-; X64-NEXT:    mov rcx, qword ptr [rbp - 0x88]
+; X64-NEXT:    mov rcx, qword ptr [rbp - 0x78]
 ; X64-NEXT:    mov qword ptr [rax + 0x58], rcx
-; X64-NEXT:    add rsp, 0xd8
+; X64-NEXT:    add rsp, 0xc8
 ; X64-NEXT:    pop r15
 ; X64-NEXT:    pop r14
 ; X64-NEXT:    pop r13
@@ -1337,15 +1270,16 @@ define void @insert_chain(ptr %p, i8 %a, i64 %b, i64 %c, i64 %d, i64 %e, i64 %f,
 ; ARM64-NEXT:    stp x21, x22, [sp, #0x20]
 ; ARM64-NEXT:    stp x23, x24, [sp, #0x30]
 ; ARM64-NEXT:    stp x25, x26, [sp, #0x40]
-; ARM64-NEXT:    str x27, [sp, #0x50]
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    add x17, sp, #0xa0
 ; ARM64-NEXT:    ldr x9, [x17]
 ; ARM64-NEXT:    mov w8, #0x0 // =0
 ; ARM64-NEXT:    add x8, x8, #0x4
 ; ARM64-NEXT:    mov w10, #0x0 // =0
-; ARM64-NEXT:    mov w11, #0x0 // =0
-; ARM64-NEXT:    mov w12, #0x0 // =0
-; ARM64-NEXT:    mov w13, #0x0 // =0
+; ARM64-NEXT:    mov x11, #0xd94f // =55631
+; ARM64-NEXT:    movk x11, #0x134, lsl #16
+; ARM64-NEXT:    mov x12, #0x3 // =3
+; ARM64-NEXT:    mov x13, #0x9 // =9
 ; ARM64-NEXT:    mov w14, #0x0 // =0
 ; ARM64-NEXT:    mov w15, #0x0 // =0
 ; ARM64-NEXT:    mov w18, #0x0 // =0
@@ -1357,39 +1291,23 @@ define void @insert_chain(ptr %p, i8 %a, i64 %b, i64 %c, i64 %d, i64 %e, i64 %f,
 ; ARM64-NEXT:    mov w24, #0x0 // =0
 ; ARM64-NEXT:    mov w25, #0x0 // =0
 ; ARM64-NEXT:    mov w26, #0x0 // =0
-; ARM64-NEXT:    mov w27, #0x0 // =0
-; ARM64-NEXT:    mov x12, #0xd94f // =55631
-; ARM64-NEXT:    movk x12, #0x134, lsl #16
-; ARM64-NEXT:    mov x13, #0x3 // =3
-; ARM64-NEXT:    mov x14, #0x9 // =9
-; ARM64-NEXT:    mov w15, #0x0 // =0
-; ARM64-NEXT:    mov w18, #0x0 // =0
-; ARM64-NEXT:    mov w19, #0x0 // =0
-; ARM64-NEXT:    mov w20, #0x0 // =0
-; ARM64-NEXT:    mov w21, #0x0 // =0
-; ARM64-NEXT:    mov w22, #0x0 // =0
-; ARM64-NEXT:    mov w23, #0x0 // =0
-; ARM64-NEXT:    mov w24, #0x0 // =0
-; ARM64-NEXT:    mov w25, #0x0 // =0
-; ARM64-NEXT:    mov w26, #0x0 // =0
-; ARM64-NEXT:    mov w27, #0x0 // =0
-; ARM64-NEXT:    mov x19, #0x1 // =1
-; ARM64-NEXT:    mov x22, #0x1 // =1
-; ARM64-NEXT:    mov x25, #0x1 // =1
+; ARM64-NEXT:    mov x18, #0x1 // =1
+; ARM64-NEXT:    mov x21, #0x1 // =1
+; ARM64-NEXT:    mov x24, #0x1 // =1
 ; ARM64-NEXT:    str x9, [x0]
 ; ARM64-NEXT:    str x8, [x0, #0x8]
-; ARM64-NEXT:    str w12, [x0, #0x10]
-; ARM64-NEXT:    strb w13, [x0, #0x14]
-; ARM64-NEXT:    strb w14, [x0, #0x15]
-; ARM64-NEXT:    strb w15, [x0, #0x16]
+; ARM64-NEXT:    str w11, [x0, #0x10]
+; ARM64-NEXT:    strb w12, [x0, #0x14]
+; ARM64-NEXT:    strb w13, [x0, #0x15]
+; ARM64-NEXT:    strb w14, [x0, #0x16]
 ; ARM64-NEXT:    strb w1, [x0, #0x17]
-; ARM64-NEXT:    str x19, [x0, #0x18]
+; ARM64-NEXT:    str x18, [x0, #0x18]
 ; ARM64-NEXT:    str x2, [x0, #0x20]
 ; ARM64-NEXT:    str x3, [x0, #0x28]
-; ARM64-NEXT:    str x22, [x0, #0x30]
+; ARM64-NEXT:    str x21, [x0, #0x30]
 ; ARM64-NEXT:    str x4, [x0, #0x38]
 ; ARM64-NEXT:    str x5, [x0, #0x40]
-; ARM64-NEXT:    str x25, [x0, #0x48]
+; ARM64-NEXT:    str x24, [x0, #0x48]
 ; ARM64-NEXT:    str x6, [x0, #0x50]
 ; ARM64-NEXT:    str x7, [x0, #0x58]
 ; ARM64-NEXT:    ldp x29, x30, [sp]
@@ -1397,7 +1315,6 @@ define void @insert_chain(ptr %p, i8 %a, i64 %b, i64 %c, i64 %d, i64 %e, i64 %f,
 ; ARM64-NEXT:    ldp x21, x22, [sp, #0x20]
 ; ARM64-NEXT:    ldp x23, x24, [sp, #0x30]
 ; ARM64-NEXT:    ldp x25, x26, [sp, #0x40]
-; ARM64-NEXT:    ldr x27, [sp, #0x50]
 ; ARM64-NEXT:    add sp, sp, #0xa0
 ; ARM64-NEXT:    ret
   %i1 = insertvalue { ptr, i64, i32, i8, i8, i8, i8, [3 x [3 x i64]] } { ptr undef, i64 ptrtoint (ptr getelementptr (i32, ptr null, i32 1) to i64), i32 20240719, i8 3, i8 9, i8 0, i8 undef, [3 x [3 x i64]] undef }, i8 %a, 6
