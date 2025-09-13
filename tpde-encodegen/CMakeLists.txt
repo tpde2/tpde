@@ -38,3 +38,35 @@ target_sources(tpde_encodegen PRIVATE
         src/arm64/Target.hpp
         src/x64/Target.hpp
 )
+
+if (TPDE_ENABLE_PCH)
+    target_precompile_headers(tpde_encodegen PRIVATE
+        <llvm/ADT/DenseMap.h>
+        <llvm/ADT/SmallVector.h>
+        <llvm/CodeGen/AsmPrinter.h>
+        <llvm/CodeGen/LivePhysRegs.h>
+        <llvm/CodeGen/MachineConstantPool.h>
+        <llvm/CodeGen/MachineFunction.h>
+        <llvm/CodeGen/MachineInstr.h>
+        <llvm/CodeGen/MachineModuleInfo.h>
+        <llvm/CodeGen/MachineRegisterInfo.h>
+        <llvm/IR/Constants.h>
+        <llvm/IR/Function.h>
+        <llvm/IR/Instructions.h>
+        <llvm/IR/LLVMContext.h>
+        <llvm/IR/Module.h>
+        <llvm/IR/Verifier.h>
+        <llvm/IRReader/IRReader.h>
+        <llvm/MC/MCContext.h>
+        <llvm/MC/MCObjectWriter.h>
+        <llvm/MC/MCStreamer.h>
+        <llvm/MC/TargetRegistry.h>
+        <llvm/Target/TargetLoweringObjectFile.h>
+        <llvm/Target/TargetMachine.h>
+        <iostream>
+        <format>
+        <set>
+        <string>
+        <unordered_set>
+    )
+endif ()

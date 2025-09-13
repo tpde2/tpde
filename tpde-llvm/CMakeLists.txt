@@ -60,6 +60,24 @@ target_sources(tpde_llvm PRIVATE
         src/LLVMCompilerBase.hpp
 )
 
+if (TPDE_ENABLE_PCH)
+    target_precompile_headers(tpde_llvm PRIVATE
+        src/base.hpp
+        <llvm/ADT/STLExtras.h>
+        <llvm/ADT/SmallString.h>
+        <llvm/ADT/SmallVector.h>
+        <llvm/IR/InlineAsm.h>
+        <llvm/IR/Instructions.h>
+        <llvm/IR/IntrinsicInst.h>
+        <llvm/IR/Module.h>
+        <llvm/IR/Operator.h>
+        <llvm/TargetParser/Triple.h>
+        <fadec-enc2.h>
+        <ranges>
+        <variant>
+    )
+endif ()
+
 set(TPDE_CLANG_HINTS "")
 if (DEFINED LLVM_DIR)
     set(TPDE_CLANG_HINTS "${LLVM_DIR}/../clang")

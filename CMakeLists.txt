@@ -14,6 +14,7 @@ option(TPDE_INCLUDE_TESTS "enable test" ON)
 option(TPDE_ENABLE_ENCODEGEN "enable tpde-encodegen tool (needs LLVM)" ON)
 option(TPDE_ENABLE_LLVM "enable LLVM back-end (needs LLVM)" ON)
 option(TPDE_ENABLE_COVERAGE "enable coverage instrumentation" OFF)
+option(TPDE_ENABLE_PCH "enable pre-compiled headers" OFF)
 option(TPDE_BUILD_DOCS "Build documentation" OFF)
 
 # warnings
