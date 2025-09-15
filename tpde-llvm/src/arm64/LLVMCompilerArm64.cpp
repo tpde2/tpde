@@ -242,8 +242,8 @@ void LLVMCompilerArm64::insert_element(ValueRef &vec_vr,
                                        GenericValuePart el) noexcept {
   tpde::ValueAssignment *va = vec_vr.assignment();
   u32 elem_sz = this->adaptor->basic_ty_part_size(ty);
-  if (elem_sz == va->max_part_size) {
-    // We can't handle the scalarized case better than the generic impl.
+  if (ty == LLVMBasicValType::i1 || elem_sz == va->max_part_size) {
+    // We can't handle the scalarized or i1 case better than the generic impl.
     return LLVMCompilerBase::insert_element(vec_vr, idx, ty, std::move(el));
   }
 

@@ -476,7 +476,7 @@ ICMP_ALL(ICMP_VEC, u8, 8, 16)
 ICMP_ALL(ICMP_VEC, u8, 4, 32)
 ICMP_ALL(ICMP_VEC, u8, 2, 64)
 
-u64 TARGET_V1 insert_vi1(u64 v, unsigned n, bool e) { return v & ~((u64)1 << n) | ((u64)e << n); }
+u64 TARGET_V1 insert_vi1(u64 v, unsigned n, u64 e) { return v & ~((u64)1 << n) | ((u64)(e & 1) << n); }
 
 // --------------------------
 // float arithmetic

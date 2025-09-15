@@ -534,6 +534,15 @@ struct CompilerA64 : BaseTy<Adaptor, Derived, Config> {
   void generate_raw_intext(
       AsmReg dst, AsmReg src, bool sign, u32 from, u32 to) noexcept;
 
+  /// Bitfield insert. src is not modified.
+  void generate_raw_bfi(AsmReg dst, AsmReg src, u32 lsb, u32 width) noexcept {
+    ASM(BFIx, dst, src, lsb, width);
+  }
+  /// Bitfield insert in zero. src is not modified.
+  void generate_raw_bfiz(AsmReg dst, AsmReg src, u32 lsb, u32 width) noexcept {
+    ASM(UBFIZx, dst, src, lsb, width);
+  }
+
   /// Generate a function call
   ///
   /// This will get the arguments into the correct registers according to the

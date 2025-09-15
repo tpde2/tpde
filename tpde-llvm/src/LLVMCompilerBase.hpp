@@ -2867,6 +2867,21 @@ void LLVMCompilerBase<Adaptor, Derived, Config>::insert_element(
   tpde::ValueAssignment *va = vec_vr.assignment();
   u32 elem_sz = this->adaptor->basic_ty_part_size(ty);
 
+  if (ty == LLVMBasicValType::i1) {
+    assert(vec_vr.assignment()->part_count == 1);
+    assert(idx < 64);
+    ValuePartRef vec_part = vec_vr.part_unowned(0);
+    if (!vec_part.assignment().stack_valid() &&
+        !vec_part.assignment().register_valid()) {
+      AsmReg dst_reg = vec_part.alloc_reg(); // Uninitialized
+      derived()->generate_raw_bfiz(dst_reg, derived()->gval_as_reg(el), idx, 1);
+    } else {
+      AsmReg dst_reg = vec_part.load_to_reg();
+      derived()->generate_raw_bfi(dst_reg, derived()->gval_as_reg(el), idx, 1);
+    }
+    return;
+  }
+
   // TODO: optimize for scalarized vectors, reuse el as new value part.
 
   // Offset inside whole vector
@@ -2997,6 +3012,14 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_insert_element(
   if (ins->getType()->isIntegerTy(1)) {
     assert(res_vr.assignment()->part_count == 1);
     ValueRef src_vr = this->val_ref(inst->getOperand(0));
+    if (auto *ci = llvm::dyn_cast<llvm::ConstantInt>(index)) {
+      res_vr.part(0).set_value(src_vr.part(0));
+      unsigned cidx = ci->getZExtValue() < nelem ? ci->getZExtValue() : 0;
+      LLVMBasicValType bvt = LLVMBasicValType::i1;
+      derived()->insert_element(res_vr, cidx, bvt, std::move(val));
+      return true;
+    }
+
     derived()->encode_insert_vi1(src_vr.part(0),
                                  this->val_ref(index).part(0),
                                  std::move(val),

@@ -12,12 +12,11 @@ define void @ins_v5i1_0(ptr %p, i1 %e) {
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movzx eax, byte ptr [rdi]
-; X64-NEXT:    mov ecx, 0x0
-; X64-NEXT:    btr rax, rcx
-; X64-NEXT:    mov esi, esi
-; X64-NEXT:    shl rsi, cl
-; X64-NEXT:    or rsi, rax
-; X64-NEXT:    mov byte ptr [rdi], sil
+; X64-NEXT:    btr rax, 0x0
+; X64-NEXT:    mov ecx, esi
+; X64-NEXT:    and ecx, 0x1
+; X64-NEXT:    or rax, rcx
+; X64-NEXT:    mov byte ptr [rdi], al
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -27,12 +26,7 @@ define void @ins_v5i1_0(ptr %p, i1 %e) {
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrb w2, [x0]
-; ARM64-NEXT:    mov w3, #0x1 // =1
-; ARM64-NEXT:    and x1, x1, #0x1
-; ARM64-NEXT:    lsr x3, x3, #0
-; ARM64-NEXT:    lsr x1, x1, #0
-; ARM64-NEXT:    bic x3, x2, x3
-; ARM64-NEXT:    orr x2, x3, x1
+; ARM64-NEXT:    bfxil x2, x1, #0, #1
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp]
 ; ARM64-NEXT:    add sp, sp, #0xa0
@@ -50,12 +44,11 @@ define void @ins_v5i1_3(ptr %p, i1 %e) {
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movzx eax, byte ptr [rdi]
-; X64-NEXT:    mov ecx, 0x3
-; X64-NEXT:    btr rax, rcx
-; X64-NEXT:    mov esi, esi
-; X64-NEXT:    shl rsi, cl
-; X64-NEXT:    or rsi, rax
-; X64-NEXT:    mov byte ptr [rdi], sil
+; X64-NEXT:    btr rax, 0x3
+; X64-NEXT:    mov ecx, esi
+; X64-NEXT:    and ecx, 0x1
+; X64-NEXT:    lea rax, [rax + 8*rcx]
+; X64-NEXT:    mov byte ptr [rdi], al
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -65,12 +58,7 @@ define void @ins_v5i1_3(ptr %p, i1 %e) {
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrb w2, [x0]
-; ARM64-NEXT:    mov w3, #0x1 // =1
-; ARM64-NEXT:    and x1, x1, #0x1
-; ARM64-NEXT:    lsl x3, x3, #3
-; ARM64-NEXT:    lsl x1, x1, #3
-; ARM64-NEXT:    bic x3, x2, x3
-; ARM64-NEXT:    orr x2, x3, x1
+; ARM64-NEXT:    bfi x2, x1, #3, #1
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp]
 ; ARM64-NEXT:    add sp, sp, #0xa0
@@ -85,36 +73,33 @@ define void @ins_v5i1_chain(ptr %p, i1 %e0, i1 %e1, i1 %e2, i1 %e3, i1 %e4) {
 ; X64-LABEL: <ins_v5i1_chain>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    push rbx
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
-; X64-NEXT:    mov byte ptr [rbp - 0x29], cl
-; X64-NEXT:    mov ecx, 0x0
+; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    xor eax, eax
-; X64-NEXT:    btr rax, rcx
-; X64-NEXT:    mov esi, esi
-; X64-NEXT:    shl rsi, cl
-; X64-NEXT:    or rsi, rax
-; X64-NEXT:    mov ecx, 0x1
-; X64-NEXT:    btr rsi, rcx
-; X64-NEXT:    mov edx, edx
-; X64-NEXT:    shl rdx, cl
-; X64-NEXT:    or rdx, rsi
-; X64-NEXT:    mov ecx, 0x2
-; X64-NEXT:    btr rdx, rcx
-; X64-NEXT:    mov eax, dword ptr [rbp - 0x29]
-; X64-NEXT:    shl rax, cl
-; X64-NEXT:    or rax, rdx
-; X64-NEXT:    mov ecx, 0x3
-; X64-NEXT:    btr rax, rcx
-; X64-NEXT:    mov r8d, r8d
-; X64-NEXT:    shl r8, cl
-; X64-NEXT:    or r8, rax
-; X64-NEXT:    mov ecx, 0x4
-; X64-NEXT:    btr r8, rcx
-; X64-NEXT:    mov r9d, r9d
-; X64-NEXT:    shl r9, cl
-; X64-NEXT:    or r9, r8
-; X64-NEXT:    mov byte ptr [rdi], r9b
+; X64-NEXT:    btr rax, 0x0
+; X64-NEXT:    mov ebx, esi
+; X64-NEXT:    and ebx, 0x1
+; X64-NEXT:    or rax, rbx
+; X64-NEXT:    btr rax, 0x1
+; X64-NEXT:    mov ebx, edx
+; X64-NEXT:    and ebx, 0x1
+; X64-NEXT:    lea rax, [rax + 2*rbx]
+; X64-NEXT:    btr rax, 0x2
+; X64-NEXT:    mov edx, ecx
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    lea rax, [rax + 4*rdx]
+; X64-NEXT:    btr rax, 0x3
+; X64-NEXT:    mov ecx, r8d
+; X64-NEXT:    and ecx, 0x1
+; X64-NEXT:    lea rax, [rax + 8*rcx]
+; X64-NEXT:    btr rax, 0x4
+; X64-NEXT:    mov ecx, r9d
+; X64-NEXT:    and ecx, 0x1
+; X64-NEXT:    shl ecx, 0x4
+; X64-NEXT:    or rax, rcx
+; X64-NEXT:    mov byte ptr [rdi], al
+; X64-NEXT:    pop rbx
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -123,38 +108,13 @@ define void @ins_v5i1_chain(ptr %p, i1 %e0, i1 %e1, i1 %e2, i1 %e3, i1 %e4) {
 ; ARM64-NEXT:    stp x29, x30, [sp]
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
-; ARM64-NEXT:    mov w6, #0x1 // =1
-; ARM64-NEXT:    and x1, x1, #0x1
-; ARM64-NEXT:    lsr x6, x6, #0
-; ARM64-NEXT:    lsr x1, x1, #0
-; ARM64-NEXT:    mov w7, #0x0 // =0
-; ARM64-NEXT:    bic x6, x7, x6
-; ARM64-NEXT:    orr x7, x6, x1
-; ARM64-NEXT:    mov w1, #0x1 // =1
-; ARM64-NEXT:    and x2, x2, #0x1
-; ARM64-NEXT:    lsl x1, x1, #1
-; ARM64-NEXT:    lsl x2, x2, #1
-; ARM64-NEXT:    bic x1, x7, x1
-; ARM64-NEXT:    orr x6, x1, x2
-; ARM64-NEXT:    mov w1, #0x1 // =1
-; ARM64-NEXT:    and x3, x3, #0x1
-; ARM64-NEXT:    lsl x1, x1, #2
-; ARM64-NEXT:    lsl x3, x3, #2
-; ARM64-NEXT:    bic x1, x6, x1
-; ARM64-NEXT:    orr x2, x1, x3
-; ARM64-NEXT:    mov w1, #0x1 // =1
-; ARM64-NEXT:    and x4, x4, #0x1
-; ARM64-NEXT:    lsl x1, x1, #3
-; ARM64-NEXT:    lsl x4, x4, #3
-; ARM64-NEXT:    bic x1, x2, x1
-; ARM64-NEXT:    orr x2, x1, x4
-; ARM64-NEXT:    mov w1, #0x1 // =1
-; ARM64-NEXT:    and x5, x5, #0x1
-; ARM64-NEXT:    lsl x1, x1, #4
-; ARM64-NEXT:    lsl x5, x5, #4
-; ARM64-NEXT:    bic x1, x2, x1
-; ARM64-NEXT:    orr x2, x1, x5
-; ARM64-NEXT:    strb w2, [x0]
+; ARM64-NEXT:    mov w6, #0x0 // =0
+; ARM64-NEXT:    bfxil x6, x1, #0, #1
+; ARM64-NEXT:    bfi x6, x2, #1, #1
+; ARM64-NEXT:    bfi x6, x3, #2, #1
+; ARM64-NEXT:    bfi x6, x4, #3, #1
+; ARM64-NEXT:    bfi x6, x5, #4, #1
+; ARM64-NEXT:    strb w6, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp]
 ; ARM64-NEXT:    add sp, sp, #0xa0
 ; ARM64-NEXT:    ret
@@ -176,7 +136,7 @@ define void @ins_v5i1_dyn(ptr %p, i1 %e, i32 %i) {
 ; X64-NEXT:    movzx eax, byte ptr [rdi]
 ; X64-NEXT:    mov ecx, edx
 ; X64-NEXT:    btr rax, rcx
-; X64-NEXT:    mov esi, esi
+; X64-NEXT:    and esi, 0x1
 ; X64-NEXT:    shl rsi, cl
 ; X64-NEXT:    or rsi, rax
 ; X64-NEXT:    mov byte ptr [rdi], sil
@@ -212,12 +172,11 @@ define void @ins_v16i1_0(ptr %p, i1 %e) {
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movzx eax, word ptr [rdi]
-; X64-NEXT:    mov ecx, 0x0
-; X64-NEXT:    btr rax, rcx
-; X64-NEXT:    mov esi, esi
-; X64-NEXT:    shl rsi, cl
-; X64-NEXT:    or rsi, rax
-; X64-NEXT:    mov word ptr [rdi], si
+; X64-NEXT:    btr rax, 0x0
+; X64-NEXT:    mov ecx, esi
+; X64-NEXT:    and ecx, 0x1
+; X64-NEXT:    or rax, rcx
+; X64-NEXT:    mov word ptr [rdi], ax
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -227,12 +186,7 @@ define void @ins_v16i1_0(ptr %p, i1 %e) {
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrh w2, [x0]
-; ARM64-NEXT:    mov w3, #0x1 // =1
-; ARM64-NEXT:    and x1, x1, #0x1
-; ARM64-NEXT:    lsr x3, x3, #0
-; ARM64-NEXT:    lsr x1, x1, #0
-; ARM64-NEXT:    bic x3, x2, x3
-; ARM64-NEXT:    orr x2, x3, x1
+; ARM64-NEXT:    bfxil x2, x1, #0, #1
 ; ARM64-NEXT:    strh w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp]
 ; ARM64-NEXT:    add sp, sp, #0xa0
@@ -250,12 +204,11 @@ define void @ins_v16i1_3(ptr %p, i1 %e) {
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movzx eax, word ptr [rdi]
-; X64-NEXT:    mov ecx, 0x3
-; X64-NEXT:    btr rax, rcx
-; X64-NEXT:    mov esi, esi
-; X64-NEXT:    shl rsi, cl
-; X64-NEXT:    or rsi, rax
-; X64-NEXT:    mov word ptr [rdi], si
+; X64-NEXT:    btr rax, 0x3
+; X64-NEXT:    mov ecx, esi
+; X64-NEXT:    and ecx, 0x1
+; X64-NEXT:    lea rax, [rax + 8*rcx]
+; X64-NEXT:    mov word ptr [rdi], ax
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -265,12 +218,7 @@ define void @ins_v16i1_3(ptr %p, i1 %e) {
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrh w2, [x0]
-; ARM64-NEXT:    mov w3, #0x1 // =1
-; ARM64-NEXT:    and x1, x1, #0x1
-; ARM64-NEXT:    lsl x3, x3, #3
-; ARM64-NEXT:    lsl x1, x1, #3
-; ARM64-NEXT:    bic x3, x2, x3
-; ARM64-NEXT:    orr x2, x3, x1
+; ARM64-NEXT:    bfi x2, x1, #3, #1
 ; ARM64-NEXT:    strh w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp]
 ; ARM64-NEXT:    add sp, sp, #0xa0
@@ -285,36 +233,33 @@ define void @ins_v16i1_chain(ptr %p, i1 %e0, i1 %e1, i1 %e2, i1 %e3, i1 %e4) {
 ; X64-LABEL: <ins_v16i1_chain>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    push rbx
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
-; X64-NEXT:    mov byte ptr [rbp - 0x29], cl
-; X64-NEXT:    mov ecx, 0x0
+; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    xor eax, eax
-; X64-NEXT:    btr rax, rcx
-; X64-NEXT:    mov esi, esi
-; X64-NEXT:    shl rsi, cl
-; X64-NEXT:    or rsi, rax
-; X64-NEXT:    mov ecx, 0x1
-; X64-NEXT:    btr rsi, rcx
-; X64-NEXT:    mov edx, edx
-; X64-NEXT:    shl rdx, cl
-; X64-NEXT:    or rdx, rsi
-; X64-NEXT:    mov ecx, 0x2
-; X64-NEXT:    btr rdx, rcx
-; X64-NEXT:    mov eax, dword ptr [rbp - 0x29]
-; X64-NEXT:    shl rax, cl
-; X64-NEXT:    or rax, rdx
-; X64-NEXT:    mov ecx, 0x3
-; X64-NEXT:    btr rax, rcx
-; X64-NEXT:    mov r8d, r8d
-; X64-NEXT:    shl r8, cl
-; X64-NEXT:    or r8, rax
-; X64-NEXT:    mov ecx, 0x4
-; X64-NEXT:    btr r8, rcx
-; X64-NEXT:    mov r9d, r9d
-; X64-NEXT:    shl r9, cl
-; X64-NEXT:    or r9, r8
-; X64-NEXT:    mov word ptr [rdi], r9w
+; X64-NEXT:    btr rax, 0x0
+; X64-NEXT:    mov ebx, esi
+; X64-NEXT:    and ebx, 0x1
+; X64-NEXT:    or rax, rbx
+; X64-NEXT:    btr rax, 0x1
+; X64-NEXT:    mov ebx, edx
+; X64-NEXT:    and ebx, 0x1
+; X64-NEXT:    lea rax, [rax + 2*rbx]
+; X64-NEXT:    btr rax, 0x2
+; X64-NEXT:    mov edx, ecx
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    lea rax, [rax + 4*rdx]
+; X64-NEXT:    btr rax, 0x3
+; X64-NEXT:    mov ecx, r8d
+; X64-NEXT:    and ecx, 0x1
+; X64-NEXT:    lea rax, [rax + 8*rcx]
+; X64-NEXT:    btr rax, 0x4
+; X64-NEXT:    mov ecx, r9d
+; X64-NEXT:    and ecx, 0x1
+; X64-NEXT:    shl ecx, 0x4
+; X64-NEXT:    or rax, rcx
+; X64-NEXT:    mov word ptr [rdi], ax
+; X64-NEXT:    pop rbx
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
@@ -323,38 +268,13 @@ define void @ins_v16i1_chain(ptr %p, i1 %e0, i1 %e1, i1 %e2, i1 %e3, i1 %e4) {
 ; ARM64-NEXT:    stp x29, x30, [sp]
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
-; ARM64-NEXT:    mov w6, #0x1 // =1
-; ARM64-NEXT:    and x1, x1, #0x1
-; ARM64-NEXT:    lsr x6, x6, #0
-; ARM64-NEXT:    lsr x1, x1, #0
-; ARM64-NEXT:    mov w7, #0x0 // =0
-; ARM64-NEXT:    bic x6, x7, x6
-; ARM64-NEXT:    orr x7, x6, x1
-; ARM64-NEXT:    mov w1, #0x1 // =1
-; ARM64-NEXT:    and x2, x2, #0x1
-; ARM64-NEXT:    lsl x1, x1, #1
-; ARM64-NEXT:    lsl x2, x2, #1
-; ARM64-NEXT:    bic x1, x7, x1
-; ARM64-NEXT:    orr x6, x1, x2
-; ARM64-NEXT:    mov w1, #0x1 // =1
-; ARM64-NEXT:    and x3, x3, #0x1
-; ARM64-NEXT:    lsl x1, x1, #2
-; ARM64-NEXT:    lsl x3, x3, #2
-; ARM64-NEXT:    bic x1, x6, x1
-; ARM64-NEXT:    orr x2, x1, x3
-; ARM64-NEXT:    mov w1, #0x1 // =1
-; ARM64-NEXT:    and x4, x4, #0x1
-; ARM64-NEXT:    lsl x1, x1, #3
-; ARM64-NEXT:    lsl x4, x4, #3
-; ARM64-NEXT:    bic x1, x2, x1
-; ARM64-NEXT:    orr x2, x1, x4
-; ARM64-NEXT:    mov w1, #0x1 // =1
-; ARM64-NEXT:    and x5, x5, #0x1
-; ARM64-NEXT:    lsl x1, x1, #4
-; ARM64-NEXT:    lsl x5, x5, #4
-; ARM64-NEXT:    bic x1, x2, x1
-; ARM64-NEXT:    orr x2, x1, x5
-; ARM64-NEXT:    strh w2, [x0]
+; ARM64-NEXT:    mov w6, #0x0 // =0
+; ARM64-NEXT:    bfxil x6, x1, #0, #1
+; ARM64-NEXT:    bfi x6, x2, #1, #1
+; ARM64-NEXT:    bfi x6, x3, #2, #1
+; ARM64-NEXT:    bfi x6, x4, #3, #1
+; ARM64-NEXT:    bfi x6, x5, #4, #1
+; ARM64-NEXT:    strh w6, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp]
 ; ARM64-NEXT:    add sp, sp, #0xa0
 ; ARM64-NEXT:    ret
@@ -376,7 +296,7 @@ define void @ins_v16i1_dyn(ptr %p, i1 %e, i32 %i) {
 ; X64-NEXT:    movzx eax, word ptr [rdi]
 ; X64-NEXT:    mov ecx, edx
 ; X64-NEXT:    btr rax, rcx
-; X64-NEXT:    mov esi, esi
+; X64-NEXT:    and esi, 0x1
 ; X64-NEXT:    shl rsi, cl
 ; X64-NEXT:    or rsi, rax
 ; X64-NEXT:    mov word ptr [rdi], si
@@ -1165,7 +1085,7 @@ define <2 x float> @ins_v2f32_const_nosalvage(<2 x float> %v) {
 ; ARM64-NEXT:    mov v0.16b, v8.16b
 ; ARM64-NEXT:    movi v1.8b, #0x0
 ; ARM64-NEXT:    mov v0.s[0], v1.s[0]
-; ARM64-NEXT:    b 0xa94 <ins_v2f32_const_nosalvage+0x14>
+; ARM64-NEXT:    b 0x994 <ins_v2f32_const_nosalvage+0x14>
   br label %loop
 
 loop:

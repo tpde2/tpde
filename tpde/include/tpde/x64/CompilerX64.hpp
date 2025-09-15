@@ -491,6 +491,12 @@ struct CompilerX64 : BaseTy<Adaptor, Derived, Config> {
   void generate_raw_intext(
       AsmReg dst, AsmReg src, bool sign, u32 from, u32 to) noexcept;
 
+  /// Bitfield insert. Needs a temporary register, src is not modified.
+  void generate_raw_bfi(AsmReg dst, AsmReg src, u32 lsb, u32 width) noexcept;
+  /// Bitfield insert in zero. src is not modified, but src and dst must be
+  /// different.
+  void generate_raw_bfiz(AsmReg dst, AsmReg src, u32 lsb, u32 width) noexcept;
+
   /// Generate a function call
   ///
   /// This will get the arguments into the correct registers according to the
@@ -1603,6 +1609,83 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::generate_raw_intext(
       ASM(SHL64ri, dst, 64 - from);
       ASM(SAR64ri, dst, 64 - from);
     }
+  }
+}
+
+template <IRAdaptor Adaptor,
+          typename Derived,
+          template <typename, typename, typename> class BaseTy,
+          typename Config>
+void CompilerX64<Adaptor, Derived, BaseTy, Config>::generate_raw_bfi(
+    AsmReg dst, AsmReg src, u32 lsb, u32 width) noexcept {
+  assert(lsb < 63 && width < 64 && lsb + width <= 64 && width != 0);
+  assert(may_clobber_flags());
+  ScratchReg tmp1{this};
+  AsmReg tmp1_reg = tmp1.alloc_gp();
+  // First, clear relevant bits in dst.
+  if (width == 1) {
+    ASM(BTR64ri, dst, lsb);
+  } else if (lsb + width <= 31) {
+    ASM(AND64ri, dst, ~(((u64{1} << width) - 1) << lsb));
+  } else {
+    ASM(MOV64ri, tmp1_reg, ~(((u64{1} << width) - 1) << lsb));
+    ASM(AND64rr, dst, tmp1_reg);
+  }
+  // Second, clear irrelevant bits in src; result is in tmp1_reg.
+  if (width == 8) {
+    ASM(MOVZXr32r8, tmp1_reg, src);
+  } else if (width == 16) {
+    ASM(MOVZXr32r16, tmp1_reg, src);
+  } else if (width <= 32) {
+    ASM(MOV32rr, tmp1_reg, src);
+    if (width < 32) {
+      ASM(AND32ri, tmp1_reg, (u32{1} << width) - 1);
+    }
+  } else {
+    ASM(MOV64ri, tmp1_reg, (u64{1} << width) - 1);
+    ASM(AND64rr, tmp1_reg, src);
+  }
+  // Third, merge. Bits are disjoint, so addition is possible.
+  if (lsb >= 1 && lsb <= 3) {
+    ASM(LEA64rm, dst, FE_MEM(dst, u8(1 << lsb), tmp1_reg, 0));
+  } else {
+    if (lsb > 0 && lsb + width <= 32) {
+      ASM(SHL32ri, tmp1_reg, lsb);
+    } else if (lsb > 0) {
+      ASM(SHL64ri, tmp1_reg, lsb);
+    }
+    ASM(OR64rr, dst, tmp1_reg);
+  }
+}
+
+template <IRAdaptor Adaptor,
+          typename Derived,
+          template <typename, typename, typename> class BaseTy,
+          typename Config>
+void CompilerX64<Adaptor, Derived, BaseTy, Config>::generate_raw_bfiz(
+    AsmReg dst, AsmReg src, u32 lsb, u32 width) noexcept {
+  assert(lsb < 63 && width < 64 && lsb + width <= 64 && width != 0);
+  assert(dst != src);
+  assert(may_clobber_flags());
+  // Clear irrelevant bits in src and move to dst.
+  if (width == 8) {
+    ASM(MOVZXr32r8, dst, src);
+  } else if (width == 16) {
+    ASM(MOVZXr32r16, dst, src);
+  } else if (width <= 32) {
+    ASM(MOV32rr, dst, src);
+    if (width < 32) {
+      ASM(AND32ri, dst, (u32{1} << width) - 1);
+    }
+  } else {
+    ASM(MOV64ri, dst, (u64{1} << width) - 1);
+    ASM(AND64rr, dst, src);
+  }
+  // Shift into place.
+  if (lsb > 0 && lsb + width <= 32) {
+    ASM(SHL32ri, dst, lsb);
+  } else if (lsb > 0) {
+    ASM(SHL64ri, dst, lsb);
   }
 }
 
