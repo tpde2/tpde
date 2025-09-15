@@ -140,3 +140,73 @@ loop:
 ret:
   terminate
 }
+
+; CHECK: Liveness for loop_swappedphi
+; CHECK-NEXT:   0: 2 refs, 0->0 (entry->entry), lf: false
+; CHECK-NEXT:   1: ignored
+; CHECK-NEXT:   2: 3 refs, 0->1 (entry->loop), lf: true
+; CHECK-NEXT:   3: 2 refs, 1->1 (loop->loop), lf: false
+; CHECK-NEXT:   4: ignored
+; CHECK-NEXT:   5: ignored
+; CHECK-NEXT: End Liveness
+loop_swappedphi() {
+entry:
+  %init =
+  jump ^loop
+loop:
+  %phi = phi [^loop, %inc], [^entry, %init]
+  %inc = %phi
+  jump ^loop, ^ret
+ret:
+  terminate
+}
+
+; CHECK: Liveness for loop2
+; CHECK-NEXT: 0: 1 refs, 0->0 (entry->entry), lf: false
+; CHECK-NEXT: 1: ignored
+; CHECK-NEXT: 2: 2 refs, 1->1 (loop1->loop1), lf: false
+; CHECK-NEXT: 3: ignored
+; CHECK-NEXT: 4: 3 refs, 1->2 (loop1->loop2), lf: true
+; CHECK-NEXT: 5: 2 refs, 2->2 (loop2->loop2), lf: false
+; CHECK-NEXT: 6: ignored
+; CHECK-NEXT: 7: ignored
+; CHECK-NEXT: End Liveness
+loop2() {
+entry:
+  %init =
+  jump ^loop1
+loop1:
+  %val1 =
+  jump ^loop1, ^loop2
+loop2:
+  %phi = phi [^loop1, %val1], [^loop2, %inc]
+  %inc = %phi
+  jump ^loop2, ^ret
+ret:
+  terminate
+}
+
+; CHECK: Liveness for loop2_swappedphi
+; CHECK-NEXT: 0: 1 refs, 0->0 (entry->entry), lf: false
+; CHECK-NEXT: 1: ignored
+; CHECK-NEXT: 2: 2 refs, 1->1 (loop1->loop1), lf: false
+; CHECK-NEXT: 3: ignored
+; CHECK-NEXT: 4: 3 refs, 1->2 (loop1->loop2), lf: true
+; CHECK-NEXT: 5: 2 refs, 2->2 (loop2->loop2), lf: false
+; CHECK-NEXT: 6: ignored
+; CHECK-NEXT: 7: ignored
+; CHECK-NEXT: End Liveness
+loop2_swappedphi() {
+entry:
+  %init =
+  jump ^loop1
+loop1:
+  %val1 =
+  jump ^loop1, ^loop2
+loop2:
+  %phi = phi [^loop2, %inc], [^loop1, %val1]
+  %inc = %phi
+  jump ^loop2, ^ret
+ret:
+  terminate
+}

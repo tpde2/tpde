@@ -773,21 +773,29 @@ void Analyzer<Adaptor>::compute_liveness() noexcept {
     TPDE_LOG_TRACE("    increasing ref_count to {}", liveness.ref_count);
 
     // helpers
-    const auto update_for_block_only = [&liveness, block_idx]() {
-      const auto old_first = static_cast<u32>(liveness.first);
-      const auto old_last = static_cast<u32>(liveness.last);
+    const auto update_for_block_only =
+        [&liveness, block_idx](bool check_for_backwards_extension) {
+          const auto old_first = static_cast<u32>(liveness.first);
+          const auto old_last = static_cast<u32>(liveness.last);
 
-      const auto new_first = std::min(old_first, block_idx);
-      const auto new_last = std::max(old_last, block_idx);
-      liveness.first = static_cast<BlockIndex>(new_first);
-      liveness.last = static_cast<BlockIndex>(new_last);
+          const auto new_first = std::min(old_first, block_idx);
+          const auto new_last = std::max(old_last, block_idx);
+          liveness.first = static_cast<BlockIndex>(new_first);
+          liveness.last = static_cast<BlockIndex>(new_last);
 
-      // if last changed, we don't need to extend the lifetime to the end
-      // of the last block
-      liveness.last_full = (old_last == new_last) ? liveness.last_full : false;
-    };
+          // if last changed, we don't need to extend the lifetime to the end
+          // of the last block except if we extended the liveness interval
+          // to an outside loop which means we saw a use in a previous block
+          if (old_last == new_last && check_for_backwards_extension) {
+            liveness.last_full = true;
+          } else if (old_last != new_last) {
+            liveness.last_full = false;
+          }
+        };
 
-    const auto update_for_loop = [&liveness](const Loop &loop) {
+    const auto update_for_loop = [&liveness](
+                                     const Loop &loop,
+                                     bool check_for_backwards_extension) {
       const auto old_first = static_cast<u32>(liveness.first);
       const auto old_last = static_cast<u32>(liveness.last);
 
@@ -798,14 +806,18 @@ void Analyzer<Adaptor>::compute_liveness() noexcept {
 
       // if last changed, set last_full to true
       // since the values need to be allocated when the loop is active
-      liveness.last_full = (old_last == new_last) ? liveness.last_full : true;
+      // Otherwise, if the liveness interval was extended backwards we need to
+      // mark the liveness intervall as full as well
+      if (old_last != new_last || check_for_backwards_extension) {
+        liveness.last_full = true;
+      }
     };
 
     const auto block_loop_idx = block_loop_map[block_idx];
     if (liveness.lowest_common_loop == block_loop_idx) {
       // just extend the liveness interval
       TPDE_LOG_TRACE("    lcl is same as block loop");
-      update_for_block_only();
+      update_for_block_only(false);
 
       TPDE_LOG_TRACE("    new interval {}->{}, lf: {}",
                      static_cast<u32>(liveness.first),
@@ -843,7 +855,7 @@ void Analyzer<Adaptor>::compute_liveness() noexcept {
       }
       assert(loops[cur_loop_idx].level == target_level);
       TPDE_LOG_TRACE("    target_loop is {}", cur_loop_idx);
-      update_for_loop(loops[cur_loop_idx]);
+      update_for_loop(loops[cur_loop_idx], false);
 
       TPDE_LOG_TRACE("    new interval {}->{}, lf: {}",
                      static_cast<u32>(liveness.first),
@@ -903,17 +915,17 @@ void Analyzer<Adaptor>::compute_liveness() noexcept {
            static_cast<u32>(liveness_loop.begin));
     assert(static_cast<u32>(loops[prev_lhs].end) >=
            static_cast<u32>(liveness_loop.end));
-    update_for_loop(loops[prev_lhs]);
+    update_for_loop(loops[prev_lhs], false);
 
     // extend by block if the block_loop is the lcl
     // or by prev_rhs (the loop containing block_loop nested directly in
     // lcl) otherwise
     if (lhs_idx == block_loop_idx) {
-      update_for_block_only();
+      update_for_block_only(true);
     } else {
       assert(loops[prev_rhs].parent == lhs_idx);
       assert(loops[prev_rhs].level == loops[lhs_idx].level + 1);
-      update_for_loop(loops[prev_rhs]);
+      update_for_loop(loops[prev_rhs], true);
     }
 
     TPDE_LOG_TRACE("    new interval {}->{}, lf: {}",
