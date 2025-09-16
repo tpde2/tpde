@@ -558,6 +558,36 @@ struct CompilerA64 : BaseTy<Adaptor, Derived, Config> {
                      typename Base::ValueRef *result,
                      bool variable_args = false);
 
+private:
+  /// Internal function, don't use. Emit compare of cmp_reg with case_value.
+  void switch_emit_cmp(AsmReg cmp_reg,
+                       AsmReg tmp_reg,
+                       u64 case_value,
+                       bool width_is_32) noexcept;
+
+public:
+  /// Internal function, don't use. Jump if cmp_reg equals case_value.
+  void switch_emit_cmpeq(Label case_label,
+                         AsmReg cmp_reg,
+                         AsmReg tmp_reg,
+                         u64 case_value,
+                         bool width_is_32) noexcept;
+  /// Internal function, don't use. Emit bounds check and jump table.
+  bool switch_emit_jump_table(Label default_label,
+                              std::span<const Label> labels,
+                              AsmReg cmp_reg,
+                              AsmReg tmp_reg,
+                              u64 low_bound,
+                              u64 high_bound,
+                              bool width_is_32) noexcept;
+  /// Internal function, don't use. Jump if cmp_reg is greater than case_value.
+  void switch_emit_binary_step(Label case_label,
+                               Label gt_label,
+                               AsmReg cmp_reg,
+                               AsmReg tmp_reg,
+                               u64 case_value,
+                               bool width_is_32) noexcept;
+
   /// Generate code sequence to load address of sym into a register. This will
   /// generate a function call for dynamic TLS access models.
   ScratchReg tls_get_addr(SymRef sym, TLSModel model) noexcept;
@@ -1981,6 +2011,77 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::generate_call(
   if (result) {
     cb.add_ret(*result);
   }
+}
+
+template <IRAdaptor Adaptor,
+          typename Derived,
+          template <typename, typename, typename> typename BaseTy,
+          typename Config>
+void CompilerA64<Adaptor, Derived, BaseTy, Config>::switch_emit_cmp(
+    AsmReg cmp_reg, AsmReg tmp_reg, u64 case_value, bool width_is_32) noexcept {
+  if (width_is_32) {
+    if (!ASMIF(CMPwi, cmp_reg, case_value)) {
+      materialize_constant(case_value, Config::GP_BANK, 4, tmp_reg);
+      ASM(CMPw, cmp_reg, tmp_reg);
+    }
+  } else {
+    if (!ASMIF(CMPxi, cmp_reg, case_value)) {
+      materialize_constant(case_value, Config::GP_BANK, 4, tmp_reg);
+      ASM(CMPx, cmp_reg, tmp_reg);
+    }
+  }
+}
+
+template <IRAdaptor Adaptor,
+          typename Derived,
+          template <typename, typename, typename> typename BaseTy,
+          typename Config>
+void CompilerA64<Adaptor, Derived, BaseTy, Config>::switch_emit_cmpeq(
+    Label case_label,
+    AsmReg cmp_reg,
+    AsmReg tmp_reg,
+    u64 case_value,
+    bool width_is_32) noexcept {
+  switch_emit_cmp(cmp_reg, tmp_reg, case_value, width_is_32);
+  generate_raw_jump(Jump::Jeq, case_label);
+}
+
+template <IRAdaptor Adaptor,
+          typename Derived,
+          template <typename, typename, typename> typename BaseTy,
+          typename Config>
+bool CompilerA64<Adaptor, Derived, BaseTy, Config>::switch_emit_jump_table(
+    Label default_label,
+    std::span<const Label> labels,
+    AsmReg cmp_reg,
+    AsmReg tmp_reg,
+    u64 low_bound,
+    u64 high_bound,
+    bool width_is_32) noexcept {
+  (void)default_label;
+  (void)labels;
+  (void)cmp_reg;
+  (void)tmp_reg;
+  (void)low_bound;
+  (void)high_bound;
+  (void)width_is_32;
+  // TODO: implement jump table
+  return false;
+}
+
+template <IRAdaptor Adaptor,
+          typename Derived,
+          template <typename, typename, typename> typename BaseTy,
+          typename Config>
+void CompilerA64<Adaptor, Derived, BaseTy, Config>::switch_emit_binary_step(
+    Label case_label,
+    Label gt_label,
+    AsmReg cmp_reg,
+    AsmReg tmp_reg,
+    u64 case_value,
+    bool width_is_32) noexcept {
+  switch_emit_cmpeq(case_label, cmp_reg, tmp_reg, case_value, width_is_32);
+  generate_raw_jump(Jump::Jhi, gt_label);
 }
 
 template <IRAdaptor Adaptor,

@@ -512,6 +512,36 @@ struct CompilerX64 : BaseTy<Adaptor, Derived, Config> {
                      typename Base::ValueRef *result,
                      bool variable_args = false);
 
+private:
+  /// Internal function, don't use. Emit compare of cmp_reg with case_value.
+  void switch_emit_cmp(AsmReg cmp_reg,
+                       AsmReg tmp_reg,
+                       u64 case_value,
+                       bool width_is_32) noexcept;
+
+public:
+  /// Internal function, don't use. Jump if cmp_reg equals case_value.
+  void switch_emit_cmpeq(Label case_label,
+                         AsmReg cmp_reg,
+                         AsmReg tmp_reg,
+                         u64 case_value,
+                         bool width_is_32) noexcept;
+  /// Internal function, don't use. Emit bounds check and jump table.
+  bool switch_emit_jump_table(Label default_label,
+                              std::span<const Label> labels,
+                              AsmReg cmp_reg,
+                              AsmReg tmp_reg,
+                              u64 low_bound,
+                              u64 high_bound,
+                              bool width_is_32) noexcept;
+  /// Internal function, don't use. Jump if cmp_reg is greater than case_value.
+  void switch_emit_binary_step(Label case_label,
+                               Label gt_label,
+                               AsmReg cmp_reg,
+                               AsmReg tmp_reg,
+                               u64 case_value,
+                               bool width_is_32) noexcept;
+
   /// Generate code sequence to load address of sym into a register. This will
   /// generate a function call for dynamic TLS access models.
   ScratchReg tls_get_addr(SymRef sym, TLSModel model) noexcept;
@@ -1892,6 +1922,119 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::generate_call(
   if (result) {
     cb.add_ret(*result);
   }
+}
+
+template <IRAdaptor Adaptor,
+          typename Derived,
+          template <typename, typename, typename> typename BaseTy,
+          typename Config>
+void CompilerX64<Adaptor, Derived, BaseTy, Config>::switch_emit_cmp(
+    const AsmReg cmp_reg,
+    const AsmReg tmp_reg,
+    const u64 case_value,
+    const bool width_is_32) noexcept {
+  if (width_is_32) {
+    ASM(CMP32ri, cmp_reg, case_value);
+  } else {
+    if ((i64)((i32)case_value) == (i64)case_value) {
+      ASM(CMP64ri, cmp_reg, case_value);
+    } else {
+      this->materialize_constant(&case_value, Config::GP_BANK, 8, tmp_reg);
+      ASM(CMP64rr, cmp_reg, tmp_reg);
+    }
+  }
+}
+
+template <IRAdaptor Adaptor,
+          typename Derived,
+          template <typename, typename, typename> typename BaseTy,
+          typename Config>
+void CompilerX64<Adaptor, Derived, BaseTy, Config>::switch_emit_cmpeq(
+    const Label case_label,
+    const AsmReg cmp_reg,
+    const AsmReg tmp_reg,
+    const u64 case_value,
+    const bool width_is_32) noexcept {
+  switch_emit_cmp(cmp_reg, tmp_reg, case_value, width_is_32);
+  generate_raw_jump(Jump::je, case_label);
+}
+
+template <IRAdaptor Adaptor,
+          typename Derived,
+          template <typename, typename, typename> typename BaseTy,
+          typename Config>
+bool CompilerX64<Adaptor, Derived, BaseTy, Config>::switch_emit_jump_table(
+    Label default_label,
+    std::span<const Label> labels,
+    AsmReg cmp_reg,
+    AsmReg tmp_reg,
+    u64 low_bound,
+    u64 high_bound,
+    bool width_is_32) noexcept {
+  // NB: we must not evict any registers here.
+  if (low_bound != 0) {
+    switch_emit_cmp(cmp_reg, tmp_reg, low_bound, width_is_32);
+    generate_raw_jump(Jump::jb, default_label);
+  }
+  switch_emit_cmp(cmp_reg, tmp_reg, high_bound, width_is_32);
+  generate_raw_jump(Jump::ja, default_label);
+
+  if (width_is_32) {
+    // zero-extend cmp_reg since we use the full width
+    ASM(MOV32rr, cmp_reg, cmp_reg);
+  }
+
+  if (low_bound != 0) {
+    if (i32(low_bound) == i64(low_bound)) {
+      ASM(SUB64ri, cmp_reg, low_bound);
+    } else {
+      this->materialize_constant(&low_bound, Config::GP_BANK, 8, tmp_reg);
+      ASM(SUB64rr, cmp_reg, tmp_reg);
+    }
+  }
+
+  Label jump_table = this->text_writer.label_create();
+  ASM(LEA64rm, tmp_reg, FE_MEM(FE_IP, 0, FE_NOREG, -1));
+  // we reuse the jump offset stuff since the patch procedure is the same
+  this->text_writer.label_ref(jump_table,
+                              this->text_writer.offset() - 4,
+                              LabelFixupKind::X64_JMP_OR_MEM_DISP);
+  // load the 4 byte displacement from the jump table
+  ASM(MOVSXr64m32, cmp_reg, FE_MEM(tmp_reg, 4, cmp_reg, 0));
+  ASM(ADD64rr, tmp_reg, cmp_reg);
+  ASM(JMPr, tmp_reg);
+
+  this->text_writer.align(4);
+  this->text_writer.ensure_space(4 + 4 * labels.size());
+  this->label_place(jump_table);
+  const u32 table_off = this->text_writer.offset();
+  for (u32 i = 0; i < labels.size(); i++) {
+    if (this->text_writer.label_is_pending(labels[i])) {
+      this->text_writer.label_ref(labels[i],
+                                  this->text_writer.offset(),
+                                  LabelFixupKind::X64_JUMP_TABLE);
+      this->text_writer.write(table_off);
+    } else {
+      const auto label_off = this->text_writer.label_offset(labels[i]);
+      this->text_writer.write((i32)label_off - (i32)table_off);
+    }
+  }
+  return true;
+}
+
+template <IRAdaptor Adaptor,
+          typename Derived,
+          template <typename, typename, typename> typename BaseTy,
+          typename Config>
+void CompilerX64<Adaptor, Derived, BaseTy, Config>::switch_emit_binary_step(
+    const Label case_label,
+    const Label gt_label,
+    const AsmReg cmp_reg,
+    const AsmReg tmp_reg,
+    const u64 case_value,
+    const bool width_is_32) noexcept {
+  switch_emit_cmpeq(case_label, cmp_reg, tmp_reg, case_value, width_is_32);
+  generate_raw_jump(Jump::ja, gt_label);
 }
 
 template <IRAdaptor Adaptor,

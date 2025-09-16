@@ -97,29 +97,6 @@ struct LLVMCompilerX64 : tpde::x64::CompilerX64<LLVMAdaptor,
 
   GenericValuePart create_addr_for_alloca(tpde::AssignmentPartRef ap) noexcept;
 
-  void switch_emit_cmp(AsmReg cmp_reg,
-                       AsmReg tmp_reg,
-                       u64 case_value,
-                       bool width_is_32) noexcept;
-  void switch_emit_cmpeq(tpde::Label case_label,
-                         AsmReg cmp_reg,
-                         AsmReg tmp_reg,
-                         u64 case_value,
-                         bool width_is_32) noexcept;
-  bool switch_emit_jump_table(tpde::Label default_label,
-                              std::span<tpde::Label> labels,
-                              AsmReg cmp_reg,
-                              AsmReg tmp_reg,
-                              u64 low_bound,
-                              u64 high_bound,
-                              bool width_is_32) noexcept;
-  void switch_emit_binary_step(tpde::Label case_label,
-                               tpde::Label gt_label,
-                               AsmReg cmp_reg,
-                               AsmReg tmp_reg,
-                               u64 case_value,
-                               bool width_is_32) noexcept;
-
   void create_helper_call(std::span<IRValueRef> args,
                           ValueRef *result,
                           SymRef sym) noexcept;
@@ -470,99 +447,6 @@ void LLVMCompilerX64::compile_i32_cmp_zero(
 LLVMCompilerX64::GenericValuePart LLVMCompilerX64::create_addr_for_alloca(
     tpde::AssignmentPartRef ap) noexcept {
   return GenericValuePart::Expr{AsmReg::BP, ap.variable_stack_off()};
-}
-
-void LLVMCompilerX64::switch_emit_cmp(const AsmReg cmp_reg,
-                                      const AsmReg tmp_reg,
-                                      const u64 case_value,
-                                      const bool width_is_32) noexcept {
-  if (width_is_32) {
-    ASM(CMP32ri, cmp_reg, case_value);
-  } else {
-    if ((i64)((i32)case_value) == (i64)case_value) {
-      ASM(CMP64ri, cmp_reg, case_value);
-    } else {
-      ValuePartRef const_ref{this, case_value, 8, CompilerConfig::GP_BANK};
-      ASM(CMP64rr, cmp_reg, const_ref.reload_into_specific_fixed(tmp_reg));
-    }
-  }
-}
-
-void LLVMCompilerX64::switch_emit_cmpeq(const tpde::Label case_label,
-                                        const AsmReg cmp_reg,
-                                        const AsmReg tmp_reg,
-                                        const u64 case_value,
-                                        const bool width_is_32) noexcept {
-  switch_emit_cmp(cmp_reg, tmp_reg, case_value, width_is_32);
-  generate_raw_jump(Jump::je, case_label);
-}
-
-bool LLVMCompilerX64::switch_emit_jump_table(tpde::Label default_label,
-                                             std::span<tpde::Label> labels,
-                                             AsmReg cmp_reg,
-                                             AsmReg tmp_reg,
-                                             u64 low_bound,
-                                             u64 high_bound,
-                                             bool width_is_32) noexcept {
-  // NB: we must not evict any registers here.
-  if (low_bound != 0) {
-    switch_emit_cmp(cmp_reg, tmp_reg, low_bound, width_is_32);
-    generate_raw_jump(Jump::jb, default_label);
-  }
-  switch_emit_cmp(cmp_reg, tmp_reg, high_bound, width_is_32);
-  generate_raw_jump(Jump::ja, default_label);
-
-  if (width_is_32) {
-    // zero-extend cmp_reg since we use the full width
-    ASM(MOV32rr, cmp_reg, cmp_reg);
-  }
-
-  if (low_bound != 0) {
-    if ((i64)((i32)low_bound) == (i64)low_bound) {
-      ASM(SUB64ri, cmp_reg, low_bound);
-    } else {
-      ValuePartRef const_ref{this, &low_bound, 8, CompilerConfig::GP_BANK};
-      ASM(SUB64rr, cmp_reg, const_ref.reload_into_specific_fixed(tmp_reg));
-    }
-  }
-
-  tpde::Label jump_table = text_writer.label_create();
-  ASM(LEA64rm, tmp_reg, FE_MEM(FE_IP, 0, FE_NOREG, -1));
-  // we reuse the jump offset stuff since the patch procedure is the same
-  text_writer.label_ref(jump_table,
-                        text_writer.offset() - 4,
-                        tpde::LabelFixupKind::X64_JMP_OR_MEM_DISP);
-  // load the 4 byte displacement from the jump table
-  ASM(MOVSXr64m32, cmp_reg, FE_MEM(tmp_reg, 4, cmp_reg, 0));
-  ASM(ADD64rr, tmp_reg, cmp_reg);
-  ASM(JMPr, tmp_reg);
-
-  text_writer.align(4);
-  text_writer.ensure_space(4 + 4 * labels.size());
-  label_place(jump_table);
-  const auto table_off = text_writer.offset();
-  for (u32 i = 0; i < labels.size(); i++) {
-    if (text_writer.label_is_pending(labels[i])) {
-      text_writer.label_ref(labels[i],
-                            text_writer.offset(),
-                            tpde::LabelFixupKind::X64_JUMP_TABLE);
-      text_writer.write<u32>(table_off);
-    } else {
-      const auto label_off = text_writer.label_offset(labels[i]);
-      text_writer.write<i32>((i32)label_off - (i32)table_off);
-    }
-  }
-  return true;
-}
-
-void LLVMCompilerX64::switch_emit_binary_step(const tpde::Label case_label,
-                                              const tpde::Label gt_label,
-                                              const AsmReg cmp_reg,
-                                              const AsmReg tmp_reg,
-                                              const u64 case_value,
-                                              const bool width_is_32) noexcept {
-  switch_emit_cmpeq(case_label, cmp_reg, tmp_reg, case_value, width_is_32);
-  generate_raw_jump(Jump::ja, gt_label);
 }
 
 void LLVMCompilerX64::create_helper_call(std::span<IRValueRef> args,

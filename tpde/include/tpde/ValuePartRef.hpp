@@ -280,7 +280,7 @@ public:
   /// Move into a scratch register, reuse an existing register if possible.
   ScratchReg into_scratch(CompilerBase *compiler) && noexcept {
     // TODO: implement this. This needs size information to copy the value.
-    assert((has_assignment() || state.c.owned) &&
+    assert((has_assignment() || state.c.owned || state.c.is_const) &&
            "into_scratch from unowned ValuePart not implemented");
     ScratchReg res{compiler};
     if (can_salvage()) {
@@ -852,6 +852,12 @@ struct CompilerBase<Adaptor, Derived, Config>::ValuePartRef : ValuePart {
     return *this;
   }
 
+  ValuePartRef &operator=(ValuePart &&other) noexcept {
+    reset();
+    ValuePart::operator=(std::move(other));
+    return *this;
+  }
+
   AsmReg alloc_reg(u64 exclusion_mask = 0) noexcept {
     return ValuePart::alloc_reg(compiler, exclusion_mask);
   }
@@ -888,6 +894,10 @@ struct CompilerBase<Adaptor, Derived, Config>::ValuePartRef : ValuePart {
     return ValuePartRef{
         compiler,
         std::move(*static_cast<ValuePart *>(this)).into_temporary(compiler)};
+  }
+
+  ScratchReg into_scratch() && noexcept {
+    return std::move(*static_cast<ValuePart *>(this)).into_scratch(compiler);
   }
 
   ValuePartRef into_extended(bool sign, u32 from, u32 to) && noexcept {
