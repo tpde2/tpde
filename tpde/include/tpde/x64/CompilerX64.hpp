@@ -643,16 +643,21 @@ std::optional<i32>
   }
 
   this->stack.frame_used = true;
+  i32 frame_off = 0x10 + cca.stack_off;
   if (cca.byval) {
-    // Return byval frame_off.
-    return 0x10 + cca.stack_off;
+    return frame_off; // Return byval frame_off.
+  } else if (vp.assignment().assignment()->part_count == 1 &&
+             !vp.assignment().register_valid()) {
+    // For single-part values, the in-memory layout is equal to our
+    // layout in the spill slot. Reuse argument area as spill slot.
+    // However, don't do this for fixed assignments (indicated by
+    // register_valid()).
+    // TODO: consider doing this for two-part values when possible.
+    vp.assignment().set_stack_valid();
+    vp.assignment().assignment()->frame_off = frame_off;
   } else {
-    //  TODO(ts): maybe allow negative frame offsets for value
-    //  assignments so we can simply reference this?
-    //  but this probably doesn't work with multi-part values
-    //  since the offsets are different
     AsmReg dst = vp.alloc_reg(this);
-    this->load_from_stack(dst, 0x10 + cca.stack_off, cca.size);
+    this->load_from_stack(dst, frame_off, cca.size);
   }
   return {};
 }
