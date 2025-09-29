@@ -25,6 +25,7 @@
 #include <llvm/TargetParser/Triple.h>
 
 #include "tpde-llvm/LLVMCompiler.hpp"
+#include "tpde-llvm/OrcCompiler.hpp"
 
 #include <dlfcn.h>
 #include <iostream>
@@ -86,10 +87,10 @@ int main(int argc, char *argv[]) {
   }
 #endif
 
-  llvm::LLVMContext context;
+  auto context = std::make_unique<llvm::LLVMContext>();
   llvm::SMDiagnostic diag{};
 
-  auto mod = llvm::parseIRFile(ir_path.Get(), diag, context);
+  auto mod = llvm::parseIRFile(ir_path.Get(), diag, *context);
   if (!mod) {
     diag.print(argv[0], llvm::errs());
     return 1;
@@ -103,13 +104,13 @@ int main(int argc, char *argv[]) {
 
   std::string triple_str = llvm::sys::getProcessTriple();
   llvm::Triple triple(triple_str);
-  auto compiler = tpde_llvm::LLVMCompiler::create(triple);
-  if (!compiler) {
-    std::cerr << "Unknown architecture: " << triple_str << "\n";
-    return 1;
-  }
 
   if (!orc) {
+    auto compiler = tpde_llvm::LLVMCompiler::create(triple);
+    if (!compiler) {
+      std::cerr << "Unknown architecture: " << triple_str << "\n";
+      return 1;
+    }
     auto mapper = compiler->compile_and_map(*mod, [](std::string_view name) {
       return ::dlsym(RTLD_DEFAULT, std::string(name).c_str());
     });
@@ -121,21 +122,14 @@ int main(int argc, char *argv[]) {
     return ((int (*)(int, char **))main_addr)(0, nullptr);
   }
 
-  std::vector<uint8_t> buf;
-  if (!compiler->compile_to_elf(*mod, buf)) {
-    std::cerr << "Failed to compile\n";
-    return 1;
-  }
-  llvm::StringRef buf_strref(reinterpret_cast<char *>(buf.data()), buf.size());
-  auto obj_membuf = llvm::MemoryBuffer::getMemBuffer(buf_strref, "", false);
-  assert(obj_membuf->getBufferSize());
-
   size_t page_size = exit_on_err(llvm::sys::Process::getPageSize());
   llvm::orc::ExecutionSession es(
       exit_on_err(llvm::orc::SelfExecutorProcessControl::Create()));
   llvm::orc::MapperJITLinkMemoryManager memory_manager(
       page_size, std::make_unique<llvm::orc::InProcessMemoryMapper>(page_size));
   llvm::orc::ObjectLinkingLayer object_layer(es, memory_manager);
+  llvm::orc::IRCompileLayer compile_layer(
+      es, object_layer, std::make_unique<tpde_llvm::OrcCompiler>(triple));
   llvm::orc::JITDylib &dylib = exit_on_err(es.createJITDylib("<main>"));
 
   // TODO: correct global prefix for MachO/COFF platforms
@@ -143,7 +137,8 @@ int main(int argc, char *argv[]) {
       llvm::orc::DynamicLibrarySearchGenerator::GetForCurrentProcess(
           /*GlobalPrefix=*/'\0')));
 
-  exit_on_err(object_layer.add(dylib, std::move(obj_membuf)));
+  llvm::orc::ThreadSafeModule tsm(std::move(mod), std::move(context));
+  exit_on_err(compile_layer.add(dylib, std::move(tsm)));
 
 #if LLVM_VERSION_MAJOR >= 21
   object_layer.addPlugin(

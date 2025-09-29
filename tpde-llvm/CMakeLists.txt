@@ -43,12 +43,14 @@ target_sources(tpde_llvm PRIVATE
     src/JITMapper.cpp
     src/LLVMAdaptor.cpp
     src/LLVMCompiler.cpp
+    src/OrcCompiler.cpp
 
     PUBLIC
     FILE_SET HEADERS
     BASE_DIRS include
     FILES
         include/tpde-llvm/LLVMCompiler.hpp
+        include/tpde-llvm/OrcCompiler.hpp
 
     PRIVATE
     FILE_SET priv_headers TYPE HEADERS
