@@ -17,13 +17,12 @@ define i1 @fcmp_f32_false(float %0, float %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fcmp_f32_false>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov w0, #0x0 // =0
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
     %2 = fcmp false float %0, %1
@@ -41,13 +40,12 @@ define i1 @fcmp_f32_true(float %0, float %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fcmp_f32_true>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov x0, #0x1 // =1
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
     %2 = fcmp true float %0, %1
@@ -67,14 +65,13 @@ define i1 @fcmp_f32_oge(float %0, float %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fcmp_f32_oge>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fcmp s0, s1
 ; ARM64-NEXT:    cset w0, ge
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
     %2 = fcmp oge float %0, %1
@@ -94,14 +91,13 @@ define i1 @fcmp_f32_ord(float %0, float %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fcmp_f32_ord>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fcmp s0, s1
 ; ARM64-NEXT:    cset w0, vc
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
     %2 = fcmp ord float %0, %1
@@ -121,14 +117,13 @@ define i1 @fcmp_f32_oeq(float %0, float %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fcmp_f32_oeq>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fcmp s0, s1
 ; ARM64-NEXT:    cset w0, eq
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
     %2 = fcmp oeq float %0, %1
@@ -148,14 +143,13 @@ define i1 @fcmp_f32_ogt(float %0, float %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fcmp_f32_ogt>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fcmp s0, s1
 ; ARM64-NEXT:    cset w0, gt
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
     %2 = fcmp ogt float %0, %1
@@ -175,14 +169,13 @@ define i1 @fcmp_f32_olt(float %0, float %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fcmp_f32_olt>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fcmp s0, s1
 ; ARM64-NEXT:    cset w0, mi
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
     %2 = fcmp olt float %0, %1
@@ -202,14 +195,13 @@ define i1 @fcmp_f32_ole(float %0, float %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fcmp_f32_ole>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fcmp s0, s1
 ; ARM64-NEXT:    cset w0, ls
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
     %2 = fcmp ole float %0, %1
@@ -229,14 +221,13 @@ define i1 @fcmp_f32_uno(float %0, float %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fcmp_f32_uno>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fcmp s0, s1
 ; ARM64-NEXT:    cset w0, vs
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
     %2 = fcmp uno float %0, %1
@@ -256,14 +247,13 @@ define i1 @fcmp_f32_ugt(float %0, float %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fcmp_f32_ugt>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fcmp s0, s1
 ; ARM64-NEXT:    cset w0, hi
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
     %2 = fcmp ugt float %0, %1
@@ -283,14 +273,13 @@ define i1 @fcmp_f32_uge(float %0, float %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fcmp_f32_uge>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fcmp s0, s1
 ; ARM64-NEXT:    cset w0, pl
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
     %2 = fcmp uge float %0, %1
@@ -310,14 +299,13 @@ define i1 @fcmp_f32_ult(float %0, float %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fcmp_f32_ult>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fcmp s0, s1
 ; ARM64-NEXT:    cset w0, lt
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
     %2 = fcmp ult float %0, %1
@@ -337,14 +325,13 @@ define i1 @fcmp_f32_ule(float %0, float %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fcmp_f32_ule>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fcmp s0, s1
 ; ARM64-NEXT:    cset w0, le
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
     %2 = fcmp ule float %0, %1
@@ -364,14 +351,13 @@ define i1 @fcmp_f32_une(float %0, float %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fcmp_f32_une>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fcmp s0, s1
 ; ARM64-NEXT:    cset w0, ne
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
     %2 = fcmp une float %0, %1
@@ -391,16 +377,15 @@ define i1 @fcmp_f32_one(float %0, float %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fcmp_f32_one>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fcmp s0, s1
 ; ARM64-NEXT:    cset w0, mi
 ; ARM64-NEXT:    csinc w1, w0, wzr, le
 ; ARM64-NEXT:    mov w0, w1
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
     %2 = fcmp one float %0, %1
@@ -420,16 +405,15 @@ define i1 @fcmp_f32_ueq(float %0, float %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fcmp_f32_ueq>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fcmp s0, s1
 ; ARM64-NEXT:    cset w0, eq
 ; ARM64-NEXT:    csinc w1, w0, wzr, vc
 ; ARM64-NEXT:    mov w0, w1
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
     %2 = fcmp ueq float %0, %1
@@ -449,16 +433,15 @@ define i1 @fcmp_f32_one_nonan(float %0, float %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fcmp_f32_one_nonan>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fcmp s0, s1
 ; ARM64-NEXT:    cset w0, mi
 ; ARM64-NEXT:    csinc w1, w0, wzr, le
 ; ARM64-NEXT:    mov w0, w1
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
     %2 = fcmp nnan one float %0, %1
@@ -479,15 +462,14 @@ define i1 @fcmp_f32_oeq_0(float %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fcmp_f32_oeq_0>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    movi v1.8b, #0x0
 ; ARM64-NEXT:    fcmp s0, s1
 ; ARM64-NEXT:    cset w0, eq
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
     %2 = fcmp oeq float %0, 0.0
@@ -507,13 +489,12 @@ define i1 @fcmp_f64_false(double %0, double %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fcmp_f64_false>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov w0, #0x0 // =0
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
     %2 = fcmp false double %0, %1
@@ -531,13 +512,12 @@ define i1 @fcmp_f64_true(double %0, double %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fcmp_f64_true>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov x0, #0x1 // =1
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
     %2 = fcmp true double %0, %1
@@ -557,14 +537,13 @@ define i1 @fcmp_f64_oge(double %0, double %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fcmp_f64_oge>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fcmp d0, d1
 ; ARM64-NEXT:    cset w0, ge
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
     %2 = fcmp oge double %0, %1
@@ -584,14 +563,13 @@ define i1 @fcmp_f64_ord(double %0, double %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fcmp_f64_ord>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fcmp d0, d1
 ; ARM64-NEXT:    cset w0, vc
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
     %2 = fcmp ord double %0, %1
@@ -611,14 +589,13 @@ define i1 @fcmp_f64_oeq(double %0, double %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fcmp_f64_oeq>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fcmp d0, d1
 ; ARM64-NEXT:    cset w0, eq
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
     %2 = fcmp oeq double %0, %1
@@ -638,14 +615,13 @@ define i1 @fcmp_f64_ogt(double %0, double %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fcmp_f64_ogt>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fcmp d0, d1
 ; ARM64-NEXT:    cset w0, gt
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
     %2 = fcmp ogt double %0, %1
@@ -665,14 +641,13 @@ define i1 @fcmp_f64_olt(double %0, double %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fcmp_f64_olt>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fcmp d0, d1
 ; ARM64-NEXT:    cset w0, mi
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
     %2 = fcmp olt double %0, %1
@@ -692,14 +667,13 @@ define i1 @fcmp_f64_ole(double %0, double %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fcmp_f64_ole>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fcmp d0, d1
 ; ARM64-NEXT:    cset w0, ls
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
     %2 = fcmp ole double %0, %1
@@ -719,14 +693,13 @@ define i1 @fcmp_f64_uno(double %0, double %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fcmp_f64_uno>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fcmp d0, d1
 ; ARM64-NEXT:    cset w0, vs
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
     %2 = fcmp uno double %0, %1
@@ -746,14 +719,13 @@ define i1 @fcmp_f64_ugt(double %0, double %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fcmp_f64_ugt>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fcmp d0, d1
 ; ARM64-NEXT:    cset w0, hi
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
     %2 = fcmp ugt double %0, %1
@@ -773,14 +745,13 @@ define i1 @fcmp_f64_uge(double %0, double %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fcmp_f64_uge>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fcmp d0, d1
 ; ARM64-NEXT:    cset w0, pl
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
     %2 = fcmp uge double %0, %1
@@ -800,14 +771,13 @@ define i1 @fcmp_f64_ult(double %0, double %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fcmp_f64_ult>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fcmp d0, d1
 ; ARM64-NEXT:    cset w0, lt
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
     %2 = fcmp ult double %0, %1
@@ -827,14 +797,13 @@ define i1 @fcmp_f64_ule(double %0, double %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fcmp_f64_ule>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fcmp d0, d1
 ; ARM64-NEXT:    cset w0, le
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
     %2 = fcmp ule double %0, %1
@@ -854,14 +823,13 @@ define i1 @fcmp_f64_une(double %0, double %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fcmp_f64_une>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fcmp d0, d1
 ; ARM64-NEXT:    cset w0, ne
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
     %2 = fcmp une double %0, %1
@@ -881,16 +849,15 @@ define i1 @fcmp_f64_one(double %0, double %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fcmp_f64_one>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fcmp d0, d1
 ; ARM64-NEXT:    cset w0, mi
 ; ARM64-NEXT:    csinc w1, w0, wzr, le
 ; ARM64-NEXT:    mov w0, w1
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
     %2 = fcmp one double %0, %1
@@ -910,16 +877,15 @@ define i1 @fcmp_f64_ueq(double %0, double %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fcmp_f64_ueq>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fcmp d0, d1
 ; ARM64-NEXT:    cset w0, eq
 ; ARM64-NEXT:    csinc w1, w0, wzr, vc
 ; ARM64-NEXT:    mov w0, w1
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
     %2 = fcmp ueq double %0, %1
@@ -939,16 +905,15 @@ define i1 @fcmp_f64_one_nonan(double %0, double %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fcmp_f64_one_nonan>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fcmp d0, d1
 ; ARM64-NEXT:    cset w0, mi
 ; ARM64-NEXT:    csinc w1, w0, wzr, le
 ; ARM64-NEXT:    mov w0, w1
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
     %2 = fcmp nnan one double %0, %1
@@ -969,15 +934,14 @@ define i1 @fcmp_f64_oeq_0(double %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fcmp_f64_oeq_0>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    movi v1.8b, #0x0
 ; ARM64-NEXT:    fcmp d0, d1
 ; ARM64-NEXT:    cset w0, eq
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
     %2 = fcmp oeq double %0, 0.0

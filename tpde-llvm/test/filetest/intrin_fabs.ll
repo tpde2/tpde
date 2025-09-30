@@ -21,13 +21,12 @@ define float @fabsf32(float %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fabsf32>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fabs s0, s0
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %1 = call float @llvm.fabs.f32(float %0)
@@ -46,13 +45,12 @@ define double @fabsf64(double %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fabsf64>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fabs d0, d0
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %1 = call double @llvm.fabs.f64(double %0)
@@ -71,17 +69,16 @@ define fp128 @fabsf128(fp128 %v) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fabsf128>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    str q0, [sp, #-0x10]!
 ; ARM64-NEXT:    ldrb w0, [sp, #0xf]
 ; ARM64-NEXT:    and w0, w0, #0x7f
 ; ARM64-NEXT:    strb w0, [sp, #0xf]
 ; ARM64-NEXT:    ldr q0, [sp], #0x10
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %r = call fp128 @llvm.fabs(fp128 %v)
   ret fp128 %r

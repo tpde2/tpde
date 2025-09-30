@@ -937,23 +937,28 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::finish_func(
   {
     // NB: code alignment factor 4, data alignment factor -8.
     util::SmallVector<u32, 16> prologue;
-    prologue.push_back(de64_SUBxi(DA_SP, DA_SP, final_frame_size));
     this->assembler.eh_write_inst(dwarf::DW_CFA_advance_loc, 1);
     this->assembler.eh_write_inst(dwarf::DW_CFA_def_cfa_offset,
                                   final_frame_size);
-    prologue.push_back(de64_STPx(DA_GP(29), DA_GP(30), DA_SP, 0));
-    prologue.push_back(de64_MOV_SPx(DA_GP(29), DA_SP));
-    this->assembler.eh_write_inst(dwarf::DW_CFA_advance_loc, 2);
+    if (final_frame_size <= 0x1f8) {
+      prologue.push_back(
+          de64_STPx_pre(DA_GP(29), DA_GP(30), DA_SP, -int(final_frame_size)));
+      prologue.push_back(de64_MOV_SPx(DA_GP(29), DA_SP));
+    } else {
+      prologue.push_back(de64_SUBxi(DA_SP, DA_SP, final_frame_size));
+      prologue.push_back(de64_STPx(DA_GP(29), DA_GP(30), DA_SP, 0));
+      prologue.push_back(de64_MOV_SPx(DA_GP(29), DA_SP));
+    }
+
+    // Patched below
+    auto fde_prologue_adv_off = this->assembler.eh_writer.size();
+    this->assembler.eh_write_inst(dwarf::DW_CFA_advance_loc, 0);
     this->assembler.eh_write_inst(dwarf::DW_CFA_def_cfa_register,
                                   dwarf::a64::DW_reg_fp);
     this->assembler.eh_write_inst(
         dwarf::DW_CFA_offset, dwarf::a64::DW_reg_fp, final_frame_size / 8);
     this->assembler.eh_write_inst(
         dwarf::DW_CFA_offset, dwarf::a64::DW_reg_lr, final_frame_size / 8 - 1);
-
-    // Patched below
-    auto fde_prologue_adv_off = this->assembler.eh_writer.size();
-    this->assembler.eh_write_inst(dwarf::DW_CFA_advance_loc, 0);
 
     AsmReg last_reg = AsmReg::make_invalid();
     u32 frame_off = 16;
@@ -1006,7 +1011,7 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::finish_func(
 
     assert(prologue.size() < 0x4c);
     this->assembler.eh_writer.data()[fde_prologue_adv_off] =
-        dwarf::DW_CFA_advance_loc | (prologue.size() - 3);
+        dwarf::DW_CFA_advance_loc | (prologue.size() - 1);
 
     // Pad with NOPs so that func_prologue_alloc - prologue.size() is a
     // multiple if 16 (the function alignment).
@@ -1052,8 +1057,6 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::finish_func(
     const auto ret_start = write_ptr;
     if (this->stack.has_dynamic_alloca) {
       *write_ptr++ = de64_MOV_SPx(DA_SP, DA_GP(29));
-    } else {
-      *write_ptr++ = de64_LDPx(DA_GP(29), DA_GP(30), DA_SP, 0);
     }
 
     AsmReg last_reg = AsmReg::make_invalid();
@@ -1092,11 +1095,14 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::finish_func(
       }
     }
 
-    if (this->stack.has_dynamic_alloca) {
+    if (final_frame_size <= 0x1f8) {
+      *write_ptr++ =
+          de64_LDPx_post(DA_GP(29), DA_GP(30), DA_SP, final_frame_size);
+    } else {
       *write_ptr++ = de64_LDPx(DA_GP(29), DA_GP(30), DA_SP, 0);
+      *write_ptr++ = de64_ADDxi(DA_SP, DA_SP, final_frame_size);
     }
 
-    *write_ptr++ = de64_ADDxi(DA_SP, DA_SP, final_frame_size);
     *write_ptr++ = de64_RET(DA_GP(30));
 
     ret_size = (write_ptr - ret_start) * 4;

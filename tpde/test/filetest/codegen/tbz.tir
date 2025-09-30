@@ -6,9 +6,9 @@
 
 define @tbz(%a) {
 ; CHECK-LABEL: <tbz>:
-; CHECK:         20: sub sp, sp, #0xb0
-; CHECK-NEXT:    24: stp x29, x30, [sp]
-; CHECK-NEXT:    28: mov x29, sp
+; CHECK:         20: stp x29, x30, [sp, #-0xb0]!
+; CHECK-NEXT:    24: mov x29, sp
+; CHECK-NEXT:    28: nop
 ; CHECK-NEXT:    2c: nop
 ; CHECK-NEXT:    30: str x0, [x29, #0xa0]
 ; CHECK-NEXT:    34: tbnz x0, #0x2f, 0x40 <tbz+0x20>
@@ -16,9 +16,8 @@ define @tbz(%a) {
 ; CHECK-NEXT:    3c: b 0x48 <tbz+0x28>
 ; CHECK-NEXT:    40: ldr x0, [x29, #0xa0]
 ; CHECK-NEXT:    44: add x1, x0, x0
-; CHECK-NEXT:    48: ldp x29, x30, [sp]
-; CHECK-NEXT:    4c: add sp, sp, #0xb0
-; CHECK-NEXT:    50: ret
+; CHECK-NEXT:    48: ldp x29, x30, [sp], #0xb0
+; CHECK-NEXT:    4c: ret
 entry:
   tbz %a, ^tgt1, ^tgt2, 47
 tgt1:
@@ -33,21 +32,20 @@ ret:
 
 define @tbz_small(%a) {
 ; CHECK-LABEL: <tbz_small>:
-; CHECK:         80: sub sp, sp, #0xb0
-; CHECK-NEXT:    84: stp x29, x30, [sp]
-; CHECK-NEXT:    88: mov x29, sp
-; CHECK-NEXT:    8c: nop
-; CHECK-NEXT:    90: str x0, [x29, #0xa0]
-; CHECK-NEXT:    94: tbnz x0, #0x2f, 0x890 <tbz_small+0x810>
-; CHECK-NEXT:    98: b 0x888 <tbz_small+0x808>
+; CHECK:         70: stp x29, x30, [sp, #-0xb0]!
+; CHECK-NEXT:    74: mov x29, sp
+; CHECK-NEXT:    78: nop
+; CHECK-NEXT:    7c: nop
+; CHECK-NEXT:    80: str x0, [x29, #0xa0]
+; CHECK-NEXT:    84: tbnz x0, #0x2f, 0x880 <tbz_small+0x810>
+; CHECK-NEXT:    88: b 0x878 <tbz_small+0x808>
 ; CHECK-NEXT:     ...
-; CHECK-NEXT:    888: sub x1, x0, x0
-; CHECK-NEXT:    88c: b 0x898 <tbz_small+0x818>
-; CHECK-NEXT:    890: ldr x0, [x29, #0xa0]
-; CHECK-NEXT:    894: add x1, x0, x0
-; CHECK-NEXT:    898: ldp x29, x30, [sp]
-; CHECK-NEXT:    89c: add sp, sp, #0xb0
-; CHECK-NEXT:    8a0: ret
+; CHECK-NEXT:    878: sub x1, x0, x0
+; CHECK-NEXT:    87c: b 0x888 <tbz_small+0x818>
+; CHECK-NEXT:    880: ldr x0, [x29, #0xa0]
+; CHECK-NEXT:    884: add x1, x0, x0
+; CHECK-NEXT:    888: ldp x29, x30, [sp], #0xb0
+; CHECK-NEXT:    88c: ret
 entry:
   tbz %a, ^tgt1, ^tgt2, 47
 tgt1:
@@ -64,23 +62,22 @@ ret:
 ; Medium-sized tbz; veener space is allocated but not used
 define @tbz_medium(%a) {
 ; CHECK-LABEL: <tbz_medium>:
-; CHECK:         8d0: sub sp, sp, #0xb0
-; CHECK-NEXT:    8d4: stp x29, x30, [sp]
-; CHECK-NEXT:    8d8: mov x29, sp
-; CHECK-NEXT:    8dc: nop
-; CHECK-NEXT:    8e0: str x0, [x29, #0xa0]
-; CHECK-NEXT:    8e4: tbnz x0, #0x2f, 0x87f8 <tbz_medium+0x7f28>
-; CHECK-NEXT:    8e8: b 0x8f0 <tbz_medium+0x20>
-; CHECK-NEXT:    8ec: udf #0x0
-; CHECK-NEXT:    8f0: b 0x87f0 <tbz_medium+0x7f20>
+; CHECK:         8b0: stp x29, x30, [sp, #-0xb0]!
+; CHECK-NEXT:    8b4: mov x29, sp
+; CHECK-NEXT:    8b8: nop
+; CHECK-NEXT:    8bc: nop
+; CHECK-NEXT:    8c0: str x0, [x29, #0xa0]
+; CHECK-NEXT:    8c4: tbnz x0, #0x2f, 0x87d8 <tbz_medium+0x7f28>
+; CHECK-NEXT:    8c8: b 0x8d0 <tbz_medium+0x20>
+; CHECK-NEXT:    8cc: udf #0x0
+; CHECK-NEXT:    8d0: b 0x87d0 <tbz_medium+0x7f20>
 ; CHECK-NEXT:     ...
-; CHECK-NEXT:    87f0: sub x1, x0, x0
-; CHECK-NEXT:    87f4: b 0x8800 <tbz_medium+0x7f30>
-; CHECK-NEXT:    87f8: ldr x0, [x29, #0xa0]
-; CHECK-NEXT:    87fc: add x1, x0, x0
-; CHECK-NEXT:    8800: ldp x29, x30, [sp]
-; CHECK-NEXT:    8804: add sp, sp, #0xb0
-; CHECK-NEXT:    8808: ret
+; CHECK-NEXT:    87d0: sub x1, x0, x0
+; CHECK-NEXT:    87d4: b 0x87e0 <tbz_medium+0x7f30>
+; CHECK-NEXT:    87d8: ldr x0, [x29, #0xa0]
+; CHECK-NEXT:    87dc: add x1, x0, x0
+; CHECK-NEXT:    87e0: ldp x29, x30, [sp], #0xb0
+; CHECK-NEXT:    87e4: ret
 entry:
   tbz %a, ^tgt1, ^tgt2, 47
 tgt1:
@@ -97,23 +94,22 @@ ret:
 ; Large-sized tbz; veener must be used
 define @tbz_large(%a) {
 ; CHECK-LABEL: <tbz_large>:
-; CHECK:         8830: sub sp, sp, #0xb0
-; CHECK-NEXT:    8834: stp x29, x30, [sp]
-; CHECK-NEXT:    8838: mov x29, sp
-; CHECK-NEXT:    883c: nop
-; CHECK-NEXT:    8840: str x0, [x29, #0xa0]
-; CHECK-NEXT:    8844: tbnz x0, #0x2f, 0x884c <tbz_large+0x1c>
-; CHECK-NEXT:    8848: b 0x8850 <tbz_large+0x20>
-; CHECK-NEXT:    884c: b 0x10858 <tbz_large+0x8028>
-; CHECK-NEXT:    8850: b 0x10850 <tbz_large+0x8020>
+; CHECK:         8810: stp x29, x30, [sp, #-0xb0]!
+; CHECK-NEXT:    8814: mov x29, sp
+; CHECK-NEXT:    8818: nop
+; CHECK-NEXT:    881c: nop
+; CHECK-NEXT:    8820: str x0, [x29, #0xa0]
+; CHECK-NEXT:    8824: tbnz x0, #0x2f, 0x882c <tbz_large+0x1c>
+; CHECK-NEXT:    8828: b 0x8830 <tbz_large+0x20>
+; CHECK-NEXT:    882c: b 0x10838 <tbz_large+0x8028>
+; CHECK-NEXT:    8830: b 0x10830 <tbz_large+0x8020>
 ; CHECK-NEXT:     ...
-; CHECK-NEXT:    10850: sub x1, x0, x0
-; CHECK-NEXT:    10854: b 0x10860 <tbz_large+0x8030>
-; CHECK-NEXT:    10858: ldr x0, [x29, #0xa0]
-; CHECK-NEXT:    1085c: add x1, x0, x0
-; CHECK-NEXT:    10860: ldp x29, x30, [sp]
-; CHECK-NEXT:    10864: add sp, sp, #0xb0
-; CHECK-NEXT:    10868: ret
+; CHECK-NEXT:    10830: sub x1, x0, x0
+; CHECK-NEXT:    10834: b 0x10840 <tbz_large+0x8030>
+; CHECK-NEXT:    10838: ldr x0, [x29, #0xa0]
+; CHECK-NEXT:    1083c: add x1, x0, x0
+; CHECK-NEXT:    10840: ldp x29, x30, [sp], #0xb0
+; CHECK-NEXT:    10844: ret
 entry:
   tbz %a, ^tgt1, ^tgt2, 47
 tgt1:

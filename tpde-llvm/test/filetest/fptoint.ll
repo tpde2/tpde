@@ -17,13 +17,12 @@ define i32 @f32toi32(float %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <f32toi32>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fcvtzs w0, s0
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %1 = fptosi float %0 to i32
@@ -41,13 +40,12 @@ define i32 @f32tou32(float %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <f32tou32>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fcvtzu w0, s0
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %1 = fptoui float %0 to i32
@@ -65,13 +63,12 @@ define i64 @f32toi64(float %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <f32toi64>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fcvtzs x0, s0
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %1 = fptosi float %0 to i64
@@ -97,13 +94,12 @@ define i64 @f32tou64(float %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <f32tou64>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fcvtzu x0, s0
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %1 = fptoui float %0 to i64
@@ -122,13 +118,12 @@ define i32 @f64toi32(double %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <f64toi32>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fcvtzs w0, d0
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %1 = fptosi double %0 to i32
@@ -146,13 +141,12 @@ define i32 @f64tou32(double %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <f64tou32>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fcvtzu w0, d0
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %1 = fptoui double %0 to i32
@@ -170,13 +164,12 @@ define i64 @f64toi64(double %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <f64toi64>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fcvtzs x0, d0
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %1 = fptosi double %0 to i64
@@ -202,13 +195,12 @@ define i64 @f64tou64(double %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <f64tou64>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fcvtzu x0, d0
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %1 = fptoui double %0 to i64
@@ -230,14 +222,13 @@ define i64 @f128toi64(fp128 %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <f128toi64>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    bl 0x230 <f128toi64+0x10>
 ; ARM64-NEXT:     R_AARCH64_CALL26 __fixtfdi
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %r = fptosi fp128 %p to i64
   ret i64 %r
@@ -258,14 +249,13 @@ define i64 @f128tou64(fp128 %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <f128tou64>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    bl 0x270 <f128tou64+0x10>
 ; ARM64-NEXT:     R_AARCH64_CALL26 __fixunstfdi
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %r = fptoui fp128 %p to i64
   ret i64 %r

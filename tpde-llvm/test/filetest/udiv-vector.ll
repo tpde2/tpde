@@ -27,9 +27,9 @@ define void @udiv_v1i8(ptr %p, ptr %q) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <udiv_v1i8>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrb w2, [x0]
 ; ARM64-NEXT:    ldrb w3, [x1]
@@ -37,8 +37,7 @@ define void @udiv_v1i8(ptr %p, ptr %q) {
 ; ARM64-NEXT:    uxtb w3, w3
 ; ARM64-NEXT:    udiv w2, w2, w3
 ; ARM64-NEXT:    strb w2, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %a = load <1 x i8>, ptr %p
   %b = load <1 x i8>, ptr %q
@@ -114,9 +113,9 @@ define void @udiv_v5i8(ptr %p, ptr %q) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <udiv_v5i8>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrb w2, [x0]
 ; ARM64-NEXT:    ldrb w3, [x0, #0x1]
@@ -148,8 +147,7 @@ define void @udiv_v5i8(ptr %p, ptr %q) {
 ; ARM64-NEXT:    strb w4, [x0, #0x2]
 ; ARM64-NEXT:    strb w5, [x0, #0x3]
 ; ARM64-NEXT:    strb w6, [x0, #0x4]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %a = load <5 x i8>, ptr %p
   %b = load <5 x i8>, ptr %q
@@ -253,9 +251,9 @@ define <8 x i8> @udiv_v8i8(<8 x i8> %a, <8 x i8> %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <udiv_v8i8>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    umov w0, v0.b[0]
 ; ARM64-NEXT:    umov w1, v1.b[0]
@@ -306,8 +304,7 @@ define <8 x i8> @udiv_v8i8(<8 x i8> %a, <8 x i8> %b) {
 ; ARM64-NEXT:    udiv w0, w0, w1
 ; ARM64-NEXT:    mov v2.b[7], w0
 ; ARM64-NEXT:    mov v0.16b, v2.16b
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %r = udiv <8 x i8> %a, %b
   ret <8 x i8> %r
@@ -488,9 +485,9 @@ define <16 x i8> @udiv_v16i8(<16 x i8> %a, <16 x i8> %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <udiv_v16i8>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    umov w0, v0.b[0]
 ; ARM64-NEXT:    umov w1, v1.b[0]
@@ -589,8 +586,7 @@ define <16 x i8> @udiv_v16i8(<16 x i8> %a, <16 x i8> %b) {
 ; ARM64-NEXT:    udiv w0, w0, w1
 ; ARM64-NEXT:    mov v2.b[15], w0
 ; ARM64-NEXT:    mov v0.16b, v2.16b
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %r = udiv <16 x i8> %a, %b
   ret <16 x i8> %r
@@ -941,9 +937,9 @@ define void @udiv_v32i8(ptr %p, ptr %q) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <udiv_v32i8>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr q0, [x0]
 ; ARM64-NEXT:    ldr q1, [x0, #0x10]
@@ -1143,8 +1139,7 @@ define void @udiv_v32i8(ptr %p, ptr %q) {
 ; ARM64-NEXT:    mov v5.b[15], w1
 ; ARM64-NEXT:    str q4, [x0]
 ; ARM64-NEXT:    str q5, [x0, #0x10]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %a = load <32 x i8>, ptr %p
   %b = load <32 x i8>, ptr %q
@@ -1208,9 +1203,9 @@ define <4 x i16> @udiv_v4i16(<4 x i16> %a, <4 x i16> %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <udiv_v4i16>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    umov w0, v0.h[0]
 ; ARM64-NEXT:    umov w1, v1.h[0]
@@ -1237,8 +1232,7 @@ define <4 x i16> @udiv_v4i16(<4 x i16> %a, <4 x i16> %b) {
 ; ARM64-NEXT:    udiv w0, w0, w1
 ; ARM64-NEXT:    mov v2.h[3], w0
 ; ARM64-NEXT:    mov v0.16b, v2.16b
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %r = udiv <4 x i16> %a, %b
   ret <4 x i16> %r
@@ -1339,9 +1333,9 @@ define <8 x i16> @udiv_v8i16(<8 x i16> %a, <8 x i16> %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <udiv_v8i16>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    umov w0, v0.h[0]
 ; ARM64-NEXT:    umov w1, v1.h[0]
@@ -1392,8 +1386,7 @@ define <8 x i16> @udiv_v8i16(<8 x i16> %a, <8 x i16> %b) {
 ; ARM64-NEXT:    udiv w0, w0, w1
 ; ARM64-NEXT:    mov v2.h[7], w0
 ; ARM64-NEXT:    mov v0.16b, v2.16b
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %r = udiv <8 x i16> %a, %b
   ret <8 x i16> %r
@@ -1430,9 +1423,9 @@ define <2 x i32> @udiv_v2i32(<2 x i32> %a, <2 x i32> %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <udiv_v2i32>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov w0, v0.s[0]
 ; ARM64-NEXT:    mov w1, v1.s[0]
@@ -1443,8 +1436,7 @@ define <2 x i32> @udiv_v2i32(<2 x i32> %a, <2 x i32> %b) {
 ; ARM64-NEXT:    udiv w0, w0, w1
 ; ARM64-NEXT:    mov v2.s[1], w0
 ; ARM64-NEXT:    mov v0.16b, v2.16b
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %r = udiv <2 x i32> %a, %b
   ret <2 x i32> %r
@@ -1497,9 +1489,9 @@ define <4 x i32> @udiv_v4i32(<4 x i32> %a, <4 x i32> %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <udiv_v4i32>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov w0, v0.s[0]
 ; ARM64-NEXT:    mov w1, v1.s[0]
@@ -1518,8 +1510,7 @@ define <4 x i32> @udiv_v4i32(<4 x i32> %a, <4 x i32> %b) {
 ; ARM64-NEXT:    udiv w0, w0, w1
 ; ARM64-NEXT:    mov v2.s[3], w0
 ; ARM64-NEXT:    mov v0.16b, v2.16b
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %r = udiv <4 x i32> %a, %b
   ret <4 x i32> %r
@@ -1556,9 +1547,9 @@ define <2 x i64> @udiv_v2i64(<2 x i64> %a, <2 x i64> %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <udiv_v2i64>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov x0, v0.d[0]
 ; ARM64-NEXT:    mov x1, v1.d[0]
@@ -1569,8 +1560,7 @@ define <2 x i64> @udiv_v2i64(<2 x i64> %a, <2 x i64> %b) {
 ; ARM64-NEXT:    udiv x0, x0, x1
 ; ARM64-NEXT:    mov v2.d[1], x0
 ; ARM64-NEXT:    mov v0.16b, v2.16b
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %r = udiv <2 x i64> %a, %b
   ret <2 x i64> %r
@@ -1590,16 +1580,15 @@ define void @udiv_v4i1(ptr %p, ptr %q) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <udiv_v4i1>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrb w2, [x0]
 ; ARM64-NEXT:    ldrb w1, [x1]
 ; ARM64-NEXT:    and w1, w1, w2
 ; ARM64-NEXT:    strb w1, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %a = load <4 x i1>, ptr %p
   %b = load <4 x i1>, ptr %q
@@ -1621,16 +1610,15 @@ define void @udiv_v4i1_const(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <udiv_v4i1_const>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrb w1, [x0]
 ; ARM64-NEXT:    mov x2, #0x5 // =5
 ; ARM64-NEXT:    and w2, w2, w1
 ; ARM64-NEXT:    strb w2, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %a = load <4 x i1>, ptr %p
   %r = udiv <4 x i1> %a, <i1 1, i1 0, i1 1, i1 0>
@@ -1652,16 +1640,15 @@ define void @udiv_v8i1(ptr %p, ptr %q) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <udiv_v8i1>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrb w2, [x0]
 ; ARM64-NEXT:    ldrb w1, [x1]
 ; ARM64-NEXT:    and w1, w1, w2
 ; ARM64-NEXT:    strb w1, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %a = load <8 x i1>, ptr %p
   %b = load <8 x i1>, ptr %q
@@ -1683,16 +1670,15 @@ define void @udiv_v8i1_const(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <udiv_v8i1_const>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrb w1, [x0]
 ; ARM64-NEXT:    mov x2, #0x55 // =85
 ; ARM64-NEXT:    and w2, w2, w1
 ; ARM64-NEXT:    strb w2, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %a = load <8 x i1>, ptr %p
   %r = udiv <8 x i1> %a, <i1 1, i1 0, i1 1, i1 0, i1 1, i1 0, i1 1, i1 0>
@@ -1714,16 +1700,15 @@ define void @udiv_v32i1(ptr %p, ptr %q) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <udiv_v32i1>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr w2, [x0]
 ; ARM64-NEXT:    ldr w1, [x1]
 ; ARM64-NEXT:    and w1, w1, w2
 ; ARM64-NEXT:    str w1, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %a = load <32 x i1>, ptr %p
   %b = load <32 x i1>, ptr %q
@@ -1745,15 +1730,14 @@ define void @udiv_v32i1_const(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <udiv_v32i1_const>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr w1, [x0]
 ; ARM64-NEXT:    and w1, w1, #0x55555555
 ; ARM64-NEXT:    str w1, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %a = load <32 x i1>, ptr %p
   %r = udiv <32 x i1> %a, <i1 1, i1 0, i1 1, i1 0, i1 1, i1 0, i1 1, i1 0, i1 1, i1 0, i1 1, i1 0, i1 1, i1 0, i1 1, i1 0, i1 1, i1 0, i1 1, i1 0, i1 1, i1 0, i1 1, i1 0, i1 1, i1 0, i1 1, i1 0, i1 1, i1 0, i1 1, i1 0>
@@ -1775,16 +1759,15 @@ define void @udiv_v64i1(ptr %p, ptr %q) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <udiv_v64i1>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr x2, [x0]
 ; ARM64-NEXT:    ldr x1, [x1]
 ; ARM64-NEXT:    and x1, x1, x2
 ; ARM64-NEXT:    str x1, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %a = load <64 x i1>, ptr %p
   %b = load <64 x i1>, ptr %q
@@ -1806,15 +1789,14 @@ define void @udiv_v64i1_const(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <udiv_v64i1_const>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr x1, [x0]
 ; ARM64-NEXT:    and x1, x1, #0x5555555555555555
 ; ARM64-NEXT:    str x1, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %a = load <64 x i1>, ptr %p
   %r = udiv <64 x i1> %a, <i1 1, i1 0, i1 1, i1 0, i1 1, i1 0, i1 1, i1 0, i1 1, i1 0, i1 1, i1 0, i1 1, i1 0, i1 1, i1 0, i1 1, i1 0, i1 1, i1 0, i1 1, i1 0, i1 1, i1 0, i1 1, i1 0, i1 1, i1 0, i1 1, i1 0, i1 1, i1 0, i1 1, i1 0, i1 1, i1 0, i1 1, i1 0, i1 1, i1 0, i1 1, i1 0, i1 1, i1 0, i1 1, i1 0, i1 1, i1 0, i1 1, i1 0, i1 1, i1 0, i1 1, i1 0, i1 1, i1 0, i1 1, i1 0, i1 1, i1 0, i1 1, i1 0, i1 1, i1 0>

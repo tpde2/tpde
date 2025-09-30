@@ -18,15 +18,14 @@ define float @vr_fadd_v1f32(float %s, ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <vr_fadd_v1f32>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr s1, [x0]
 ; ARM64-NEXT:    mov v2.16b, v1.16b
 ; ARM64-NEXT:    fadd s0, s0, s2
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %v = load <1 x float>, ptr %p
   %r = call float @llvm.vector.reduce.fadd(float %s, <1 x float> %v)
@@ -53,9 +52,9 @@ define float @vr_fadd_v4f32(float %s, ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <vr_fadd_v4f32>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr q1, [x0]
 ; ARM64-NEXT:    mov s2, v1.s[0]
@@ -66,8 +65,7 @@ define float @vr_fadd_v4f32(float %s, ptr %p) {
 ; ARM64-NEXT:    fadd s0, s0, s2
 ; ARM64-NEXT:    mov s2, v1.s[3]
 ; ARM64-NEXT:    fadd s0, s0, s2
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %v = load <4 x float>, ptr %p
   %r = call float @llvm.vector.reduce.fadd(float %s, <4 x float> %v)
@@ -99,9 +97,9 @@ define float @vr_fadd_v5f32(float %s, ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <vr_fadd_v5f32>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr s1, [x0]
 ; ARM64-NEXT:    ldr s2, [x0, #0x4]
@@ -118,8 +116,7 @@ define float @vr_fadd_v5f32(float %s, ptr %p) {
 ; ARM64-NEXT:    fadd s0, s0, s6
 ; ARM64-NEXT:    mov v6.16b, v5.16b
 ; ARM64-NEXT:    fadd s0, s0, s6
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %v = load <5 x float>, ptr %p
   %r = call float @llvm.vector.reduce.fadd(float %s, <5 x float> %v)
@@ -156,9 +153,9 @@ define float @vr_fadd_v8f32(float %s, ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <vr_fadd_v8f32>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr q1, [x0]
 ; ARM64-NEXT:    ldr q2, [x0, #0x10]
@@ -178,8 +175,7 @@ define float @vr_fadd_v8f32(float %s, ptr %p) {
 ; ARM64-NEXT:    fadd s0, s0, s3
 ; ARM64-NEXT:    mov s3, v2.s[3]
 ; ARM64-NEXT:    fadd s0, s0, s3
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %v = load <8 x float>, ptr %p
   %r = call float @llvm.vector.reduce.fadd(float %s, <8 x float> %v)
@@ -199,15 +195,14 @@ define double @vr_fadd_v1f64(double %s, ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <vr_fadd_v1f64>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr d1, [x0]
 ; ARM64-NEXT:    mov v2.16b, v1.16b
 ; ARM64-NEXT:    fadd d0, d0, d2
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %v = load <1 x double>, ptr %p
   %r = call double @llvm.vector.reduce.fadd(double %s, <1 x double> %v)
@@ -230,17 +225,16 @@ define double @vr_fadd_v2f64(double %s, ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <vr_fadd_v2f64>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr q1, [x0]
 ; ARM64-NEXT:    mov d2, v1.d[0]
 ; ARM64-NEXT:    fadd d0, d0, d2
 ; ARM64-NEXT:    mov d2, v1.d[1]
 ; ARM64-NEXT:    fadd d0, d0, d2
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %v = load <2 x double>, ptr %p
   %r = call double @llvm.vector.reduce.fadd(double %s, <2 x double> %v)
@@ -272,9 +266,9 @@ define double @vr_fadd_v5f64(double %s, ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <vr_fadd_v5f64>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr d1, [x0]
 ; ARM64-NEXT:    ldr d2, [x0, #0x8]
@@ -291,8 +285,7 @@ define double @vr_fadd_v5f64(double %s, ptr %p) {
 ; ARM64-NEXT:    fadd d0, d0, d6
 ; ARM64-NEXT:    mov v6.16b, v5.16b
 ; ARM64-NEXT:    fadd d0, d0, d6
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %v = load <5 x double>, ptr %p
   %r = call double @llvm.vector.reduce.fadd(double %s, <5 x double> %v)

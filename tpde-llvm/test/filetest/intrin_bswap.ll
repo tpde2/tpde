@@ -18,13 +18,12 @@ define i16 @bswapi16(i16 %x) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <bswapi16>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    rev16 w0, w0
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %res = call i16 @llvm.bswap.i16(i16 %x)
   ret i16 %res
@@ -42,13 +41,12 @@ define i32 @bswapi32(i32 %x) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <bswapi32>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    rev w0, w0
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %res = call i32 @llvm.bswap.i32(i32 %x)
   ret i32 %res
@@ -67,15 +65,14 @@ define i48 @bswapi48(i48 %x) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <bswapi48>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    rev x0, x0
 ; ARM64-NEXT:    lsr x1, x0, #16
 ; ARM64-NEXT:    mov x0, x1
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %res = call i48 @llvm.bswap.i48(i48 %x)
   ret i48 %res
@@ -93,13 +90,12 @@ define i64 @bswapi64(i64 %x) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <bswapi64>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    rev x0, x0
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %res = call i64 @llvm.bswap.i64(i64 %x)
   ret i64 %res
@@ -119,17 +115,16 @@ define i128 @bswapi128(i128 %x) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <bswapi128>:
-; ARM64:         sub sp, sp, #0xb0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xb0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    rev x1, x1
 ; ARM64-NEXT:    rev x0, x0
 ; ARM64-NEXT:    str x0, [x29, #0xa8]
 ; ARM64-NEXT:    mov x0, x1
 ; ARM64-NEXT:    ldr x1, [x29, #0xa8]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xb0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
   %res = call i128 @llvm.bswap(i128 %x)
   ret i128 %res

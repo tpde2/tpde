@@ -23,9 +23,9 @@ define ptr @getaddr() {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <getaddr>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    adrp x0, 0x0 <.text>
 ; ARM64-NEXT:     R_AARCH64_TLSDESC_ADR_PAGE21 t1
@@ -37,8 +37,7 @@ define ptr @getaddr() {
 ; ARM64-NEXT:     R_AARCH64_TLSDESC_CALL t1
 ; ARM64-NEXT:    mrs x1, TPIDR_EL0
 ; ARM64-NEXT:    add x0, x1, x0
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %p = call ptr @llvm.threadlocal.address(ptr @t1)
   ret ptr %p
@@ -61,9 +60,9 @@ define i32 @load() {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    adrp x0, 0x0 <.text>
 ; ARM64-NEXT:     R_AARCH64_TLSDESC_ADR_PAGE21 t1
@@ -76,8 +75,7 @@ define i32 @load() {
 ; ARM64-NEXT:    mrs x1, TPIDR_EL0
 ; ARM64-NEXT:    add x0, x1, x0
 ; ARM64-NEXT:    ldr w0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %p = call ptr @llvm.threadlocal.address(ptr @t1)
   %l = load i32, ptr %p
@@ -103,9 +101,9 @@ define void @store(i32 %v) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store>:
-; ARM64:         sub sp, sp, #0xb0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xb0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    str w0, [x29, #0xa0]
 ; ARM64-NEXT:    adrp x0, 0x0 <.text>
@@ -120,8 +118,7 @@ define void @store(i32 %v) {
 ; ARM64-NEXT:    add x0, x1, x0
 ; ARM64-NEXT:    ldr w1, [x29, #0xa0]
 ; ARM64-NEXT:    str w1, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xb0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
   %p = call ptr @llvm.threadlocal.address(ptr @t1)
   store i32 %v, ptr %p
@@ -148,9 +145,9 @@ define void @store3(i32, i32, i32 %v) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store3>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    adrp x0, 0x0 <.text>
 ; ARM64-NEXT:     R_AARCH64_TLSDESC_ADR_PAGE21 t1
@@ -163,8 +160,7 @@ define void @store3(i32, i32, i32 %v) {
 ; ARM64-NEXT:    mrs x1, TPIDR_EL0
 ; ARM64-NEXT:    add x0, x1, x0
 ; ARM64-NEXT:    str w2, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %p = call ptr @llvm.threadlocal.address(ptr @t1)
   store i32 %v, ptr %p

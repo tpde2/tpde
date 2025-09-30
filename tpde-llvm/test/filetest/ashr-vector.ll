@@ -23,17 +23,16 @@ define void @ashr_v1i8(ptr %p, ptr %q) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ashr_v1i8>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrb w2, [x0]
 ; ARM64-NEXT:    ldrb w3, [x1]
 ; ARM64-NEXT:    sxtb w2, w2
 ; ARM64-NEXT:    asr w2, w2, w3
 ; ARM64-NEXT:    strb w2, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %a = load <1 x i8>, ptr %p
   %b = load <1 x i8>, ptr %q
@@ -56,16 +55,15 @@ define void @ashr_v1i8_3(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ashr_v1i8_3>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrb w1, [x0]
 ; ARM64-NEXT:    sxtb w1, w1
 ; ARM64-NEXT:    asr w1, w1, #3
 ; ARM64-NEXT:    strb w1, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %a = load <1 x i8>, ptr %p
   %r = ashr <1 x i8> %a, <i8 3>
@@ -122,9 +120,9 @@ define void @ashr_v5i8(ptr %p, ptr %q) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ashr_v5i8>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrb w2, [x0]
 ; ARM64-NEXT:    ldrb w3, [x0, #0x1]
@@ -151,8 +149,7 @@ define void @ashr_v5i8(ptr %p, ptr %q) {
 ; ARM64-NEXT:    strb w4, [x0, #0x2]
 ; ARM64-NEXT:    strb w5, [x0, #0x3]
 ; ARM64-NEXT:    strb w6, [x0, #0x4]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %a = load <5 x i8>, ptr %p
   %b = load <5 x i8>, ptr %q
@@ -193,9 +190,9 @@ define void @ashr_v5i8_3(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ashr_v5i8_3>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrb w1, [x0]
 ; ARM64-NEXT:    ldrb w2, [x0, #0x1]
@@ -217,8 +214,7 @@ define void @ashr_v5i8_3(ptr %p) {
 ; ARM64-NEXT:    strb w3, [x0, #0x2]
 ; ARM64-NEXT:    strb w4, [x0, #0x3]
 ; ARM64-NEXT:    strb w5, [x0, #0x4]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %a = load <5 x i8>, ptr %p
   %r = ashr <5 x i8> %a, <i8 3, i8 3, i8 3, i8 3, i8 3>
@@ -264,14 +260,13 @@ define <8 x i8> @ashr_v8i8(<8 x i8> %a, <8 x i8> %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ashr_v8i8>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    neg v1.8b, v1.8b
 ; ARM64-NEXT:    sshl v0.8b, v0.8b, v1.8b
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %r = ashr <8 x i8> %a, %b
   ret <8 x i8> %r
@@ -317,15 +312,14 @@ define <8 x i8> @ashr_v8i8_3(<8 x i8> %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ashr_v8i8_3>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    movi v1.8b, #0x3
 ; ARM64-NEXT:    neg v1.8b, v1.8b
 ; ARM64-NEXT:    sshl v0.8b, v0.8b, v1.8b
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %r = ashr <8 x i8> %a, <i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3>
   ret <8 x i8> %r
@@ -395,14 +389,13 @@ define <16 x i8> @ashr_v16i8(<16 x i8> %a, <16 x i8> %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ashr_v16i8>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    neg v1.16b, v1.16b
 ; ARM64-NEXT:    sshl v0.16b, v0.16b, v1.16b
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %r = ashr <16 x i8> %a, %b
   ret <16 x i8> %r
@@ -474,15 +467,14 @@ define <16 x i8> @ashr_v16i8_3(<16 x i8> %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ashr_v16i8_3>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    movi v1.16b, #0x3
 ; ARM64-NEXT:    neg v1.16b, v1.16b
 ; ARM64-NEXT:    sshl v0.16b, v0.16b, v1.16b
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %r = ashr <16 x i8> %a, <i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3>
   ret <16 x i8> %r
@@ -612,9 +604,9 @@ define void @ashr_v32i8(ptr %p, ptr %q) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ashr_v32i8>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr q0, [x0]
 ; ARM64-NEXT:    ldr q1, [x0, #0x10]
@@ -626,8 +618,7 @@ define void @ashr_v32i8(ptr %p, ptr %q) {
 ; ARM64-NEXT:    sshl v1.16b, v1.16b, v3.16b
 ; ARM64-NEXT:    str q0, [x0]
 ; ARM64-NEXT:    str q1, [x0, #0x10]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %a = load <32 x i8>, ptr %p
   %b = load <32 x i8>, ptr %q
@@ -762,9 +753,9 @@ define void @ashr_v32i8_3(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ashr_v32i8_3>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr q0, [x0]
 ; ARM64-NEXT:    ldr q1, [x0, #0x10]
@@ -776,8 +767,7 @@ define void @ashr_v32i8_3(ptr %p) {
 ; ARM64-NEXT:    sshl v1.16b, v1.16b, v2.16b
 ; ARM64-NEXT:    str q0, [x0]
 ; ARM64-NEXT:    str q1, [x0, #0x10]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %a = load <32 x i8>, ptr %p
   %r = ashr <32 x i8> %a, <i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3>
@@ -826,14 +816,13 @@ define <4 x i16> @ashr_v4i16(<4 x i16> %a, <4 x i16> %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ashr_v4i16>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    neg v1.4h, v1.4h
 ; ARM64-NEXT:    sshl v0.4h, v0.4h, v1.4h
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %r = ashr <4 x i16> %a, %b
   ret <4 x i16> %r
@@ -882,15 +871,14 @@ define <4 x i16> @ashr_v4i16_3(<4 x i16> %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ashr_v4i16_3>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    movi v1.4h, #0x3
 ; ARM64-NEXT:    neg v1.4h, v1.4h
 ; ARM64-NEXT:    sshl v0.4h, v0.4h, v1.4h
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %r = ashr <4 x i16> %a, <i16 3, i16 3, i16 3, i16 3>
   ret <4 x i16> %r
@@ -937,14 +925,13 @@ define <8 x i16> @ashr_v8i16(<8 x i16> %a, <8 x i16> %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ashr_v8i16>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    neg v1.8h, v1.8h
 ; ARM64-NEXT:    sshl v0.8h, v0.8h, v1.8h
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %r = ashr <8 x i16> %a, %b
   ret <8 x i16> %r
@@ -993,15 +980,14 @@ define <8 x i16> @ashr_v8i16_3(<8 x i16> %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ashr_v8i16_3>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    movi v1.8h, #0x3
 ; ARM64-NEXT:    neg v1.8h, v1.8h
 ; ARM64-NEXT:    sshl v0.8h, v0.8h, v1.8h
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %r = ashr <8 x i16> %a, <i16 3, i16 3, i16 3, i16 3, i16 3, i16 3, i16 3, i16 3>
   ret <8 x i16> %r
@@ -1024,14 +1010,13 @@ define <2 x i32> @ashr_v2i32(<2 x i32> %a, <2 x i32> %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ashr_v2i32>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    neg v1.2s, v1.2s
 ; ARM64-NEXT:    sshl v0.2s, v0.2s, v1.2s
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %r = ashr <2 x i32> %a, %b
   ret <2 x i32> %r
@@ -1056,15 +1041,14 @@ define <2 x i32> @ashr_v2i32_3(<2 x i32> %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ashr_v2i32_3>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    movi v1.2s, #0x3
 ; ARM64-NEXT:    neg v1.2s, v1.2s
 ; ARM64-NEXT:    sshl v0.2s, v0.2s, v1.2s
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %r = ashr <2 x i32> %a, <i32 3, i32 3>
   ret <2 x i32> %r
@@ -1096,14 +1080,13 @@ define <4 x i32> @ashr_v4i32(<4 x i32> %a, <4 x i32> %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ashr_v4i32>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    neg v1.4s, v1.4s
 ; ARM64-NEXT:    sshl v0.4s, v0.4s, v1.4s
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %r = ashr <4 x i32> %a, %b
   ret <4 x i32> %r
@@ -1137,15 +1120,14 @@ define <4 x i32> @ashr_v4i32_3(<4 x i32> %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ashr_v4i32_3>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    movi v1.4s, #0x3
 ; ARM64-NEXT:    neg v1.4s, v1.4s
 ; ARM64-NEXT:    sshl v0.4s, v0.4s, v1.4s
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %r = ashr <4 x i32> %a, <i32 3, i32 3, i32 3, i32 3>
   ret <4 x i32> %r
@@ -1174,14 +1156,13 @@ define <2 x i64> @ashr_v2i64(<2 x i64> %a, <2 x i64> %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ashr_v2i64>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    neg v1.2d, v1.2d
 ; ARM64-NEXT:    sshl v0.2d, v0.2d, v1.2d
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %r = ashr <2 x i64> %a, %b
   ret <2 x i64> %r
@@ -1212,9 +1193,9 @@ define <2 x i64> @ashr_v2i64_3(<2 x i64> %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ashr_v2i64_3>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    adrp x16, 0x0 <.text>
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
@@ -1222,8 +1203,7 @@ define <2 x i64> @ashr_v2i64_3(<2 x i64> %a) {
 ; ARM64-NEXT:     R_AARCH64_LDST128_ABS_LO12_NC
 ; ARM64-NEXT:    neg v1.2d, v1.2d
 ; ARM64-NEXT:    sshl v0.2d, v0.2d, v1.2d
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %r = ashr <2 x i64> %a, <i64 3, i64 3>
   ret <2 x i64> %r

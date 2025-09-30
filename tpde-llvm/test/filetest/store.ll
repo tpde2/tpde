@@ -22,13 +22,12 @@ define void @store_i8(ptr %a, i8 %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_i8>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    strb w1, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   store i8 %b, ptr %a
@@ -46,14 +45,13 @@ define void @store_i8_const(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_i8_const>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov x1, #0xd // =13
 ; ARM64-NEXT:    strb w1, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   store i8 13, ptr %a
@@ -72,13 +70,12 @@ define void @store_i16(ptr %a, i16 %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_i16>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    strh w1, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   store i16 %b, ptr %a
@@ -96,14 +93,13 @@ define void @store_i16_const(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_i16_const>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov x1, #0x1337 // =4919
 ; ARM64-NEXT:    strh w1, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   store i16 u0x1337, ptr %a
@@ -122,13 +118,12 @@ define void @store_i32(ptr %a, i32 %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_i32>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    str w1, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   store i32 %b, ptr %a
@@ -146,13 +141,12 @@ define void @store_i32_alloca(i32 %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_i32_alloca>:
-; ARM64:         sub sp, sp, #0xb0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xb0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    str w0, [x29, #0xa0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xb0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
 entry:
   %a = alloca i32
@@ -171,15 +165,14 @@ define void @store_i32_const(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_i32_const>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov x1, #0x1337 // =4919
 ; ARM64-NEXT:    movk x1, #0x1337, lsl #16
 ; ARM64-NEXT:    str w1, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   store i32 u0x13371337, ptr %a
@@ -198,13 +191,12 @@ define void @store_i64(ptr %a, i64 %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_i64>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    str x1, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   store i64 %b, ptr %a
@@ -222,13 +214,12 @@ define void @store_i64_alloca(i64 %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_i64_alloca>:
-; ARM64:         sub sp, sp, #0xb0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xb0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    str x0, [x29, #0xa0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xb0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
 entry:
   %a = alloca i64
@@ -247,15 +238,14 @@ define void @store_i64_const1(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_i64_const1>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov x1, #0x1337 // =4919
 ; ARM64-NEXT:    movk x1, #0x1337, lsl #16
 ; ARM64-NEXT:    str x1, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   store i64 u0x13371337, ptr %a
@@ -274,15 +264,14 @@ define void @store_i64_const2(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_i64_const2>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov x1, #0x1337 // =4919
 ; ARM64-NEXT:    movk x1, #0xf337, lsl #16
 ; ARM64-NEXT:    str x1, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   store i64 u0xF3371337, ptr %a
@@ -300,14 +289,13 @@ define void @store_i64_const3(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_i64_const3>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov x1, #-0x2 // =-2
 ; ARM64-NEXT:    str x1, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   store i64 -2, ptr %a
@@ -327,13 +315,12 @@ define void @store_i128(ptr %a, i128 %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_i128>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    stp x2, x3, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   store i128 %b, ptr %a
@@ -352,14 +339,13 @@ define void @store_i128_alloca(i128 %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_i128_alloca>:
-; ARM64:         sub sp, sp, #0xb0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xb0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    add x2, x29, #0xa0
 ; ARM64-NEXT:    stp x0, x1, [x2]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xb0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
 entry:
   %a = alloca i128
@@ -381,9 +367,9 @@ define void @store_i128_const1(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_i128_const1>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov x1, #0x1337 // =4919
 ; ARM64-NEXT:    movk x1, #0x1337, lsl #16
@@ -394,8 +380,7 @@ define void @store_i128_const1(ptr %a) {
 ; ARM64-NEXT:    movk x2, #0x1337, lsl #32
 ; ARM64-NEXT:    movk x2, #0x1337, lsl #48
 ; ARM64-NEXT:    stp x1, x2, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   store i128 u0x13371337133713371337133713371337, ptr %a
@@ -416,17 +401,16 @@ define void @store_i128_const2(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_i128_const2>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov x1, #0x1337 // =4919
 ; ARM64-NEXT:    movk x1, #0xf337, lsl #16
 ; ARM64-NEXT:    mov x2, #0x1337 // =4919
 ; ARM64-NEXT:    movk x2, #0xf337, lsl #16
 ; ARM64-NEXT:    stp x1, x2, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   store i128 u0xF337133700000000F3371337, ptr %a
@@ -445,15 +429,14 @@ define void @store_i128_const3(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_i128_const3>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov x1, #-0x2 // =-2
 ; ARM64-NEXT:    mov x2, #-0x1 // =-1
 ; ARM64-NEXT:    stp x1, x2, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   store i128 -2, ptr %a
@@ -472,13 +455,12 @@ define void @store_f32(ptr %a, float %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_f32>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    str s0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   store float %b, ptr %a
@@ -496,13 +478,12 @@ define void @store_float_alloca(float %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_float_alloca>:
-; ARM64:         sub sp, sp, #0xb0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xb0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    str s0, [x29, #0xa0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xb0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
 entry:
   %a = alloca float
@@ -523,14 +504,13 @@ define void @store_f32_const(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_f32_const>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fmov s0, #1.00000000
 ; ARM64-NEXT:    str s0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   store float 1.0, ptr %a
@@ -549,14 +529,13 @@ define void @store_f32_const0(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_f32_const0>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    movi v0.8b, #0x0
 ; ARM64-NEXT:    str s0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   store float 0.0, ptr %a
@@ -574,13 +553,12 @@ define void @store_f64(ptr %a, double %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_f64>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    str d0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   store double %b, ptr %a
@@ -600,14 +578,13 @@ define void @store_f64_const(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_f64_const>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fmov d0, #1.00000000
 ; ARM64-NEXT:    str d0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   store double 1.0, ptr %a
@@ -626,14 +603,13 @@ define void @store_f64_const0(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_f64_const0>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    movi v0.8b, #0x0
 ; ARM64-NEXT:    str d0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   store double 0.0, ptr %a
@@ -653,15 +629,14 @@ define void @store_i24(ptr %a, i24 %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_i24>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    lsr w2, w1, #16
 ; ARM64-NEXT:    strh w1, [x0]
 ; ARM64-NEXT:    strb w2, [x0, #0x2]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   store i24 %b, ptr %a
@@ -681,15 +656,14 @@ define void @store_i24_alloca(i24 %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_i24_alloca>:
-; ARM64:         sub sp, sp, #0xb0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xb0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    lsr w1, w0, #16
 ; ARM64-NEXT:    strh w0, [x29, #0xa0]
 ; ARM64-NEXT:    strb w1, [x29, #0xa2]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xb0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
 entry:
   %a = alloca i24
@@ -711,17 +685,16 @@ define void @store_i24_const(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_i24_const>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov x1, #0x1337 // =4919
 ; ARM64-NEXT:    movk x1, #0x37, lsl #16
 ; ARM64-NEXT:    lsr w2, w1, #16
 ; ARM64-NEXT:    strh w1, [x0]
 ; ARM64-NEXT:    strb w2, [x0, #0x2]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   store i24 u0x371337, ptr %a
@@ -742,15 +715,14 @@ define void @store_i40(ptr %a, i40 %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_i40>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    lsr x2, x1, #32
 ; ARM64-NEXT:    str w1, [x0]
 ; ARM64-NEXT:    strb w2, [x0, #0x4]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   store i40 %b, ptr %a
@@ -771,9 +743,9 @@ define void @store_i40_const(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_i40_const>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov x1, #0x1337 // =4919
 ; ARM64-NEXT:    movk x1, #0x1337, lsl #16
@@ -781,8 +753,7 @@ define void @store_i40_const(ptr %a) {
 ; ARM64-NEXT:    lsr x2, x1, #32
 ; ARM64-NEXT:    str w1, [x0]
 ; ARM64-NEXT:    strb w2, [x0, #0x4]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   store i40 u0x3713371337, ptr %a
@@ -803,15 +774,14 @@ define void @store_i48(ptr %a, i48 %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_i48>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    lsr x2, x1, #32
 ; ARM64-NEXT:    str w1, [x0]
 ; ARM64-NEXT:    strh w2, [x0, #0x4]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   store i48 %b, ptr %a
@@ -831,15 +801,14 @@ define void @store_i48_alloca(i48 %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_i48_alloca>:
-; ARM64:         sub sp, sp, #0xb0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xb0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    lsr x1, x0, #32
 ; ARM64-NEXT:    str w0, [x29, #0xa0]
 ; ARM64-NEXT:    strh w1, [x29, #0xa4]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xb0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
 entry:
   %a = alloca i48
@@ -861,9 +830,9 @@ define void @store_i48_const(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_i48_const>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov x1, #0x1337 // =4919
 ; ARM64-NEXT:    movk x1, #0x1337, lsl #16
@@ -871,8 +840,7 @@ define void @store_i48_const(ptr %a) {
 ; ARM64-NEXT:    lsr x2, x1, #32
 ; ARM64-NEXT:    str w1, [x0]
 ; ARM64-NEXT:    strh w2, [x0, #0x4]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   store i48 u0x133713371337, ptr %a
@@ -896,17 +864,16 @@ define void @store_i56(ptr %a, i56 %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_i56>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    lsr x2, x1, #48
 ; ARM64-NEXT:    lsr x3, x1, #32
 ; ARM64-NEXT:    str w1, [x0]
 ; ARM64-NEXT:    strb w2, [x0, #0x6]
 ; ARM64-NEXT:    strh w3, [x0, #0x4]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   store i56 %b, ptr %a
@@ -930,9 +897,9 @@ define void @store_i56_const(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_i56_const>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov x1, #0x1337 // =4919
 ; ARM64-NEXT:    movk x1, #0x1337, lsl #16
@@ -943,8 +910,7 @@ define void @store_i56_const(ptr %a) {
 ; ARM64-NEXT:    str w1, [x0]
 ; ARM64-NEXT:    strb w2, [x0, #0x6]
 ; ARM64-NEXT:    strh w3, [x0, #0x4]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   store i56 u0x37133713371337, ptr %a
@@ -963,13 +929,12 @@ define void @store_4f(ptr %a, <4 x float> %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_4f>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    str q0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   store <4 x float> %b, ptr %a
@@ -1008,14 +973,13 @@ define void @store_struct_i8_i1(ptr %a, %struct.i8_i1 %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_struct_i8_i1>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    strb w1, [x0]
 ; ARM64-NEXT:    strb w2, [x0, #0x1]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   store %struct.i8_i1 %b, ptr %a
@@ -1034,14 +998,13 @@ define void @store_struct_i8_i8(ptr %a, %struct.i8_i8 %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_struct_i8_i8>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    strb w1, [x0]
 ; ARM64-NEXT:    strb w2, [x0, #0x1]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   store %struct.i8_i8 %b, ptr %a
@@ -1060,14 +1023,13 @@ define void @store_struct_i8_i16(ptr %a, %struct.i8_i16 %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_struct_i8_i16>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    strb w1, [x0]
 ; ARM64-NEXT:    strh w2, [x0, #0x2]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   store %struct.i8_i16 %b, ptr %a
@@ -1086,14 +1048,13 @@ define void @store_struct_i8_i32(ptr %a, %struct.i8_i32 %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_struct_i8_i32>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    strb w1, [x0]
 ; ARM64-NEXT:    str w2, [x0, #0x4]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   store %struct.i8_i32 %b, ptr %a
@@ -1112,14 +1073,13 @@ define void @store_struct_i8_i64(ptr %a, %struct.i8_i64 %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_struct_i8_i64>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    strb w1, [x0]
 ; ARM64-NEXT:    str x2, [x0, #0x8]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   store %struct.i8_i64 %b, ptr %a
@@ -1139,14 +1099,13 @@ define void @store_struct_i1_i32(ptr %a, %struct.i1_i32 %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_struct_i1_i32>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    strb w1, [x0]
 ; ARM64-NEXT:    str w2, [x0, #0x4]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   store %struct.i1_i32 %b, ptr %a
@@ -1165,14 +1124,13 @@ define void @store_struct_i16_i32(ptr %a, %struct.i16_i32 %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_struct_i16_i32>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    strh w1, [x0]
 ; ARM64-NEXT:    str w2, [x0, #0x4]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   store %struct.i16_i32 %b, ptr %a
@@ -1191,14 +1149,13 @@ define void @store_struct_i32_i32(ptr %a, %struct.i32_i32 %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_struct_i32_i32>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    str w1, [x0]
 ; ARM64-NEXT:    str w2, [x0, #0x4]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   store %struct.i32_i32 %b, ptr %a
@@ -1217,14 +1174,13 @@ define void @store_struct_i64_i32(ptr %a, %struct.i64_i32 %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_struct_i64_i32>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    str x1, [x0]
 ; ARM64-NEXT:    str w2, [x0, #0x8]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   store %struct.i64_i32 %b, ptr %a
@@ -1243,14 +1199,13 @@ define void @store_struct_ptr_i32(ptr %a, %struct.ptr_i32 %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_struct_ptr_i32>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    str x1, [x0]
 ; ARM64-NEXT:    str w2, [x0, #0x8]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   store %struct.ptr_i32 %b, ptr %a
@@ -1269,14 +1224,13 @@ define void @store_struct_i32_ptr(ptr %a, %struct.i32_ptr %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_struct_i32_ptr>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    str w1, [x0]
 ; ARM64-NEXT:    str x2, [x0, #0x8]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   store %struct.i32_ptr %b, ptr %a
@@ -1295,14 +1249,13 @@ define void @store_struct_f32_ptr(ptr %a, %struct.f32_ptr %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_struct_f32_ptr>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    str s0, [x0]
 ; ARM64-NEXT:    str x1, [x0, #0x8]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   store %struct.f32_ptr %b, ptr %a
@@ -1325,9 +1278,9 @@ define void @store_struct_i128_i1(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_struct_i128_i1>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr x1, [x0]
 ; ARM64-NEXT:    ldr x2, [x0, #0x8]
@@ -1335,8 +1288,7 @@ define void @store_struct_i128_i1(ptr %a) {
 ; ARM64-NEXT:    str x1, [x0]
 ; ARM64-NEXT:    str x2, [x0, #0x8]
 ; ARM64-NEXT:    strb w3, [x0, #0x10]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %b = load %struct.i128_i1, ptr %a
@@ -1358,9 +1310,9 @@ define void @store_const_struct_i128_i128(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_const_struct_i128_i128>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov x1, #0x7b // =123
 ; ARM64-NEXT:    str x1, [x0]
@@ -1370,8 +1322,7 @@ define void @store_const_struct_i128_i128(ptr %a) {
 ; ARM64-NEXT:    str x1, [x0, #0x10]
 ; ARM64-NEXT:    mov w1, #0x0 // =0
 ; ARM64-NEXT:    str x1, [x0, #0x18]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   store { i128, i128 } { i128 123, i128 456 }, ptr %a
   ret void
@@ -1394,9 +1345,9 @@ define void @store_struct_i32_i32_i32_i32_i32_i32(ptr %a, %struct.i32_i32_i32_i3
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_struct_i32_i32_i32_i32_i32_i32>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    str w1, [x0]
 ; ARM64-NEXT:    str w2, [x0, #0x4]
@@ -1404,8 +1355,7 @@ define void @store_struct_i32_i32_i32_i32_i32_i32(ptr %a, %struct.i32_i32_i32_i3
 ; ARM64-NEXT:    str w4, [x0, #0xc]
 ; ARM64-NEXT:    str w5, [x0, #0x10]
 ; ARM64-NEXT:    str w6, [x0, #0x14]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   store %struct.i32_i32_i32_i32_i32_i32 %b, ptr %a
@@ -1426,17 +1376,16 @@ define void @store_packed(ptr %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_packed>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov x1, #0x1 // =1
 ; ARM64-NEXT:    strh w1, [x0]
 ; ARM64-NEXT:    mov x1, #0x2 // =2
 ; ARM64-NEXT:    add x2, x0, #0x2
 ; ARM64-NEXT:    str w1, [x2]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   store %struct_i16_i32_packed <{i16 1, i32 2}>, ptr %0
   ret void
@@ -1474,9 +1423,9 @@ define void @store_mult_const(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_mult_const>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov w1, #0x0 // =0
 ; ARM64-NEXT:    str x1, [x0]
@@ -1522,8 +1471,7 @@ define void @store_mult_const(ptr %p) {
 ; ARM64-NEXT:    str x1, [x0]
 ; ARM64-NEXT:    mov w1, #0x0 // =0
 ; ARM64-NEXT:    str x1, [x0, #0x8]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   store { i64, i64 } zeroinitializer, ptr %p, align 8
   store { i64, i64 } zeroinitializer, ptr %p, align 8

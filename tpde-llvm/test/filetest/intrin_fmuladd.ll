@@ -18,13 +18,12 @@ define float @fmuladdf32(float %0, float %1, float %2) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fmuladdf32>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fmadd s0, s0, s1, s2
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %r = call float @llvm.fmuladd(float %0, float %1, float %2)
   ret float %r
@@ -42,13 +41,12 @@ define double @fmuladdf64(double %0, double %1, double %2) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fmuladdf64>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fmadd d0, d0, d1, d2
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %r = call double @llvm.fmuladd(double %0, double %1, double %2)
   ret double %r
@@ -74,9 +72,9 @@ define fp128 @fmuladdf128(fp128 %0, fp128 %1, fp128 %2) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fmuladdf128>:
-; ARM64:         sub sp, sp, #0xb0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xb0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    str q2, [x29, #0xa0]
 ; ARM64-NEXT:    bl 0xb4 <fmuladdf128+0x14>
@@ -84,8 +82,7 @@ define fp128 @fmuladdf128(fp128 %0, fp128 %1, fp128 %2) {
 ; ARM64-NEXT:    ldr q1, [x29, #0xa0]
 ; ARM64-NEXT:    bl 0xbc <fmuladdf128+0x1c>
 ; ARM64-NEXT:     R_AARCH64_CALL26 __addtf3
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xb0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
   %r = call fp128 @llvm.fmuladd(fp128 %0, fp128 %1, fp128 %2)
   ret fp128 %r
@@ -111,9 +108,9 @@ define void @fmuladdf128_nouse(fp128 %0, fp128 %1, fp128 %2) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fmuladdf128_nouse>:
-; ARM64:         sub sp, sp, #0xb0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xb0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    str q2, [x29, #0xa0]
 ; ARM64-NEXT:    bl 0x104 <fmuladdf128_nouse+0x14>
@@ -121,8 +118,7 @@ define void @fmuladdf128_nouse(fp128 %0, fp128 %1, fp128 %2) {
 ; ARM64-NEXT:    ldr q1, [x29, #0xa0]
 ; ARM64-NEXT:    bl 0x10c <fmuladdf128_nouse+0x1c>
 ; ARM64-NEXT:     R_AARCH64_CALL26 __addtf3
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xb0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
   %r = call fp128 @llvm.fmuladd(fp128 %0, fp128 %1, fp128 %2)
   ret void

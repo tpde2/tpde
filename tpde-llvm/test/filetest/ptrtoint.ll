@@ -18,12 +18,11 @@ define i64 @ptrtoint_i64(ptr %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ptrtoint_i64>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    nop
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
   %1 = ptrtoint ptr %0 to i64
@@ -42,13 +41,12 @@ define i64 @ptrtoint_i64_no_salvage(ptr %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ptrtoint_i64_no_salvage>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov x1, x0
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
   %1 = ptrtoint ptr %0 to i64
@@ -67,12 +65,11 @@ define i32 @ptrtoint_i32(ptr %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ptrtoint_i32>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    nop
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
   %1 = ptrtoint ptr %0 to i32
@@ -91,13 +88,12 @@ define i32 @ptrtoint_i32_no_salvage(ptr %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ptrtoint_i32_no_salvage>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov x1, x0
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
   %1 = ptrtoint ptr %0 to i32
@@ -115,12 +111,11 @@ define <2 x i64> @ptrtoint_v2i64(<2 x ptr> %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ptrtoint_v2i64>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    nop
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %r = ptrtoint <2 x ptr> %p to <2 x i64>
   ret <2 x i64> %r
@@ -142,9 +137,9 @@ define void @ptrtoint_v6i64(ptr %p, ptr %q) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ptrtoint_v6i64>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr q0, [x0]
 ; ARM64-NEXT:    ldr q1, [x0, #0x10]
@@ -152,8 +147,7 @@ define void @ptrtoint_v6i64(ptr %p, ptr %q) {
 ; ARM64-NEXT:    str q0, [x1]
 ; ARM64-NEXT:    str q1, [x1, #0x10]
 ; ARM64-NEXT:    str q2, [x1, #0x20]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %l = load <6 x ptr>, ptr %p
   %r = ptrtoint <6 x ptr> %l to <6 x i64>

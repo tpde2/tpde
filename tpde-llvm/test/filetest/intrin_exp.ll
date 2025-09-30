@@ -20,14 +20,13 @@ define float @f32(float %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <f32>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    bl 0x30 <f32+0x10>
 ; ARM64-NEXT:     R_AARCH64_CALL26 expf
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %r = call float @llvm.exp(float %a)
   ret float %r
@@ -48,14 +47,13 @@ define double @f64(double %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <f64>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    bl 0x70 <f64+0x10>
 ; ARM64-NEXT:     R_AARCH64_CALL26 exp
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %r = call double @llvm.exp(double %a)
   ret double %r

@@ -31,9 +31,9 @@ define void @ctlz_i8(i8 %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ctlz_i8>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ands w1, w0, #0xff
 ; ARM64-NEXT:    mov w2, #0x8 // =8
@@ -41,8 +41,7 @@ define void @ctlz_i8(i8 %0) {
 ; ARM64-NEXT:    tst w0, #0xff
 ; ARM64-NEXT:    sub w1, w1, #0x18
 ; ARM64-NEXT:    csel w0, w2, w1, eq
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
     %1 = call i8 @llvm.ctlz.i8(i8 %0, i1 0)
@@ -63,15 +62,14 @@ define void @ctlz_i8_zero_poison(i8 %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ctlz_i8_zero_poison>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    and w0, w0, #0xff
 ; ARM64-NEXT:    clz w0, w0
 ; ARM64-NEXT:    sub w1, w0, #0x18
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
     %1 = call i8 @llvm.ctlz.i8(i8 %0, i1 1)
@@ -95,9 +93,9 @@ define void @ctlz_i16(i16 %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ctlz_i16>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ands w1, w0, #0xffff
 ; ARM64-NEXT:    mov w2, #0x10 // =16
@@ -105,8 +103,7 @@ define void @ctlz_i16(i16 %0) {
 ; ARM64-NEXT:    tst w0, #0xffff
 ; ARM64-NEXT:    sub w1, w1, #0x10
 ; ARM64-NEXT:    csel w0, w2, w1, eq
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
     %1 = call i16 @llvm.ctlz.i16(i16 %0, i1 0)
@@ -127,15 +124,14 @@ define void @ctlz_i16_zero_poison(i16 %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ctlz_i16_zero_poison>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    and w0, w0, #0xffff
 ; ARM64-NEXT:    clz w0, w0
 ; ARM64-NEXT:    sub w1, w0, #0x10
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
     %1 = call i16 @llvm.ctlz.i16(i16 %0, i1 1)
@@ -155,13 +151,12 @@ define void @ctlz_i32(i32 %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ctlz_i32>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    clz w0, w0
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
     %1 = call i32 @llvm.ctlz.i32(i32 %0, i1 0)
@@ -180,13 +175,12 @@ define void @ctlz_i32_zero_poison(i32 %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ctlz_i32_zero_poison>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    clz w0, w0
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
     %1 = call i32 @llvm.ctlz.i32(i32 %0, i1 1)
@@ -206,13 +200,12 @@ define void @ctlz_i64(i64 %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ctlz_i64>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    clz x0, x0
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
     %1 = call i64 @llvm.ctlz.i64(i64 %0, i1 0)
@@ -231,13 +224,12 @@ define void @ctlz_i64_zero_poison(i64 %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ctlz_i64_zero_poison>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    clz x0, x0
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
     %1 = call i64 @llvm.ctlz.i64(i64 %0, i1 1)
@@ -260,14 +252,13 @@ define void @ctlz_i32_no_salvage(i32 %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ctlz_i32_no_salvage>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    clz w1, w0
 ; ARM64-NEXT:    clz w0, w0
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
     %1 = call i32 @llvm.ctlz.i32(i32 %0, i1 0)
@@ -291,14 +282,13 @@ define void @ctlz_i64_no_salvage(i64 %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ctlz_i64_no_salvage>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    clz x1, x0
 ; ARM64-NEXT:    clz x0, x0
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
     %1 = call i64 @llvm.ctlz.i64(i64 %0, i1 0)
@@ -330,9 +320,9 @@ define void @ctlz_i16_no_salvage(i16 %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ctlz_i16_no_salvage>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ands w1, w0, #0xffff
 ; ARM64-NEXT:    mov w2, #0x10 // =16
@@ -346,8 +336,7 @@ define void @ctlz_i16_no_salvage(i16 %0) {
 ; ARM64-NEXT:    tst w0, #0xffff
 ; ARM64-NEXT:    sub w1, w1, #0x10
 ; ARM64-NEXT:    csel w0, w2, w1, eq
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
     %1 = call i16 @llvm.ctlz.i16(i16 %0, i1 0)

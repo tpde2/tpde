@@ -17,13 +17,12 @@ define i1 @ext_v5i1_0(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ext_v5i1_0>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrb w0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %v = load <5 x i1>, ptr %p
   %r = extractelement <5 x i1> %v, i32 0
@@ -43,14 +42,13 @@ define i1 @ext_v5i1_3(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ext_v5i1_3>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrb w0, [x0]
 ; ARM64-NEXT:    lsr x0, x0, #3
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %v = load <5 x i1>, ptr %p
   %r = extractelement <5 x i1> %v, i32 3
@@ -72,15 +70,14 @@ define i1 @ext_v5i1_3_twice(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ext_v5i1_3_twice>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrb w0, [x0]
 ; ARM64-NEXT:    lsr x1, x0, #3
 ; ARM64-NEXT:    lsr x0, x0, #3
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %v = load <5 x i1>, ptr %p
   %r1 = extractelement <5 x i1> %v, i32 3
@@ -102,14 +99,13 @@ define i1 @ext_v5i1_dyn(ptr %p, i32 %i) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ext_v5i1_dyn>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrb w0, [x0]
 ; ARM64-NEXT:    lsr x0, x0, x1
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %v = load <5 x i1>, ptr %p
   %r = extractelement <5 x i1> %v, i32 %i
@@ -128,13 +124,12 @@ define i1 @ext_v16i1_0(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ext_v16i1_0>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrh w0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %v = load <16 x i1>, ptr %p
   %r = extractelement <16 x i1> %v, i32 0
@@ -154,14 +149,13 @@ define i1 @ext_v16i1_3(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ext_v16i1_3>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrh w0, [x0]
 ; ARM64-NEXT:    lsr x0, x0, #3
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %v = load <16 x i1>, ptr %p
   %r = extractelement <16 x i1> %v, i32 3
@@ -183,15 +177,14 @@ define i1 @ext_v16i1_3_twice(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ext_v16i1_3_twice>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrh w0, [x0]
 ; ARM64-NEXT:    lsr x1, x0, #3
 ; ARM64-NEXT:    lsr x0, x0, #3
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %v = load <16 x i1>, ptr %p
   %r1 = extractelement <16 x i1> %v, i32 3
@@ -213,14 +206,13 @@ define i1 @ext_v16i1_dyn(ptr %p, i32 %i) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ext_v16i1_dyn>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrh w0, [x0]
 ; ARM64-NEXT:    lsr x0, x0, x1
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %v = load <16 x i1>, ptr %p
   %r = extractelement <16 x i1> %v, i32 %i
@@ -244,9 +236,9 @@ define i8 @ext_v5i8_0(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ext_v5i8_0>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrb w1, [x0]
 ; ARM64-NEXT:    ldrb w2, [x0, #0x1]
@@ -254,8 +246,7 @@ define i8 @ext_v5i8_0(ptr %p) {
 ; ARM64-NEXT:    ldrb w4, [x0, #0x3]
 ; ARM64-NEXT:    ldrb w5, [x0, #0x4]
 ; ARM64-NEXT:    mov w0, w1
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %v = load <5 x i8>, ptr %p
   %r = extractelement <5 x i8> %v, i32 0
@@ -280,9 +271,9 @@ define i8 @ext_v5i8_3(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ext_v5i8_3>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrb w1, [x0]
 ; ARM64-NEXT:    ldrb w2, [x0, #0x1]
@@ -290,8 +281,7 @@ define i8 @ext_v5i8_3(ptr %p) {
 ; ARM64-NEXT:    ldrb w4, [x0, #0x3]
 ; ARM64-NEXT:    ldrb w5, [x0, #0x4]
 ; ARM64-NEXT:    mov w0, w4
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %v = load <5 x i8>, ptr %p
   %r = extractelement <5 x i8> %v, i32 3
@@ -318,9 +308,9 @@ define i8 @ext_v5i8_3_twice(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ext_v5i8_3_twice>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrb w1, [x0]
 ; ARM64-NEXT:    ldrb w2, [x0, #0x1]
@@ -330,8 +320,7 @@ define i8 @ext_v5i8_3_twice(ptr %p) {
 ; ARM64-NEXT:    mov w0, w4
 ; ARM64-NEXT:    add w4, w4, w0
 ; ARM64-NEXT:    mov w0, w4
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %v = load <5 x i8>, ptr %p
   %r1 = extractelement <5 x i8> %v, i32 3
@@ -367,9 +356,9 @@ define i8 @ext_v5i8_dyn(ptr %p, i32 %i) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ext_v5i8_dyn>:
-; ARM64:         sub sp, sp, #0xb0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xb0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrb w2, [x0]
 ; ARM64-NEXT:    ldrb w3, [x0, #0x1]
@@ -387,8 +376,7 @@ define i8 @ext_v5i8_dyn(ptr %p, i32 %i) {
 ; ARM64-NEXT:    add x0, x29, x0
 ; ARM64-NEXT:    ldrb w1, [x0, #0xa0]
 ; ARM64-NEXT:    mov w0, w1
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xb0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
   %v = load <5 x i8>, ptr %p
   %r = extractelement <5 x i8> %v, i32 %i
@@ -407,13 +395,12 @@ define i8 @ext_v16i8_0(<16 x i8> %v) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ext_v16i8_0>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    umov w0, v0.b[0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %r = extractelement <16 x i8> %v, i32 0
   ret i8 %r
@@ -431,13 +418,12 @@ define i8 @ext_v16i8_11(<16 x i8> %v) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ext_v16i8_11>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    umov w0, v0.b[11]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %r = extractelement <16 x i8> %v, i32 11
   ret i8 %r
@@ -456,17 +442,16 @@ define i8 @ext_v16i8_dyn(<16 x i8> %v, i32 %i) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ext_v16i8_dyn>:
-; ARM64:         sub sp, sp, #0xb0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xb0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    str q0, [x29, #0xa0]
 ; ARM64-NEXT:    and x0, x0, #0xf
 ; ARM64-NEXT:    add x0, x29, x0
 ; ARM64-NEXT:    ldrb w1, [x0, #0xa0]
 ; ARM64-NEXT:    mov w0, w1
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xb0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
   %r = extractelement <16 x i8> %v, i32 %i
   ret i8 %r
@@ -488,17 +473,16 @@ define i8 @ext_v64i8_0(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ext_v64i8_0>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr q0, [x0]
 ; ARM64-NEXT:    ldr q1, [x0, #0x10]
 ; ARM64-NEXT:    ldr q2, [x0, #0x20]
 ; ARM64-NEXT:    ldr q3, [x0, #0x30]
 ; ARM64-NEXT:    umov w0, v0.b[0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %v = load <64 x i8>, ptr %p
   %r = extractelement <64 x i8> %v, i32 0
@@ -521,17 +505,16 @@ define i8 @ext_v64i8_43(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ext_v64i8_43>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr q0, [x0]
 ; ARM64-NEXT:    ldr q1, [x0, #0x10]
 ; ARM64-NEXT:    ldr q2, [x0, #0x20]
 ; ARM64-NEXT:    ldr q3, [x0, #0x30]
 ; ARM64-NEXT:    umov w0, v2.b[11]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %v = load <64 x i8>, ptr %p
   %r = extractelement <64 x i8> %v, i32 43
@@ -556,9 +539,9 @@ define i8 @ext_v64i8_43_twice(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ext_v64i8_43_twice>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr q0, [x0]
 ; ARM64-NEXT:    ldr q1, [x0, #0x10]
@@ -568,8 +551,7 @@ define i8 @ext_v64i8_43_twice(ptr %p) {
 ; ARM64-NEXT:    umov w1, v2.b[11]
 ; ARM64-NEXT:    add w1, w1, w0
 ; ARM64-NEXT:    mov w0, w1
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %v = load <64 x i8>, ptr %p
   %r1 = extractelement <64 x i8> %v, i32 43
@@ -598,9 +580,9 @@ define i8 @ext_v64i8_dyn(ptr %p, i32 %i) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ext_v64i8_dyn>:
-; ARM64:         sub sp, sp, #0xe0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xe0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr q0, [x0]
 ; ARM64-NEXT:    ldr q1, [x0, #0x10]
@@ -613,8 +595,7 @@ define i8 @ext_v64i8_dyn(ptr %p, i32 %i) {
 ; ARM64-NEXT:    and x1, x1, #0x3f
 ; ARM64-NEXT:    add x1, x29, x1
 ; ARM64-NEXT:    ldrb w0, [x1, #0xa0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xe0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xe0
 ; ARM64-NEXT:    ret
   %v = load <64 x i8>, ptr %p
   %r = extractelement <64 x i8> %v, i32 %i
@@ -633,13 +614,12 @@ define i32 @ext_v4i32_0(<4 x i32> %v) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ext_v4i32_0>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov w0, v0.s[0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %r = extractelement <4 x i32> %v, i32 0
   ret i32 %r
@@ -657,13 +637,12 @@ define i32 @ext_v4i32_3(<4 x i32> %v) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ext_v4i32_3>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov w0, v0.s[3]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %r = extractelement <4 x i32> %v, i32 3
   ret i32 %r
@@ -682,17 +661,16 @@ define i32 @ext_v4i32_dyn(<4 x i32> %v, i32 %i) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ext_v4i32_dyn>:
-; ARM64:         sub sp, sp, #0xb0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xb0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    str q0, [x29, #0xa0]
 ; ARM64-NEXT:    and x0, x0, #0x3
 ; ARM64-NEXT:    add x0, x29, x0, lsl #2
 ; ARM64-NEXT:    ldr w1, [x0, #0xa0]
 ; ARM64-NEXT:    mov w0, w1
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xb0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
   %r = extractelement <4 x i32> %v, i32 %i
   ret i32 %r
@@ -711,14 +689,13 @@ define double @ext_v2f64_0(<2 x double> %v) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ext_v2f64_0>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov d1, v0.d[0]
 ; ARM64-NEXT:    mov v0.16b, v1.16b
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %r = extractelement <2 x double> %v, i32 0
   ret double %r
@@ -737,14 +714,13 @@ define double @ext_v2f64_1(<2 x double> %v) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ext_v2f64_1>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov d1, v0.d[1]
 ; ARM64-NEXT:    mov v0.16b, v1.16b
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %r = extractelement <2 x double> %v, i32 1
   ret double %r
@@ -764,17 +740,16 @@ define double @ext_v2f64_dyn(<2 x double> %v, i32 %i) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ext_v2f64_dyn>:
-; ARM64:         sub sp, sp, #0xb0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xb0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    str q0, [x29, #0xa0]
 ; ARM64-NEXT:    and x0, x0, #0x1
 ; ARM64-NEXT:    add x0, x29, x0, lsl #3
 ; ARM64-NEXT:    ldr d1, [x0, #0xa0]
 ; ARM64-NEXT:    mov v0.16b, v1.16b
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xb0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
   %r = extractelement <2 x double> %v, i32 %i
   ret double %r

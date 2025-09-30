@@ -25,21 +25,19 @@ define @br1() {
 ; X64-FIXED-NEXT:    ret
 ;
 ; ARM64-LABEL: <br1>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    nop
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 ;
 ; ARM64-FIXED-LABEL: <br1>:
-; ARM64-FIXED:         sub sp, sp, #0xa0
-; ARM64-FIXED-NEXT:    stp x29, x30, [sp]
+; ARM64-FIXED:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-FIXED-NEXT:    mov x29, sp
 ; ARM64-FIXED-NEXT:    nop
-; ARM64-FIXED-NEXT:    ldp x29, x30, [sp]
-; ARM64-FIXED-NEXT:    add sp, sp, #0xa0
+; ARM64-FIXED-NEXT:    nop
+; ARM64-FIXED-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-FIXED-NEXT:    ret
 entry:
   br ^ret
@@ -86,39 +84,35 @@ define @condbr1(%a, %b) {
 ; X64-FIXED-NEXT:    ret
 ;
 ; ARM64-LABEL: <condbr1>:
-; ARM64:         sub sp, sp, #0xb0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xb0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    str x1, [x29, #0xa0]
 ; ARM64-NEXT:    cmp x0, #0x0
 ; ARM64-NEXT:    b.eq 0xac <condbr1+0x4c>
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xb0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
 ; ARM64-NEXT:     ...
 ; ARM64-NEXT:    ldr x0, [x29, #0xa0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xb0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
 ;
 ; ARM64-FIXED-LABEL: <condbr1>:
-; ARM64-FIXED:         sub sp, sp, #0xa0
-; ARM64-FIXED-NEXT:    stp x29, x30, [sp]
+; ARM64-FIXED:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-FIXED-NEXT:    mov x29, sp
+; ARM64-FIXED-NEXT:    nop
 ; ARM64-FIXED-NEXT:    nop
 ; ARM64-FIXED-NEXT:    mov x9, x0
 ; ARM64-FIXED-NEXT:    mov x10, x1
 ; ARM64-FIXED-NEXT:    cmp x9, #0x0
 ; ARM64-FIXED-NEXT:    b.eq 0xb4 <condbr1+0x54>
 ; ARM64-FIXED-NEXT:    mov x0, x9
-; ARM64-FIXED-NEXT:    ldp x29, x30, [sp]
-; ARM64-FIXED-NEXT:    add sp, sp, #0xa0
+; ARM64-FIXED-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-FIXED-NEXT:    ret
 ; ARM64-FIXED-NEXT:     ...
 ; ARM64-FIXED-NEXT:    mov x0, x10
-; ARM64-FIXED-NEXT:    ldp x29, x30, [sp]
-; ARM64-FIXED-NEXT:    add sp, sp, #0xa0
+; ARM64-FIXED-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-FIXED-NEXT:    ret
 entry:
   condbr %a, ^ret1, ^ret2
@@ -167,40 +161,36 @@ define @condbr2(%a, %b) {
 ; X64-FIXED-NEXT:    ret
 ;
 ; ARM64-LABEL: <condbr2>:
-; ARM64:         sub sp, sp, #0xb0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xb0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    str x0, [x29, #0xa0]
 ; ARM64-NEXT:    cmp x0, #0x0
 ; ARM64-NEXT:    b.ne 0x130 <condbr2+0x50>
 ; ARM64-NEXT:    mov x0, x1
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xb0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
 ; ARM64-NEXT:     ...
 ; ARM64-NEXT:    ldr x0, [x29, #0xa0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xb0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
 ;
 ; ARM64-FIXED-LABEL: <condbr2>:
-; ARM64-FIXED:         sub sp, sp, #0xa0
-; ARM64-FIXED-NEXT:    stp x29, x30, [sp]
+; ARM64-FIXED:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-FIXED-NEXT:    mov x29, sp
+; ARM64-FIXED-NEXT:    nop
 ; ARM64-FIXED-NEXT:    nop
 ; ARM64-FIXED-NEXT:    mov x9, x0
 ; ARM64-FIXED-NEXT:    mov x10, x1
 ; ARM64-FIXED-NEXT:    cmp x9, #0x0
-; ARM64-FIXED-NEXT:    b.ne 0x144 <condbr2+0x54>
+; ARM64-FIXED-NEXT:    b.ne 0x134 <condbr2+0x54>
 ; ARM64-FIXED-NEXT:    mov x0, x10
-; ARM64-FIXED-NEXT:    ldp x29, x30, [sp]
-; ARM64-FIXED-NEXT:    add sp, sp, #0xa0
+; ARM64-FIXED-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-FIXED-NEXT:    ret
 ; ARM64-FIXED-NEXT:     ...
 ; ARM64-FIXED-NEXT:    mov x0, x9
-; ARM64-FIXED-NEXT:    ldp x29, x30, [sp]
-; ARM64-FIXED-NEXT:    add sp, sp, #0xa0
+; ARM64-FIXED-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-FIXED-NEXT:    ret
 entry:
   condbr %a, ^ret1, ^ret2
@@ -252,9 +242,9 @@ define @condbr3(%a, %b, %c) {
 ; X64-FIXED-NEXT:    ret
 ;
 ; ARM64-LABEL: <condbr3>:
-; ARM64:         sub sp, sp, #0xb0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xb0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    str x2, [x29, #0xa0]
 ; ARM64-NEXT:    cmp x0, #0x0
@@ -266,27 +256,25 @@ define @condbr3(%a, %b, %c) {
 ; ARM64-NEXT:    ldr x0, [x29, #0xa0]
 ; ARM64-NEXT:    ldr x1, [x29, #0xa8]
 ; ARM64-NEXT:    sub x0, x0, x1
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xb0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
 ;
 ; ARM64-FIXED-LABEL: <condbr3>:
-; ARM64-FIXED:         sub sp, sp, #0xa0
-; ARM64-FIXED-NEXT:    stp x29, x30, [sp]
+; ARM64-FIXED:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-FIXED-NEXT:    mov x29, sp
+; ARM64-FIXED-NEXT:    nop
 ; ARM64-FIXED-NEXT:    nop
 ; ARM64-FIXED-NEXT:    mov x9, x1
 ; ARM64-FIXED-NEXT:    mov x10, x2
 ; ARM64-FIXED-NEXT:    cmp x0, #0x0
-; ARM64-FIXED-NEXT:    b.ne 0x1a8 <condbr3+0x28>
+; ARM64-FIXED-NEXT:    b.ne 0x188 <condbr3+0x28>
 ; ARM64-FIXED-NEXT:    mov x2, x9
-; ARM64-FIXED-NEXT:    b 0x1b0 <condbr3+0x30>
+; ARM64-FIXED-NEXT:    b 0x190 <condbr3+0x30>
 ; ARM64-FIXED-NEXT:    add x9, x9, x10
 ; ARM64-FIXED-NEXT:    mov x2, x9
 ; ARM64-FIXED-NEXT:    sub x10, x10, x2
 ; ARM64-FIXED-NEXT:    mov x0, x10
-; ARM64-FIXED-NEXT:    ldp x29, x30, [sp]
-; ARM64-FIXED-NEXT:    add sp, sp, #0xa0
+; ARM64-FIXED-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-FIXED-NEXT:    ret
 entry:
   condbr %a, ^t, ^f
@@ -340,37 +328,35 @@ define @loop1(%a, %b) {
 ; X64-FIXED-NEXT:    ret
 ;
 ; ARM64-LABEL: <loop1>:
-; ARM64:         sub sp, sp, #0xb0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xb0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    str x1, [x29, #0xa0]
 ; ARM64-NEXT:    str x0, [x29, #0xa8]
 ; ARM64-NEXT:    ldr x0, [x29, #0xa8]
 ; ARM64-NEXT:    cmp x0, #0x0
-; ARM64-NEXT:    b.eq 0x204 <loop1+0x34>
+; ARM64-NEXT:    b.eq 0x1f4 <loop1+0x34>
 ; ARM64-NEXT:    ldr x1, [x29, #0xa0]
 ; ARM64-NEXT:    sub x2, x0, x1
 ; ARM64-NEXT:    str x2, [x29, #0xa8]
-; ARM64-NEXT:    b 0x1e8 <loop1+0x18>
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xb0
+; ARM64-NEXT:    b 0x1d8 <loop1+0x18>
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
 ;
 ; ARM64-FIXED-LABEL: <loop1>:
-; ARM64-FIXED:         sub sp, sp, #0xa0
-; ARM64-FIXED-NEXT:    stp x29, x30, [sp]
+; ARM64-FIXED:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-FIXED-NEXT:    mov x29, sp
+; ARM64-FIXED-NEXT:    nop
 ; ARM64-FIXED-NEXT:    nop
 ; ARM64-FIXED-NEXT:    mov x9, x1
 ; ARM64-FIXED-NEXT:    mov x2, x0
 ; ARM64-FIXED-NEXT:    cmp x2, #0x0
-; ARM64-FIXED-NEXT:    b.eq 0x21c <loop1+0x2c>
+; ARM64-FIXED-NEXT:    b.eq 0x1ec <loop1+0x2c>
 ; ARM64-FIXED-NEXT:    sub x0, x2, x9
 ; ARM64-FIXED-NEXT:    mov x2, x0
-; ARM64-FIXED-NEXT:    b 0x208 <loop1+0x18>
-; ARM64-FIXED-NEXT:    ldp x29, x30, [sp]
-; ARM64-FIXED-NEXT:    add sp, sp, #0xa0
+; ARM64-FIXED-NEXT:    b 0x1d8 <loop1+0x18>
+; ARM64-FIXED-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-FIXED-NEXT:    ret
 entry:
   br ^loop_head
@@ -425,39 +411,37 @@ define @phi_chain1(%a) {
 ; X64-FIXED-NEXT:    ret
 ;
 ; ARM64-LABEL: <phi_chain1>:
-; ARM64:         sub sp, sp, #0xb0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xb0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    str x0, [x29, #0xa0]
 ; ARM64-NEXT:    str x0, [x29, #0xa8]
 ; ARM64-NEXT:    ldr x0, [x29, #0xa8]
 ; ARM64-NEXT:    cmp x0, #0x0
-; ARM64-NEXT:    b.eq 0x268 <phi_chain1+0x38>
+; ARM64-NEXT:    b.eq 0x258 <phi_chain1+0x38>
 ; ARM64-NEXT:    ldr x1, [x29, #0xa0]
 ; ARM64-NEXT:    add x2, x1, x0
 ; ARM64-NEXT:    str x1, [x29, #0xa8]
 ; ARM64-NEXT:    str x2, [x29, #0xa0]
-; ARM64-NEXT:    b 0x248 <phi_chain1+0x18>
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xb0
+; ARM64-NEXT:    b 0x238 <phi_chain1+0x18>
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
 ;
 ; ARM64-FIXED-LABEL: <phi_chain1>:
-; ARM64-FIXED:         sub sp, sp, #0xa0
-; ARM64-FIXED-NEXT:    stp x29, x30, [sp]
+; ARM64-FIXED:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-FIXED-NEXT:    mov x29, sp
+; ARM64-FIXED-NEXT:    nop
 ; ARM64-FIXED-NEXT:    nop
 ; ARM64-FIXED-NEXT:    mov x2, x0
 ; ARM64-FIXED-NEXT:    mov x3, x0
 ; ARM64-FIXED-NEXT:    cmp x3, #0x0
-; ARM64-FIXED-NEXT:    b.eq 0x280 <phi_chain1+0x30>
+; ARM64-FIXED-NEXT:    b.eq 0x250 <phi_chain1+0x30>
 ; ARM64-FIXED-NEXT:    add x0, x2, x3
 ; ARM64-FIXED-NEXT:    mov x3, x2
 ; ARM64-FIXED-NEXT:    mov x2, x0
-; ARM64-FIXED-NEXT:    b 0x268 <phi_chain1+0x18>
-; ARM64-FIXED-NEXT:    ldp x29, x30, [sp]
-; ARM64-FIXED-NEXT:    add sp, sp, #0xa0
+; ARM64-FIXED-NEXT:    b 0x238 <phi_chain1+0x18>
+; ARM64-FIXED-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-FIXED-NEXT:    ret
 entry:
   br ^loop_head
@@ -514,41 +498,39 @@ define @phi_cycle1(%a) {
 ; X64-FIXED-NEXT:    ret
 ;
 ; ARM64-LABEL: <phi_cycle1>:
-; ARM64:         sub sp, sp, #0xb0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xb0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    str x0, [x29, #0xa0]
 ; ARM64-NEXT:    str x0, [x29, #0xa8]
 ; ARM64-NEXT:    ldr x0, [x29, #0xa8]
 ; ARM64-NEXT:    cmp x0, #0x0
-; ARM64-NEXT:    b.eq 0x2dc <phi_cycle1+0x3c>
+; ARM64-NEXT:    b.eq 0x2bc <phi_cycle1+0x3c>
 ; ARM64-NEXT:    ldr x1, [x29, #0xa0]
 ; ARM64-NEXT:    add x2, x1, x0
 ; ARM64-NEXT:    mov x2, x1
 ; ARM64-NEXT:    str x0, [x29, #0xa0]
 ; ARM64-NEXT:    str x2, [x29, #0xa8]
-; ARM64-NEXT:    b 0x2b8 <phi_cycle1+0x18>
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xb0
+; ARM64-NEXT:    b 0x298 <phi_cycle1+0x18>
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
 ;
 ; ARM64-FIXED-LABEL: <phi_cycle1>:
-; ARM64-FIXED:         sub sp, sp, #0xa0
-; ARM64-FIXED-NEXT:    stp x29, x30, [sp]
+; ARM64-FIXED:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-FIXED-NEXT:    mov x29, sp
+; ARM64-FIXED-NEXT:    nop
 ; ARM64-FIXED-NEXT:    nop
 ; ARM64-FIXED-NEXT:    mov x2, x0
 ; ARM64-FIXED-NEXT:    mov x3, x0
 ; ARM64-FIXED-NEXT:    cmp x3, #0x0
-; ARM64-FIXED-NEXT:    b.eq 0x2e4 <phi_cycle1+0x34>
+; ARM64-FIXED-NEXT:    b.eq 0x2b4 <phi_cycle1+0x34>
 ; ARM64-FIXED-NEXT:    add x0, x2, x3
 ; ARM64-FIXED-NEXT:    mov x0, x2
 ; ARM64-FIXED-NEXT:    mov x2, x3
 ; ARM64-FIXED-NEXT:    mov x3, x0
-; ARM64-FIXED-NEXT:    b 0x2c8 <phi_cycle1+0x18>
-; ARM64-FIXED-NEXT:    ldp x29, x30, [sp]
-; ARM64-FIXED-NEXT:    add sp, sp, #0xa0
+; ARM64-FIXED-NEXT:    b 0x298 <phi_cycle1+0x18>
+; ARM64-FIXED-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-FIXED-NEXT:    ret
 entry:
   br ^loop_head

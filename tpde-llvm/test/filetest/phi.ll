@@ -22,10 +22,10 @@ define i32 @phi_cycle() {
 ; X64-NEXT:    jmp <L0>
 ;
 ; ARM64-LABEL: <phi_cycle>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    stp x19, x20, [sp, #0x10]
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov x19, #0x1 // =1
 ; ARM64-NEXT:    mov x20, #0x2 // =2
 ; ARM64-NEXT:    mov w0, w19
@@ -53,10 +53,10 @@ define i32 @phi_unicycle() {
 ; X64-NEXT:    jmp <L0>
 ;
 ; ARM64-LABEL: <phi_unicycle>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    stp x19, x20, [sp, #0x10]
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov x19, #0x1 // =1
 ; ARM64-NEXT:    mov x20, #0x2 // =2
 ; ARM64-NEXT:    b 0x88 <phi_unicycle+0x18>
@@ -90,14 +90,10 @@ define ptr @phi_twocycles() {
 ; X64-NEXT:    jmp <L0>
 ;
 ; ARM64-LABEL: <phi_twocycles>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    stp x19, x20, [sp, #0x10]
 ; ARM64-NEXT:    stp x21, x22, [sp, #0x20]
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov x19, #0x1 // =1
 ; ARM64-NEXT:    mov x20, #0x2 // =2
 ; ARM64-NEXT:    mov x21, #0x3 // =3
@@ -108,7 +104,7 @@ define ptr @phi_twocycles() {
 ; ARM64-NEXT:    mov w0, w21
 ; ARM64-NEXT:    mov w21, w22
 ; ARM64-NEXT:    mov w22, w0
-; ARM64-NEXT:    b 0xd0 <phi_twocycles+0x30>
+; ARM64-NEXT:    b 0xd0 <phi_twocycles+0x20>
   br label %1
 
 1:                                                ; preds = %1, %0
@@ -138,21 +134,17 @@ define ptr @phi_cycles_selfref() {
 ; X64-NEXT:    jmp <L0>
 ;
 ; ARM64-LABEL: <phi_cycles_selfref>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    stp x19, x20, [sp, #0x10]
 ; ARM64-NEXT:    str x21, [sp, #0x20]
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov x19, #0x1 // =1
 ; ARM64-NEXT:    mov x20, #0x2 // =2
 ; ARM64-NEXT:    mov x21, #0x3 // =3
 ; ARM64-NEXT:    mov w0, w19
 ; ARM64-NEXT:    mov w19, w20
 ; ARM64-NEXT:    mov w20, w0
-; ARM64-NEXT:    b 0x12c <phi_cycles_selfref+0x2c>
+; ARM64-NEXT:    b 0x12c <phi_cycles_selfref+0x1c>
   br label %1
 
 1:                                                ; preds = %1, %0
@@ -184,9 +176,9 @@ define void @phi_cycle_i128(i1 %c, i128 %v1, i128 %v2) {
 ; X64-NEXT:    jmp <L0>
 ;
 ; ARM64-LABEL: <phi_cycle_i128>:
-; ARM64:         sub sp, sp, #0xc0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xc0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    str x2, [x29, #0xa0]
 ; ARM64-NEXT:    str x3, [x29, #0xa8]
@@ -255,9 +247,9 @@ define void @phi_cycle_multipart(i1 %c, [4 x i64] %v1, [4 x i64] %v2) {
 ; X64-NEXT:    jmp <L0>
 ;
 ; ARM64-LABEL: <phi_cycle_multipart>:
-; ARM64:         sub sp, sp, #0x100
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0x100]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    add x17, sp, #0x100
 ; ARM64-NEXT:    ldr x0, [x17]
@@ -331,10 +323,10 @@ define i32 @phi_last_use(i1 %c, i32 %a, i32 %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <phi_last_use>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    stp x19, x20, [sp, #0x10]
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov w19, w1
 ; ARM64-NEXT:    tst w0, #0x1
 ; ARM64-NEXT:    b.eq 0x2c4 <phi_last_use+0x24>
@@ -345,9 +337,8 @@ define i32 @phi_last_use(i1 %c, i32 %a, i32 %b) {
 ; ARM64-NEXT:    cbnz w1, 0x2c4 <phi_last_use+0x24>
 ; ARM64-NEXT:    mov w20, w0
 ; ARM64-NEXT:    mov w0, w20
-; ARM64-NEXT:    ldp x29, x30, [sp]
 ; ARM64-NEXT:    ldp x19, x20, [sp, #0x10]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   br i1 %c, label %ret, label %loop

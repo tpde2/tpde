@@ -18,14 +18,13 @@ define ptr @ptrmask_dyn(ptr %0, i64 %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ptrmask_dyn>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    and x1, x1, x0
 ; ARM64-NEXT:    mov x0, x1
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %res = call ptr @llvm.ptrmask.p0.i64(ptr %0, i64 %1)
   ret ptr %res
@@ -43,13 +42,12 @@ define ptr @ptrmask_c1(ptr %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ptrmask_c1>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    and x0, x0, #0xfffffffffffffff0
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %res = call ptr @llvm.ptrmask.p0.i64(ptr %0, i64 -16)
   ret ptr %res
@@ -68,13 +66,12 @@ define ptr @ptrmask_c2(ptr %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ptrmask_c2>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    and x0, x0, #0xfffffffffffff8
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %res = call ptr @llvm.ptrmask.p0.i64(ptr %0, i64 72057594037927928)
   ret ptr %res

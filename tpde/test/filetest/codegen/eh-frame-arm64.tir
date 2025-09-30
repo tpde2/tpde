@@ -24,28 +24,27 @@
 ; EH-EMPTY:
 
 define @add1(%a, %b) {
-; EH-LABEL: FDE cie=00000000 pc=00000020...00000040
+; EH-LABEL: FDE cie=00000000 pc=00000020...0000003c
 ; EH-NEXT:   Format:       DWARF32
 ; EH-NEXT:   DW_CFA_advance_loc: 4 to 0x24
 ; EH-NEXT:   DW_CFA_def_cfa_offset: +160
-; EH-NEXT:   DW_CFA_advance_loc: 8 to 0x2c
+; EH-NEXT:   DW_CFA_advance_loc: 4 to 0x28
 ; EH-NEXT:   DW_CFA_def_cfa_register: W29
 ; EH-NEXT:   DW_CFA_offset: W29 -160
 ; EH-NEXT:   DW_CFA_offset: W30 -152
-; EH-NEXT:   DW_CFA_advance_loc: 0 to 0x2c
+; EH-NEXT:   DW_CFA_nop:
 ; EH-NEXT:   DW_CFA_nop:
 ; EH-NEXT:   DW_CFA_nop:
 ; EH-NEXT:   DW_CFA_nop:
 ; EH-EMPTY:
 ; ASM-LABEL: <add1>:
-; ASM:         20: sub sp, sp, #0xa0
-; ASM-NEXT:    24: stp x29, x30, [sp]
-; ASM-NEXT:    28: mov x29, sp
+; ASM:         20: stp x29, x30, [sp, #-0xa0]!
+; ASM-NEXT:    24: mov x29, sp
+; ASM-NEXT:    28: nop
 ; ASM-NEXT:    2c: nop
 ; ASM-NEXT:    30: add x0, x0, x1
-; ASM-NEXT:    34: ldp x29, x30, [sp]
-; ASM-NEXT:    38: add sp, sp, #0xa0
-; ASM-NEXT:    3c: ret
+; ASM-NEXT:    34: ldp x29, x30, [sp], #0xa0
+; ASM-NEXT:    38: ret
 entry:
   %res = add %a, %b
   ret %res

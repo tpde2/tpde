@@ -10,9 +10,9 @@ declare void @llvm.va_start.p0(ptr) #2
 
 define void @f(i64 %0, i64 %1, i64 %2, i64 %3, i64 %4, i64 %5, i64 %6, i64 %7, i64 %8, ...) {
 ; ARM64-LABEL: <f>:
-; ARM64:         sub sp, sp, #0x190
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0x190]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    stp x0, x1, [sp, #0xa0]
 ; ARM64-NEXT:    stp x2, x3, [sp, #0xb0]
@@ -37,8 +37,7 @@ define void @f(i64 %0, i64 %1, i64 %2, i64 %3, i64 %4, i64 %5, i64 %6, i64 %7, i
 ; ARM64-NEXT:    str w16, [x0, #0x18]
 ; ARM64-NEXT:    mov x16, #0xffffff80 // =4294967168
 ; ARM64-NEXT:    str w16, [x0, #0x1c]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0x190
+; ARM64-NEXT:    ldp x29, x30, [sp], #0x190
 ; ARM64-NEXT:    ret
   %10 = alloca %struct.__va_list, align 8
   call void @llvm.va_start.p0(ptr nonnull %10)

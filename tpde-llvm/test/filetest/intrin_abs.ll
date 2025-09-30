@@ -27,15 +27,14 @@ define i8 @absi8(i8 %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <absi8>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    sxtb w0, w0
 ; ARM64-NEXT:    cmp w0, #0x0
 ; ARM64-NEXT:    cneg w0, w0, mi
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %1 = call i8 @llvm.abs.i8(i8 %0, i1 1)
@@ -56,15 +55,14 @@ define i16 @absi16(i16 %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <absi16>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    sxth w0, w0
 ; ARM64-NEXT:    cmp w0, #0x0
 ; ARM64-NEXT:    cneg w0, w0, mi
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %1 = call i16 @llvm.abs.i16(i16 %0, i1 1)
@@ -86,15 +84,14 @@ define i17 @absi17(i17 %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <absi17>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    sbfx w0, w0, #0, #17
 ; ARM64-NEXT:    cmp w0, #0x0
 ; ARM64-NEXT:    cneg w0, w0, mi
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %1 = call i17 @llvm.abs.i17(i17 %0, i1 1)
@@ -114,14 +111,13 @@ define i32 @absi32(i32 %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <absi32>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    cmp w0, #0x0
 ; ARM64-NEXT:    cneg w0, w0, mi
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %1 = call i32 @llvm.abs.i32(i32 %0, i1 1)
@@ -143,15 +139,14 @@ define i37 @absi37(i37 %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <absi37>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    sbfx x0, x0, #0, #37
 ; ARM64-NEXT:    cmp x0, #0x0
 ; ARM64-NEXT:    cneg x0, x0, mi
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %1 = call i37 @llvm.abs.i37(i37 %0, i1 1)
@@ -171,14 +166,13 @@ define i64 @absi64(i64 %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <absi64>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    cmp x0, #0x0
 ; ARM64-NEXT:    cneg x0, x0, mi
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %1 = call i64 @llvm.abs.i64(i64 %0, i1 1)
@@ -205,9 +199,9 @@ define i128 @absi128(i128 %v) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <absi128>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    asr x2, x1, #63
 ; ARM64-NEXT:    eor x0, x0, x2
@@ -216,8 +210,7 @@ define i128 @absi128(i128 %v) {
 ; ARM64-NEXT:    sbc x4, x1, x2
 ; ARM64-NEXT:    mov x0, x3
 ; ARM64-NEXT:    mov x1, x4
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %r = call i128 @llvm.abs(i128 %v, i1 false)
   ret i128 %r

@@ -16,13 +16,12 @@ define void @load_v1i8(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_v1i8>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrb w1, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %l = load volatile <1 x i8>, ptr %p
   ret void
@@ -39,13 +38,12 @@ define void @load_v1i16(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_v1i16>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrh w1, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %l = load volatile <1 x i16>, ptr %p
   ret void
@@ -62,13 +60,12 @@ define void @load_v1i32(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_v1i32>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr w1, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %l = load volatile <1 x i32>, ptr %p
   ret void
@@ -85,13 +82,12 @@ define void @load_v1i64(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_v1i64>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr x1, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %l = load volatile <1 x i64>, ptr %p
   ret void
@@ -108,13 +104,12 @@ define void @load_v1ptr(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_v1ptr>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr x1, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %l = load volatile <1 x ptr>, ptr %p
   ret void
@@ -131,13 +126,12 @@ define void @load_v1f32(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_v1f32>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr s0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %l = load volatile <1 x float>, ptr %p
   ret void
@@ -154,13 +148,12 @@ define void @load_v1f64(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_v1f64>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr d0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %l = load volatile <1 x double>, ptr %p
   ret void
@@ -178,14 +171,13 @@ define void @load_v2i8(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_v2i8>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrb w1, [x0]
 ; ARM64-NEXT:    ldrb w2, [x0, #0x1]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %l = load volatile <2 x i8>, ptr %p
   ret void
@@ -203,14 +195,13 @@ define void @load_v2i16(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_v2i16>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrh w1, [x0]
 ; ARM64-NEXT:    ldrh w2, [x0, #0x2]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %l = load volatile <2 x i16>, ptr %p
   ret void
@@ -227,13 +218,12 @@ define void @load_v2i32(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_v2i32>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr d0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %l = load volatile <2 x i32>, ptr %p
   ret void
@@ -250,13 +240,12 @@ define void @load_v2i64(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_v2i64>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr q0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %l = load volatile <2 x i64>, ptr %p
   ret void
@@ -273,13 +262,12 @@ define <2 x ptr> @load_v2ptr(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_v2ptr>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr q0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %l = load volatile <2 x ptr>, ptr %p
   ret <2 x ptr> %l
@@ -296,13 +284,12 @@ define void @load_v2f32(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_v2f32>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr d0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %l = load volatile <2 x float>, ptr %p
   ret void
@@ -319,13 +306,12 @@ define void @load_v2f64(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_v2f64>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr q0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %l = load volatile <2 x double>, ptr %p
   ret void
@@ -344,15 +330,14 @@ define void @load_v3i8(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_v3i8>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrb w1, [x0]
 ; ARM64-NEXT:    ldrb w2, [x0, #0x1]
 ; ARM64-NEXT:    ldrb w3, [x0, #0x2]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %l = load volatile <3 x i8>, ptr %p
   ret void
@@ -371,15 +356,14 @@ define void @load_v3i16(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_v3i16>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrh w1, [x0]
 ; ARM64-NEXT:    ldrh w2, [x0, #0x2]
 ; ARM64-NEXT:    ldrh w3, [x0, #0x4]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %l = load volatile <3 x i16>, ptr %p
   ret void
@@ -398,15 +382,14 @@ define void @load_v3i32(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_v3i32>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr w1, [x0]
 ; ARM64-NEXT:    ldr w2, [x0, #0x4]
 ; ARM64-NEXT:    ldr w3, [x0, #0x8]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %l = load volatile <3 x i32>, ptr %p
   ret void
@@ -425,15 +408,14 @@ define void @load_v3i64(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_v3i64>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr x1, [x0]
 ; ARM64-NEXT:    ldr x2, [x0, #0x8]
 ; ARM64-NEXT:    ldr x3, [x0, #0x10]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %l = load volatile <3 x i64>, ptr %p
   ret void
@@ -452,15 +434,14 @@ define void @load_v3ptr(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_v3ptr>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr x1, [x0]
 ; ARM64-NEXT:    ldr x2, [x0, #0x8]
 ; ARM64-NEXT:    ldr x3, [x0, #0x10]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %l = load volatile <3 x ptr>, ptr %p
   ret void
@@ -479,15 +460,14 @@ define void @load_v3f32(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_v3f32>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr s0, [x0]
 ; ARM64-NEXT:    ldr s1, [x0, #0x4]
 ; ARM64-NEXT:    ldr s2, [x0, #0x8]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %l = load volatile <3 x float>, ptr %p
   ret void
@@ -506,15 +486,14 @@ define void @load_v3f64(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_v3f64>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr d0, [x0]
 ; ARM64-NEXT:    ldr d1, [x0, #0x8]
 ; ARM64-NEXT:    ldr d2, [x0, #0x10]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %l = load volatile <3 x double>, ptr %p
   ret void
@@ -536,16 +515,15 @@ define void @load_v4i8(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_v4i8>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrb w1, [x0]
 ; ARM64-NEXT:    ldrb w2, [x0, #0x1]
 ; ARM64-NEXT:    ldrb w3, [x0, #0x2]
 ; ARM64-NEXT:    ldrb w4, [x0, #0x3]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %l = load volatile <4 x i8>, ptr %p
   ret void
@@ -562,13 +540,12 @@ define void @load_v4i16(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_v4i16>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr d0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %l = load volatile <4 x i16>, ptr %p
   ret void
@@ -585,13 +562,12 @@ define void @load_v4i32(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_v4i32>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr q0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %l = load volatile <4 x i32>, ptr %p
   ret void
@@ -609,14 +585,13 @@ define void @load_v4i64(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_v4i64>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr q0, [x0]
 ; ARM64-NEXT:    ldr q1, [x0, #0x10]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %l = load volatile <4 x i64>, ptr %p
   ret void
@@ -634,14 +609,13 @@ define void @load_v4ptr(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_v4ptr>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr q0, [x0]
 ; ARM64-NEXT:    ldr q1, [x0, #0x10]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %l = load volatile <4 x ptr>, ptr %p
   ret void
@@ -658,13 +632,12 @@ define void @load_v4f32(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_v4f32>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr q0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %l = load volatile <4 x float>, ptr %p
   ret void
@@ -682,14 +655,13 @@ define void @load_v4f64(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_v4f64>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr q0, [x0]
 ; ARM64-NEXT:    ldr q1, [x0, #0x10]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %l = load volatile <4 x double>, ptr %p
   ret void
@@ -709,16 +681,15 @@ define void @load_v64i8(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_v64i8>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr q0, [x0]
 ; ARM64-NEXT:    ldr q1, [x0, #0x10]
 ; ARM64-NEXT:    ldr q2, [x0, #0x20]
 ; ARM64-NEXT:    ldr q3, [x0, #0x30]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %l = load volatile <64 x i8>, ptr %p
   ret void
@@ -742,9 +713,9 @@ define void @load_v64i16(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_v64i16>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr q0, [x0]
 ; ARM64-NEXT:    ldr q1, [x0, #0x10]
@@ -754,8 +725,7 @@ define void @load_v64i16(ptr %p) {
 ; ARM64-NEXT:    ldr q5, [x0, #0x50]
 ; ARM64-NEXT:    ldr q6, [x0, #0x60]
 ; ARM64-NEXT:    ldr q7, [x0, #0x70]
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %l = load volatile <64 x i16>, ptr %p
   ret void
@@ -787,13 +757,13 @@ define void @load_v64i32(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_v64i32>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    stp d8, d9, [sp, #0x10]
 ; ARM64-NEXT:    stp d10, d11, [sp, #0x20]
 ; ARM64-NEXT:    stp d12, d13, [sp, #0x30]
 ; ARM64-NEXT:    stp d14, d15, [sp, #0x40]
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr q0, [x0]
 ; ARM64-NEXT:    ldr q1, [x0, #0x10]
@@ -811,12 +781,11 @@ define void @load_v64i32(ptr %p) {
 ; ARM64-NEXT:    ldr q13, [x0, #0xd0]
 ; ARM64-NEXT:    ldr q14, [x0, #0xe0]
 ; ARM64-NEXT:    ldr q15, [x0, #0xf0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
 ; ARM64-NEXT:    ldp d8, d9, [sp, #0x10]
 ; ARM64-NEXT:    ldp d10, d11, [sp, #0x20]
 ; ARM64-NEXT:    ldp d12, d13, [sp, #0x30]
 ; ARM64-NEXT:    ldp d14, d15, [sp, #0x40]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %l = load volatile <64 x i32>, ptr %p
   ret void
@@ -881,13 +850,13 @@ define void @load_v64i64(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_v64i64>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    stp d8, d9, [sp, #0x10]
 ; ARM64-NEXT:    stp d10, d11, [sp, #0x20]
 ; ARM64-NEXT:    stp d12, d13, [sp, #0x30]
 ; ARM64-NEXT:    stp d14, d15, [sp, #0x40]
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr q0, [x0]
 ; ARM64-NEXT:    ldr q1, [x0, #0x10]
@@ -921,12 +890,11 @@ define void @load_v64i64(ptr %p) {
 ; ARM64-NEXT:    ldr q29, [x0, #0x1d0]
 ; ARM64-NEXT:    ldr q30, [x0, #0x1e0]
 ; ARM64-NEXT:    ldr q31, [x0, #0x1f0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
 ; ARM64-NEXT:    ldp d8, d9, [sp, #0x10]
 ; ARM64-NEXT:    ldp d10, d11, [sp, #0x20]
 ; ARM64-NEXT:    ldp d12, d13, [sp, #0x30]
 ; ARM64-NEXT:    ldp d14, d15, [sp, #0x40]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %l = load volatile <64 x i64>, ptr %p
   ret void
@@ -991,13 +959,13 @@ define void @load_v64ptr(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_v64ptr>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    stp d8, d9, [sp, #0x10]
 ; ARM64-NEXT:    stp d10, d11, [sp, #0x20]
 ; ARM64-NEXT:    stp d12, d13, [sp, #0x30]
 ; ARM64-NEXT:    stp d14, d15, [sp, #0x40]
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr q0, [x0]
 ; ARM64-NEXT:    ldr q1, [x0, #0x10]
@@ -1031,12 +999,11 @@ define void @load_v64ptr(ptr %p) {
 ; ARM64-NEXT:    ldr q29, [x0, #0x1d0]
 ; ARM64-NEXT:    ldr q30, [x0, #0x1e0]
 ; ARM64-NEXT:    ldr q31, [x0, #0x1f0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
 ; ARM64-NEXT:    ldp d8, d9, [sp, #0x10]
 ; ARM64-NEXT:    ldp d10, d11, [sp, #0x20]
 ; ARM64-NEXT:    ldp d12, d13, [sp, #0x30]
 ; ARM64-NEXT:    ldp d14, d15, [sp, #0x40]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %l = load volatile <64 x ptr>, ptr %p
   ret void
@@ -1068,13 +1035,13 @@ define void @load_v64f32(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_v64f32>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    stp d8, d9, [sp, #0x10]
 ; ARM64-NEXT:    stp d10, d11, [sp, #0x20]
 ; ARM64-NEXT:    stp d12, d13, [sp, #0x30]
 ; ARM64-NEXT:    stp d14, d15, [sp, #0x40]
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr q0, [x0]
 ; ARM64-NEXT:    ldr q1, [x0, #0x10]
@@ -1092,12 +1059,11 @@ define void @load_v64f32(ptr %p) {
 ; ARM64-NEXT:    ldr q13, [x0, #0xd0]
 ; ARM64-NEXT:    ldr q14, [x0, #0xe0]
 ; ARM64-NEXT:    ldr q15, [x0, #0xf0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
 ; ARM64-NEXT:    ldp d8, d9, [sp, #0x10]
 ; ARM64-NEXT:    ldp d10, d11, [sp, #0x20]
 ; ARM64-NEXT:    ldp d12, d13, [sp, #0x30]
 ; ARM64-NEXT:    ldp d14, d15, [sp, #0x40]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %l = load volatile <64 x float>, ptr %p
   ret void
@@ -1162,13 +1128,13 @@ define void @load_v64f64(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_v64f64>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    stp d8, d9, [sp, #0x10]
 ; ARM64-NEXT:    stp d10, d11, [sp, #0x20]
 ; ARM64-NEXT:    stp d12, d13, [sp, #0x30]
 ; ARM64-NEXT:    stp d14, d15, [sp, #0x40]
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr q0, [x0]
 ; ARM64-NEXT:    ldr q1, [x0, #0x10]
@@ -1202,12 +1168,11 @@ define void @load_v64f64(ptr %p) {
 ; ARM64-NEXT:    ldr q29, [x0, #0x1d0]
 ; ARM64-NEXT:    ldr q30, [x0, #0x1e0]
 ; ARM64-NEXT:    ldr q31, [x0, #0x1f0]
-; ARM64-NEXT:    ldp x29, x30, [sp]
 ; ARM64-NEXT:    ldp d8, d9, [sp, #0x10]
 ; ARM64-NEXT:    ldp d10, d11, [sp, #0x20]
 ; ARM64-NEXT:    ldp d12, d13, [sp, #0x30]
 ; ARM64-NEXT:    ldp d14, d15, [sp, #0x40]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %l = load volatile <64 x double>, ptr %p
   ret void

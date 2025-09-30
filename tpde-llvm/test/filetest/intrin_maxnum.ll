@@ -23,13 +23,12 @@ define float @maxnumf32(float %0, float %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <maxnumf32>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fmaxnm s0, s0, s1
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %res = call float @llvm.maxnum(float %0, float %1)
   ret float %res
@@ -53,13 +52,12 @@ define double @maxnumf64(double %0, double %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <maxnumf64>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fmaxnm d0, d0, d1
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %res = call double @llvm.maxnum(double %0, double %1)
   ret double %res
@@ -83,14 +81,13 @@ define float @maxnumf32_noreuse(float %0, float %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <maxnumf32_noreuse>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fmaxnm s1, s0, s1
 ; ARM64-NEXT:    fadd s0, s0, s1
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %cs = call float @llvm.maxnum(float %0, float %1)
   %res = fadd float %0, %cs
@@ -115,14 +112,13 @@ define double @maxnumf64_noreuse(double %0, double %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <maxnumf64_noreuse>:
-; ARM64:         sub sp, sp, #0xa0
-; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fmaxnm d1, d0, d1
 ; ARM64-NEXT:    fadd d0, d0, d1
-; ARM64-NEXT:    ldp x29, x30, [sp]
-; ARM64-NEXT:    add sp, sp, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %cs = call double @llvm.maxnum(double %0, double %1)
   %res = fadd double %0, %cs
