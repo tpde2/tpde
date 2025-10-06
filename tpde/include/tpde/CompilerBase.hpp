@@ -1595,14 +1595,21 @@ void CompilerBase<Adaptor, Derived, Config>::generate_switch(
   const auto spilled = this->spill_before_branch();
   this->begin_branch_region();
 
-  // because some blocks might have PHI-values we need to first jump to a
-  // label which then fixes the registers and then jumps to the block
-  // TODO(ts): check which blocks need PHIs and otherwise jump directly to
-  // them? probably better for branch predictor
-
   tpde::util::SmallVector<tpde::Label, 64> case_labels;
+  // Labels that need an intermediate block to setup registers. This is
+  // separate, because most switch targets don't need this.
+  tpde::util::SmallVector<std::pair<tpde::Label, IRBlockRef>, 64> case_blocks;
   for (auto i = 0u; i < cases.size(); ++i) {
-    case_labels.push_back(this->text_writer.label_create());
+    // If the target might need additional register moves, we can't branch there
+    // immediately.
+    // TODO: more precise condition?
+    BlockIndex target = this->analyzer.block_idx(cases[i].second);
+    if (analyzer.block_has_phis(target)) {
+      case_labels.push_back(this->text_writer.label_create());
+      case_blocks.emplace_back(case_labels.back(), cases[i].second);
+    } else {
+      case_labels.push_back(this->block_labels[u32(target)]);
+    }
   }
 
   const auto default_label = this->text_writer.label_create();
@@ -1693,10 +1700,13 @@ void CompilerBase<Adaptor, Derived, Config>::generate_switch(
   derived()->generate_branch_to_block(
       Derived::Jump::jmp, default_block, false, false);
 
-  for (auto i = 0u; i < cases.size(); ++i) {
-    this->label_place(case_labels[i]);
+  for (const auto &[label, target] : case_blocks) {
+    // Branch predictors typically have problems if too many branches follow too
+    // closely. Ensure a minimum alignment.
+    this->text_writer.align(8);
+    this->label_place(label);
     derived()->generate_branch_to_block(
-        Derived::Jump::jmp, cases[i].second, false, false);
+        Derived::Jump::jmp, target, false, false);
   }
 
   this->end_branch_region();

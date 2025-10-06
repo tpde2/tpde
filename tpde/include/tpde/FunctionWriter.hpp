@@ -178,7 +178,9 @@ public:
 
   /// Reference label at given offset inside the code section.
   void label_ref(Label label, u32 off, LabelFixupKind kind) noexcept {
-    assert(label_is_pending(label));
+    // We also permit this to be called even if label is already placed to
+    // simplify code at the call site. It might be preferable, however, to
+    // immediately write the final value.
     label_fixups.emplace_back(LabelFixup{label, off, kind});
   }
 

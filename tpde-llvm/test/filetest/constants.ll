@@ -1463,15 +1463,14 @@ define i32 @phi_gep_insert_after_earlier_phi() {
 ; X64-NEXT:    je <L1>
 ; X64-NEXT:    jmp <L2>
 ; X64-NEXT:  <L2>:
-; X64-NEXT:    jmp <L3>
-; X64-NEXT:  <L0>:
-; X64-NEXT:    jmp <L3>
+; X64-NEXT:    jmp <L0>
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:  <L1>:
 ; X64-NEXT:    mov rbx, rax
-; X64-NEXT:    jmp <L4>
-; X64-NEXT:  <L3>:
+; X64-NEXT:    jmp <L3>
+; X64-NEXT:  <L0>:
 ; X64-NEXT:    xor ebx, ebx
-; X64-NEXT:  <L4>:
+; X64-NEXT:  <L3>:
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    pop rbx
 ; X64-NEXT:    pop rbp
@@ -1488,12 +1487,12 @@ define i32 @phi_gep_insert_after_earlier_phi() {
 ; ARM64-NEXT:    add x0, x0, #0x28
 ; ARM64-NEXT:    mov w1, #0x0 // =0
 ; ARM64-NEXT:    cmp w1, #0x0
-; ARM64-NEXT:    b.eq 0xb7c <phi_gep_insert_after_earlier_phi+0x3c>
+; ARM64-NEXT:    b.eq 0xb88 <phi_gep_insert_after_earlier_phi+0x48>
 ; ARM64-NEXT:    cmp w1, #0x1
 ; ARM64-NEXT:    b.eq 0xb80 <phi_gep_insert_after_earlier_phi+0x40>
 ; ARM64-NEXT:    b 0xb78 <phi_gep_insert_after_earlier_phi+0x38>
 ; ARM64-NEXT:    b 0xb88 <phi_gep_insert_after_earlier_phi+0x48>
-; ARM64-NEXT:    b 0xb88 <phi_gep_insert_after_earlier_phi+0x48>
+; ARM64-NEXT:    udf #0x0
 ; ARM64-NEXT:    mov x19, x0
 ; ARM64-NEXT:    b 0xb8c <phi_gep_insert_after_earlier_phi+0x4c>
 ; ARM64-NEXT:    mov w19, #0x0 // =0
