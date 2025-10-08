@@ -1136,24 +1136,7 @@ template <IRAdaptor Adaptor,
           template <typename, typename, typename> typename BaseTy,
           typename Config>
 void CompilerA64<Adaptor, Derived, BaseTy, Config>::gen_func_epilog() noexcept {
-  // epilogue:
-  // if !func_has_dynamic_alloca:
-  //   ldp x29, x30, [sp]
-  // else:
-  //   mov sp, fp
-  // for each saved reg pair:
-  //   if func_has_dynamic_alloca:
-  //     ldp r1, r2, [fp, #<off>]
-  //   else:
-  //     ldp r1, r2, [sp, #<off>]
-  // if func_has_dynamic_alloca:
-  //   ldp x29, x30, [sp]
-  // add sp, sp, #<frame_size>
-  // ret
-  //
-  // however, since we will later patch this, we only
-  // reserve the space for now
-
+  // Patched at the end, just reserve the space here.
   func_ret_offs.push_back(this->text_writer.offset());
   this->text_writer.ensure_space(func_epilogue_alloc);
   this->text_writer.cur_ptr() += func_epilogue_alloc;

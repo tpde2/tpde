@@ -336,8 +336,7 @@ struct CompilerX64 : BaseTy<Adaptor, Derived, Config> {
   // since they are clobbered there
   u64 fixed_assignment_nonallocatable_mask =
       create_bitmask({AsmReg::AX, AsmReg::DX, AsmReg::CX});
-  u32 func_start_off = 0u, func_reg_save_off = 0u, func_reg_save_alloc = 0u,
-      func_reg_restore_alloc = 0u;
+  u32 func_start_off = 0u, func_prologue_alloc = 0u, func_epilogue_alloc = 0u;
   /// For vararg functions only: number of scalar and xmm registers used.
   // TODO: this information should be obtained from the CCAssigner.
   u32 scalar_arg_count = 0xFFFF'FFFF, vec_arg_count = 0xFFFF'FFFF;
@@ -589,27 +588,24 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::gen_func_prolog_and_args(
 
   const CCInfo &cc_info = cc_assigner->get_ccinfo();
 
-  ASM(PUSHr, FE_BP);
-  ASM(MOV64rr, FE_BP, FE_SP);
-
-  func_reg_save_off = this->text_writer.offset();
-
   auto csr = cc_info.callee_saved_regs;
   assert(!(csr & ~this->register_file.bank_regs(Config::GP_BANK)) &&
          "non-gp callee-saved registers not implemented");
 
   u32 csr_logp = std::popcount((csr >> AsmReg::AX) & 0xff);
   u32 csr_higp = std::popcount((csr >> AsmReg::R8) & 0xff);
-  // R8 and higher need a REX prefix; 7 bytes for sub rsp.
-  u32 reg_save_size = 1 * csr_logp + 2 * csr_higp + 7;
+  // R8 and higher need a REX prefix
+  u32 reg_save_size = 1 * csr_logp + 2 * csr_higp;
   this->stack.frame_size = 8 * (csr_logp + csr_higp);
   max_callee_stack_arg_size = 0;
 
-  this->text_writer.ensure_space(reg_save_size);
-  this->text_writer.cur_ptr() += reg_save_size;
-  func_reg_save_alloc = reg_save_size;
-  // pop uses the same amount of bytes as push
-  func_reg_restore_alloc = reg_save_size;
+  // 11 bytes for push rbp/mov rbp, rsp/sub rsp
+  func_prologue_alloc = reg_save_size + 11;
+  this->text_writer.ensure_space(func_prologue_alloc);
+  this->text_writer.cur_ptr() += func_prologue_alloc;
+  // pop has the same size as push; add/sub reg,imm32 and lea rsp, [rbp-imm32]
+  // have 7 bytes; pop rbp has 1 byte; ret has 1 byte.
+  func_epilogue_alloc = reg_save_size + 9;
 
   // TODO(ts): support larger stack alignments?
 
@@ -736,7 +732,9 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::finish_func(
   auto fde_prologue_adv_off = this->assembler.eh_writer.size();
   this->assembler.eh_write_inst(dwarf::DW_CFA_advance_loc, 0);
 
-  auto *write_ptr = this->text_writer.begin_ptr() + func_reg_save_off;
+  auto *write_ptr = this->text_writer.begin_ptr() + func_start_off;
+  write_ptr += fe64_PUSHr(write_ptr, 0, FE_BP);
+  write_ptr += fe64_MOV64rr(write_ptr, 0, FE_BP, FE_SP);
   const CCInfo &ccinfo = derived()->cur_cc_assigner()->get_ccinfo();
   auto csr = ccinfo.callee_saved_regs;
   u64 saved_regs = this->register_file.clobbered & csr;
@@ -790,16 +788,13 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::finish_func(
 
   u32 prologue_size =
       write_ptr - (this->text_writer.begin_ptr() + func_start_off);
-  assert(prologue_size < 0x44);
+  assert(prologue_size <= func_prologue_alloc);
+  assert(prologue_size < 0x44 && "cannot encode too large prologue in DWARF");
   this->assembler.eh_writer.data()[fde_prologue_adv_off] =
       dwarf::DW_CFA_advance_loc | (prologue_size - 4);
 
   // nop out the rest
-  const auto reg_save_end =
-      this->text_writer.begin_ptr() + func_reg_save_off + func_reg_save_alloc;
-  assert(reg_save_end >= write_ptr);
-  const u32 nop_len = reg_save_end - write_ptr;
-  if (nop_len) {
+  if (u32 nop_len = func_prologue_alloc - prologue_size) {
     fe64_NOP(write_ptr, nop_len);
   }
 
@@ -818,7 +813,7 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::finish_func(
   auto *text_data = this->text_writer.begin_ptr();
   u32 first_ret_off = func_ret_offs[0];
   u32 ret_size = 0;
-  u32 epilogue_size = 7 + 1 + 1 + func_reg_restore_alloc; // add + pop + ret
+  u32 epilogue_size = func_epilogue_alloc;
   u32 func_end_ret_off = this->text_writer.offset() - epilogue_size;
   {
     write_ptr = text_data + first_ret_off;
@@ -888,31 +883,10 @@ template <IRAdaptor Adaptor,
           template <typename, typename, typename> typename BaseTy,
           typename Config>
 void CompilerX64<Adaptor, Derived, BaseTy, Config>::gen_func_epilog() noexcept {
-  // epilogue:
-  // if !func_has_dynamic_alloca:
-  //   add rsp, #<frame_size>+<largest_call_frame_usage>
-  // else:
-  //   lea rsp, [rbp - <size_of_reg_save_area>]
-  // for each saved reg:
-  //   pop <reg>
-  // pop rbp
-  // ret
-  //
-  // however, since we will later patch this, we only
-  // reserve the space for now
-
+  // Patched at the end, just reserve the space here.
   func_ret_offs.push_back(this->text_writer.offset());
-
-  // add reg, imm32
-  // and
-  // lea rsp, [rbp - imm32]
-  // both take 7 bytes
-  u32 epilogue_size =
-      7 + 1 + 1 +
-      func_reg_restore_alloc; // add/lea + pop + ret + size of reg restore
-
-  this->text_writer.ensure_space(epilogue_size);
-  this->text_writer.cur_ptr() += epilogue_size;
+  this->text_writer.ensure_space(func_epilogue_alloc);
+  this->text_writer.cur_ptr() += func_epilogue_alloc;
 }
 
 template <IRAdaptor Adaptor,

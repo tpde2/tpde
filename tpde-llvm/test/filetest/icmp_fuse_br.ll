@@ -19,8 +19,7 @@ define i8 @icmp_eq_i8_0_br(i8 %0) {
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax + rax]
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    mov eax, 0x2
 ; X64-NEXT:    pop rbp
@@ -63,8 +62,7 @@ define i8 @icmp_eq_i32_0_br(i32 %0) {
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax + rax]
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    mov eax, 0x2
 ; X64-NEXT:    pop rbp
@@ -106,8 +104,7 @@ define i8 @icmp_ne_i32_0_br(i32 %0) {
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax + rax]
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    mov eax, 0x2
 ; X64-NEXT:    pop rbp
@@ -149,8 +146,7 @@ define i8 @icmp_ne_i64_0_br(i64 %0) {
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax + rax]
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    mov eax, 0x2
 ; X64-NEXT:    pop rbp
@@ -193,8 +189,7 @@ define i8 @icmp_eq_i8_1_br(i8 %0) {
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax + rax]
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    mov eax, 0x2
 ; X64-NEXT:    pop rbp
@@ -238,8 +233,7 @@ define i8 @icmp_eq_i32_1_br(i32 %0) {
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax + rax]
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    mov eax, 0x2
 ; X64-NEXT:    pop rbp
@@ -282,8 +276,7 @@ define i8 @icmp_ne_i32_1_br(i32 %0) {
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax + rax]
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    mov eax, 0x2
 ; X64-NEXT:    pop rbp
@@ -327,8 +320,7 @@ define i8 @icmp_ugt_i32_1_br(i32 %0) {
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax + rax]
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    mov eax, 0x2
 ; X64-NEXT:    pop rbp
@@ -371,8 +363,7 @@ define i8 @icmp_uge_i32_1_br(i32 %0) {
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax + rax]
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    mov eax, 0x2
 ; X64-NEXT:    pop rbp
@@ -415,8 +406,7 @@ define i8 @icmp_ult_i32_1_br(i32 %0) {
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax + rax]
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    mov eax, 0x2
 ; X64-NEXT:    pop rbp
@@ -459,8 +449,7 @@ define i8 @icmp_ule_i32_1_br(i32 %0) {
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax + rax]
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    mov eax, 0x2
 ; X64-NEXT:    pop rbp
@@ -503,8 +492,7 @@ define i8 @icmp_sgt_i32_1_br(i32 %0) {
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax + rax]
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    mov eax, 0x2
 ; X64-NEXT:    pop rbp
@@ -547,8 +535,7 @@ define i8 @icmp_sge_i32_1_br(i32 %0) {
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax + rax]
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    mov eax, 0x2
 ; X64-NEXT:    pop rbp
@@ -591,8 +578,7 @@ define i8 @icmp_slt_i32_1_br(i32 %0) {
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax + rax]
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    mov eax, 0x2
 ; X64-NEXT:    pop rbp
@@ -635,8 +621,7 @@ define i8 @icmp_sle_i32_1_br(i32 %0) {
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax + rax]
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    mov eax, 0x2
 ; X64-NEXT:    pop rbp
@@ -686,7 +671,6 @@ define i8 @icmp_eq_i32_0_br_no_salvage(i32 %0) {
 ; X64-NEXT:    ret
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    mov eax, 0x2
 ; X64-NEXT:    pop rbx

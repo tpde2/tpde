@@ -60,8 +60,7 @@ define @condbr1(%a, %b) {
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax + rax]
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    mov rax, qword ptr [rbp - 0x30]
 ; X64-NEXT:    pop rbp
@@ -80,8 +79,7 @@ define @condbr1(%a, %b) {
 ; X64-FIXED-NEXT:    pop rbp
 ; X64-FIXED-NEXT:    ret
 ; X64-FIXED-NEXT:    nop word ptr [rax + rax]
-; X64-FIXED-NEXT:    nop word ptr [rax + rax]
-; X64-FIXED-NEXT:    nop dword ptr [rax + rax]
+; X64-FIXED-NEXT:    nop dword ptr [rax]
 ; X64-FIXED-NEXT:  <L0>:
 ; X64-FIXED-NEXT:    mov rax, rdi
 ; X64-FIXED-NEXT:    pop rbp
@@ -143,8 +141,7 @@ define @condbr2(%a, %b) {
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax + rax]
+; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    mov rax, qword ptr [rbp - 0x30]
 ; X64-NEXT:    pop rbp
@@ -163,8 +160,7 @@ define @condbr2(%a, %b) {
 ; X64-FIXED-NEXT:    pop rbp
 ; X64-FIXED-NEXT:    ret
 ; X64-FIXED-NEXT:    nop word ptr [rax + rax]
-; X64-FIXED-NEXT:    nop word ptr [rax + rax]
-; X64-FIXED-NEXT:    nop dword ptr [rax + rax]
+; X64-FIXED-NEXT:    nop dword ptr [rax]
 ; X64-FIXED-NEXT:  <L0>:
 ; X64-FIXED-NEXT:    mov rax, r10
 ; X64-FIXED-NEXT:    pop rbp

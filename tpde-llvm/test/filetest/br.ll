@@ -52,7 +52,6 @@ define i64 @condbr0(i64 %0, i1 %1) {
 ; X64-NEXT:    ret
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    lea rbx, [rbx + 0xa]
 ; X64-NEXT:    mov rax, rbx
@@ -105,7 +104,6 @@ define i64 @condbr1(i64 %0, i1 %1) {
 ; X64-NEXT:    ret
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    mov rax, rbx
 ; X64-NEXT:    pop rbx
