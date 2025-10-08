@@ -793,6 +793,7 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::gen_func_prolog_and_args(
   // TODO(ts): support larger stack alignments?
 
   if (this->adaptor->cur_is_vararg()) [[unlikely]] {
+    this->stack.frame_used = true;
     reg_save_frame_off = this->stack.frame_size;
     // We additionally store a pointer to the stack area, which we can't compute
     // with a constant offset from the frame pointer. Add 16 bytes to maintain
@@ -1164,6 +1165,7 @@ template <IRAdaptor Adaptor,
           typename Config>
 void CompilerA64<Adaptor, Derived, BaseTy, Config>::spill_reg(
     const AsmReg reg, const u32 frame_off, const u32 size) noexcept {
+  assert(this->stack.frame_used);
   assert((size & (size - 1)) == 0);
   assert(util::align_up(frame_off, size) == frame_off);
   // We don't support stack frames that aren't encodeable with add/sub.
@@ -1209,6 +1211,7 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::load_from_stack(
     const i32 frame_off,
     const u32 size,
     const bool sign_extend) noexcept {
+  assert(this->stack.frame_used);
   assert((size & (size - 1)) == 0);
   assert(util::align_up(frame_off, size) == frame_off);
   // We don't support stack frames that aren't encodeable with add/sub.
@@ -1263,6 +1266,7 @@ template <IRAdaptor Adaptor,
           typename Config>
 void CompilerA64<Adaptor, Derived, BaseTy, Config>::load_address_of_stack_var(
     const AsmReg dst, const AssignmentPartRef ap) noexcept {
+  assert(this->stack.frame_used);
   auto frame_off = ap.variable_stack_off();
   assert(frame_off >= 0);
   if (!ASMIF(ADDxi, dst, DA_GP(29), frame_off)) {
@@ -1396,6 +1400,8 @@ template <IRAdaptor Adaptor,
           typename Config>
 void CompilerA64<Adaptor, Derived, BaseTy, Config>::alloca_fixed(
     u64 size, u32 align, ValuePart &res) noexcept {
+  assert(this->stack.has_dynamic_alloca &&
+         "function marked as not having dynamic allocas can't have alloca");
   assert(align != 0 && (align & (align - 1)) == 0 && "invalid alignment");
   size = tpde::util::align_up(size, 16);
   AsmReg res_reg = res.alloc_reg(this);
@@ -1426,6 +1432,8 @@ template <IRAdaptor Adaptor,
           typename Config>
 void CompilerA64<Adaptor, Derived, BaseTy, Config>::alloca_dynamic(
     u64 elem_size, ValuePart &&count, u32 align, ValuePart &res) noexcept {
+  assert(this->stack.has_dynamic_alloca &&
+         "function marked as not having dynamic allocas can't have alloca");
   assert(align != 0 && (align & (align - 1)) == 0 && "invalid alignment");
   AsmReg size_reg = count.has_reg() ? count.cur_reg() : count.load_to_reg(this);
   AsmReg res_reg = res.alloc_try_reuse(this, count);

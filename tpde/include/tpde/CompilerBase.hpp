@@ -140,6 +140,9 @@ struct CompilerBase {
     /// If a function has no calls, this will allow using the red zone
     /// guaranteed by some ABIs.
     bool generated_call;
+    /// Whether the stack frame is used. If the stack frame is never used, the
+    /// frame setup can in some cases be omitted entirely.
+    bool frame_used;
     /// Free-Lists for 1/2/4/8/16 sized allocations
     // TODO(ts): make the allocations for 4/8 different from the others
     // since they are probably the one's most used?
@@ -984,6 +987,7 @@ void CompilerBase<Adaptor, Derived, Config>::init_variable_ref(
 template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>
 i32 CompilerBase<Adaptor, Derived, Config>::allocate_stack_slot(
     u32 size) noexcept {
+  this->stack.frame_used = true;
   unsigned align_bits = 4;
   if (size == 0) {
     return 0; // 0 is the "invalid" stack slot
@@ -2133,6 +2137,7 @@ bool CompilerBase<Adaptor, Derived, Config>::compile_func(
   stack.has_dynamic_alloca = this->adaptor->cur_has_dynamic_alloca();
   stack.is_leaf_function = !derived()->cur_func_may_emit_calls();
   stack.generated_call = false;
+  stack.frame_used = false;
 
   assignments.cur_fixed_assignment_count = {};
   assert(std::ranges::none_of(assignments.value_ptrs, std::identity{}));

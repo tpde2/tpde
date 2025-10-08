@@ -614,6 +614,7 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::gen_func_prolog_and_args(
   // TODO(ts): support larger stack alignments?
 
   if (this->adaptor->cur_is_vararg()) {
+    this->stack.frame_used = true;
     this->stack.frame_size += 6 * 8 + 8 * 16;
     reg_save_frame_off = this->stack.frame_size;
     auto mem = FE_MEM(FE_BP, 0, FE_NOREG, -(i32)reg_save_frame_off);
@@ -682,6 +683,7 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::gen_func_prolog_and_args(
             return {};
           }
 
+          this->stack.frame_used = true;
           if (cca.byval) {
             // Return byval frame_off.
             return 0x10 + cca.stack_off;
@@ -919,6 +921,7 @@ template <IRAdaptor Adaptor,
           typename Config>
 void CompilerX64<Adaptor, Derived, BaseTy, Config>::spill_reg(
     const AsmReg reg, const i32 frame_off, const u32 size) noexcept {
+  assert(this->stack.frame_used);
   this->text_writer.ensure_space(16);
   assert(frame_off < 0);
   const auto mem = FE_MEM(FE_BP, 0, FE_NOREG, frame_off);
@@ -950,6 +953,7 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::load_from_stack(
     const i32 frame_off,
     const u32 size,
     const bool sign_extend) noexcept {
+  assert(this->stack.frame_used);
   this->text_writer.ensure_space(16);
   const auto mem = FE_MEM(FE_BP, 0, FE_NOREG, frame_off);
 
@@ -990,6 +994,7 @@ template <IRAdaptor Adaptor,
           typename Config>
 void CompilerX64<Adaptor, Derived, BaseTy, Config>::load_address_of_stack_var(
     const AsmReg dst, const AssignmentPartRef ap) noexcept {
+  assert(this->stack.frame_used);
   ASM(LEA64rm, dst, FE_MEM(FE_BP, 0, FE_NOREG, ap.variable_stack_off()));
 }
 
