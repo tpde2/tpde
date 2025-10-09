@@ -446,16 +446,48 @@ bool compile_ret(IRInstRef inst) {
 ```
 
 ## Branches
-- branching mostly handled by the compiler
-- use `generate_branch_to_block` from the architecture compiler to emit an (un)conditional branch, arguments are architecture-specific
-- before calling it, need to call [spill_before_branch](@ref CompilerBase::spill_before_branch) so that values which live across blocks
-  can be spilled and [begin_branch_region](@ref CompilerBase::begin_branch_region) which asserts that no value assignments are changed during branching
-- after all branches are generated, call [end_branch_region](@ref CompilerBase::end_branch_region) to end code generation for branches and [release_spilled_regs](@ref CompilerBase::release_spilled_regs) so the register allocator can free values which can no longer be assumed to be in registers after the branch
+There are high-level functions to generate branches/switches and low-level primitives for more special use cases.
 
 > [!warning]
-> Never emit a branch to a block other than using `generate_branch_to_block`
+> Never emit a branch to a block other than using `generate_branch_to_block` or the high-level functions that do this internally.
 
-### Unconditional branch
+### High-Level Functions
+- These functions can only be called at the end of a block. No value parts must be locked when these functions are called.
+- Unconditional branches can be generated with [generate_uncond_branch](@ref tpde::CompilerBase::generate_uncond_branch).
+- Conditional branches can be generated with [generate_cond_branch](@ref tpde::CompilerBase::generate_cond_branch). The possible branching conditions are architecture-specific. Typically the branch condition involves reading the status flags register, this must be set beforehand. The function might invert the branch condition to implicitly fall through to the next block.
+- Switches over integers can be generated with [generate_switch](@ref tpde::CompilerBase::generate_switch). The switch operand must be in a single register, only switches up to 64 bits are supported.
+
+```cpp
+bool compile_br(IRInstRef inst) {
+    IRBlockRef target = /* IR-specific way to get target block ref */;
+    this->generate_uncond_branch(target);
+    return true;
+}
+bool compile_condbr(IRInstRef inst) {
+    IRValueRef cond_val = /* IR-specific way to get condition */;
+    IRBlockRef true_target = /* IR-specific way to get block ref */;
+    IRBlockRef false_target = /* IR-specific way to get block ref */;
+
+    // Note: the condition must not be locked and must be ref-counted when
+    // generate_cond_branch is called.
+    {
+        auto [cond_ref, cond_part] = this->val_ref_single(cond_val);
+        ASM(CMP32ri, cond_part.load_to_reg(), 0);
+    }
+
+    this->generate_cond_branch(Jump::jne, true_target, false_target);
+    return true;
+}
+```
+
+### Low-Level Branching Functions
+- branching mostly handled by the compiler
+- use `generate_branch_to_block` from the architecture compiler to emit an (un)conditional branch, arguments are architecture-specific
+- before calling it, need to call [spill_before_branch](@ref tpde::CompilerBase::spill_before_branch) so that values which live across blocks
+  can be spilled and [begin_branch_region](@ref tpde::CompilerBase::begin_branch_region) which asserts that no value assignments are changed during branching
+- after all branches are generated, call [end_branch_region](@ref tpde::CompilerBase::end_branch_region) to end code generation for branches and [release_spilled_regs](@ref tpde::CompilerBase::release_spilled_regs) so the register allocator can free values which can no longer be assumed to be in registers after the branch
+
+#### Unconditional branch
 - need to get `IRBlockRef` to jump to
 - straightforward
 ```cpp
@@ -475,7 +507,7 @@ bool compile_br(IRInstRef inst) {
 ```
 - split only relevant to conditional branches
 
-### Conditional branch
+#### Conditional branch
 - a bit more involved but can also be simple
 - suppose jump to false block only when lower 32 bit 0, otherwise true block
 - need to ask framework whether branch to block needs to be split
@@ -510,7 +542,7 @@ bool compile_condbr(IRInstRef inst) {
 ```
 
 - want to optimize this, since we want to avoid branch to block that comes directly after
-- a bit more involved but code can be easily reused
+- a bit more involved; it is typically preferable to call @ref tpde::CompilerBase::generate_cond_branch instead.
 ```cpp
 bool compile_condbr(IRInstRef inst) {
     IRValueRef cond_val = /* IR-specific way to get condition */;

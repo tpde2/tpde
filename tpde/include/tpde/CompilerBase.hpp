@@ -429,6 +429,17 @@ public:
   /// registers which don't contain any values
   void release_regs_after_return() noexcept;
 
+  /// Generate an unconditional branch at the end of a basic block. No further
+  /// instructions must follow. If target is the next block in the block order,
+  /// the branch is omitted.
+  void generate_uncond_branch(IRBlockRef target) noexcept;
+
+  /// Generate an conditional branch at the end of a basic block.
+  template <typename Jump>
+  void generate_cond_branch(Jump jmp,
+                            IRBlockRef true_target,
+                            IRBlockRef false_target) noexcept;
+
   /// Generate a switch at the end of a basic block. Only the lowest bits of the
   /// condition are considered. The condition must be a general-purpose
   /// register. The cases must be sorted and every case value must appear at
@@ -1567,6 +1578,51 @@ void CompilerBase<Adaptor, Derived, Config>::
       free_reg(Reg{reg_id});
     }
   }
+}
+
+template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>
+void CompilerBase<Adaptor, Derived, Config>::generate_uncond_branch(
+    IRBlockRef target) noexcept {
+  auto spilled = spill_before_branch();
+  begin_branch_region();
+
+  derived()->generate_branch_to_block(Derived::Jump::jmp, target, false, true);
+
+  end_branch_region();
+  release_spilled_regs(spilled);
+}
+
+template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>
+template <typename Jump>
+void CompilerBase<Adaptor, Derived, Config>::generate_cond_branch(
+    Jump jmp, IRBlockRef true_target, IRBlockRef false_target) noexcept {
+  IRBlockRef next = analyzer.block_ref(next_block());
+
+  bool true_needs_split = branch_needs_split(true_target);
+  bool false_needs_split = branch_needs_split(false_target);
+
+  auto spilled = spill_before_branch();
+  begin_branch_region();
+
+  if (next == true_target || (next != false_target && true_needs_split)) {
+    derived()->generate_branch_to_block(
+        derived()->invert_jump(jmp), false_target, false_needs_split, false);
+    derived()->generate_branch_to_block(
+        Derived::Jump::jmp, true_target, false, true);
+  } else if (next == false_target) {
+    derived()->generate_branch_to_block(
+        jmp, true_target, true_needs_split, false);
+    derived()->generate_branch_to_block(
+        Derived::Jump::jmp, false_target, false, true);
+  } else {
+    assert(!true_needs_split);
+    derived()->generate_branch_to_block(jmp, true_target, false, false);
+    derived()->generate_branch_to_block(
+        Derived::Jump::jmp, false_target, false, true);
+  }
+
+  end_branch_region();
+  release_spilled_regs(spilled);
 }
 
 template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>

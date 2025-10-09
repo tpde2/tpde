@@ -781,15 +781,7 @@ bool compile_br(IRInstRef inst) noexcept {
     const TestIR::Value &value = ir()->values[static_cast<u32>(inst_idx)];
 
     IRBlockRef target = this->ir()->value_operands[value.op_begin_idx];
-    
-    const auto spilled = this->spill_before_branch();
-    this->begin_branch_region();
-
-    this->generate_branch_to_block(Jump::jmp, target, /* needs_split = */ false, /* last_inst = */ true);
-
-    this->end_branch_region();
-    this->release_spilled_regs(spilled);
- 
+    this->generate_uncond_branch(target);
     return true;
 }
 ```
@@ -800,33 +792,6 @@ Conditional branches require us to do the comparisons (as they are built into th
 select the suitable branch condition. Otherwise we can copy from the reference again.
 
 ```cpp
-void generate_condbr(tpde::x64::CompilerX64::Jump cc, 
-    IRBlockRef true_target, IRBlockRef false_target) noexcept {
-    
-    bool true_needs_split = this->branch_needs_split(true_target);
-    bool false_needs_split = this->branch_needs_split(false_target);
-    const IRBlockRef next_block = this->analyzer.block_ref(this->next_block());
-
-    // let the framework spill
-    const auto spilled = this->spill_before_branch();
-    this->begin_branch_region();
-
-    if (next_block == true_target || (next_block != false_target && true_needs_split)) {
-        // if the following block is the true target or if we have to always emit a branch but a branch to the true block
-        // is heavy (i.e. needs to be split) then we want to first jump to the false block
-        this->generate_branch_to_block(this->invert_jump(cc), false_target, false_needs_split, /* last_inst = */ false);
-        // if the next block is the true_target, then the jump will not be emitted
-        this->generate_branch_to_block(Jump::jmp, true_target, /* needs_split = */ false, /* last_inst = */ true);
-    } else {
-        // try to elide the branch to the false_target
-        this->generate_branch_to_block(cc, true_target, true_needs_split, /* last_inst = */ false);
-        this->generate_branch_to_block(Jump::jmp, false_target, /* needs_split = */ false, /* last_inst = */ true);
-    }
-
-    this->end_branch_region();
-    this->release_spilled_regs(spilled);
-}
-
 bool compile_condbr(IRInstRef inst) noexcept {
     const TestIR::Value &value = ir()->values[static_cast<u32>(inst_idx)];
 
@@ -840,7 +805,7 @@ bool compile_condbr(IRInstRef inst) noexcept {
     ASM(CMP64ri, cond_reg, 0);
 
     // we want to jump to the true target of the condition is not zero, so Jump::jne
-    this->generate_condbr(Jump::jne, true_target, false_target);
+    this->generate_cond_branch(Jump::jne, true_target, false_target);
     return true;
 }
 
@@ -866,7 +831,7 @@ bool compile_tbz(IRInstRef inst) noexcept {
         ASM(BT64ri, cond_reg, bit_idx);
     }
 
-    this->generate_condbr(cc, true_target, false_target);
+    this->generate_cond_branch(cc, true_target, false_target);
     return true;
 }
 ```

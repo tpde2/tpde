@@ -95,9 +95,6 @@ struct LLVMCompilerArm64 : tpde::a64::CompilerA64<LLVMAdaptor,
                       GenericValuePart el) noexcept;
 
   bool compile_br(const llvm::Instruction *, const ValInfo &, u64) noexcept;
-  void generate_conditional_branch(Jump jmp,
-                                   IRBlockRef true_target,
-                                   IRBlockRef false_target) noexcept;
   bool compile_inline_asm(const llvm::CallBase *) noexcept;
   bool compile_icmp(const llvm::Instruction *, const ValInfo &, u64) noexcept;
   void compile_i32_cmp_zero(AsmReg reg, llvm::CmpInst::Predicate p) noexcept;
@@ -261,14 +258,7 @@ bool LLVMCompilerArm64::compile_br(const llvm::Instruction *inst,
                                    u64) noexcept {
   const auto *br = llvm::cast<llvm::BranchInst>(inst);
   if (br->isUnconditional()) {
-    auto spilled = this->spill_before_branch();
-    this->begin_branch_region();
-
-    generate_branch_to_block(
-        Jump::jmp, adaptor->block_lookup_idx(br->getSuccessor(0)), false, true);
-
-    this->end_branch_region();
-    release_spilled_regs(spilled);
+    generate_uncond_branch(adaptor->block_lookup_idx(br->getSuccessor(0)));
     return true;
   }
 
@@ -282,37 +272,9 @@ bool LLVMCompilerArm64::compile_br(const llvm::Instruction *inst,
     ASM(TSTwi, cond_reg, 1);
   }
 
-  generate_conditional_branch(Jump::Jne, true_block, false_block);
+  generate_cond_branch(Jump::Jne, true_block, false_block);
 
   return true;
-}
-
-void LLVMCompilerArm64::generate_conditional_branch(
-    Jump jmp, IRBlockRef true_target, IRBlockRef false_target) noexcept {
-  const auto next_block = this->analyzer.block_ref(this->next_block());
-
-  const auto true_needs_split = this->branch_needs_split(true_target);
-  const auto false_needs_split = this->branch_needs_split(false_target);
-
-  const auto spilled = this->spill_before_branch();
-  this->begin_branch_region();
-
-  if (next_block == true_target ||
-      (next_block != false_target && true_needs_split)) {
-    generate_branch_to_block(
-        invert_jump(jmp), false_target, false_needs_split, false);
-    generate_branch_to_block(Jump::jmp, true_target, false, true);
-  } else if (next_block == false_target) {
-    generate_branch_to_block(jmp, true_target, true_needs_split, false);
-    generate_branch_to_block(Jump::jmp, false_target, false, true);
-  } else {
-    assert(!true_needs_split);
-    this->generate_branch_to_block(jmp, true_target, false, false);
-    this->generate_branch_to_block(Jump::jmp, false_target, false, true);
-  }
-
-  this->end_branch_region();
-  this->release_spilled_regs(spilled);
 }
 
 bool LLVMCompilerArm64::compile_inline_asm(
@@ -462,7 +424,7 @@ bool LLVMCompilerArm64::compile_icmp(const llvm::Instruction *inst,
         Jump cbz{jump_kind, lhs_reg, int_width <= 32};
         auto true_block = adaptor->block_lookup_idx(fuse_br->getSuccessor(0));
         auto false_block = adaptor->block_lookup_idx(fuse_br->getSuccessor(1));
-        generate_conditional_branch(cbz, true_block, false_block);
+        generate_cond_branch(cbz, true_block, false_block);
         this->adaptor->inst_set_fused(fuse_br, true);
         return true;
       }
@@ -501,7 +463,7 @@ bool LLVMCompilerArm64::compile_icmp(const llvm::Instruction *inst,
     }
     auto true_block = adaptor->block_lookup_idx(fuse_br->getSuccessor(0));
     auto false_block = adaptor->block_lookup_idx(fuse_br->getSuccessor(1));
-    generate_conditional_branch(jump, true_block, false_block);
+    generate_cond_branch(jump, true_block, false_block);
     this->adaptor->inst_set_fused(fuse_br, true);
   } else if (fuse_ext) {
     auto [_, res_ref] = this->result_ref_single(fuse_ext);
