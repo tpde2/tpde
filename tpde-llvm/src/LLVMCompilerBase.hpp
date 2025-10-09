@@ -12,6 +12,7 @@
 #include <llvm/IR/GlobalIFunc.h>
 #include <llvm/IR/GlobalObject.h>
 #include <llvm/IR/GlobalValue.h>
+#include <llvm/IR/GlobalVariable.h>
 #include <llvm/IR/Instruction.h>
 #include <llvm/IR/Instructions.h>
 #include <llvm/IR/IntrinsicInst.h>
@@ -23,7 +24,7 @@
 #include <llvm/Support/TimeProfiler.h>
 #include <llvm/Support/raw_ostream.h>
 
-
+#include "tpde/Assembler.hpp"
 #include "tpde/CompilerBase.hpp"
 #include "tpde/ValLocalIdx.hpp"
 #include "tpde/ValueAssignment.hpp"
@@ -775,89 +776,55 @@ LLVMCompilerBase<Adaptor, Derived, Config>::SecRef
   }
 
   // I'm certain this simplified section assignment code is buggy...
-  bool tls = false;
-  bool read_only = true;
-  bool init_zero = false;
-  bool is_func = llvm::isa<llvm::Function>(go);
-  bool retain = used_globals.contains(go);
-  if (auto *gv = llvm::dyn_cast<llvm::GlobalVariable>(go)) {
-    tls = gv->isThreadLocal();
-    read_only = gv->isConstant();
-    init_zero = gv->getInitializer()->isNullValue();
-    assert((!init_zero || !needs_relocs) &&
-           "zero-initialized sections must not have relocations");
+  using tpde::SectionKind;
+  SectionKind kind;
+  if (llvm::isa<llvm::Function>(go)) {
+    kind = SectionKind::Text;
+  } else {
+    auto gv = llvm::cast<llvm::GlobalVariable>(go);
+    bool init_zero = gv->getInitializer()->isNullValue();
+    bool read_only = gv->isConstant();
+    if (gv->isThreadLocal()) {
+      kind = init_zero ? SectionKind::ThreadBSS : SectionKind::ThreadData;
+    } else if (!read_only && init_zero) {
+      assert(!needs_relocs && "BSS section must not have relocations");
+      kind = SectionKind::BSS;
+    } else if (read_only) {
+      kind = needs_relocs ? SectionKind::DataRelRO : SectionKind::ReadOnly;
+    } else {
+      kind = SectionKind::Data;
+    }
   }
 
+  bool retain = used_globals.contains(go);
   llvm::StringRef sec_name = go->getSection();
   const llvm::Comdat *comdat = go->getComdat();
 
   // If the section name is empty, use the default section.
   if (!retain && !comdat && sec_name.empty()) [[likely]] {
-    if (is_func) {
-      return this->assembler.get_text_section();
-    }
-
-    if (tls) {
-      return init_zero ? this->assembler.get_tbss_section()
-                       : this->assembler.get_tdata_section();
-    }
-
-    if (!read_only && init_zero) {
-      return this->assembler.get_bss_section();
-    }
-    return this->assembler.get_data_section(read_only, needs_relocs);
+    return this->assembler.get_default_section(kind);
   }
 
+  // Group section must be created before the group contents.
   SecRef group_sec = get_group_section(go, sym);
 
-  llvm::StringRef def_name;
-  unsigned type = SHT_PROGBITS;
-  unsigned flags = SHF_ALLOC;
-  if (is_func) {
-    def_name = ".text";
-    flags |= SHF_EXECINSTR;
-  } else if (tls) {
-    def_name = init_zero ? llvm::StringRef(".tbss") : llvm::StringRef(".tdata");
-    type = init_zero ? SHT_NOBITS : SHT_PROGBITS;
-    flags |= SHF_WRITE | SHF_TLS;
-  } else if (!read_only && init_zero) {
-    def_name = ".bss";
-    type = SHT_NOBITS;
-    flags |= SHF_WRITE;
-  } else if (!read_only) {
-    def_name = ".data";
-    flags |= SHF_WRITE;
-  } else if (needs_relocs) {
-    def_name = ".data.rel.ro";
-    flags |= SHF_WRITE;
-  } else {
-    def_name = ".rodata";
+  // TODO: is it *required* that we merge sections here? For now, don't.
+  SecRef sec = this->assembler.create_section(kind);
+  if (!sec_name.empty()) {
+    this->assembler.rename_section(sec, sec_name);
+  }
+
+  if (group_sec.valid()) {
+    // TODO: ELF only
+    this->assembler.add_to_group(group_sec, sec);
   }
 
   if (retain) {
-    flags |= SHF_GNU_RETAIN;
+    // TODO: ELF only
+    this->assembler.get_section(sec).flags |= SHF_GNU_RETAIN;
   }
 
-  if (sec_name.empty()) {
-    sec_name = def_name; // Use default prefix
-  }
-
-  llvm::SmallString<512> name_buf;
-  if (comdat) {
-    llvm::StringRef go_name = go->getName();
-    name_buf.reserve(sec_name.size() + 1 + go_name.size());
-    name_buf.append(sec_name);
-    name_buf.push_back('.');
-    // TODO: apply LLVM's name mangling.
-    // TODO: do we need to include the platform prefix (_ on Darwin) here?
-    name_buf.append(go_name);
-    sec_name = name_buf.str();
-  }
-
-  // TODO: is it *required* that we merge sections here? For now, don't.
-
-  return this->assembler.create_section(
-      sec_name, type, flags, needs_relocs, group_sec);
+  return sec;
 }
 
 template <typename Adaptor, typename Derived, typename Config>

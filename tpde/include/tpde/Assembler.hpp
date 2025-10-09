@@ -228,6 +228,8 @@ public:
     return get_default_section(SectionKind::ThreadBSS);
   }
 
+  virtual void rename_section(SecRef, std::string_view name) noexcept = 0;
+
   /// @}
 
   virtual SymRef sym_add_undef(std::string_view, SymBinding) noexcept = 0;

@@ -16,11 +16,6 @@
 ; CHECK-DAG: [{{ *}}[[SEC2_RWT_IDX:[0-9]+]]] sec2 PROGBITS {{[0-9a-f]+}} {{[0-9a-f]+}} {{[0-9a-f]+}} {{0+}} WAT 0 0 {{[0-9]+}}
 
 ; CHECK: Symbol table '.symtab'
-; CHECK-DAG:          0 SECTION LOCAL  DEFAULT [[SEC1_RX_IDX]]      sec1
-; CHECK-DAG:          0 SECTION LOCAL  DEFAULT [[SEC1_RO_IDX]]      sec1
-; CHECK-DAG:          0 SECTION LOCAL  DEFAULT [[SEC1_RW_IDX]]      sec1
-; CHECK-DAG:          0 SECTION LOCAL  DEFAULT [[SEC2_RW_IDX]]      sec2
-; CHECK-DAG:          0 SECTION LOCAL  DEFAULT [[SEC2_RWT_IDX]]     sec2
 ; CHECK-DAG: {{[0-9]+}} FUNC    GLOBAL DEFAULT [[SEC1_RX_IDX]]      fsec1
 ; CHECK-DAG:          4 OBJECT  GLOBAL DEFAULT [[SEC1_RO_IDX]]      csec1
 ; CHECK-DAG:          4 OBJECT  GLOBAL DEFAULT [[SEC1_RW_IDX]]      gsec1

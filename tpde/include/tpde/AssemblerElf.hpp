@@ -212,29 +212,20 @@ private:
     return get_section(ref).relocs;
   }
 
-  /// Allocate a new section for relocations.
-  [[nodiscard]] SecRef create_rela_section(SecRef ref,
-                                           unsigned flags,
-                                           unsigned rela_name) noexcept;
-
   [[nodiscard]] SymRef create_section_symbol(SecRef ref,
                                              std::string_view name) noexcept;
 
 public:
   SecRef create_structor_section(bool init, SecRef group = SecRef()) noexcept;
 
-  /// Create a new section with the given name, ELF section type, and flags.
-  /// Optionally, a corresponding relocation (.rela) section is also created,
-  /// otherwise, the section must not have relocations.
-  [[nodiscard]] SecRef create_section(std::string_view name,
-                                      unsigned type,
-                                      unsigned flags,
-                                      bool with_rela,
-                                      SecRef group = SecRef()) noexcept;
+  void rename_section(SecRef, std::string_view) noexcept override;
 
   /// Create a new group section.
   [[nodiscard]] SecRef create_group_section(SymRef signature_sym,
                                             bool is_comdat) noexcept;
+
+  /// Add a section to a section group.
+  void add_to_group(SecRef group_ref, SecRef sec_ref) noexcept;
 
   const char *sec_name(SecRef ref) const noexcept;
 

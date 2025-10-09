@@ -17,7 +17,7 @@
 ; CHECK-DAG: {{[0-9]+}} FUNC    GLOBAL DEFAULT [[C2_TEXT]]      c2a
 ; CHECK-DAG:          4 OBJECT  GLOBAL DEFAULT [[C2_DATA]]      c2b
 
-; CHECK: COMDAT group section [{{ *}}[[C1_GROUP]]] `.group' [c1] contains 1 sections:
+; CHECK: COMDAT group section [{{ *}}[[C1_GROUP]]] `.group' [c1] contains [[#]] sections:
 ; CHECK: [{{ *}}[[C1_DATA]]]
 
 ; CHECK: COMDAT group section [{{ *}}[[C2_GROUP]]] `.group' [c2] contains [[#]] sections:

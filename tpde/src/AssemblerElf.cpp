@@ -135,6 +135,16 @@ SymRef AssemblerElf::create_section_symbol(SecRef ref,
   return sym;
 }
 
+void AssemblerElf::rename_section(SecRef ref, std::string_view name) noexcept {
+  DataSection &sec = get_section(ref);
+  // This is possible, just not implemented. But maybe there's no requirement at
+  // all that section symbols are named.
+  assert(!sec.sym.valid() && "cannot rename after section symbol is created");
+  size_t rela_name = elf::SHSTRTAB.size();
+  rela_name += shstrtab_extra.add_prefix(sec.has_relocs ? ".rela" : "", name);
+  sec.name = rela_name + (sec.has_relocs ? 5 : 0);
+}
+
 const char *AssemblerElf::sec_name(SecRef ref) const noexcept {
   const DataSection &sec = get_section(ref);
   assert(sec.name < elf::SHSTRTAB.size());
@@ -143,51 +153,17 @@ const char *AssemblerElf::sec_name(SecRef ref) const noexcept {
 
 SecRef AssemblerElf::create_structor_section(bool init, SecRef group) noexcept {
   // TODO: priorities
-  std::string_view name = init ? ".init_array" : ".fini_array";
-  unsigned type = init ? SHT_INIT_ARRAY : SHT_FINI_ARRAY;
-  SecRef secref =
-      create_section(name, type, SHF_ALLOC | SHF_WRITE, true, group);
-  get_section(secref).align = 8;
-  return secref;
-}
-
-SecRef AssemblerElf::create_section(std::string_view name,
-                                    unsigned type,
-                                    unsigned flags,
-                                    bool with_rela,
-                                    SecRef group) noexcept {
-  assert(type != SHT_GROUP && "use create_group_section to create groups");
-
-  assert(name.find('\0') == std::string_view::npos &&
-         "name must not contain null-bytes");
-  size_t rela_name = elf::SHSTRTAB.size();
-  rela_name += shstrtab_extra.add_prefix(with_rela ? ".rela" : "", name);
-
-  assert(!(flags & SHF_GROUP) && "SHF_GROUP is added by assembler");
-  DataSection *group_sec = nullptr;
-  unsigned group_flag = 0;
+  TargetInfo::SectionFlags flags{
+      .type = u32(init ? SHT_INIT_ARRAY : SHT_FINI_ARRAY),
+      .flags = SHF_ALLOC | SHF_WRITE,
+      .name = 0,
+      .align = 8};
+  SecRef secref = create_section(flags);
+  rename_section(secref, init ? ".init_array" : ".fini_array");
   if (group.valid()) {
-    group_flag = SHF_GROUP;
-    group_sec = &get_section(group);
-    assert(group_sec->type == SHT_GROUP);
+    add_to_group(group, secref);
   }
-
-  TargetInfo::SectionFlags sec_flags{.type = type,
-                                     .flags = flags | group_flag,
-                                     .name =
-                                         u32(rela_name + (with_rela ? 5 : 0)),
-                                     .has_relocs = with_rela,
-                                     .is_bss = type == SHT_NOBITS};
-  SecRef ref = Assembler::create_section(sec_flags);
-  if (group_sec) {
-    group_sec->write<u32>(ref.id());
-    if (with_rela) {
-      group_sec->write<u32>(ref.id() + 1);
-    }
-  }
-
-  get_section(ref).sym = create_section_symbol(ref, name);
-  return ref;
+  return secref;
 }
 
 SecRef AssemblerElf::create_group_section(SymRef signature_sym,
@@ -197,7 +173,7 @@ SecRef AssemblerElf::create_group_section(SymRef signature_sym,
                                  .name = elf::sec_off(".group"),
                                  .align = 4,
                                  .has_relocs = false};
-  SecRef ref = Assembler::create_section(flags);
+  SecRef ref = create_section(flags);
   DataSection &sec = get_section(ref);
   sec.sym = signature_sym;
   // Group flags.
@@ -205,10 +181,21 @@ SecRef AssemblerElf::create_group_section(SymRef signature_sym,
   return ref;
 }
 
+void AssemblerElf::add_to_group(SecRef group_ref, SecRef sec_ref) noexcept {
+  DataSection &sec = get_section(sec_ref);
+  assert(!(sec.flags & SHF_GROUP) && "section must be in at most one group");
+  sec.flags |= SHF_GROUP;
+  DataSection &group = get_section(group_ref);
+  assert(group.type == SHT_GROUP);
+  group.write<u32>(sec_ref.id());
+  if (sec.has_relocs) {
+    group.write<u32>(sec_ref.id() + 1);
+  }
+}
+
 void AssemblerElf::init_sections() noexcept {
   for (size_t i = 0; i < elf::predef_sec_count(); i++) {
     sections.emplace_back(nullptr);
-    // (void)create_section(SHT_NULL, 0, 0);
   }
 
   SecRef secref_eh_frame = get_default_section(SectionKind::EHFrame);
