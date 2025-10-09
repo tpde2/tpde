@@ -510,6 +510,18 @@ public:
 #endif
   }
 
+  /// Generate a branch to a basic block; execution continues afterwards.
+  /// Multiple calls to this function can be used to build conditional branches.
+  /// @tparam Jump Target-defined Jump type (e.g., CompilerX64::Jump).
+  /// @param needs_split Result of branch_needs_split(); pass false for an
+  ///  unconditional branch.
+  /// @param last_inst Whether fall-through to target is possible.
+  template <typename Jump>
+  void generate_branch_to_block(Jump jmp,
+                                IRBlockRef target,
+                                bool needs_split,
+                                bool last_inst) noexcept;
+
 #ifndef NDEBUG
   bool may_change_value_state() const noexcept { return !generating_branch; }
 #endif
@@ -1630,12 +1642,32 @@ void CompilerBase<Adaptor, Derived, Config>::
 }
 
 template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>
+template <typename Jump>
+void CompilerBase<Adaptor, Derived, Config>::generate_branch_to_block(
+    Jump jmp, IRBlockRef target, bool needs_split, bool last_inst) noexcept {
+  BlockIndex target_idx = this->analyzer.block_idx(target);
+  Label target_label = this->block_labels[u32(target_idx)];
+  if (!needs_split) {
+    move_to_phi_nodes(target_idx);
+    if (!last_inst || target_idx != this->next_block()) {
+      derived()->generate_raw_jump(jmp, target_label);
+    }
+  } else {
+    Label tmp_label = this->text_writer.label_create();
+    derived()->generate_raw_jump(derived()->invert_jump(jmp), tmp_label);
+    move_to_phi_nodes(target_idx);
+    derived()->generate_raw_jump(Jump::jmp, target_label);
+    this->label_place(tmp_label);
+  }
+}
+
+template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>
 void CompilerBase<Adaptor, Derived, Config>::generate_uncond_branch(
     IRBlockRef target) noexcept {
   auto spilled = spill_before_branch();
   begin_branch_region();
 
-  derived()->generate_branch_to_block(Derived::Jump::jmp, target, false, true);
+  generate_branch_to_block(Derived::Jump::jmp, target, false, true);
 
   end_branch_region();
   release_spilled_regs(spilled);
@@ -1654,20 +1686,16 @@ void CompilerBase<Adaptor, Derived, Config>::generate_cond_branch(
   begin_branch_region();
 
   if (next == true_target || (next != false_target && true_needs_split)) {
-    derived()->generate_branch_to_block(
+    generate_branch_to_block(
         derived()->invert_jump(jmp), false_target, false_needs_split, false);
-    derived()->generate_branch_to_block(
-        Derived::Jump::jmp, true_target, false, true);
+    generate_branch_to_block(Derived::Jump::jmp, true_target, false, true);
   } else if (next == false_target) {
-    derived()->generate_branch_to_block(
-        jmp, true_target, true_needs_split, false);
-    derived()->generate_branch_to_block(
-        Derived::Jump::jmp, false_target, false, true);
+    generate_branch_to_block(jmp, true_target, true_needs_split, false);
+    generate_branch_to_block(Derived::Jump::jmp, false_target, false, true);
   } else {
     assert(!true_needs_split);
-    derived()->generate_branch_to_block(jmp, true_target, false, false);
-    derived()->generate_branch_to_block(
-        Derived::Jump::jmp, false_target, false, true);
+    generate_branch_to_block(jmp, true_target, false, false);
+    generate_branch_to_block(Derived::Jump::jmp, false_target, false, true);
   }
 
   end_branch_region();

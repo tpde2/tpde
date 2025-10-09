@@ -475,11 +475,7 @@ struct CompilerX64 : BaseTy<Adaptor, Derived, Config> {
 
   FeCond jump_to_cond(Jump jmp) noexcept;
 
-  void generate_branch_to_block(Jump jmp,
-                                IRBlockRef target,
-                                bool needs_split,
-                                bool last_inst) noexcept;
-
+  /// Generate jump instruction to target label.
   void generate_raw_jump(Jump jmp, Label target) noexcept;
 
   /// Set dst to 1 if cc is true, otherwise set it to zero. If zext is false,
@@ -1479,34 +1475,6 @@ FeCond CompilerX64<Adaptor, Derived, BaseTy, Config>::jump_to_cond(
   default: TPDE_UNREACHABLE("invalid conditional jump");
   }
   return res;
-}
-
-template <IRAdaptor Adaptor,
-          typename Derived,
-          template <typename, typename, typename> typename BaseTy,
-          typename Config>
-void CompilerX64<Adaptor, Derived, BaseTy, Config>::generate_branch_to_block(
-    const Jump jmp,
-    IRBlockRef target,
-    const bool needs_split,
-    const bool last_inst) noexcept {
-  const auto target_idx = this->analyzer.block_idx(target);
-  if (!needs_split || jmp == Jump::jmp) {
-    this->derived()->move_to_phi_nodes(target_idx);
-
-    if (!last_inst || this->analyzer.block_idx(target) != this->next_block()) {
-      generate_raw_jump(jmp, this->block_labels[(u32)target_idx]);
-    }
-  } else {
-    auto tmp_label = this->text_writer.label_create();
-    generate_raw_jump(invert_jump(jmp), tmp_label);
-
-    this->derived()->move_to_phi_nodes(target_idx);
-
-    generate_raw_jump(Jump::jmp, this->block_labels[(u32)target_idx]);
-
-    this->label_place(tmp_label);
-  }
 }
 
 template <IRAdaptor Adaptor,
