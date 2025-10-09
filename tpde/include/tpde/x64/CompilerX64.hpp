@@ -118,6 +118,7 @@ constexpr static u64 create_bitmask(const std::array<AsmReg, N> regs) {
   return set;
 }
 
+/// x86-64 System V calling convention.
 class CCAssignerSysV : public CCAssigner {
 public:
   static constexpr CCInfo Info{
@@ -265,6 +266,7 @@ concept Compiler = tpde::Compiler<T, Config> && requires(T a) {
 };
 } // namespace concepts
 
+/// Compiler mixin for targeting x86-64.
 template <IRAdaptor Adaptor,
           typename Derived,
           template <typename, typename, typename> typename BaseTy =
@@ -439,6 +441,7 @@ struct CompilerX64 : BaseTy<Adaptor, Derived, Config> {
                       u32 align,
                       ValuePart &res) noexcept;
 
+  /// Materialize constant into a register.
   void materialize_constant(const u64 *data,
                             RegBank bank,
                             u32 size,
@@ -487,6 +490,8 @@ struct CompilerX64 : BaseTy<Adaptor, Derived, Config> {
   /// Move src into dst if cc is true, otherwise do nothing
   void generate_raw_cmov(Jump cc, AsmReg dst, AsmReg src, bool is_64) noexcept;
 
+  /// Integer extension. Might need a temporary register, src is not modified,
+  /// might clobber flags.
   void generate_raw_intext(
       AsmReg dst, AsmReg src, bool sign, u32 from, u32 to) noexcept;
 
@@ -512,20 +517,20 @@ struct CompilerX64 : BaseTy<Adaptor, Derived, Config> {
                      bool variable_args = false);
 
 private:
-  /// Internal function, don't use. Emit compare of cmp_reg with case_value.
+  /// @internal Emit compare of cmp_reg with case_value.
   void switch_emit_cmp(AsmReg cmp_reg,
                        AsmReg tmp_reg,
                        u64 case_value,
                        bool width_is_32) noexcept;
 
 public:
-  /// Internal function, don't use. Jump if cmp_reg equals case_value.
+  /// @internal Jump if cmp_reg equals case_value.
   void switch_emit_cmpeq(Label case_label,
                          AsmReg cmp_reg,
                          AsmReg tmp_reg,
                          u64 case_value,
                          bool width_is_32) noexcept;
-  /// Internal function, don't use. Emit bounds check and jump table.
+  /// @internal Emit bounds check and jump table.
   bool switch_emit_jump_table(Label default_label,
                               std::span<const Label> labels,
                               AsmReg cmp_reg,
@@ -533,7 +538,7 @@ public:
                               u64 low_bound,
                               u64 high_bound,
                               bool width_is_32) noexcept;
-  /// Internal function, don't use. Jump if cmp_reg is greater than case_value.
+  /// @internal Jump if cmp_reg is greater than case_value.
   void switch_emit_binary_step(Label case_label,
                                Label gt_label,
                                AsmReg cmp_reg,

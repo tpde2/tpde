@@ -343,19 +343,36 @@ public:
     init_variable_ref(adaptor->val_local_idx(value), var_ref_data);
   }
 
+  /// \name Stack Slots
+  /// @{
+
+  /// Allocate a static stack slot.
   i32 allocate_stack_slot(u32 size) noexcept;
+  /// Free a static stack slot.
   void free_stack_slot(u32 slot, u32 size) noexcept;
+
+  /// @}
 
   template <typename Fn>
   void handle_func_arg(u32 arg_idx, IRValueRef arg, Fn add_arg) noexcept;
 
+  /// \name Value References
+  /// @{
+
+  /// Get a using reference to a value.
   ValueRef val_ref(IRValueRef value) noexcept;
 
+  /// Get a using reference to a single-part value and provide direct access to
+  /// the only part. This is a convenience function; note that the ValueRef must
+  /// outlive the ValuePartRef (i.e. auto p = val_ref().part(0); won't work, as
+  /// the value will possibly be deallocated when the ValueRef is destroyed).
   std::pair<ValueRef, ValuePartRef> val_ref_single(IRValueRef value) noexcept;
 
-  /// Get a defining reference to a value
+  /// Get a defining reference to a value.
   ValueRef result_ref(IRValueRef value) noexcept;
 
+  /// Get a defining reference to a single-part value and provide direct access
+  /// to the only part. Similar to val_ref_single().
   std::pair<ValueRef, ValuePartRef>
       result_ref_single(IRValueRef value) noexcept;
 
@@ -371,6 +388,8 @@ public:
   ValueRef result_ref_stack_slot(IRValueRef value,
                                  AssignmentPartRef base,
                                  i32 off) noexcept;
+
+  /// @}
 
   [[deprecated("Use ValuePartRef::set_value")]]
   void set_value(ValuePartRef &val_ref, ScratchReg &scratch) noexcept;
@@ -389,9 +408,13 @@ public:
   AsmReg gval_as_reg_reuse(GenericValuePart &gv, ScratchReg &dst) noexcept;
 
 private:
+  /// @internal Select register when a value needs to be evicted.
   Reg select_reg_evict(RegBank bank, u64 exclusion_mask) noexcept;
 
 public:
+  /// \name Low-Level Assignment Register Handling
+  /// @{
+
   /// Select an available register, evicting loaded values if needed.
   Reg select_reg(RegBank bank, u64 exclusion_mask) noexcept {
     Reg res = register_file.find_first_free_excluding(bank, exclusion_mask);
@@ -404,6 +427,7 @@ public:
   /// Reload a value part from memory or recompute variable address.
   void reload_to_reg(AsmReg dst, AssignmentPartRef ap) noexcept;
 
+  /// Allocate a stack slot for an assignment.
   void allocate_spill_slot(AssignmentPartRef ap) noexcept;
 
   /// Ensure the value is spilled in its stack slot (except variable refs).
@@ -418,16 +442,10 @@ public:
   /// Free the register. Requires that the contained value is already spilled.
   void free_reg(Reg reg) noexcept;
 
-  // TODO(ts): switch to a branch_spill_before naming style?
-  typename RegisterFile::RegBitSet
-      spill_before_branch(bool force_spill = false) noexcept;
-  void release_spilled_regs(typename RegisterFile::RegBitSet) noexcept;
+  /// @}
 
-  /// When reaching a point in the function where no other blocks will be
-  /// reached anymore, use this function to release register assignments after
-  /// the end of that block so the compiler does not accidentally use
-  /// registers which don't contain any values
-  void release_regs_after_return() noexcept;
+  /// \name High-Level Branch Generation
+  /// @{
 
   /// Generate an unconditional branch at the end of a basic block. No further
   /// instructions must follow. If target is the next block in the block order,
@@ -449,6 +467,32 @@ public:
       u32 width,
       IRBlockRef default_block,
       std::span<const std::pair<u64, IRBlockRef>> cases) noexcept;
+
+  /// @}
+
+  /// \name Low-Level Branch Primitives
+  /// The general flow of using these low-level primitive is:
+  /// 1. spill_before_branch()
+  /// 2. begin_branch_region()
+  /// 3. One or more calls to generate_branch_to_block()
+  /// 4. end_branch_region()
+  /// 5. release_spilled_regs()
+  /// @{
+
+  // TODO(ts): switch to a branch_spill_before naming style?
+  /// Spill values that need to be spilled for later blocks. Returns the set
+  /// of registers that will be free'd at the end of the block; pass this to
+  /// release_spilled_regs().
+  typename RegisterFile::RegBitSet
+      spill_before_branch(bool force_spill = false) noexcept;
+  /// Free registers marked by spill_before_branch().
+  void release_spilled_regs(typename RegisterFile::RegBitSet) noexcept;
+
+  /// When reaching a point in the function where no other blocks will be
+  /// reached anymore, use this function to release register assignments after
+  /// the end of that block so the compiler does not accidentally use
+  /// registers which don't contain any values
+  void release_regs_after_return() noexcept;
 
   /// Indicate beginning of region where value-state must not change.
   void begin_branch_region() noexcept {
@@ -478,10 +522,14 @@ public:
 
   void move_to_phi_nodes_impl(BlockIndex target) noexcept;
 
+  /// Whether branch to a block requires additional instructions and therefore
+  /// a direct jump to the block is not possible.
   bool branch_needs_split(IRBlockRef target) noexcept {
     // for now, if the target has PHI-nodes, we split
     return analyzer.block_has_phis(target);
   }
+
+  /// @}
 
   BlockIndex next_block() const noexcept;
 
@@ -498,6 +546,7 @@ public:
         text_writer.get_sec_ref(), sym, type, offset, addend);
   }
 
+  /// Convenience function to place a label at the current position.
   void label_place(Label label) noexcept {
     this->text_writer.label_place(label, text_writer.offset());
   }

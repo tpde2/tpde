@@ -161,6 +161,7 @@ constexpr static u64 create_bitmask(const std::array<AsmReg, N> regs) {
   return set;
 }
 
+/// AArch64 AAPCS calling convention.
 class CCAssignerAAPCS : public CCAssigner {
   static constexpr CCInfo Info{
       // we reserve SP,FP,R16 and R17 for our special use cases
@@ -313,6 +314,7 @@ concept Compiler = tpde::Compiler<T, Config> && requires(T a) {
 };
 } // namespace concepts
 
+/// Compiler mixin for targeting AArch64.
 template <IRAdaptor Adaptor,
           typename Derived,
           template <typename, typename, typename> typename BaseTy =
@@ -437,10 +439,12 @@ struct CompilerA64 : BaseTy<Adaptor, Derived, Config> {
                       u32 align,
                       ValuePart &res) noexcept;
 
+  /// Materialize constant into a register.
   void materialize_constant(const u64 *data,
                             RegBank bank,
                             u32 size,
                             AsmReg dst) noexcept;
+  /// Materialize constant into a register.
   void materialize_constant(u64 const_u64,
                             RegBank bank,
                             u32 size,
@@ -451,30 +455,31 @@ struct CompilerA64 : BaseTy<Adaptor, Derived, Config> {
 
   AsmReg select_fixed_assignment_reg(AssignmentPartRef, IRValueRef) noexcept;
 
+  /// Jump conditions.
   struct Jump {
+    // TDOO: naming consistency
     enum Kind : uint8_t {
-      Jeq,
-      Jne,
-      Jcs,
-      Jhs = Jcs,
-      Jcc,
-      Jlo = Jcc,
-      Jmi,
-      Jpl,
-      Jvs,
-      Jvc,
-      Jhi,
-      Jls,
-      Jge,
-      Jlt,
-      Jgt,
-      Jle,
-      // TDOO: consistency
-      jmp,
-      Cbz,
-      Cbnz,
-      Tbz,
-      Tbnz
+      Jeq,       ///< Equal (Z == 1)
+      Jne,       ///< Not equal (Z == 0)
+      Jcs,       ///< Carry set (C == 1)
+      Jhs = Jcs, ///< Unsigned higher or same (C == 1)
+      Jcc,       ///< Carry clear (C == 0)
+      Jlo = Jcc, ///< Unsigned lower (C == 0)
+      Jmi,       ///< Minus, negative (N == 1)
+      Jpl,       ///< Plus, positive or zero  (N == 0)
+      Jvs,       ///< Overflow  (V == 1)
+      Jvc,       ///< No Overflow (V == 0)
+      Jhi,       ///< Unsigned higher (C == 1 && Z == 0)
+      Jls,       ///< Unsigned lower or same (!(C == 1 && Z == 0))
+      Jge,       ///< Signed greater than or equal (N == V)
+      Jlt,       ///< Signed less than (N != V)
+      Jgt,       ///< Signed greater than (Z == 0 && N == V)
+      Jle,       ///< Signed lessthan or equal  (!(Z == 0 && N == V))
+      jmp,       ///< Unconditional jump
+      Cbz,       ///< Compare and branch if zero (Wn or Xn register)
+      Cbnz,      ///< Compare and branch if not zero (Wn or Xn register)
+      Tbz,       ///< Test single bit and branch if zero (Xn register)
+      Tbnz,      ///< Test single bit and branch if not zero (Xn register)
     };
 
     Kind kind;
@@ -482,17 +487,21 @@ struct CompilerA64 : BaseTy<Adaptor, Derived, Config> {
     bool cmp_is_32;
     u8 test_bit;
 
+    /// Unconditional branch.
     constexpr Jump() : kind(Kind::jmp) {}
 
+    /// Unconditional or conditional branch based on flags.
     constexpr Jump(Kind kind) : kind(kind), cmp_is_32(false), test_bit(0) {
       assert(kind != Cbz && kind != Cbnz && kind != Tbz && kind != Tbnz);
     }
 
+    /// Cbz/Cbnz branch.
     constexpr Jump(Kind kind, AsmReg cmp_reg, bool cmp_is_32)
         : kind(kind), cmp_reg(cmp_reg), cmp_is_32(cmp_is_32), test_bit(0) {
       assert(kind == Cbz || kind == Cbnz);
     }
 
+    /// Tbz/Tbnz branch.
     constexpr Jump(Kind kind, AsmReg cmp_reg, u8 test_bit)
         : kind(kind), cmp_reg(cmp_reg), cmp_is_32(false), test_bit(test_bit) {
       assert(kind == Tbz || kind == Tbnz);
@@ -531,6 +540,7 @@ struct CompilerA64 : BaseTy<Adaptor, Derived, Config> {
                            AsmReg false_select,
                            bool is_64) noexcept;
 
+  /// Integer extension. src is not modified.
   void generate_raw_intext(
       AsmReg dst, AsmReg src, bool sign, u32 from, u32 to) noexcept;
 
@@ -559,20 +569,20 @@ struct CompilerA64 : BaseTy<Adaptor, Derived, Config> {
                      bool variable_args = false);
 
 private:
-  /// Internal function, don't use. Emit compare of cmp_reg with case_value.
+  /// @internal Emit compare of cmp_reg with case_value.
   void switch_emit_cmp(AsmReg cmp_reg,
                        AsmReg tmp_reg,
                        u64 case_value,
                        bool width_is_32) noexcept;
 
 public:
-  /// Internal function, don't use. Jump if cmp_reg equals case_value.
+  /// @internal Jump if cmp_reg equals case_value.
   void switch_emit_cmpeq(Label case_label,
                          AsmReg cmp_reg,
                          AsmReg tmp_reg,
                          u64 case_value,
                          bool width_is_32) noexcept;
-  /// Internal function, don't use. Emit bounds check and jump table.
+  /// @internal Emit bounds check and jump table.
   bool switch_emit_jump_table(Label default_label,
                               std::span<const Label> labels,
                               AsmReg cmp_reg,
@@ -580,7 +590,7 @@ public:
                               u64 low_bound,
                               u64 high_bound,
                               bool width_is_32) noexcept;
-  /// Internal function, don't use. Jump if cmp_reg is greater than case_value.
+  /// @internal Jump if cmp_reg is greater than case_value.
   void switch_emit_binary_step(Label case_label,
                                Label gt_label,
                                AsmReg cmp_reg,

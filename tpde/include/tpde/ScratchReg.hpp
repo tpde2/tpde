@@ -4,6 +4,8 @@
 #pragma once
 
 namespace tpde {
+
+/// Owned unspillable and unevictable temporary register with RAII semantics.
 template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>
 struct CompilerBase<Adaptor, Derived, Config>::ScratchReg {
 private:
@@ -12,6 +14,7 @@ private:
   AsmReg reg = AsmReg::make_invalid();
 
 public:
+  /// Constructor, no register.
   explicit ScratchReg(CompilerBase *compiler) : compiler(compiler) {}
 
   explicit ScratchReg(const ScratchReg &) = delete;
@@ -22,31 +25,37 @@ public:
   ScratchReg &operator=(const ScratchReg &) = delete;
   ScratchReg &operator=(ScratchReg &&) noexcept;
 
+  /// Whether a register is currently allocated.
   bool has_reg() const noexcept { return reg.valid(); }
 
+  /// The allocated register.
   AsmReg cur_reg() const noexcept {
     assert(has_reg());
     return reg;
   }
 
+  /// Allocate a specific register.
   AsmReg alloc_specific(AsmReg reg) noexcept;
 
+  /// Allocate a general-purpose register.
   AsmReg alloc_gp() noexcept { return alloc(Config::GP_BANK); }
 
-  /// Allocate register in the specified bank, optionally excluding certain
-  /// non-fixed registers. Spilling can be disabled for spill code to avoid
-  /// recursion; if spilling is disabled, the allocation can fail.
+  /// Allocate register in the specified bank. Does nothing if it holds a
+  /// register in the specified bank. Evicts a register if required.
   AsmReg alloc(RegBank bank) noexcept;
 
+  /// Release register, marking it as unused; returns the register.
   AsmReg release() noexcept {
     AsmReg res = reg;
     reset();
     return res;
   }
 
+  /// Deallocate register.
   void reset() noexcept;
 
-  /// Forcefully change register without updating register file. Avoid.
+  /// @internal Forcefully change register without updating register file.
+  /// Avoid.
   void force_set_reg(AsmReg reg) noexcept { this->reg = reg; }
 };
 
