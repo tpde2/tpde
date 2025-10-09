@@ -51,8 +51,8 @@ define @condbr1(%a, %b) {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    nop dword ptr [rax]
+; X64-NEXT:    test rdi, rdi
 ; X64-NEXT:    mov qword ptr [rbp - 0x30], rsi
-; X64-NEXT:    cmp rdi, 0x0
 ; X64-NEXT:    je <L0>
 ; X64-NEXT:    mov rax, rdi
 ; X64-NEXT:    pop rbp
@@ -71,7 +71,7 @@ define @condbr1(%a, %b) {
 ; X64-FIXED-NEXT:    nop dword ptr [rax]
 ; X64-FIXED-NEXT:    mov r10, rdi
 ; X64-FIXED-NEXT:    mov rdi, rsi
-; X64-FIXED-NEXT:    cmp r10, 0x0
+; X64-FIXED-NEXT:    test r10, r10
 ; X64-FIXED-NEXT:    je <L0>
 ; X64-FIXED-NEXT:    mov rax, r10
 ; X64-FIXED-NEXT:    pop rbp
@@ -88,8 +88,8 @@ define @condbr1(%a, %b) {
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
-; ARM64-NEXT:    str x1, [x29, #0xa0]
 ; ARM64-NEXT:    cmp x0, #0x0
+; ARM64-NEXT:    str x1, [x29, #0xa0]
 ; ARM64-NEXT:    b.eq 0xac <condbr1+0x4c>
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
@@ -128,8 +128,8 @@ define @condbr2(%a, %b) {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    nop dword ptr [rax]
+; X64-NEXT:    test rdi, rdi
 ; X64-NEXT:    mov qword ptr [rbp - 0x30], rdi
-; X64-NEXT:    cmp rdi, 0x0
 ; X64-NEXT:    jne <L0>
 ; X64-NEXT:    mov rax, rsi
 ; X64-NEXT:    pop rbp
@@ -148,7 +148,7 @@ define @condbr2(%a, %b) {
 ; X64-FIXED-NEXT:    nop dword ptr [rax]
 ; X64-FIXED-NEXT:    mov r10, rdi
 ; X64-FIXED-NEXT:    mov rdi, rsi
-; X64-FIXED-NEXT:    cmp r10, 0x0
+; X64-FIXED-NEXT:    test r10, r10
 ; X64-FIXED-NEXT:    jne <L0>
 ; X64-FIXED-NEXT:    mov rax, rdi
 ; X64-FIXED-NEXT:    pop rbp
@@ -165,8 +165,8 @@ define @condbr2(%a, %b) {
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
-; ARM64-NEXT:    str x0, [x29, #0xa0]
 ; ARM64-NEXT:    cmp x0, #0x0
+; ARM64-NEXT:    str x0, [x29, #0xa0]
 ; ARM64-NEXT:    b.ne 0x130 <condbr2+0x50>
 ; ARM64-NEXT:    mov x0, x1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
@@ -206,8 +206,8 @@ define @condbr3(%a, %b, %c) {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    nop dword ptr [rax]
+; X64-NEXT:    test rdi, rdi
 ; X64-NEXT:    mov qword ptr [rbp - 0x30], rdx
-; X64-NEXT:    cmp rdi, 0x0
 ; X64-NEXT:    jne <L0>
 ; X64-NEXT:    mov qword ptr [rbp - 0x38], rsi
 ; X64-NEXT:    jmp <L1>
@@ -228,7 +228,7 @@ define @condbr3(%a, %b, %c) {
 ; X64-FIXED-NEXT:    nop dword ptr [rax]
 ; X64-FIXED-NEXT:    mov r10, rsi
 ; X64-FIXED-NEXT:    mov rsi, rdx
-; X64-FIXED-NEXT:    cmp rdi, 0x0
+; X64-FIXED-NEXT:    test rdi, rdi
 ; X64-FIXED-NEXT:    jne <L0>
 ; X64-FIXED-NEXT:    mov r8, r10
 ; X64-FIXED-NEXT:    jmp <L1>
@@ -246,8 +246,8 @@ define @condbr3(%a, %b, %c) {
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    nop
 ; ARM64-NEXT:    nop
-; ARM64-NEXT:    str x2, [x29, #0xa0]
 ; ARM64-NEXT:    cmp x0, #0x0
+; ARM64-NEXT:    str x2, [x29, #0xa0]
 ; ARM64-NEXT:    b.ne 0x184 <condbr3+0x24>
 ; ARM64-NEXT:    str x1, [x29, #0xa8]
 ; ARM64-NEXT:    b 0x18c <condbr3+0x2c>
@@ -298,7 +298,7 @@ define @loop1(%a, %b) {
 ; X64-NEXT:    mov qword ptr [rbp - 0x38], rdi
 ; X64-NEXT:  <L1>:
 ; X64-NEXT:    mov rax, qword ptr [rbp - 0x38]
-; X64-NEXT:    cmp rax, 0x0
+; X64-NEXT:    test rax, rax
 ; X64-NEXT:    je <L0>
 ; X64-NEXT:    mov rcx, rax
 ; X64-NEXT:    mov rdx, qword ptr [rbp - 0x30]
@@ -317,7 +317,7 @@ define @loop1(%a, %b) {
 ; X64-FIXED-NEXT:    mov r10, rsi
 ; X64-FIXED-NEXT:    mov rsi, rdi
 ; X64-FIXED-NEXT:  <L1>:
-; X64-FIXED-NEXT:    cmp rsi, 0x0
+; X64-FIXED-NEXT:    test rsi, rsi
 ; X64-FIXED-NEXT:    je <L0>
 ; X64-FIXED-NEXT:    mov rax, rsi
 ; X64-FIXED-NEXT:    sub rax, r10
@@ -381,7 +381,7 @@ define @phi_chain1(%a) {
 ; X64-NEXT:    mov qword ptr [rbp - 0x38], rdi
 ; X64-NEXT:  <L1>:
 ; X64-NEXT:    mov rax, qword ptr [rbp - 0x38]
-; X64-NEXT:    cmp rax, 0x0
+; X64-NEXT:    test rax, rax
 ; X64-NEXT:    je <L0>
 ; X64-NEXT:    mov rcx, qword ptr [rbp - 0x30]
 ; X64-NEXT:    lea rdx, [rcx + rax]
@@ -400,7 +400,7 @@ define @phi_chain1(%a) {
 ; X64-FIXED-NEXT:    mov rsi, rdi
 ; X64-FIXED-NEXT:    mov r8, rdi
 ; X64-FIXED-NEXT:  <L1>:
-; X64-FIXED-NEXT:    cmp r8, 0x0
+; X64-FIXED-NEXT:    test r8, r8
 ; X64-FIXED-NEXT:    je <L0>
 ; X64-FIXED-NEXT:    lea rax, [rsi + r8]
 ; X64-FIXED-NEXT:    mov r8, rsi
@@ -466,7 +466,7 @@ define @phi_cycle1(%a) {
 ; X64-NEXT:    mov qword ptr [rbp - 0x38], rdi
 ; X64-NEXT:  <L1>:
 ; X64-NEXT:    mov rax, qword ptr [rbp - 0x38]
-; X64-NEXT:    cmp rax, 0x0
+; X64-NEXT:    test rax, rax
 ; X64-NEXT:    je <L0>
 ; X64-NEXT:    mov rcx, qword ptr [rbp - 0x30]
 ; X64-NEXT:    lea rdx, [rcx + rax]
@@ -486,7 +486,7 @@ define @phi_cycle1(%a) {
 ; X64-FIXED-NEXT:    mov rsi, rdi
 ; X64-FIXED-NEXT:    mov r8, rdi
 ; X64-FIXED-NEXT:  <L1>:
-; X64-FIXED-NEXT:    cmp r8, 0x0
+; X64-FIXED-NEXT:    test r8, r8
 ; X64-FIXED-NEXT:    je <L0>
 ; X64-FIXED-NEXT:    lea rax, [rsi + r8]
 ; X64-FIXED-NEXT:    mov rax, rsi

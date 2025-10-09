@@ -2,22 +2,41 @@
 ; SPDX-FileCopyrightText: 2025 Contributors to TPDE <https://tpde.org>
 ; SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-; RUN: tpde_test --target=aarch64 %s --no-fixed-assignments | llvm-objdump -d -r --no-show-raw-insn - | FileCheck %s
+; RUN: tpde_test --target=x86_64 %s --no-fixed-assignments | %objdump | FileCheck %s --check-prefixes=X64
+; RUN: tpde_test --target=aarch64 %s --no-fixed-assignments | %objdump | FileCheck %s --check-prefixes=ARM64
 
 define @tbz(%a) {
-; CHECK-LABEL: <tbz>:
-; CHECK:         20: stp x29, x30, [sp, #-0xb0]!
-; CHECK-NEXT:    24: mov x29, sp
-; CHECK-NEXT:    28: nop
-; CHECK-NEXT:    2c: nop
-; CHECK-NEXT:    30: str x0, [x29, #0xa0]
-; CHECK-NEXT:    34: tbnz x0, #0x2f, 0x40 <tbz+0x20>
-; CHECK-NEXT:    38: sub x1, x0, x0
-; CHECK-NEXT:    3c: b 0x48 <tbz+0x28>
-; CHECK-NEXT:    40: ldr x0, [x29, #0xa0]
-; CHECK-NEXT:    44: add x1, x0, x0
-; CHECK-NEXT:    48: ldp x29, x30, [sp], #0xb0
-; CHECK-NEXT:    4c: ret
+; X64-LABEL: <tbz>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop dword ptr [rax]
+; X64-NEXT:    bt rdi, 0x2f
+; X64-NEXT:    mov qword ptr [rbp - 0x30], rdi
+; X64-NEXT:    jae <L0>
+; X64-NEXT:    mov rax, rdi
+; X64-NEXT:    sub rax, rdi
+; X64-NEXT:    jmp <L1>
+; X64-NEXT:  <L0>:
+; X64-NEXT:    mov rax, qword ptr [rbp - 0x30]
+; X64-NEXT:    lea rcx, [rax + rax]
+; X64-NEXT:  <L1>:
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <tbz>:
+; ARM64:         stp x29, x30, [sp, #-0xb0]!
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
+; ARM64-NEXT:    str x0, [x29, #0xa0]
+; ARM64-NEXT:    tbnz x0, #0x2f, 0x40 <tbz+0x20>
+; ARM64-NEXT:    sub x1, x0, x0
+; ARM64-NEXT:    b 0x48 <tbz+0x28>
+; ARM64-NEXT:    ldr x0, [x29, #0xa0]
+; ARM64-NEXT:    add x1, x0, x0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
+; ARM64-NEXT:    ret
 entry:
   tbz %a, ^tgt1, ^tgt2, 47
 tgt1:
@@ -31,21 +50,41 @@ ret:
 }
 
 define @tbz_small(%a) {
-; CHECK-LABEL: <tbz_small>:
-; CHECK:         70: stp x29, x30, [sp, #-0xb0]!
-; CHECK-NEXT:    74: mov x29, sp
-; CHECK-NEXT:    78: nop
-; CHECK-NEXT:    7c: nop
-; CHECK-NEXT:    80: str x0, [x29, #0xa0]
-; CHECK-NEXT:    84: tbnz x0, #0x2f, 0x880 <tbz_small+0x810>
-; CHECK-NEXT:    88: b 0x878 <tbz_small+0x808>
-; CHECK-NEXT:     ...
-; CHECK-NEXT:    878: sub x1, x0, x0
-; CHECK-NEXT:    87c: b 0x888 <tbz_small+0x818>
-; CHECK-NEXT:    880: ldr x0, [x29, #0xa0]
-; CHECK-NEXT:    884: add x1, x0, x0
-; CHECK-NEXT:    888: ldp x29, x30, [sp], #0xb0
-; CHECK-NEXT:    88c: ret
+; X64-LABEL: <tbz_small>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop dword ptr [rax]
+; X64-NEXT:    bt rdi, 0x2f
+; X64-NEXT:    mov qword ptr [rbp - 0x30], rdi
+; X64-NEXT:    jae <L0>
+; X64-NEXT:    jmp <L1>
+; X64-NEXT:     ...
+; X64-NEXT:    mov rax, rdi
+; X64-NEXT:    sub rax, rdi
+; X64-NEXT:    jmp <L2>
+; X64-NEXT:  <L0>:
+; X64-NEXT:    mov rax, qword ptr [rbp - 0x30]
+; X64-NEXT:    lea rcx, [rax + rax]
+; X64-NEXT:  <L2>:
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <tbz_small>:
+; ARM64:         stp x29, x30, [sp, #-0xb0]!
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
+; ARM64-NEXT:    str x0, [x29, #0xa0]
+; ARM64-NEXT:    tbnz x0, #0x2f, 0x880 <tbz_small+0x810>
+; ARM64-NEXT:    b 0x878 <tbz_small+0x808>
+; ARM64-NEXT:     ...
+; ARM64-NEXT:    sub x1, x0, x0
+; ARM64-NEXT:    b 0x888 <tbz_small+0x818>
+; ARM64-NEXT:    ldr x0, [x29, #0xa0]
+; ARM64-NEXT:    add x1, x0, x0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
+; ARM64-NEXT:    ret
 entry:
   tbz %a, ^tgt1, ^tgt2, 47
 tgt1:
@@ -61,23 +100,43 @@ ret:
 
 ; Medium-sized tbz; veener space is allocated but not used
 define @tbz_medium(%a) {
-; CHECK-LABEL: <tbz_medium>:
-; CHECK:         8b0: stp x29, x30, [sp, #-0xb0]!
-; CHECK-NEXT:    8b4: mov x29, sp
-; CHECK-NEXT:    8b8: nop
-; CHECK-NEXT:    8bc: nop
-; CHECK-NEXT:    8c0: str x0, [x29, #0xa0]
-; CHECK-NEXT:    8c4: tbnz x0, #0x2f, 0x87d8 <tbz_medium+0x7f28>
-; CHECK-NEXT:    8c8: b 0x8d0 <tbz_medium+0x20>
-; CHECK-NEXT:    8cc: udf #0x0
-; CHECK-NEXT:    8d0: b 0x87d0 <tbz_medium+0x7f20>
-; CHECK-NEXT:     ...
-; CHECK-NEXT:    87d0: sub x1, x0, x0
-; CHECK-NEXT:    87d4: b 0x87e0 <tbz_medium+0x7f30>
-; CHECK-NEXT:    87d8: ldr x0, [x29, #0xa0]
-; CHECK-NEXT:    87dc: add x1, x0, x0
-; CHECK-NEXT:    87e0: ldp x29, x30, [sp], #0xb0
-; CHECK-NEXT:    87e4: ret
+; X64-LABEL: <tbz_medium>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop dword ptr [rax]
+; X64-NEXT:    bt rdi, 0x2f
+; X64-NEXT:    mov qword ptr [rbp - 0x30], rdi
+; X64-NEXT:    jae <L0>
+; X64-NEXT:    jmp <L1>
+; X64-NEXT:     ...
+; X64-NEXT:    mov rax, rdi
+; X64-NEXT:    sub rax, rdi
+; X64-NEXT:    jmp <L2>
+; X64-NEXT:  <L0>:
+; X64-NEXT:    mov rax, qword ptr [rbp - 0x30]
+; X64-NEXT:    lea rcx, [rax + rax]
+; X64-NEXT:  <L2>:
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <tbz_medium>:
+; ARM64:         stp x29, x30, [sp, #-0xb0]!
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
+; ARM64-NEXT:    str x0, [x29, #0xa0]
+; ARM64-NEXT:    tbnz x0, #0x2f, 0x87d8 <tbz_medium+0x7f28>
+; ARM64-NEXT:    b 0x8d0 <tbz_medium+0x20>
+; ARM64-NEXT:    udf #0x0
+; ARM64-NEXT:    b 0x87d0 <tbz_medium+0x7f20>
+; ARM64-NEXT:     ...
+; ARM64-NEXT:    sub x1, x0, x0
+; ARM64-NEXT:    b 0x87e0 <tbz_medium+0x7f30>
+; ARM64-NEXT:    ldr x0, [x29, #0xa0]
+; ARM64-NEXT:    add x1, x0, x0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
+; ARM64-NEXT:    ret
 entry:
   tbz %a, ^tgt1, ^tgt2, 47
 tgt1:
@@ -93,23 +152,43 @@ ret:
 
 ; Large-sized tbz; veener must be used
 define @tbz_large(%a) {
-; CHECK-LABEL: <tbz_large>:
-; CHECK:         8810: stp x29, x30, [sp, #-0xb0]!
-; CHECK-NEXT:    8814: mov x29, sp
-; CHECK-NEXT:    8818: nop
-; CHECK-NEXT:    881c: nop
-; CHECK-NEXT:    8820: str x0, [x29, #0xa0]
-; CHECK-NEXT:    8824: tbnz x0, #0x2f, 0x882c <tbz_large+0x1c>
-; CHECK-NEXT:    8828: b 0x8830 <tbz_large+0x20>
-; CHECK-NEXT:    882c: b 0x10838 <tbz_large+0x8028>
-; CHECK-NEXT:    8830: b 0x10830 <tbz_large+0x8020>
-; CHECK-NEXT:     ...
-; CHECK-NEXT:    10830: sub x1, x0, x0
-; CHECK-NEXT:    10834: b 0x10840 <tbz_large+0x8030>
-; CHECK-NEXT:    10838: ldr x0, [x29, #0xa0]
-; CHECK-NEXT:    1083c: add x1, x0, x0
-; CHECK-NEXT:    10840: ldp x29, x30, [sp], #0xb0
-; CHECK-NEXT:    10844: ret
+; X64-LABEL: <tbz_large>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    nop dword ptr [rax]
+; X64-NEXT:    bt rdi, 0x2f
+; X64-NEXT:    mov qword ptr [rbp - 0x30], rdi
+; X64-NEXT:    jae <L0>
+; X64-NEXT:    jmp <L1>
+; X64-NEXT:     ...
+; X64-NEXT:    mov rax, rdi
+; X64-NEXT:    sub rax, rdi
+; X64-NEXT:    jmp <L2>
+; X64-NEXT:  <L0>:
+; X64-NEXT:    mov rax, qword ptr [rbp - 0x30]
+; X64-NEXT:    lea rcx, [rax + rax]
+; X64-NEXT:  <L2>:
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <tbz_large>:
+; ARM64:         stp x29, x30, [sp, #-0xb0]!
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    nop
+; ARM64-NEXT:    nop
+; ARM64-NEXT:    str x0, [x29, #0xa0]
+; ARM64-NEXT:    tbnz x0, #0x2f, 0x882c <tbz_large+0x1c>
+; ARM64-NEXT:    b 0x8830 <tbz_large+0x20>
+; ARM64-NEXT:    b 0x10838 <tbz_large+0x8028>
+; ARM64-NEXT:    b 0x10830 <tbz_large+0x8020>
+; ARM64-NEXT:     ...
+; ARM64-NEXT:    sub x1, x0, x0
+; ARM64-NEXT:    b 0x10840 <tbz_large+0x8030>
+; ARM64-NEXT:    ldr x0, [x29, #0xa0]
+; ARM64-NEXT:    add x1, x0, x0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
+; ARM64-NEXT:    ret
 entry:
   tbz %a, ^tgt1, ^tgt2, 47
 tgt1:

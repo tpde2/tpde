@@ -31,52 +31,40 @@ bool TestIRCompilerX64::compile_inst(IRInstRef inst_idx, InstRange) noexcept {
     return true;
   }
   case alloca: return true;
-  case br: {
-    auto block_idx = ir()->value_operands[value.op_begin_idx];
-    auto spilled = this->spill_before_branch();
-
-    this->generate_branch_to_block(
-        Jump::jmp, static_cast<IRBlockRef>(block_idx), false, true);
-
-    this->release_spilled_regs(spilled);
+  case zerofill: {
+    auto size = ir()->value_operands[value.op_begin_idx];
+    this->text_writer.ensure_space(size);
+    ASM(JMP, this->text_writer.cur_ptr() + size);
+    std::memset(this->text_writer.cur_ptr(), 0, size);
+    this->text_writer.cur_ptr() += size;
     return true;
   }
-  case condbr: {
-    auto val_idx =
-        static_cast<IRValueRef>(ir()->value_operands[value.op_begin_idx]);
-    auto true_block =
-        static_cast<IRBlockRef>(ir()->value_operands[value.op_begin_idx + 1]);
-    auto false_block =
-        static_cast<IRBlockRef>(ir()->value_operands[value.op_begin_idx + 2]);
+  case br: {
+    auto block_idx = ir()->value_operands[value.op_begin_idx];
+    this->generate_uncond_branch(IRBlockRef(block_idx));
+    return true;
+  }
+  case condbr:
+  case tbz: {
+    auto val_idx = IRValueRef(ir()->value_operands[value.op_begin_idx]);
+    auto true_block = IRBlockRef(ir()->value_operands[value.op_begin_idx + 1]);
+    auto false_block = IRBlockRef(ir()->value_operands[value.op_begin_idx + 2]);
 
-    auto [_, val] = this->val_ref_single(val_idx);
-
-    auto true_needs_split = this->branch_needs_split(true_block);
-    auto false_needs_split = this->branch_needs_split(false_block);
-
-    auto val_reg = val.load_to_reg();
-
-    auto spilled = this->spill_before_branch();
-
-    ASM(CMP64ri, val_reg, 0);
-    if (this->analyzer.block_ref(this->next_block()) == true_block) {
-      this->generate_branch_to_block(
-          Jump::je, false_block, false_needs_split, false);
-      this->generate_branch_to_block(Jump::jmp, true_block, false, true);
-    } else if (this->analyzer.block_ref(this->next_block()) == false_block) {
-      this->generate_branch_to_block(
-          Jump::jne, true_block, true_needs_split, false);
-      this->generate_branch_to_block(Jump::jmp, false_block, false, true);
-    } else if (!true_needs_split) {
-      this->generate_branch_to_block(Jump::jne, true_block, false, false);
-      this->generate_branch_to_block(Jump::jmp, false_block, false, true);
+    auto [cond_ref, cond_part] = this->val_ref_single(val_idx);
+    auto cond_reg = cond_part.load_to_reg();
+    Jump cc = Jump::jne;
+    if (value.op == condbr) {
+      ASM(TEST64rr, cond_reg, cond_reg);
     } else {
-      this->generate_branch_to_block(
-          Jump::je, false_block, false_needs_split, false);
-      this->generate_branch_to_block(Jump::jmp, true_block, false, true);
+      u32 bit = ir()->value_operands[value.op_begin_idx + 3];
+      if (bit <= 32) {
+        ASM(TEST32ri, cond_reg, u32{1} << bit);
+      } else {
+        ASM(BT64ri, cond_reg, bit);
+        cc = Jump::jb;
+      }
     }
-
-    this->release_spilled_regs(spilled);
+    this->generate_cond_branch(cc, true_block, false_block);
     return true;
   }
   case call: {
