@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
 #include "tpde/AssemblerElf.hpp"
+#include "tpde/Assembler.hpp"
 #include "tpde/StringTable.hpp"
 #include "tpde/util/VectorWriter.hpp"
 #include "tpde/util/misc.hpp"
@@ -107,32 +108,10 @@ void AssemblerElf::reset() noexcept {
   local_symbols.resize(1); // first symbol must be null
   strtab = StringTable();
   shstrtab_extra = StringTable();
-  secref_text = SecRef();
-  secref_rodata = SecRef();
-  secref_relro = SecRef();
-  secref_data = SecRef();
-  secref_bss = SecRef();
-  secref_tdata = SecRef();
-  secref_tbss = SecRef();
-  secref_eh_frame = SecRef();
-  secref_except_table = SecRef();
   cur_personality_func_addr = SymRef();
 
   init_sections();
   eh_init_cie();
-}
-
-SecRef AssemblerElf::create_section(unsigned type,
-                                    unsigned flags,
-                                    unsigned name) noexcept {
-  SecRef ref = static_cast<SecRef>(sections.size());
-  auto &sec = sections.emplace_back(new (section_allocator) DataSection(ref));
-  sec->type = type;
-  sec->flags = flags;
-  sec->name = name;
-  sec->is_virtual = type == SHT_NOBITS;
-  sec->has_relocs = false;
-  return ref;
 }
 
 SymRef AssemblerElf::create_section_symbol(SecRef ref,
@@ -156,66 +135,10 @@ SymRef AssemblerElf::create_section_symbol(SecRef ref,
   return sym;
 }
 
-DataSection &AssemblerElf::get_or_create_section(SecRef &ref,
-                                                 unsigned rela_name,
-                                                 unsigned type,
-                                                 unsigned flags,
-                                                 unsigned align,
-                                                 bool with_rela) noexcept {
-  if (!ref.valid()) [[unlikely]] {
-    if (with_rela) {
-      ref = create_section(type, flags, rela_name + 5);
-      sections.emplace_back(nullptr); // Reserve ID for RELA section.
-    } else {
-      ref = create_section(type, flags, rela_name);
-    }
-
-    std::string_view name{elf::SHSTRTAB.data() + rela_name +
-                          (with_rela ? 5 : 0)};
-
-    DataSection &sec = get_section(ref);
-    sec.align = align;
-    sec.sym = create_section_symbol(ref, name);
-    sec.has_relocs = with_rela;
-  }
-  return get_section(ref);
-}
-
 const char *AssemblerElf::sec_name(SecRef ref) const noexcept {
   const DataSection &sec = get_section(ref);
   assert(sec.name < elf::SHSTRTAB.size());
   return elf::SHSTRTAB.data() + sec.name;
-}
-
-SecRef AssemblerElf::get_data_section(bool rodata, bool relro) noexcept {
-  SecRef &secref = !rodata ? secref_data : relro ? secref_relro : secref_rodata;
-  unsigned off_r = !rodata ? elf::sec_off(".rela.data")
-                   : relro ? elf::sec_off(".rela.data.rel.ro")
-                           : elf::sec_off(".rela.rodata");
-  unsigned flags = SHF_ALLOC | (rodata && !relro ? 0 : SHF_WRITE);
-  (void)get_or_create_section(secref, off_r, SHT_PROGBITS, flags, 1);
-  return secref;
-}
-
-SecRef AssemblerElf::get_bss_section() noexcept {
-  unsigned off = elf::sec_off(".bss");
-  unsigned flags = SHF_ALLOC | SHF_WRITE;
-  (void)get_or_create_section(secref_bss, off, SHT_NOBITS, flags, 1, false);
-  return secref_bss;
-}
-
-SecRef AssemblerElf::get_tdata_section() noexcept {
-  unsigned off_r = elf::sec_off(".rela.tdata");
-  unsigned flags = SHF_ALLOC | SHF_WRITE | SHF_TLS;
-  (void)get_or_create_section(secref_tdata, off_r, SHT_PROGBITS, flags, 1);
-  return secref_tdata;
-}
-
-SecRef AssemblerElf::get_tbss_section() noexcept {
-  unsigned off = elf::sec_off(".tbss");
-  unsigned flags = SHF_ALLOC | SHF_WRITE | SHF_TLS;
-  (void)get_or_create_section(secref_tbss, off, SHT_NOBITS, flags, 1, false);
-  return secref_tbss;
 }
 
 SecRef AssemblerElf::create_structor_section(bool init, SecRef group) noexcept {
@@ -249,31 +172,33 @@ SecRef AssemblerElf::create_section(std::string_view name,
     assert(group_sec->type == SHT_GROUP);
   }
 
-  SecRef ref;
-  if (with_rela) {
-    ref = create_section(type, flags | group_flag, rela_name + 5);
-    sections.emplace_back(nullptr); // Reserve ID for RELA section.
-    if (group_sec) {
-      group_sec->write<u32>(ref.id());
+  TargetInfo::SectionFlags sec_flags{.type = type,
+                                     .flags = flags | group_flag,
+                                     .name =
+                                         u32(rela_name + (with_rela ? 5 : 0)),
+                                     .has_relocs = with_rela,
+                                     .is_bss = type == SHT_NOBITS};
+  SecRef ref = Assembler::create_section(sec_flags);
+  if (group_sec) {
+    group_sec->write<u32>(ref.id());
+    if (with_rela) {
       group_sec->write<u32>(ref.id() + 1);
-    }
-  } else {
-    ref = create_section(type, flags | group_flag, rela_name);
-    if (group_sec) {
-      group_sec->write<u32>(ref.id());
     }
   }
 
   get_section(ref).sym = create_section_symbol(ref, name);
-  get_section(ref).has_relocs = with_rela;
   return ref;
 }
 
 SecRef AssemblerElf::create_group_section(SymRef signature_sym,
                                           bool is_comdat) noexcept {
-  SecRef ref = create_section(SHT_GROUP, 0, elf::sec_off(".group"));
+  TargetInfo::SectionFlags flags{.type = SHT_GROUP,
+                                 .flags = 0,
+                                 .name = elf::sec_off(".group"),
+                                 .align = 4,
+                                 .has_relocs = false};
+  SecRef ref = Assembler::create_section(flags);
   DataSection &sec = get_section(ref);
-  sec.align = 4;
   sec.sym = signature_sym;
   // Group flags.
   sec.write<u32>(is_comdat ? GRP_COMDAT : 0);
@@ -282,16 +207,12 @@ SecRef AssemblerElf::create_group_section(SymRef signature_sym,
 
 void AssemblerElf::init_sections() noexcept {
   for (size_t i = 0; i < elf::predef_sec_count(); i++) {
-    (void)create_section(SHT_NULL, 0, 0);
+    sections.emplace_back(nullptr);
+    // (void)create_section(SHT_NULL, 0, 0);
   }
 
-  unsigned off_text = elf::sec_off(".rela.text");
-  (void)get_or_create_section(
-      secref_text, off_text, SHT_PROGBITS, SHF_ALLOC | SHF_EXECINSTR, 16);
-  unsigned off_eh_frame = elf::sec_off(".rela.eh_frame");
-  DataSection &eh_frame_sec = get_or_create_section(
-      secref_eh_frame, off_eh_frame, SHT_PROGBITS, SHF_ALLOC, 8);
-  eh_writer = util::VectorWriter(eh_frame_sec.data);
+  SecRef secref_eh_frame = get_default_section(SectionKind::EHFrame);
+  eh_writer = util::VectorWriter(get_section(secref_eh_frame).data);
 }
 
 
@@ -335,41 +256,6 @@ SymRef AssemblerElf::sym_add(const std::string_view name,
     global_symbols.push_back(sym);
     assert(global_symbols.size() < 0x8000'0000);
     return SymRef((global_symbols.size() - 1) | 0x8000'0000);
-  }
-}
-
-void AssemblerElf::sym_def_predef_data(SecRef sec_ref,
-                                       SymRef sym_ref,
-                                       std::span<const u8> data,
-                                       const u32 align,
-                                       u32 *off) noexcept {
-  DataSection &sec = get_section(sec_ref);
-  sec.align = std::max(sec.align, align);
-  size_t pos = util::align_up(sec.size(), align);
-  sym_def(sym_ref, sec_ref, pos, data.size());
-  assert(!sec.is_virtual && "cannot add data to virtual section");
-  sec.data.resize(pos);
-  sec.data.append(data.begin(), data.end());
-
-  if (off) {
-    *off = pos;
-  }
-}
-
-void AssemblerElf::sym_def_predef_zero(
-    SecRef sec_ref, SymRef sym_ref, u32 size, u32 align, u32 *off) noexcept {
-  DataSection &sec = get_section(sec_ref);
-  sec.align = std::max(sec.align, align);
-  size_t pos = util::align_up(sec.size(), align);
-  sym_def(sym_ref, sec_ref, pos, size);
-  if (sec.is_virtual) {
-    sec.vsize = pos + size;
-  } else {
-    sec.data.resize(pos + size);
-  }
-
-  if (off) {
-    *off = pos;
   }
 }
 
@@ -477,7 +363,7 @@ void AssemblerElf::eh_init_cie(SymRef personality_func_addr) noexcept {
                                   dwarf::DW_EH_PE_sdata4 |
                                   dwarf::DW_EH_PE_indirect);
 
-    reloc_sec(secref_eh_frame,
+    reloc_sec(get_default_section(SectionKind::EHFrame),
               personality_func_addr,
               target_info.reloc_pc32,
               eh_writer.size(),
@@ -551,14 +437,19 @@ u32 AssemblerElf::eh_begin_fde(SymRef personality_func_addr) noexcept {
 void AssemblerElf::eh_end_fde(u32 fde_start, SymRef func) noexcept {
   eh_align_frame();
 
+  SecRef secref_eh_frame = get_default_section(SectionKind::EHFrame);
   u8 *eh_data = eh_writer.data();
-  auto *func_sym = sym_ptr(func);
 
   // relocate the func_start to the function
   // relocate against .text so we don't have to fix up any relocations
   // NB: ld.bfd (for a reason that needs to be investigated) doesn't accept
   // using the function symbol here.
   DataSection &func_sec = get_section(sym_section(func));
+  if (!func_sec.sym.valid()) {
+    func_sec.sym = create_section_symbol(func_sec.get_ref(), "");
+  }
+
+  auto *func_sym = sym_ptr(func);
   this->reloc_sec(secref_eh_frame,
                   func_sec.sym,
                   target_info.reloc_pc32,
@@ -570,13 +461,12 @@ void AssemblerElf::eh_end_fde(u32 fde_start, SymRef func) noexcept {
   const u32 len = eh_writer.size() - fde_start - sizeof(u32);
   *reinterpret_cast<u32 *>(eh_data + fde_start) = len;
   if (cur_personality_func_addr.valid()) {
-    DataSection &except_table =
-        get_or_create_section(secref_except_table,
-                              elf::sec_off(".rela.gcc_except_table"),
-                              SHT_PROGBITS,
-                              SHF_ALLOC,
-                              8);
-    ;
+    SecRef secref_except_table = get_default_section(SectionKind::LSDA);
+    DataSection &except_table = get_section(secref_except_table);
+    if (!except_table.sym.valid()) {
+      except_table.sym =
+          create_section_symbol(secref_except_table, ".gcc_except_table");
+    }
     reloc_sec(secref_eh_frame,
               except_table.sym,
               target_info.reloc_pc32,
@@ -644,6 +534,7 @@ void AssemblerElf::except_encode_func(SymRef func_sym,
   }
 
   {
+    SecRef secref_except_table = get_default_section(SectionKind::LSDA);
     util::VectorWriter et_writer(get_section(secref_except_table).data);
     // write the lsda (see
     // https://github.com/llvm/llvm-project/blob/main/libcxxabi/src/cxa_personality.cpp#L60)
@@ -1039,6 +930,58 @@ static constexpr auto get_cie_initial_instrs_x64() {
 
 static constexpr auto cie_instrs_x64 = get_cie_initial_instrs_x64();
 
+static constexpr auto get_elf_section_flags() {
+  using SectionFlags = Assembler::TargetInfo::SectionFlags;
+  std::array<SectionFlags, unsigned(SectionKind::Max)> section_flags;
+  section_flags[u8(SectionKind::Text)] =
+      SectionFlags{.type = SHT_PROGBITS,
+                   .flags = SHF_ALLOC | SHF_EXECINSTR,
+                   .name = elf::sec_off(".rela.text") + 5,
+                   .align = 16};
+  section_flags[u8(SectionKind::ReadOnly)] =
+      SectionFlags{.type = SHT_PROGBITS,
+                   .flags = SHF_ALLOC,
+                   .name = elf::sec_off(".rodata"),
+                   .has_relocs = false};
+  section_flags[u8(SectionKind::EHFrame)] =
+      SectionFlags{.type = SHT_PROGBITS,
+                   .flags = SHF_ALLOC,
+                   .name = elf::sec_off(".rela.eh_frame") + 5,
+                   .align = 8};
+  section_flags[u8(SectionKind::LSDA)] =
+      SectionFlags{.type = SHT_PROGBITS,
+                   .flags = SHF_ALLOC,
+                   .name = elf::sec_off(".rela.gcc_except_table") + 5,
+                   .align = 8};
+  section_flags[u8(SectionKind::Data)] =
+      SectionFlags{.type = SHT_PROGBITS,
+                   .flags = SHF_ALLOC | SHF_WRITE,
+                   .name = elf::sec_off(".rela.data") + 5};
+  section_flags[u8(SectionKind::DataRelRO)] =
+      SectionFlags{.type = SHT_PROGBITS,
+                   .flags = SHF_ALLOC | SHF_WRITE,
+                   .name = elf::sec_off(".rela.data.rel.ro") + 5};
+  section_flags[u8(SectionKind::BSS)] =
+      SectionFlags{.type = SHT_NOBITS,
+                   .flags = SHF_ALLOC | SHF_WRITE,
+                   .name = elf::sec_off(".bss"),
+                   .has_relocs = false,
+                   .is_bss = true};
+  section_flags[u8(SectionKind::ThreadData)] =
+      SectionFlags{.type = SHT_PROGBITS,
+                   .flags = SHF_ALLOC | SHF_WRITE | SHF_TLS,
+                   .name = elf::sec_off(".rela.tdata") + 5};
+  section_flags[u8(SectionKind::ThreadBSS)] =
+      SectionFlags{.type = SHT_NOBITS,
+                   .flags = SHF_ALLOC | SHF_WRITE | SHF_TLS,
+                   .name = elf::sec_off(".tbss"),
+                   .has_relocs = false,
+                   .is_bss = true};
+  return section_flags;
+}
+
+static constexpr auto elf_section_flags = get_elf_section_flags();
+
 } // namespace
 
 // Clang Format gives random indentation.
@@ -1052,6 +995,8 @@ const AssemblerElf::TargetInfoElf AssemblerElfA64::TARGET_INFO{
 
     .reloc_pc32 = R_AARCH64_PREL32,
     .reloc_abs64 = R_AARCH64_ABS64,
+
+    .section_flags = elf_section_flags,
   },
 
   ELFOSABI_SYSV,
@@ -1067,6 +1012,8 @@ const AssemblerElf::TargetInfoElf AssemblerElfX64::TARGET_INFO{
 
     .reloc_pc32 = R_X86_64_PC32,
     .reloc_abs64 = R_X86_64_64,
+
+    .section_flags = elf_section_flags,
   },
 
   ELFOSABI_SYSV,

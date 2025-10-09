@@ -134,7 +134,7 @@ bool ElfMapper::map(AssemblerElf &assembler, SymbolResolver resolver) noexcept {
     }
     sec.addr = base_off;
     size_t sec_size = sec.size();
-    if (as.section == assembler.secref_eh_frame) {
+    if (as.section == assembler.get_default_section(SectionKind::EHFrame)) {
       // Add zero-terminator to eh_frame. This is required for libgcc's
       // __register_frame, which iterates over FDEs up to the zero-terminator.
       sec_size += 4;
@@ -396,7 +396,8 @@ bool ElfMapper::map(AssemblerElf &assembler, SymbolResolver resolver) noexcept {
   }
 
   // Register eh_frame FDEs
-  auto &eh_frame = assembler.get_section(assembler.secref_eh_frame);
+  auto &eh_frame = assembler.get_section(
+      assembler.get_default_section(SectionKind::EHFrame));
   registered_frame_off = eh_frame.addr + assembler.eh_first_fde_off;
   __register_frame(mapped_addr + registered_frame_off);
 

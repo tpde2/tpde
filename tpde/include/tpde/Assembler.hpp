@@ -51,6 +51,21 @@ struct Relocation {
   i32 addend;    ///< Addend.
 };
 
+/// Section kinds, lowered to file-format specific flags.
+enum class SectionKind : u8 {
+  Text,       ///< Text section, executable code (ELF .text)
+  ReadOnly,   ///< Read-only data section (ELF .rodata)
+  EHFrame,    ///< EH Frame section (ELF .eh_frame)
+  LSDA,       ///< LSDA section (ELF .gcc_except_table)
+  Data,       ///< Writable data section (ELF .data)
+  DataRelRO,  ///< Read-only data section with relocations (ELF .data.rel.ro)
+  BSS,        ///< Zero-initialized data section (ELF .bss)
+  ThreadData, ///< Initialized thread-local data section (ELF .tdata)
+  ThreadBSS,  ///< Zero-initialized thread-local data section (ELF .tbss)
+
+  Max
+};
+
 struct DataSection {
   friend class Assembler;
   friend class AssemblerElf;
@@ -70,10 +85,10 @@ struct DataSection {
   u32 name = 0;  ///< Name (file-format-specific, can also be index, etc.).
   u32 align = 1; ///< Alignment (bytes).
 
-  /// Section symbol, or signature symbol for SHT_GROUP sections.
-  SymRef sym;
-
 private:
+  /// Section symbol, or signature symbol for SHT_GROUP sections.
+  SymRef sym = {};
+
   SecRef sec_ref;
 
   util::SmallVector<Relocation, 4> relocs;
@@ -116,7 +131,25 @@ public:
 /// Assembler base class.
 class Assembler {
 public:
+  enum class SymBinding : u8 {
+    /// Symbol with local linkage, must be defined
+    LOCAL,
+    /// Weak linkage
+    WEAK,
+    /// Global linkage
+    GLOBAL,
+  };
+
   struct TargetInfo {
+    struct SectionFlags {
+      u32 type;
+      u32 flags;
+      u32 name;
+      u8 align = 1;
+      bool has_relocs = true;
+      bool is_bss = false;
+    };
+
     /// The return address register for the CIE.
     u8 cie_return_addr_register;
     /// The initial instructions for the CIE.
@@ -130,6 +163,9 @@ public:
     u32 reloc_pc32;
     /// The relocation type for 64-bit absolute addresses.
     u32 reloc_abs64;
+
+    /// Section flags for the different section kinds.
+    std::array<SectionFlags, unsigned(SectionKind::Max)> section_flags;
   };
 
 protected:
@@ -137,6 +173,8 @@ protected:
 
   util::BumpAllocator<> section_allocator;
   util::SmallVector<util::BumpAllocUniquePtr<DataSection>, 16> sections;
+
+  std::array<SecRef, unsigned(SectionKind::Max)> default_sections;
 
   Assembler(const TargetInfo &target_info) noexcept
       : target_info(target_info) {}
@@ -158,7 +196,72 @@ public:
     return *sections[ref.id()];
   }
 
+  SecRef create_section(const TargetInfo::SectionFlags &flags) noexcept;
+
+  SecRef create_section(SectionKind kind) noexcept {
+    return create_section(target_info.section_flags[unsigned(kind)]);
+  }
+
+  SecRef get_default_section(SectionKind kind) noexcept {
+    SecRef &res = default_sections[unsigned(kind)];
+    if (!res.valid()) {
+      res = create_section(kind);
+    }
+    return res;
+  }
+
+  SecRef get_text_section() noexcept {
+    return get_default_section(SectionKind::Text);
+  }
+  SecRef get_data_section(bool rodata, bool relro = false) noexcept {
+    return get_default_section(!rodata ? SectionKind::Data
+                               : relro ? SectionKind::DataRelRO
+                                       : SectionKind::ReadOnly);
+  }
+  SecRef get_bss_section() noexcept {
+    return get_default_section(SectionKind::BSS);
+  }
+  SecRef get_tdata_section() noexcept {
+    return get_default_section(SectionKind::ThreadData);
+  }
+  SecRef get_tbss_section() noexcept {
+    return get_default_section(SectionKind::ThreadBSS);
+  }
+
   /// @}
+
+  virtual SymRef sym_add_undef(std::string_view, SymBinding) noexcept = 0;
+  virtual SymRef sym_predef_func(std::string_view, SymBinding) noexcept = 0;
+  virtual SymRef sym_predef_data(std::string_view, SymBinding) noexcept = 0;
+  virtual SymRef sym_predef_tls(std::string_view, SymBinding) noexcept = 0;
+  /// Define a symbol at the specified location.
+  virtual void sym_def(SymRef, SecRef, u64 pos, u64 size) noexcept = 0;
+
+  /// Define predefined symbol with the specified data.
+  void sym_def_predef_data(SecRef sec,
+                           SymRef sym,
+                           std::span<const u8> data,
+                           u32 align,
+                           u32 *off) noexcept;
+
+  [[nodiscard]] SymRef sym_def_data(SecRef sec,
+                                    std::string_view name,
+                                    std::span<const u8> data,
+                                    u32 align,
+                                    SymBinding binding,
+                                    u32 *off = nullptr) {
+    SymRef sym = sym_predef_data(name, binding);
+    sym_def_predef_data(sec, sym, data, align, off);
+    return sym;
+  }
+
+  /// Define predefined symbol with zero; also supported for BSS sections.
+  void sym_def_predef_zero(SecRef sec_ref,
+                           SymRef sym_ref,
+                           u32 size,
+                           u32 align,
+                           u32 *off = nullptr) noexcept;
+
 
   /// \name Relocations
   /// @{

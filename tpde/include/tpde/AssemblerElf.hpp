@@ -146,15 +146,6 @@ protected:
   };
 
 public:
-  enum class SymBinding : u8 {
-    /// Symbol with local linkage, must be defined
-    LOCAL,
-    /// Weak linkage
-    WEAK,
-    /// Global linkage
-    GLOBAL,
-  };
-
   enum class SymVisibility : u8 {
     DEFAULT = STV_DEFAULT,
     INTERNAL = STV_INTERNAL,
@@ -170,18 +161,6 @@ private:
   StringTable strtab;
   /// Storage for extra user-provided section names.
   StringTable shstrtab_extra;
-
-  SecRef secref_text = SecRef();
-  SecRef secref_rodata = SecRef();
-  SecRef secref_relro = SecRef();
-  SecRef secref_data = SecRef();
-  SecRef secref_bss = SecRef();
-  SecRef secref_tdata = SecRef();
-  SecRef secref_tbss = SecRef();
-
-  /// Unwind Info
-  SecRef secref_eh_frame = SecRef();
-  SecRef secref_except_table = SecRef();
 
 public:
   util::VectorWriter eh_writer;
@@ -233,10 +212,6 @@ private:
     return get_section(ref).relocs;
   }
 
-  /// Allocate a new section.
-  [[nodiscard]] SecRef
-      create_section(unsigned type, unsigned flags, unsigned name) noexcept;
-
   /// Allocate a new section for relocations.
   [[nodiscard]] SecRef create_rela_section(SecRef ref,
                                            unsigned flags,
@@ -245,19 +220,7 @@ private:
   [[nodiscard]] SymRef create_section_symbol(SecRef ref,
                                              std::string_view name) noexcept;
 
-  DataSection &get_or_create_section(SecRef &ref,
-                                     unsigned rela_name,
-                                     unsigned type,
-                                     unsigned flags,
-                                     unsigned align,
-                                     bool with_rela = true) noexcept;
-
 public:
-  SecRef get_text_section() noexcept { return secref_text; }
-  SecRef get_data_section(bool rodata, bool relro = false) noexcept;
-  SecRef get_bss_section() noexcept;
-  SecRef get_tdata_section() noexcept;
-  SecRef get_tbss_section() noexcept;
   SecRef create_structor_section(bool init, SecRef group = SecRef()) noexcept;
 
   /// Create a new section with the given name, ELF section type, and flags.
@@ -291,54 +254,34 @@ private:
 
 public:
   [[nodiscard]] SymRef sym_add_undef(std::string_view name,
-                                     SymBinding binding) noexcept {
+                                     SymBinding binding) noexcept override {
     return sym_add(name, binding, STT_NOTYPE);
   }
 
   [[nodiscard]] SymRef sym_predef_func(std::string_view name,
-                                       SymBinding binding) noexcept {
+                                       SymBinding binding) noexcept override {
     return sym_add(name, binding, STT_FUNC);
   }
 
   [[nodiscard]] SymRef sym_predef_data(std::string_view name,
-                                       SymBinding binding) noexcept {
+                                       SymBinding binding) noexcept override {
     return sym_add(name, binding, STT_OBJECT);
   }
 
   [[nodiscard]] SymRef sym_predef_tls(std::string_view name,
-                                      SymBinding binding) noexcept {
+                                      SymBinding binding) noexcept override {
     return sym_add(name, binding, STT_TLS);
   }
-
-  void sym_def_predef_data(SecRef sec,
-                           SymRef sym,
-                           std::span<const u8> data,
-                           u32 align,
-                           u32 *off) noexcept;
-
-  [[nodiscard]] SymRef sym_def_data(SecRef sec,
-                                    std::string_view name,
-                                    std::span<const u8> data,
-                                    u32 align,
-                                    SymBinding binding,
-                                    u32 *off = nullptr) {
-    SymRef sym = sym_predef_data(name, binding);
-    sym_def_predef_data(sec, sym, data, align, off);
-    return sym;
-  }
-
-  void sym_def_predef_zero(SecRef sec_ref,
-                           SymRef sym_ref,
-                           u32 size,
-                           u32 align,
-                           u32 *off = nullptr) noexcept;
 
 private:
   /// Set symbol sections for SHN_XINDEX.
   void sym_def_xindex(SymRef sym_ref, SecRef sec_ref) noexcept;
 
 public:
-  void sym_def(SymRef sym_ref, SecRef sec_ref, u64 pos, u64 size) noexcept {
+  void sym_def(SymRef sym_ref,
+               SecRef sec_ref,
+               u64 pos,
+               u64 size) noexcept override {
     Elf64_Sym *sym = sym_ptr(sym_ref);
     assert(sym->st_shndx == SHN_UNDEF && "cannot redefined symbol");
     sym->st_value = pos;
