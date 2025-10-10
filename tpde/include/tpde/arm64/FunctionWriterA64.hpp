@@ -14,11 +14,11 @@ class FunctionWriterA64 : public FunctionWriter<FunctionWriterA64> {
   u32 unresolved_cond_brs, unresolved_test_brs;
 
 public:
-  void begin_func(u32 expected_size) noexcept {
+  void begin_func(u32 align, u32 expected_size) noexcept {
     veneers.clear();
     // Must clear unresolved count here, begin_func will call more_space.
     unresolved_cond_brs = unresolved_test_brs = 0;
-    FunctionWriter::begin_func(expected_size);
+    FunctionWriter::begin_func(align, expected_size);
   }
 
   void more_space(u32 size) noexcept;

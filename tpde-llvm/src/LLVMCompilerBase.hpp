@@ -4223,10 +4223,10 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_invoke(
   const auto num_clauses = landing_pad->getNumClauses();
   const auto only_cleanup = is_cleanup && num_clauses == 0;
 
-  this->assembler.except_add_call_site(off_before_call,
-                                       off_after_call - off_before_call,
-                                       u32(unwind_label), // TODO: Label type?
-                                       only_cleanup);
+  this->text_writer.except_add_call_site(off_before_call,
+                                         off_after_call - off_before_call,
+                                         unwind_label,
+                                         only_cleanup);
 
   if (only_cleanup) {
     // no clause so we are done
@@ -4241,13 +4241,13 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_invoke(
         assert(llvm::dyn_cast<llvm::GlobalValue>(C));
         sym = lookup_type_info_sym(C);
       }
-      this->assembler.except_add_action(i == 0, sym);
+      this->text_writer.except_add_action(i == 0, sym);
     } else {
       assert(landing_pad->isFilter(i));
       auto *C = landing_pad->getClause(i);
       assert(C->getType()->isArrayTy());
       if (C->getType()->getArrayNumElements() == 0) {
-        this->assembler.except_add_empty_spec_action(i == 0);
+        this->text_writer.except_add_empty_spec_action(i == 0);
       } else {
         TPDE_LOG_ERR("Exception filters with non-zero length arrays "
                      "not supported");
@@ -4258,7 +4258,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_invoke(
 
   if (is_cleanup) {
     assert(num_clauses != 0);
-    this->assembler.except_add_cleanup_action();
+    this->text_writer.except_add_cleanup_action();
   }
 
   return true;
@@ -4978,7 +4978,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_intrin(
 
     // not the most efficient but it's OK
     const auto type_info_sym = lookup_type_info_sym(type);
-    const u64 idx = this->assembler.except_type_idx_for_sym(type_info_sym);
+    const u64 idx = this->text_writer.except_type_idx_for_sym(type_info_sym);
 
     auto const_ref = ValuePartRef{this, idx, 4, Config::GP_BANK};
     this->result_ref(inst).part(0).set_value(std::move(const_ref));

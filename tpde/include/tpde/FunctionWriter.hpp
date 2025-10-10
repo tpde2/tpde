@@ -33,6 +33,8 @@ protected:
   u8 *data_reserve_end = nullptr;
 
 public:
+  u32 func_begin; ///< Begin offset of the current function.
+
   /// Label offsets into section, ~0u indicates unplaced label.
   util::SmallVector<u32> label_offsets;
 
@@ -48,6 +50,28 @@ protected:
 
   /// Growth size for more_space; adjusted exponentially after every grow.
   u32 growth_size = 0x10000;
+
+private:
+  struct ExceptCallSiteInfo {
+    /// Start offset *in section* (not inside function)
+    u64 start;
+    u64 len;
+    Label landing_pad;
+    u32 action_entry;
+  };
+
+  /// Call Sites for current function
+  util::SmallVector<ExceptCallSiteInfo, 0> except_call_site_table;
+
+  /// Temporary storage for encoding call sites
+  util::SmallVector<u8, 0> except_encoded_call_sites;
+  /// Action Table for current function
+  util::SmallVector<u8, 0> except_action_table;
+  /// The type_info table (contains the symbols which contain the pointers to
+  /// the type_info)
+  util::SmallVector<SymRef, 0> except_type_info_table;
+  /// Table for exception specs
+  util::SmallVector<u8, 0> except_spec_table;
 
 public:
   FunctionWriterBase() noexcept = default;
@@ -75,6 +99,8 @@ public:
     data_cur = data_begin + section->data.size();
     data_reserve_end = data_cur;
   }
+
+  void begin_func() noexcept;
 
   /// Get the current offset into the section.
   size_t offset() const noexcept { return data_cur - data_begin; }
@@ -127,6 +153,32 @@ public:
   }
 
   /// @}
+
+  /// \name Itanium Exception ABI
+  /// @{
+
+  void except_encode_func(Assembler &assembler) noexcept;
+
+  /// add an entry to the call-site table
+  /// must be called in strictly increasing order wrt text_off
+  void except_add_call_site(u32 text_off,
+                            u32 len,
+                            Label landing_pad,
+                            bool is_cleanup) noexcept;
+
+  /// Add a cleanup action to the action table
+  /// *MUST* be the last one
+  void except_add_cleanup_action() noexcept;
+
+  /// add an action to the action table
+  /// An invalid SymRef signals a catch(...)
+  void except_add_action(bool first_action, SymRef type_sym) noexcept;
+
+  void except_add_empty_spec_action(bool first_action) noexcept;
+
+  u32 except_type_idx_for_sym(SymRef sym) noexcept;
+
+  /// @}
 };
 
 /// Helper class to write function text.
@@ -136,11 +188,11 @@ protected:
   Derived *derived() noexcept { return static_cast<Derived *>(this); }
 
 public:
-  void begin_func(u32 expected_size) noexcept {
-    label_offsets.clear();
-    label_fixups.clear();
+  void begin_func(u32 align, u32 expected_size) noexcept {
     growth_size = expected_size;
-    ensure_space(expected_size);
+    ensure_space(align + expected_size);
+    derived()->align(align);
+    FunctionWriterBase::begin_func();
   }
 
   void finish_func() noexcept { derived()->handle_fixups(); }

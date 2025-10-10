@@ -397,7 +397,7 @@ struct CompilerA64 : BaseTy<Adaptor, Derived, Config> {
     static_assert(concepts::Compiler<Derived, PlatformConfig>);
   }
 
-  void start_func(u32 func_idx) noexcept;
+  void start_func(u32) noexcept {}
 
   void gen_func_prolog_and_args(CCAssigner *cc_assigner) noexcept;
 
@@ -733,16 +733,6 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::CallBuilder::call_impl(
 
 template <IRAdaptor Adaptor,
           typename Derived,
-          template <typename, typename, typename> class BaseTy,
-          typename Config>
-void CompilerA64<Adaptor, Derived, BaseTy, Config>::start_func(
-    const u32 /*func_idx*/) noexcept {
-  this->assembler.except_begin_func();
-  this->text_writer.align(16);
-}
-
-template <IRAdaptor Adaptor,
-          typename Derived,
           template <typename, typename, typename> typename BaseTy,
           typename Config>
 void CompilerA64<Adaptor, Derived, BaseTy, Config>::gen_func_prolog_and_args(
@@ -1031,6 +1021,7 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::finish_func(
     u32 skip = util::align_down(func_prologue_alloc - prologue.size() * 4, 16);
     std::memset(this->text_writer.begin_ptr() + func_start_off, 0, skip);
     func_start_off += skip;
+    this->text_writer.func_begin += skip;
     std::memcpy(this->text_writer.begin_ptr() + func_start_off,
                 prologue.data(),
                 prologue.size() * sizeof(u32));
@@ -1050,8 +1041,7 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::finish_func(
     auto func_size = this->text_writer.offset() - func_start_off;
     this->assembler.sym_def(func_sym, func_sec, func_start_off, func_size);
     this->assembler.eh_end_fde(fde_off, func_sym);
-    this->assembler.except_encode_func(func_sym,
-                                       this->text_writer.label_offsets.data());
+    this->text_writer.except_encode_func(this->assembler);
     return;
   }
 
@@ -1130,8 +1120,7 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::finish_func(
   auto func_size = this->text_writer.offset() - func_start_off;
   this->assembler.sym_def(func_sym, func_sec, func_start_off, func_size);
   this->assembler.eh_end_fde(fde_off, func_sym);
-  this->assembler.except_encode_func(func_sym,
-                                     this->text_writer.label_offsets.data());
+  this->text_writer.except_encode_func(this->assembler);
 }
 
 template <IRAdaptor Adaptor,

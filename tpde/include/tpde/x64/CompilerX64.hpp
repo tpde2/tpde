@@ -557,8 +557,6 @@ template <IRAdaptor Adaptor,
           typename Config>
 void CompilerX64<Adaptor, Derived, BaseTy, Config>::start_func(
     const u32 /*func_idx*/) noexcept {
-  this->text_writer.align(16);
-  this->assembler.except_begin_func();
   this->preserve_flags = false;
 }
 
@@ -806,8 +804,7 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::finish_func(
     auto func_size = this->text_writer.offset() - func_start_off;
     this->assembler.sym_def(func_sym, func_sec, func_start_off, func_size);
     this->assembler.eh_end_fde(fde_off, func_sym);
-    this->assembler.except_encode_func(func_sym,
-                                       this->text_writer.label_offsets.data());
+    this->text_writer.except_encode_func(this->assembler);
     return;
   }
 
@@ -865,8 +862,7 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::finish_func(
   auto func_size = this->text_writer.offset() - func_start_off;
   this->assembler.sym_def(func_sym, func_sec, func_start_off, func_size);
   this->assembler.eh_end_fde(fde_off, func_sym);
-  this->assembler.except_encode_func(func_sym,
-                                     this->text_writer.label_offsets.data());
+  this->text_writer.except_encode_func(this->assembler);
 }
 
 template <IRAdaptor Adaptor,
