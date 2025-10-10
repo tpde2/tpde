@@ -24,9 +24,8 @@ enum class LabelFixupKind : u8 {
   AARCH64_JUMP_TABLE,
 };
 
-/// Helper class to write function text.
-template <typename Derived>
-class FunctionWriter {
+/// Architecture-independent base for helper class to write function text.
+class FunctionWriterBase {
 protected:
   DataSection *section = nullptr;
   u8 *data_begin = nullptr;
@@ -51,17 +50,13 @@ protected:
   u32 growth_size = 0x10000;
 
 public:
-  FunctionWriter() noexcept = default;
+  FunctionWriterBase() noexcept = default;
 
-  ~FunctionWriter() {
+  ~FunctionWriterBase() {
     assert(data_cur == data_reserve_end &&
            "must flush section writer before destructing");
   }
 
-protected:
-  Derived *derived() noexcept { return static_cast<Derived *>(this); }
-
-public:
   /// Get the SecRef of the current section.
   SecRef get_sec_ref() const noexcept { return get_section().get_ref(); }
 
@@ -81,18 +76,6 @@ public:
     data_reserve_end = data_cur;
   }
 
-  void begin_func(u32 expected_size) noexcept {
-    label_offsets.clear();
-    label_fixups.clear();
-    growth_size = expected_size;
-    ensure_space(expected_size);
-  }
-
-  void finish_func() noexcept { derived()->handle_fixups(); }
-
-  /// \name Text Writing
-  /// @{
-
   /// Get the current offset into the section.
   size_t offset() const noexcept { return data_cur - data_begin; }
 
@@ -108,48 +91,7 @@ public:
   /// be moved beyond the allocated region.
   u8 *&cur_ptr() noexcept { return data_cur; }
 
-  void ensure_space(size_t size) noexcept {
-    assert(data_reserve_end >= data_cur);
-    if (size_t(data_reserve_end - data_cur) < size) [[unlikely]] {
-      derived()->more_space(size);
-    }
-  }
-
   void more_space(size_t size) noexcept;
-
-  template <std::integral T>
-  void write_unchecked(T t) noexcept {
-    assert(size_t(data_reserve_end - data_cur) >= sizeof(T));
-    std::memcpy(data_cur, &t, sizeof(T));
-    data_cur += sizeof(T);
-  }
-
-  template <std::integral T>
-  void write(T t) noexcept {
-    ensure_space(sizeof(T));
-    write_unchecked<T>(t);
-  }
-
-  void flush() noexcept {
-    if (data_cur != data_reserve_end) {
-      section->data.resize(offset());
-      data_reserve_end = data_cur;
-#ifndef NDEBUG
-      section->locked = false;
-#endif
-    }
-  }
-
-  void align(size_t align) noexcept {
-    assert(align > 0 && (align & (align - 1)) == 0);
-    ensure_space(align);
-    // permit optimization when align is a constant.
-    std::memset(cur_ptr(), 0, align);
-    data_cur = data_begin + util::align_up(offset(), align);
-    section->align = std::max(section->align, u32(align));
-  }
-
-  /// @}
 
   /// \name Labels
   /// @{
@@ -187,32 +129,66 @@ public:
   /// @}
 };
 
+/// Helper class to write function text.
 template <typename Derived>
-void FunctionWriter<Derived>::more_space(size_t size) noexcept {
-  size_t cur_size = section->data.size();
-  size_t new_size;
-  if (cur_size + size <= section->data.capacity()) {
-    new_size = section->data.capacity();
-  } else {
-    new_size = cur_size + (size <= growth_size ? growth_size : size);
+class FunctionWriter : public FunctionWriterBase {
+protected:
+  Derived *derived() noexcept { return static_cast<Derived *>(this); }
 
-    // Grow by factor 1.5
-    growth_size = growth_size + (growth_size >> 1);
-    // Max 16 MiB per grow.
-    growth_size = growth_size < 0x1000000 ? growth_size : 0x1000000;
+public:
+  void begin_func(u32 expected_size) noexcept {
+    label_offsets.clear();
+    label_fixups.clear();
+    growth_size = expected_size;
+    ensure_space(expected_size);
   }
 
-  const size_t off = offset();
-  section->data.resize_uninitialized(new_size);
-#ifndef NDEBUG
-  thread_local uint8_t rand = 1;
-  std::memset(section->data.data() + off, rand += 2, new_size - off);
-  section->locked = true;
-#endif
+  void finish_func() noexcept { derived()->handle_fixups(); }
 
-  data_begin = section->data.data();
-  data_cur = data_begin + off;
-  data_reserve_end = data_begin + section->data.size();
-}
+  /// \name Text Writing
+  /// @{
+
+  /// Ensure that at least size bytes are available.
+  void ensure_space(size_t size) noexcept {
+    assert(data_reserve_end >= data_cur);
+    if (size_t(data_reserve_end - data_cur) < size) [[unlikely]] {
+      derived()->more_space(size);
+    }
+  }
+
+  template <std::integral T>
+  void write_unchecked(T t) noexcept {
+    assert(size_t(data_reserve_end - data_cur) >= sizeof(T));
+    std::memcpy(data_cur, &t, sizeof(T));
+    data_cur += sizeof(T);
+  }
+
+  template <std::integral T>
+  void write(T t) noexcept {
+    ensure_space(sizeof(T));
+    write_unchecked<T>(t);
+  }
+
+  void flush() noexcept {
+    if (data_cur != data_reserve_end) {
+      section->data.resize(offset());
+      data_reserve_end = data_cur;
+#ifndef NDEBUG
+      section->locked = false;
+#endif
+    }
+  }
+
+  void align(size_t align) noexcept {
+    assert(align > 0 && (align & (align - 1)) == 0);
+    ensure_space(align);
+    // permit optimization when align is a constant.
+    std::memset(cur_ptr(), 0, align);
+    data_cur = data_begin + util::align_up(offset(), align);
+    section->align = std::max(section->align, u32(align));
+  }
+
+  /// @}
+};
 
 } // namespace tpde

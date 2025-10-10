@@ -37,6 +37,7 @@ target_sources(tpde PRIVATE
     src/AssemblerElf.cpp
     src/base.cpp
     src/ElfMapper.cpp
+    src/FunctionWriter.cpp
     src/StringTable.cpp
     src/ValueAssignment.cpp
     src/util/SmallVector.cpp
@@ -89,6 +90,7 @@ if (TPDE_A64)
 
     target_link_libraries(tpde PUBLIC disarm64::disarm64)
     target_sources(tpde PRIVATE
+        src/arm64/FunctionWriterA64.cpp
 
         PUBLIC
         FILE_SET HEADERS
