@@ -959,6 +959,16 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::finish_func(
     AsmReg last_reg = AsmReg::make_invalid();
     u32 frame_off = 16;
     for (auto reg : util::BitSetIterator{saved_regs}) {
+      u8 dwarf_base = reg < 32 ? dwarf::a64::DW_reg_x0 : dwarf::a64::DW_reg_v0;
+      u8 dwarf_reg = dwarf_base + reg % 32;
+      u32 cfa_off = (final_frame_size - frame_off) / 8 - last_reg.valid();
+      if ((dwarf_reg & dwarf::DWARF_CFI_PRIMARY_OPCODE_MASK) == 0) {
+        this->assembler.eh_write_inst(dwarf::DW_CFA_offset, dwarf_reg, cfa_off);
+      } else {
+        this->assembler.eh_write_inst(
+            dwarf::DW_CFA_offset_extended, dwarf_reg, cfa_off);
+      }
+
       if (last_reg.valid()) {
         const auto reg_bank = this->register_file.reg_bank(AsmReg{reg});
         const auto last_bank = this->register_file.reg_bank(last_reg);
@@ -978,20 +988,9 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::finish_func(
           frame_off += 8;
           last_reg = AsmReg{reg};
         }
-        continue;
-      }
-
-      u8 dwarf_base = reg < 32 ? dwarf::a64::DW_reg_v0 : dwarf::a64::DW_reg_x0;
-      u8 dwarf_reg = dwarf_base + reg % 32;
-      u32 cfa_off = (final_frame_size - frame_off) / 8;
-      if ((dwarf_reg & dwarf::DWARF_CFI_PRIMARY_OPCODE_MASK) == 0) {
-        this->assembler.eh_write_inst(dwarf::DW_CFA_offset, dwarf_reg, cfa_off);
       } else {
-        this->assembler.eh_write_inst(
-            dwarf::DW_CFA_offset_extended, dwarf_reg, cfa_off);
+        last_reg = AsmReg{reg};
       }
-
-      last_reg = AsmReg{reg};
     }
 
     if (last_reg.valid()) {
