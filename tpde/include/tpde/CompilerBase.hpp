@@ -812,6 +812,7 @@ void CompilerBase<Adaptor, Derived, Config>::RetBuilder::ret() noexcept {
 template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>
 bool CompilerBase<Adaptor, Derived, Config>::compile() {
   // create function symbols
+  text_writer.begin_module(assembler);
   text_writer.switch_section(
       assembler.get_section(assembler.get_text_section()));
 

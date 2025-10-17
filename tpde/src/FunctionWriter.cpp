@@ -9,6 +9,15 @@
 
 namespace tpde {
 
+void FunctionWriterBase::begin_module(Assembler &assembler) noexcept {
+  this->assembler = &assembler;
+  eh_frame_section = &assembler.get_section(
+      assembler.get_default_section(SectionKind::EHFrame));
+  eh_writer = util::VectorWriter(eh_frame_section->data);
+  cur_personality_func_addr = SymRef{};
+  eh_init_cie();
+}
+
 void FunctionWriterBase::begin_func() noexcept {
   func_begin = offset();
 
@@ -22,8 +31,187 @@ void FunctionWriterBase::begin_func() noexcept {
   except_action_table.resize(2); // cleanup entry
 }
 
-void FunctionWriterBase::except_encode_func(Assembler &assembler) noexcept {
-  if (except_call_site_table.empty()) {
+void FunctionWriterBase::eh_align_frame() noexcept {
+  if (unsigned count = -eh_writer.size() & 7) {
+    eh_writer.reserve(8);
+    // Small hack for performance: always write 8 bytes (single instruction, no
+    // loop in machine code), but adjust pointer only by count bytes.
+    for (unsigned i = 0; i < 8; ++i) {
+      eh_writer.write_unchecked<u8>(dwarf::DW_CFA_nop);
+    }
+    eh_writer.unskip(8 - count);
+  }
+}
+
+void FunctionWriterBase::eh_write_inst(const u8 opcode,
+                                       const u64 arg) noexcept {
+  if ((opcode & dwarf::DWARF_CFI_PRIMARY_OPCODE_MASK) != 0) {
+    assert((arg & dwarf::DWARF_CFI_PRIMARY_OPCODE_MASK) == 0);
+    eh_writer.write<u8>(opcode | arg);
+  } else {
+    eh_writer.reserve(11);
+    eh_writer.write_unchecked<u8>(opcode);
+    eh_writer.write_uleb_unchecked(arg);
+  }
+}
+
+void FunctionWriterBase::eh_write_inst(const u8 opcode,
+                                       const u64 first_arg,
+                                       const u64 second_arg) noexcept {
+  eh_write_inst(opcode, first_arg);
+  eh_writer.write_uleb(second_arg);
+}
+
+void FunctionWriterBase::eh_init_cie(SymRef personality_func_addr) noexcept {
+  // write out the initial CIE
+
+  // CIE layout:
+  // length: u32
+  // id: u32
+  // version: u8
+  // augmentation: 3 or 5 bytes depending on whether the CIE has a personality
+  // function
+  // code_alignment_factor: uleb128 (but we only use 1 byte)
+  // data_alignment_factor: sleb128 (but we only use 1 byte)
+  // return_addr_register: u8
+  // augmentation_data_len: uleb128 (but we only use 1 byte)
+  // augmentation_data:
+  //   if personality:
+  //     personality_encoding: u8
+  //     personality_addr: u32
+  //     lsa_encoding: u8
+  //   fde_ptr_encoding: u8
+  // instructions: [u8]
+  //
+  // total: 17 bytes or 25 bytes
+
+  auto off = eh_writer.size();
+  assert(off % 8 == 0 && "eh_frame section unaligned");
+  eh_cur_cie_off = off;
+
+  eh_writer.reserve(32 + cie_info.instrs.size());
+
+  eh_writer.skip_unchecked(4);       // length written at the end.
+  eh_writer.write_unchecked<u32>(0); // id is 0 for CIEs
+  eh_writer.write_unchecked<u8>(1);  // version
+  if (!personality_func_addr.valid()) {
+    // augmentation is "zR" for a CIE with no personality meaning there is
+    // the augmentation_data_len and ptr_size field
+    eh_writer.write_unchecked<u8>('z');
+    eh_writer.write_unchecked<u8>('R');
+  } else {
+    // with a personality function the augmentation is "zPLR" meaning there
+    // is augmentation_data_len, personality_encoding, personality_addr,
+    // lsa_encoding and ptr_size
+    eh_writer.write_unchecked<u8>('z');
+    eh_writer.write_unchecked<u8>('P');
+    eh_writer.write_unchecked<u8>('L');
+    eh_writer.write_unchecked<u8>('R');
+  }
+  eh_writer.write_unchecked<u8>(0);
+
+  eh_writer.write_unchecked<u8>(cie_info.code_alignment_factor);
+  eh_writer.write_unchecked<u8>(cie_info.data_alignment_factor);
+
+  // return_addr_register is defined by the derived impl
+  eh_writer.write_unchecked<u8>(cie_info.return_addr_register);
+
+  // augmentation_data_len is 1 when no personality is present or 7 otherwise
+  eh_writer.write_unchecked<u8>((!personality_func_addr.valid()) ? 1 : 7);
+
+  if (personality_func_addr.valid()) {
+    // the personality encoding is a 4-byte pc-relative address where the
+    // address of the personality func is stored
+    eh_writer.write_unchecked<u8>(dwarf::DW_EH_PE_pcrel |
+                                  dwarf::DW_EH_PE_sdata4 |
+                                  dwarf::DW_EH_PE_indirect);
+
+    assembler->reloc_pc32(eh_frame_section->get_ref(),
+                          personality_func_addr,
+                          eh_writer.size(),
+                          0);
+    eh_writer.write_unchecked<u32>(
+        0); // relocated, zero for deterministic output
+
+    // the lsa_encoding as a 4-byte pc-relative address since the whole
+    // object should fit in 2gb
+    eh_writer.write_unchecked<u8>(dwarf::DW_EH_PE_pcrel |
+                                  dwarf::DW_EH_PE_sdata4);
+  }
+
+  // fde_ptr_encoding is a 4-byte signed pc-relative address
+  eh_writer.write_unchecked<u8>(dwarf::DW_EH_PE_sdata4 | dwarf::DW_EH_PE_pcrel);
+
+  eh_writer.write_unchecked(cie_info.instrs);
+
+  eh_align_frame();
+
+  // patch size of CIE (length is not counted)
+  u32 size = eh_writer.size() - off - sizeof(u32);
+  std::memcpy(eh_writer.data() + off, &size, sizeof(size));
+}
+
+void FunctionWriterBase::eh_begin_fde(SymRef personality_func_addr) noexcept {
+  if (personality_func_addr != cur_personality_func_addr) {
+    eh_init_cie(personality_func_addr);
+    cur_personality_func_addr = personality_func_addr;
+  }
+
+  fde_start = eh_writer.size();
+  assert(fde_start % 8 == 0 && "eh_frame section unaligned");
+
+  // FDE Layout:
+  //  length: u32
+  //  id: u32
+  //  func_start: i32
+  //  func_size: i32
+  // augmentation_data_len: uleb128 (but we only use 1 byte)
+  // augmentation_data:
+  //   if personality:
+  //     lsda_ptr: i32 (we use a 4 byte signed pc-relative pointer to an
+  //     absolute address)
+  // instructions: [u8]
+  //
+  // Total Size: 17 bytes or 21 bytes
+
+  eh_writer.zero(!cur_personality_func_addr.valid() ? 17 : 21);
+  u8 *data = eh_writer.data() + fde_start;
+
+  // we encode length later
+
+  // id is the offset from the current CIE to the id field
+  *reinterpret_cast<u32 *>(data + 4) = fde_start - eh_cur_cie_off + sizeof(u32);
+
+  // func_start and func_size will be relocated at the end
+
+  // augmentation_data_len is 0 with no personality or 4 otherwise
+  if (cur_personality_func_addr.valid()) {
+    data[16] = 4;
+  }
+}
+
+void FunctionWriterBase::eh_end_fde() noexcept {
+  eh_align_frame();
+
+  u8 *eh_data = eh_writer.data();
+
+  // relocate the func_start to the function
+  // relocate against .text so we don't have to fix up any relocations
+  // NB: ld.bfd (for a reason that needs to be investigated) doesn't accept
+  // using the function symbol here.
+  assembler->reloc_pc32(eh_frame_section->get_ref(),
+                        assembler->section_symbol(section->get_ref()),
+                        fde_start + 8,
+                        func_begin);
+  // Adjust func_size to the function size
+  *reinterpret_cast<i32 *>(eh_data + fde_start + 12) = offset() - func_begin;
+
+  const u32 len = eh_writer.size() - fde_start - sizeof(u32);
+  *reinterpret_cast<u32 *>(eh_data + fde_start) = len;
+}
+
+void FunctionWriterBase::except_encode_func() noexcept {
+  if (!cur_personality_func_addr.valid()) {
     return;
   }
 
@@ -65,11 +253,14 @@ void FunctionWriterBase::except_encode_func(Assembler &assembler) noexcept {
     ecst_writer.write_unchecked<u8>(0);
   }
 
+  // TODO: if the text section is part of a section group, this should go into
+  // the LSDA section of that group.
+  SecRef secref_lsda = assembler->get_default_section(SectionKind::LSDA);
+  DataSection &sec_lsda = assembler->get_section(secref_lsda);
+  size_t lsda_start = sec_lsda.size();
+
   {
-    // TODO: if the text section is part of a section group, this should go into
-    // the LSDA section of that group.
-    SecRef secref_lsda = assembler.get_default_section(SectionKind::LSDA);
-    util::VectorWriter et_writer(assembler.get_section(secref_lsda).data);
+    util::VectorWriter et_writer(sec_lsda.data);
     // write the lsda (see
     // https://github.com/llvm/llvm-project/blob/main/libcxxabi/src/cxa_personality.cpp#L60)
     et_writer.write<u8>(dwarf::DW_EH_PE_omit); // lpStartEncoding
@@ -101,13 +292,18 @@ void FunctionWriterBase::except_encode_func(Assembler &assembler) noexcept {
       // in reverse order since indices are negative
       size_t off = et_writer.size() - sizeof(u32) * 2;
       for (auto sym : except_type_info_table) {
-        assembler.reloc_pc32(secref_lsda, sym, off, 0);
+        assembler->reloc_pc32(secref_lsda, sym, off, 0);
         off -= sizeof(u32);
       }
 
       et_writer.write(except_spec_table);
     }
   }
+
+  assembler->reloc_pc32(eh_frame_section->get_ref(),
+                        assembler->section_symbol(secref_lsda),
+                        fde_start + 17,
+                        lsda_start);
 }
 
 void FunctionWriterBase::except_add_call_site(const u32 text_off,

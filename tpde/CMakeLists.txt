@@ -75,6 +75,7 @@ if (TPDE_X64)
 
     target_link_libraries(tpde PUBLIC fadec::fadec)
     target_sources(tpde PRIVATE
+        src/x64/FunctionWriterX64.cpp
 
         PUBLIC
         FILE_SET HEADERS

@@ -13,7 +13,11 @@ class FunctionWriterA64 : public FunctionWriter<FunctionWriterA64> {
   util::SmallVector<u32, 16> veneers;
   u32 unresolved_cond_brs, unresolved_test_brs;
 
+  static const TargetCIEInfo CIEInfo;
+
 public:
+  FunctionWriterA64() noexcept : FunctionWriter(CIEInfo) {}
+
   void begin_func(u32 align, u32 expected_size) noexcept {
     veneers.clear();
     // Must clear unresolved count here, begin_func will call more_space.

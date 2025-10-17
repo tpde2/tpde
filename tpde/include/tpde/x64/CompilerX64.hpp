@@ -716,20 +716,20 @@ template <IRAdaptor Adaptor,
 void CompilerX64<Adaptor, Derived, BaseTy, Config>::finish_func(
     u32 func_idx) noexcept {
   // NB: code alignment factor 1, data alignment factor -8.
-  auto fde_off = this->assembler.eh_begin_fde(this->get_personality_sym());
+  this->text_writer.eh_begin_fde(this->get_personality_sym());
   // push rbp
-  this->assembler.eh_write_inst(dwarf::DW_CFA_advance_loc, 1);
-  this->assembler.eh_write_inst(dwarf::DW_CFA_def_cfa_offset, 16);
-  this->assembler.eh_write_inst(
+  this->text_writer.eh_write_inst(dwarf::DW_CFA_advance_loc, 1);
+  this->text_writer.eh_write_inst(dwarf::DW_CFA_def_cfa_offset, 16);
+  this->text_writer.eh_write_inst(
       dwarf::DW_CFA_offset, dwarf::x64::DW_reg_rbp, 2);
   // mov rbp, rsp
-  this->assembler.eh_write_inst(dwarf::DW_CFA_advance_loc, 3);
-  this->assembler.eh_write_inst(dwarf::DW_CFA_def_cfa_register,
-                                dwarf::x64::DW_reg_rbp);
+  this->text_writer.eh_write_inst(dwarf::DW_CFA_advance_loc, 3);
+  this->text_writer.eh_write_inst(dwarf::DW_CFA_def_cfa_register,
+                                  dwarf::x64::DW_reg_rbp);
 
   // Patched below
-  auto fde_prologue_adv_off = this->assembler.eh_writer.size();
-  this->assembler.eh_write_inst(dwarf::DW_CFA_advance_loc, 0);
+  auto fde_prologue_adv_off = this->text_writer.eh_writer.size();
+  this->text_writer.eh_write_inst(dwarf::DW_CFA_advance_loc, 0);
 
   auto *write_ptr = this->text_writer.begin_ptr() + func_start_off;
   write_ptr += fe64_PUSHr(write_ptr, 0, FE_BP);
@@ -767,7 +767,7 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::finish_func(
     };
     u8 dwarf_reg = gpreg_to_dwarf[reg];
     auto cfa_off = num_saved_regs + 2;
-    this->assembler.eh_write_inst(dwarf::DW_CFA_offset, dwarf_reg, cfa_off);
+    this->text_writer.eh_write_inst(dwarf::DW_CFA_offset, dwarf_reg, cfa_off);
   }
 
   assert((!this->stack.has_dynamic_alloca || max_callee_stack_arg_size == 0) &&
@@ -789,7 +789,7 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::finish_func(
       write_ptr - (this->text_writer.begin_ptr() + func_start_off);
   assert(prologue_size <= func_prologue_alloc);
   assert(prologue_size < 0x44 && "cannot encode too large prologue in DWARF");
-  this->assembler.eh_writer.data()[fde_prologue_adv_off] =
+  this->text_writer.eh_writer.data()[fde_prologue_adv_off] =
       dwarf::DW_CFA_advance_loc | (prologue_size - 4);
 
   // nop out the rest
@@ -803,8 +803,8 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::finish_func(
     // TODO(ts): honor cur_needs_unwind_info
     auto func_size = this->text_writer.offset() - func_start_off;
     this->assembler.sym_def(func_sym, func_sec, func_start_off, func_size);
-    this->assembler.eh_end_fde(fde_off, func_sym);
-    this->text_writer.except_encode_func(this->assembler);
+    this->text_writer.eh_end_fde();
+    this->text_writer.except_encode_func();
     return;
   }
 
@@ -861,8 +861,8 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::finish_func(
   // TODO(ts): honor cur_needs_unwind_info
   auto func_size = this->text_writer.offset() - func_start_off;
   this->assembler.sym_def(func_sym, func_sec, func_start_off, func_size);
-  this->assembler.eh_end_fde(fde_off, func_sym);
-  this->text_writer.except_encode_func(this->assembler);
+  this->text_writer.eh_end_fde();
+  this->text_writer.except_encode_func();
 }
 
 template <IRAdaptor Adaptor,

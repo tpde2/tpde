@@ -398,7 +398,7 @@ bool ElfMapper::map(AssemblerElf &assembler, SymbolResolver resolver) noexcept {
   // Register eh_frame FDEs
   auto &eh_frame = assembler.get_section(
       assembler.get_default_section(SectionKind::EHFrame));
-  registered_frame_off = eh_frame.addr + assembler.eh_first_fde_off;
+  registered_frame_off = eh_frame.addr;
   __register_frame(mapped_addr + registered_frame_off);
 
   return true;

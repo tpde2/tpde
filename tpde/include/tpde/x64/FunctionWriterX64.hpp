@@ -12,7 +12,11 @@ namespace tpde::x64 {
 class FunctionWriterX64 : public FunctionWriter<FunctionWriterX64> {
   friend class FunctionWriter<FunctionWriterX64>;
 
+  static const TargetCIEInfo CIEInfo;
+
 public:
+  FunctionWriterX64() noexcept : FunctionWriter(CIEInfo) {}
+
   void align(size_t align) noexcept {
     u32 old_off = offset();
     FunctionWriter::align(align);

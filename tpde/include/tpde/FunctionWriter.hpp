@@ -3,9 +3,12 @@
 #pragma once
 
 #include "tpde/Assembler.hpp"
+#include "tpde/DWARF.hpp"
 #include "tpde/base.hpp"
 #include "tpde/util/SmallVector.hpp"
+#include "tpde/util/VectorWriter.hpp"
 #include <cstring>
+#include <span>
 
 namespace tpde {
 
@@ -26,6 +29,22 @@ enum class LabelFixupKind : u8 {
 
 /// Architecture-independent base for helper class to write function text.
 class FunctionWriterBase {
+protected:
+  struct TargetCIEInfo {
+    /// The initial instructions for the CIE.
+    std::span<const u8> instrs;
+    /// The return address register for the CIE.
+    u8 return_addr_register;
+    /// Code alignment factor for the CIE, ULEB128, must be one byte.
+    u8 code_alignment_factor;
+    /// Data alignment factor for the CIE, SLEB128, must be one byte.
+    u8 data_alignment_factor;
+  };
+
+private:
+  Assembler *assembler;
+  const TargetCIEInfo &cie_info;
+
 protected:
   DataSection *section = nullptr;
   u8 *data_begin = nullptr;
@@ -52,6 +71,17 @@ protected:
   u32 growth_size = 0x10000;
 
 private:
+  DataSection *eh_frame_section;
+
+public:
+  util::VectorWriter eh_writer;
+
+private:
+  /// The current personality function (if any)
+  SymRef cur_personality_func_addr;
+  u32 eh_cur_cie_off = 0u;
+  u32 fde_start;
+
   struct ExceptCallSiteInfo {
     /// Start offset *in section* (not inside function)
     u64 start;
@@ -73,14 +103,16 @@ private:
   /// Table for exception specs
   util::SmallVector<u8, 0> except_spec_table;
 
-public:
-  FunctionWriterBase() noexcept = default;
+protected:
+  FunctionWriterBase(const TargetCIEInfo &cie_info) noexcept
+      : cie_info(cie_info) {}
 
   ~FunctionWriterBase() {
     assert(data_cur == data_reserve_end &&
            "must flush section writer before destructing");
   }
 
+public:
   /// Get the SecRef of the current section.
   SecRef get_sec_ref() const noexcept { return get_section().get_ref(); }
 
@@ -100,6 +132,8 @@ public:
     data_reserve_end = data_cur;
   }
 
+  void begin_module(Assembler &assembler) noexcept;
+
   void begin_func() noexcept;
 
   /// Get the current offset into the section.
@@ -118,6 +152,17 @@ public:
   u8 *&cur_ptr() noexcept { return data_cur; }
 
   void more_space(size_t size) noexcept;
+
+  void flush() noexcept {
+    if (data_cur != data_reserve_end) {
+      section->data.resize(offset());
+      data_reserve_end = data_cur;
+#ifndef NDEBUG
+      section->locked = false;
+#endif
+    }
+    eh_writer.flush();
+  }
 
   /// \name Labels
   /// @{
@@ -154,10 +199,44 @@ public:
 
   /// @}
 
+  /// \name DWARF CFI
+  /// @{
+
+  static constexpr u32 write_eh_inst(u8 *dst, u8 opcode, u64 arg) noexcept {
+    if (opcode & dwarf::DWARF_CFI_PRIMARY_OPCODE_MASK) {
+      assert((arg & dwarf::DWARF_CFI_PRIMARY_OPCODE_MASK) == 0);
+      *dst = opcode | arg;
+      return 1;
+    }
+    *dst++ = opcode;
+    return 1 + util::uleb_write(dst, arg);
+  }
+
+  static constexpr u32
+      write_eh_inst(u8 *dst, u8 opcode, u64 arg1, u64 arg2) noexcept {
+    u8 *base = dst;
+    dst += write_eh_inst(dst, opcode, arg1);
+    dst += util::uleb_write(dst, arg2);
+    return dst - base;
+  }
+
+  void eh_align_frame() noexcept;
+  void eh_write_inst(u8 opcode, u64 arg) noexcept;
+  void eh_write_inst(u8 opcode, u64 first_arg, u64 second_arg) noexcept;
+
+private:
+  void eh_init_cie(SymRef personality_func_addr = SymRef()) noexcept;
+
+public:
+  void eh_begin_fde(SymRef personality_func_addr = SymRef()) noexcept;
+  void eh_end_fde() noexcept;
+
+  /// @}
+
   /// \name Itanium Exception ABI
   /// @{
 
-  void except_encode_func(Assembler &assembler) noexcept;
+  void except_encode_func() noexcept;
 
   /// add an entry to the call-site table
   /// must be called in strictly increasing order wrt text_off
@@ -185,6 +264,9 @@ public:
 template <typename Derived>
 class FunctionWriter : public FunctionWriterBase {
 protected:
+  FunctionWriter(const TargetCIEInfo &cie_info) noexcept
+      : FunctionWriterBase(cie_info) {}
+
   Derived *derived() noexcept { return static_cast<Derived *>(this); }
 
 public:
@@ -219,16 +301,6 @@ public:
   void write(T t) noexcept {
     ensure_space(sizeof(T));
     write_unchecked<T>(t);
-  }
-
-  void flush() noexcept {
-    if (data_cur != data_reserve_end) {
-      section->data.resize(offset());
-      data_reserve_end = data_cur;
-#ifndef NDEBUG
-      section->locked = false;
-#endif
-    }
   }
 
   void align(size_t align) noexcept {

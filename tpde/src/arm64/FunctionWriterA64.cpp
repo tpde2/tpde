@@ -7,6 +7,27 @@
 
 namespace tpde::a64 {
 
+static constexpr auto get_cie_initial_instrs_a64() {
+  std::array<u8, 32> data{};
+  // the current frame setup does not have a constant offset from the FP
+  // to the CFA so we need to encode that at the end
+  // for now just encode the CFA before the first sub sp
+
+  // def_cfa sp, 0
+  unsigned len = FunctionWriterA64::write_eh_inst(
+      data.data(), dwarf::DW_CFA_def_cfa, dwarf::a64::DW_reg_sp, 0);
+  return std::make_pair(data, len);
+}
+
+static constexpr auto cie_instrs_a64 = get_cie_initial_instrs_a64();
+
+const FunctionWriterA64::TargetCIEInfo FunctionWriterA64::CIEInfo{
+    .instrs = {cie_instrs_a64.first.data(), cie_instrs_a64.second},
+    .return_addr_register = dwarf::a64::DW_reg_lr,
+    .code_alignment_factor = 4, // ULEB128 4
+    .data_alignment_factor = 120, // SLEB128 -8
+};
+
 void FunctionWriterA64::more_space(u32 size) noexcept {
   if (allocated_size() >= (128 * 1024 * 1024)) {
     // we do not support multiple text sections currently

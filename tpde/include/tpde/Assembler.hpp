@@ -150,15 +150,6 @@ public:
       bool is_bss = false;
     };
 
-    /// The return address register for the CIE.
-    u8 cie_return_addr_register;
-    /// The initial instructions for the CIE.
-    std::span<const u8> cie_instrs;
-    /// Code alignment factor for the CIE, ULEB128, must be one byte.
-    u8 cie_code_alignment_factor;
-    /// Data alignment factor for the CIE, SLEB128, must be one byte.
-    u8 cie_data_alignment_factor;
-
     /// The relocation type for 32-bit pc-relative offsets.
     u32 reloc_pc32;
     /// The relocation type for 64-bit absolute addresses.
@@ -229,6 +220,8 @@ public:
   }
 
   virtual void rename_section(SecRef, std::string_view name) noexcept = 0;
+
+  virtual SymRef section_symbol(SecRef) noexcept = 0;
 
   /// @}
 

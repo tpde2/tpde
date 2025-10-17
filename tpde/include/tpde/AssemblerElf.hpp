@@ -7,16 +7,12 @@
 #include <elf.h>
 #include <span>
 #include <string_view>
-#include <type_traits>
 #include <vector>
 
 #include "base.hpp"
 #include "tpde/Assembler.hpp"
-#include "tpde/DWARF.hpp"
 #include "tpde/StringTable.hpp"
-#include "tpde/util/VectorWriter.hpp"
 #include "util/SmallVector.hpp"
-#include "util/misc.hpp"
 
 namespace tpde {
 
@@ -49,23 +45,10 @@ private:
   StringTable shstrtab_extra;
 
 public:
-  util::VectorWriter eh_writer;
-
-private:
-  /// The current personality function (if any)
-  SymRef cur_personality_func_addr;
-  u32 eh_cur_cie_off = 0u;
-  u32 eh_first_fde_off = 0;
-
-  /// The current function
-  SymRef cur_func;
-
-public:
   explicit AssemblerElf(const TargetInfoElf &target_info)
       : Assembler(target_info) {
     local_symbols.resize(1); // First symbol must be null.
     init_sections();
-    eh_init_cie();
   }
 
   void reset() noexcept override;
@@ -84,6 +67,8 @@ public:
   SecRef create_structor_section(bool init, SecRef group = SecRef()) noexcept;
 
   void rename_section(SecRef, std::string_view) noexcept override;
+
+  SymRef section_symbol(SecRef) noexcept override;
 
   /// Create a new group section.
   [[nodiscard]] SecRef create_group_section(SymRef signature_sym,
@@ -194,40 +179,7 @@ private:
     }
   }
 
-  // Unwind and exception info
-
 public:
-  static constexpr u32 write_eh_inst(u8 *dst, u8 opcode, u64 arg) noexcept {
-    if (opcode & dwarf::DWARF_CFI_PRIMARY_OPCODE_MASK) {
-      assert((arg & dwarf::DWARF_CFI_PRIMARY_OPCODE_MASK) == 0);
-      *dst = opcode | arg;
-      return 1;
-    }
-    *dst++ = opcode;
-    return 1 + util::uleb_write(dst, arg);
-  }
-
-  static constexpr u32
-      write_eh_inst(u8 *dst, u8 opcode, u64 arg1, u64 arg2) noexcept {
-    u8 *base = dst;
-    dst += write_eh_inst(dst, opcode, arg1);
-    dst += util::uleb_write(dst, arg2);
-    return dst - base;
-  }
-
-  void eh_align_frame() noexcept;
-  void eh_write_inst(u8 opcode, u64 arg) noexcept;
-  void eh_write_inst(u8 opcode, u64 first_arg, u64 second_arg) noexcept;
-
-private:
-  void eh_init_cie(SymRef personality_func_addr = SymRef()) noexcept;
-
-public:
-  u32 eh_begin_fde(SymRef personality_func_addr = SymRef()) noexcept;
-  void eh_end_fde(u32 fde_start, SymRef func) noexcept;
-
-  void finalize() noexcept override;
-
   // Output file generation
 
   std::vector<u8> build_object_file() noexcept override;
