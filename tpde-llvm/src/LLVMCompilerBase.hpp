@@ -385,6 +385,8 @@ public:
   void setup_var_ref_assignments() noexcept {}
 
   bool compile_func(IRFuncRef func, u32 idx) noexcept {
+    time_entry = nullptr;
+
     // Reuse/release memory for stored constants from previous function
     const_allocator.reset();
 
@@ -401,7 +403,15 @@ public:
 
     // We might encounter types that are unsupported during compilation, which
     // cause the flag in the adaptor to be set. In such cases, return false.
-    return Base::compile_func(func, idx) && !this->adaptor->func_unsupported;
+    const bool res =
+        (Base::compile_func(func, idx) && !this->adaptor->func_unsupported);
+
+    // end the TPDE_CodeGen time trace entry
+    if (time_entry) {
+      llvm::timeTraceProfilerEnd(time_entry);
+      time_entry = nullptr;
+    }
+    return res;
   }
 
   bool compile(llvm::Module &mod) noexcept;
@@ -561,7 +571,7 @@ void LLVMCompilerBase<Adaptor, Derived, Config>::analysis_start() noexcept {
 
 template <typename Adaptor, typename Derived, typename Config>
 void LLVMCompilerBase<Adaptor, Derived, Config>::analysis_end() noexcept {
-  if (llvm::timeTraceProfilerEnabled()) {
+  if (time_entry) {
     llvm::timeTraceProfilerEnd(time_entry);
     time_entry = llvm::timeTraceProfilerBegin("TPDE_CodeGen", "");
   }

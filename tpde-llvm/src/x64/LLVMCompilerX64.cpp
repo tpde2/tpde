@@ -79,8 +79,6 @@ struct LLVMCompilerX64 : tpde::x64::CompilerX64<LLVMAdaptor,
     return !arg_is_int128(val_idx);
   }
 
-  void finish_func(u32 func_idx) noexcept;
-
   void load_address_of_var_reference(AsmReg dst,
                                      tpde::AssignmentPartRef ap) noexcept;
 
@@ -109,15 +107,6 @@ struct LLVMCompilerX64 : tpde::x64::CompilerX64<LLVMAdaptor,
                                   ValuePart &&res_hi,
                                   ValuePart &&res_of) noexcept;
 };
-
-void LLVMCompilerX64::finish_func(u32 func_idx) noexcept {
-  Base::finish_func(func_idx);
-
-  if (llvm::timeTraceProfilerEnabled()) {
-    llvm::timeTraceProfilerEnd(time_entry);
-    time_entry = nullptr;
-  }
-}
 
 void LLVMCompilerX64::load_address_of_var_reference(
     AsmReg dst, tpde::AssignmentPartRef ap) noexcept {
