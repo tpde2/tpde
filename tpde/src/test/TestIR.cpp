@@ -135,7 +135,7 @@ private:
 
   bool parse_inst() {
     skip_whitespace();
-    ValueName vname;
+    ValueName vname{"", false};
     if (!text.empty() && text[0] == '%') {
       vname = parse_value_name();
       if (vname.name.empty()) {
