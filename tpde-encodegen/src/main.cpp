@@ -216,6 +216,8 @@ int main(const int argc, char *argv[]) {
               machine_func, fn.getName(), decl_lines, sym_count, impl_lines)) {
         std::cerr << std::format("Failed to generate code for function {}\n",
                                  fn.getName().str());
+        fn.print(llvm::outs());
+        machine_func->print(llvm::outs(), nullptr);
         return 1;
       }
     }
