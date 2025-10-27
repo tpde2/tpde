@@ -529,7 +529,6 @@ define void @add_i128_1(i128 %0) {
 ; ARM64-NEXT:    adc x2, x2, x1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   entry:
     %1 = add nsw i128 %0, 1
     ret void
@@ -552,7 +551,6 @@ define void @add_i128_invert(i128 %0) {
 ; ARM64-NEXT:    adc x2, x2, x1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   entry:
     %1 = add nsw i128 %0, -1
     ret void
@@ -575,7 +573,6 @@ define void @add_i128_1_reorder(i128 %0) {
 ; ARM64-NEXT:    adc x2, x2, x1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   entry:
     %1 = add nsw i128 1, %0
     ret void
@@ -724,7 +721,6 @@ define void @add_i128_salvage_imm(i128 %0) {
 ; ARM64-NEXT:    adc x2, x2, x1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   entry:
   %1 = add nsw i128 %0, 1
   ret void

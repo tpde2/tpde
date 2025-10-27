@@ -67,7 +67,6 @@ define i1 @ext_v5i1_3_twice(ptr %p) {
 ; ARM64-NEXT:    lsr x0, x0, #3
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %v = load <5 x i1>, ptr %p
   %r1 = extractelement <5 x i1> %v, i32 3
   %r2 = extractelement <5 x i1> %v, i32 3
@@ -159,7 +158,6 @@ define i1 @ext_v16i1_3_twice(ptr %p) {
 ; ARM64-NEXT:    lsr x0, x0, #3
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %v = load <16 x i1>, ptr %p
   %r1 = extractelement <16 x i1> %v, i32 3
   %r2 = extractelement <16 x i1> %v, i32 3
@@ -523,7 +521,6 @@ define i8 @ext_v64i8_dyn(ptr %p, i32 %i) {
 ; ARM64-NEXT:    ldrb w0, [x1, #0xa0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xe0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %v = load <64 x i8>, ptr %p
   %r = extractelement <64 x i8> %v, i32 %i
   ret i8 %r

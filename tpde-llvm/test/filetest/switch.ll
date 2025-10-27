@@ -28,7 +28,6 @@ define i32 @empty_switch(i32 %0) {
 ; ARM64-NEXT:    mov x0, #0xffffffff // =4294967295
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   switch i32 %0, label %default []
 default:

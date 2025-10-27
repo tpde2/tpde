@@ -91,7 +91,6 @@ define void @insert_i8_i32_0_nosalvage(ptr %0, i8 %1) {
 ; ARM64-NEXT:    str w4, [x0, #0x4]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %2 = load %struct.i8_i32, ptr %0
   %3 = insertvalue %struct.i8_i32 %2, i8 %1, 0
@@ -126,7 +125,6 @@ define void @insert_i8_i32_1_nosalvage(ptr %0, i32 %1) {
 ; ARM64-NEXT:    str w1, [x0, #0x4]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %2 = load %struct.i8_i32, ptr %0
   %3 = insertvalue %struct.i8_i32 %2, i32 %1, 1
@@ -216,7 +214,6 @@ define void @insert_ptr_i32_0_nosalvage(ptr %0, ptr %1) {
 ; ARM64-NEXT:    str w4, [x0, #0x8]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %2 = load %struct.ptr_i32, ptr %0
   %3 = insertvalue %struct.ptr_i32 %2, ptr %1, 0
@@ -243,7 +240,6 @@ define void @insert_ptr_i32_poison(ptr %0, ptr %1, i32 %2) {
 ; ARM64-NEXT:    str w2, [x0, #0x8]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %3 = insertvalue %struct.ptr_i32 poison, ptr %1, 0
   %4 = insertvalue %struct.ptr_i32 %3, i32 %2, 1
@@ -335,7 +331,6 @@ define void @insert_ptr_i32_1_nosalvage(ptr %0, i32 %1) {
 ; ARM64-NEXT:    str w1, [x0, #0x8]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %2 = load %struct.ptr_i32, ptr %0
   %3 = insertvalue %struct.ptr_i32 %2, i32 %1, 1
@@ -425,7 +420,6 @@ define void @insert_f32_ptr_0_nosalvage(ptr %0, float %1) {
 ; ARM64-NEXT:    str x2, [x0, #0x8]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %2 = load %struct.f32_ptr, ptr %0
   %3 = insertvalue %struct.f32_ptr %2, float %1, 0
@@ -460,7 +454,6 @@ define void @insert_f32_ptr_1_nosalvage(ptr %0, ptr %1) {
 ; ARM64-NEXT:    str x1, [x0, #0x8]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %2 = load %struct.f32_ptr, ptr %0
   %3 = insertvalue %struct.f32_ptr %2, ptr %1, 1
@@ -612,7 +605,6 @@ define void @insert_i128_i1_1_nosalvage(ptr %0, i1 %1) {
 ; ARM64-NEXT:    strb w1, [x0, #0x10]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %2 = load %struct.i128_i1, ptr %0
   %3 = insertvalue %struct.i128_i1 %2, i1 %1, 1

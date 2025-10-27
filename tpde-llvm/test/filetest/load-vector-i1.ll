@@ -114,7 +114,6 @@ define void @load_v37i1(ptr %p) {
 ; ARM64-NEXT:    orr x2, x0, x1, lsl #32
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %l = load volatile <37 x i1>, ptr %p
   ret void
 }

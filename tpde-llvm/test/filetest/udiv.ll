@@ -26,7 +26,6 @@ define void @udiv_i8_1(i8 %0) {
 ; ARM64-NEXT:    udiv w0, w0, w1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %1 = udiv i8 %0, 1
   ret void
@@ -52,7 +51,6 @@ define void @udiv_i8_28(i8 %0) {
 ; ARM64-NEXT:    udiv w0, w0, w1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %1 = udiv i8 %0, 28
   ret void
@@ -78,7 +76,6 @@ define void @udiv_i8_i8(i8 %0, i8 %1) {
 ; ARM64-NEXT:    udiv w0, w0, w1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %2 = udiv i8 %0, %1
   ret void
@@ -104,7 +101,6 @@ define void @udiv_i8_32(i8 %0) {
 ; ARM64-NEXT:    udiv w0, w0, w1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %1 = udiv i8 %0, 32
   ret void
@@ -130,7 +126,6 @@ define void @udiv_i16_1(i16 %0) {
 ; ARM64-NEXT:    udiv w0, w0, w1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %1 = udiv i16 %0, 1
   ret void
@@ -156,7 +151,6 @@ define void @udiv_i16_28(i16 %0) {
 ; ARM64-NEXT:    udiv w0, w0, w1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %1 = udiv i16 %0, 28
   ret void
@@ -182,7 +176,6 @@ define void @udiv_i16_32(i16 %0) {
 ; ARM64-NEXT:    udiv w0, w0, w1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %1 = udiv i16 %0, 32
   ret void
@@ -208,7 +201,6 @@ define void @udiv_i16_i16(i16 %0, i16 %1) {
 ; ARM64-NEXT:    udiv w0, w0, w1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %2 = udiv i16 %0, %1
   ret void
@@ -414,7 +406,6 @@ define void @udiv_i8_salvage(i8 %0, i8 %1) {
 ; ARM64-NEXT:    udiv w0, w0, w1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %2 = udiv i8 %0, %1
   ret void
@@ -440,7 +431,6 @@ define void @udiv_i16_salvage(i16 %0, i16 %1) {
 ; ARM64-NEXT:    udiv w0, w0, w1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %2 = udiv i16 %0, %1
   ret void

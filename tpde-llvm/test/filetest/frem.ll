@@ -203,7 +203,6 @@ define float @frem_f32_no_salvage_imm(float %0) {
 ; ARM64-NEXT:     R_AARCH64_CALL26 fmodf
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   entry:
     %1 = frem float %0, 1.0
     %2 = frem float %0, %1
@@ -283,7 +282,6 @@ define double @frem_f64_no_salvage_imm(double %0) {
 ; ARM64-NEXT:     R_AARCH64_CALL26 fmod
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   entry:
     %1 = frem double %0, 1.0
     %2 = frem double %0, %1

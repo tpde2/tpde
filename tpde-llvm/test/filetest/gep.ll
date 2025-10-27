@@ -993,7 +993,6 @@ define ptr @gep_stf_varoff_i8_zero(ptr %0, i8 %1) {
 ; ARM64-NEXT:    madd x0, x1, x16, x0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   entry:
     %2 = getelementptr inbounds %struct.three_floats, ptr %0, i8 %1
     ret ptr %2
@@ -1062,7 +1061,6 @@ define ptr @gep_stf_varoff_i16_zero(ptr %0, i16 %1) {
 ; ARM64-NEXT:    madd x0, x1, x16, x0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   entry:
     %2 = getelementptr inbounds %struct.three_floats, ptr %0, i16 %1
     ret ptr %2
@@ -1110,7 +1108,6 @@ define ptr @gep_stf_varoff_i32_zero(ptr %0, i32 %1) {
 ; ARM64-NEXT:    madd x0, x1, x16, x0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   entry:
     %2 = getelementptr inbounds %struct.three_floats, ptr %0, i32 %1
     ret ptr %2
@@ -1232,7 +1229,6 @@ define ptr @gep_stf_varoff_i64_one(ptr %0, i64 %1) {
 ; ARM64-NEXT:    add x0, x0, #0x4
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   entry:
     %2 = getelementptr inbounds %struct.three_floats, ptr %0, i64 %1, i32 1
     ret ptr %2
@@ -1573,7 +1569,6 @@ define ptr @gep_fuse_diff_type_2(ptr %p, i64 %n) {
 ; ARM64-NEXT:    add x0, x0, #0xc
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %gep1 = getelementptr inbounds i8, ptr %p, i64 12
   %gep2 = getelementptr inbounds [3 x i32], ptr %gep1, i64 %n
   ret ptr %gep2
@@ -1707,7 +1702,6 @@ define ptr @gep_stf_varoff_zero_fuse_one(ptr %0, i64 %1) {
 ; ARM64-NEXT:    add x0, x0, #0x4
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   entry:
     %2 = getelementptr inbounds %struct.three_floats, ptr %0, i64 %1, i32 0
     %3 = getelementptr inbounds float, ptr %2, i64 1
@@ -1902,7 +1896,6 @@ define i32 @gep_alloca_dist(i32 %a) {
 ; ARM64-NEXT:    ldr w0, [x29, #0xbc]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xc0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %array = alloca [32 x i8], align 1
   %gep1 = getelementptr inbounds [32 x i8], ptr %array, i64 0, i64 28
   %b = add i32 %a, 1
@@ -1953,7 +1946,6 @@ define ptr @gep_array_constoff(ptr noundef %0) {
 ; ARM64-NEXT:    ldp x29, x30, [sp]
 ; ARM64-NEXT:    add sp, sp, #0x250
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %dummy = alloca i64, align 8
   %array = alloca [201 x i16], align 1
   %gep = getelementptr inbounds [201 x i16], ptr %array, i64 0, i64 32

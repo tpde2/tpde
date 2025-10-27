@@ -36,7 +36,6 @@ define i8 @fshr_i8_3(i8 %a, i8 %b) {
 ; ARM64-NEXT:    mov w0, w4
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %res = call i8 @llvm.fshr(i8 %a, i8 %b, i8 3)
   ret i8 %res
 }
@@ -71,7 +70,6 @@ define i8 @fshr_i8_221(i8 %a, i8 %b) {
 ; ARM64-NEXT:    mov w0, w3
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %res = call i8 @llvm.fshr(i8 %a, i8 %b, i8 221)
   ret i8 %res
 }
@@ -182,7 +180,6 @@ define i8 @fshr_rotate_i8_dyn(i8 %a, i8 %c) {
 ; ARM64-NEXT:    orr w0, w3, w2
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %res = call i8 @llvm.fshr(i8 %a, i8 %a, i8 %c)
   ret i8 %res
 }
@@ -218,7 +215,6 @@ define i16 @fshr_i16_3(i16 %a, i16 %b) {
 ; ARM64-NEXT:    mov w0, w4
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %res = call i16 @llvm.fshr(i16 %a, i16 %b, i16 3)
   ret i16 %res
 }
@@ -253,7 +249,6 @@ define i16 @fshr_i16_221(i16 %a, i16 %b) {
 ; ARM64-NEXT:    mov w0, w3
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %res = call i16 @llvm.fshr(i16 %a, i16 %b, i16 221)
   ret i16 %res
 }
@@ -364,7 +359,6 @@ define i16 @fshr_rotate_i16_dyn(i16 %a, i16 %c) {
 ; ARM64-NEXT:    orr w0, w3, w2
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %res = call i16 @llvm.fshr(i16 %a, i16 %a, i16 %c)
   ret i16 %res
 }
@@ -427,7 +421,6 @@ define i32 @fshr_i32_221(i32 %a, i32 %b) {
 ; ARM64-NEXT:    mov w0, w2
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %res = call i32 @llvm.fshr(i32 %a, i32 %b, i32 221)
   ret i32 %res
 }
@@ -578,7 +571,6 @@ define i64 @fshr_i64_221(i64 %a, i64 %b) {
 ; ARM64-NEXT:    mov x0, x2
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %res = call i64 @llvm.fshr(i64 %a, i64 %b, i64 221)
   ret i64 %res
 }

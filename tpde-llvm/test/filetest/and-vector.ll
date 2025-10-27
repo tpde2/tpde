@@ -287,7 +287,6 @@ define void @and_v32i1_const(ptr %p) {
 ; ARM64-NEXT:    str w1, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %a = load <32 x i1>, ptr %p
   %r = and <32 x i1> %a, <i1 1, i1 0, i1 1, i1 0, i1 1, i1 0, i1 1, i1 0, i1 1, i1 0, i1 1, i1 0, i1 1, i1 0, i1 1, i1 0, i1 1, i1 0, i1 1, i1 0, i1 1, i1 0, i1 1, i1 0, i1 1, i1 0, i1 1, i1 0, i1 1, i1 0, i1 1, i1 0>
   store <32 x i1> %r, ptr %p

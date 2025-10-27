@@ -191,7 +191,6 @@ define i32 @usub_sat_i32(i32, i32) {
 ; ARM64-NEXT:    mov w0, w1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = call i32 @llvm.usub.sat.i32(i32 %0, i32 %1)
   ret i32 %r
 }

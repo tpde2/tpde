@@ -28,8 +28,8 @@ LLC_LIKE_TOOLS = [
 TRIPLE_ARG_RE = re.compile(r"--target[= ]([^ ]+)")
 OBJDUMP_FUNCTION_RE = re.compile(
     r'^(?:[0-9a-f]+\ )?(?P<func>\<[^\>]+\>)(?P<func_name_separator>:)\n'
-    r"(?P<body>(?:(?!(?:^\s*(?:\.\.\.|nop[^\n]*)\n)*(?:\n|$))^[^\n]+(?:\n|$))*)"
-    r"(?:(?:(?:^\s*(?:\.\.\.|nop[^\n]*)\n)*(?:\n|$))?^\n|$)", # empty line ends function
+    r"(?P<body>(?:(?!(?:^\s*(?:\.\.\.|nop[^\n]*|udf\s+#0x0)\n)*(?:\n|$))^[^\n]+(?:\n|$))*)"
+    r"(?:(?:(?:^\s*(?:\.\.\.|nop[^\n]*|udf\s+#0x0)\n)*(?:\n|$))?^\n|$)", # empty line ends function
     flags=(re.M | re.S),
 )
 

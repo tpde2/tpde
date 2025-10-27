@@ -531,7 +531,6 @@ define void @sub_i128_1(i128 %0) {
 ; ARM64-NEXT:    sbc x1, x1, x2
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   entry:
     %1 = sub nsw i128 %0, 1
     ret void
@@ -554,7 +553,6 @@ define void @sub_i128_invert(i128 %0) {
 ; ARM64-NEXT:    sbc x1, x1, x2
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   entry:
     %1 = sub nsw i128 %0, -1
     ret void
@@ -684,7 +682,6 @@ define void @sub_i128_salvage_imm(i128 %0) {
 ; ARM64-NEXT:    sbc x1, x1, x2
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   entry:
   %1 = sub nsw i128 %0, 1
   ret void

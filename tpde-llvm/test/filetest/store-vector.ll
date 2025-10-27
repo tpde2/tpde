@@ -118,7 +118,6 @@ define void @store_v1f32(ptr %p) {
 ; ARM64-NEXT:    str s0, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   store <1 x float> <float 64.0>, ptr %p
   ret void
 }
@@ -141,7 +140,6 @@ define void @store_v1f64(ptr %p) {
 ; ARM64-NEXT:    str d0, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   store <1 x double> <double 64.0>, ptr %p
   ret void
 }
@@ -233,7 +231,6 @@ define void @store_v2i64(ptr %p) {
 ; ARM64-NEXT:    str q0, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   store <2 x i64> <i64 123, i64 12>, ptr %p
   ret void
 }
@@ -301,7 +298,6 @@ define void @store_v2f64(ptr %p) {
 ; ARM64-NEXT:    str q0, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   store <2 x double> <double 64.0, double 64.0>, ptr %p
   ret void
 }

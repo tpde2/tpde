@@ -409,7 +409,6 @@ define i32 @urem_i32_i32(i32 %0, i32 %1) {
 ; ARM64-NEXT:    mov w0, w1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %2 = urem i32 %0, %1
   ret i32 %2
@@ -538,7 +537,6 @@ define i64 @urem_i64_i64(i64 %0, i64 %1) {
 ; ARM64-NEXT:    mov x0, x1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %2 = urem i64 %0, %1
   ret i64 %2
@@ -619,7 +617,6 @@ define i32 @urem_i32_salvage(i32 %0, i32 %1) {
 ; ARM64-NEXT:    mov w0, w1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %2 = urem i32 %0, %1
   ret i32 %2
@@ -644,7 +641,6 @@ define i64 @urem_i64_salvage(i64 %0, i64 %1) {
 ; ARM64-NEXT:    mov x0, x1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %2 = urem i64 %0, %1
   ret i64 %2

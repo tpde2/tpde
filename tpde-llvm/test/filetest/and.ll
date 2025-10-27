@@ -157,7 +157,6 @@ define void @and_i32_1fffff1(i32 %0) {
 ; ARM64-NEXT:    and w1, w1, w0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
     %1 = and i32 %0, u0x1fffff1
     ret void
@@ -295,7 +294,6 @@ define void @and_i128_3(i128 %0) {
 ; ARM64-NEXT:    and x0, x0, #0x3
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
     %1 = and i128 %0, 3
     ret void
@@ -339,7 +337,6 @@ define void @and_i128_90000000000000003(i128 %0) {
 ; ARM64-NEXT:    and x0, x0, #0x3
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
     %1 = and i128 %0, u0x90000000000000003
     ret void

@@ -24,7 +24,6 @@ define <8 x i8> @icmp_eq_v8i8(<8 x i8> %a, <8 x i8> %b) {
 ; ARM64-NEXT:    and v0.8b, v0.8b, v2.8b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp eq <8 x i8> %a, %b
   %x = zext <8 x i1> %r to <8 x i8>
   ret <8 x i8> %x
@@ -73,7 +72,6 @@ define <16 x i8> @icmp_eq_v16i8(<16 x i8> %a, <16 x i8> %b) {
 ; ARM64-NEXT:    and v0.16b, v0.16b, v2.16b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp eq <16 x i8> %a, %b
   %x = zext <16 x i1> %r to <16 x i8>
   ret <16 x i8> %x
@@ -121,7 +119,6 @@ define <4 x i16> @icmp_eq_v4i16(<4 x i16> %a, <4 x i16> %b) {
 ; ARM64-NEXT:    and v0.8b, v0.8b, v2.8b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp eq <4 x i16> %a, %b
   %x = zext <4 x i1> %r to <4 x i16>
   ret <4 x i16> %x
@@ -168,7 +165,6 @@ define <8 x i16> @icmp_eq_v8i16(<8 x i16> %a, <8 x i16> %b) {
 ; ARM64-NEXT:    and v0.16b, v0.16b, v2.16b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp eq <8 x i16> %a, %b
   %x = zext <8 x i1> %r to <8 x i16>
   ret <8 x i16> %x
@@ -215,7 +211,6 @@ define <2 x i32> @icmp_eq_v2i32(<2 x i32> %a, <2 x i32> %b) {
 ; ARM64-NEXT:    and v0.8b, v0.8b, v2.8b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp eq <2 x i32> %a, %b
   %x = zext <2 x i1> %r to <2 x i32>
   ret <2 x i32> %x
@@ -262,7 +257,6 @@ define <4 x i32> @icmp_eq_v4i32(<4 x i32> %a, <4 x i32> %b) {
 ; ARM64-NEXT:    and v0.16b, v0.16b, v2.16b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp eq <4 x i32> %a, %b
   %x = zext <4 x i1> %r to <4 x i32>
   ret <4 x i32> %x
@@ -364,7 +358,6 @@ define <8 x i8> @icmp_ne_v8i8(<8 x i8> %a, <8 x i8> %b) {
 ; ARM64-NEXT:    bic v0.8b, v2.8b, v0.8b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp ne <8 x i8> %a, %b
   %x = zext <8 x i1> %r to <8 x i8>
   ret <8 x i8> %x
@@ -413,7 +406,6 @@ define <16 x i8> @icmp_ne_v16i8(<16 x i8> %a, <16 x i8> %b) {
 ; ARM64-NEXT:    bic v0.16b, v2.16b, v0.16b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp ne <16 x i8> %a, %b
   %x = zext <16 x i1> %r to <16 x i8>
   ret <16 x i8> %x
@@ -462,7 +454,6 @@ define <4 x i16> @icmp_ne_v4i16(<4 x i16> %a, <4 x i16> %b) {
 ; ARM64-NEXT:    bic v0.8b, v2.8b, v0.8b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp ne <4 x i16> %a, %b
   %x = zext <4 x i1> %r to <4 x i16>
   ret <4 x i16> %x
@@ -511,7 +502,6 @@ define <8 x i16> @icmp_ne_v8i16(<8 x i16> %a, <8 x i16> %b) {
 ; ARM64-NEXT:    bic v0.16b, v2.16b, v0.16b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp ne <8 x i16> %a, %b
   %x = zext <8 x i1> %r to <8 x i16>
   ret <8 x i16> %x
@@ -560,7 +550,6 @@ define <2 x i32> @icmp_ne_v2i32(<2 x i32> %a, <2 x i32> %b) {
 ; ARM64-NEXT:    bic v0.8b, v2.8b, v0.8b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp ne <2 x i32> %a, %b
   %x = zext <2 x i1> %r to <2 x i32>
   ret <2 x i32> %x
@@ -609,7 +598,6 @@ define <4 x i32> @icmp_ne_v4i32(<4 x i32> %a, <4 x i32> %b) {
 ; ARM64-NEXT:    bic v0.16b, v2.16b, v0.16b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp ne <4 x i32> %a, %b
   %x = zext <4 x i1> %r to <4 x i32>
   ret <4 x i32> %x
@@ -713,7 +701,6 @@ define <8 x i8> @icmp_ugt_v8i8(<8 x i8> %a, <8 x i8> %b) {
 ; ARM64-NEXT:    and v0.8b, v0.8b, v2.8b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp ugt <8 x i8> %a, %b
   %x = zext <8 x i1> %r to <8 x i8>
   ret <8 x i8> %x
@@ -764,7 +751,6 @@ define <16 x i8> @icmp_ugt_v16i8(<16 x i8> %a, <16 x i8> %b) {
 ; ARM64-NEXT:    and v0.16b, v0.16b, v2.16b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp ugt <16 x i8> %a, %b
   %x = zext <16 x i1> %r to <16 x i8>
   ret <16 x i8> %x
@@ -817,7 +803,6 @@ define <4 x i16> @icmp_ugt_v4i16(<4 x i16> %a, <4 x i16> %b) {
 ; ARM64-NEXT:    and v0.8b, v0.8b, v2.8b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp ugt <4 x i16> %a, %b
   %x = zext <4 x i1> %r to <4 x i16>
   ret <4 x i16> %x
@@ -872,7 +857,6 @@ define <8 x i16> @icmp_ugt_v8i16(<8 x i16> %a, <8 x i16> %b) {
 ; ARM64-NEXT:    and v0.16b, v0.16b, v2.16b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp ugt <8 x i16> %a, %b
   %x = zext <8 x i1> %r to <8 x i16>
   ret <8 x i16> %x
@@ -927,7 +911,6 @@ define <2 x i32> @icmp_ugt_v2i32(<2 x i32> %a, <2 x i32> %b) {
 ; ARM64-NEXT:    and v0.8b, v0.8b, v2.8b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp ugt <2 x i32> %a, %b
   %x = zext <2 x i1> %r to <2 x i32>
   ret <2 x i32> %x
@@ -982,7 +965,6 @@ define <4 x i32> @icmp_ugt_v4i32(<4 x i32> %a, <4 x i32> %b) {
 ; ARM64-NEXT:    and v0.16b, v0.16b, v2.16b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp ugt <4 x i32> %a, %b
   %x = zext <4 x i1> %r to <4 x i32>
   ret <4 x i32> %x
@@ -1105,7 +1087,6 @@ define <8 x i8> @icmp_uge_v8i8(<8 x i8> %a, <8 x i8> %b) {
 ; ARM64-NEXT:    and v0.8b, v0.8b, v2.8b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp uge <8 x i8> %a, %b
   %x = zext <8 x i1> %r to <8 x i8>
   ret <8 x i8> %x
@@ -1156,7 +1137,6 @@ define <16 x i8> @icmp_uge_v16i8(<16 x i8> %a, <16 x i8> %b) {
 ; ARM64-NEXT:    and v0.16b, v0.16b, v2.16b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp uge <16 x i8> %a, %b
   %x = zext <16 x i1> %r to <16 x i8>
   ret <16 x i8> %x
@@ -1207,7 +1187,6 @@ define <4 x i16> @icmp_uge_v4i16(<4 x i16> %a, <4 x i16> %b) {
 ; ARM64-NEXT:    and v0.8b, v0.8b, v2.8b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp uge <4 x i16> %a, %b
   %x = zext <4 x i1> %r to <4 x i16>
   ret <4 x i16> %x
@@ -1258,7 +1237,6 @@ define <8 x i16> @icmp_uge_v8i16(<8 x i16> %a, <8 x i16> %b) {
 ; ARM64-NEXT:    and v0.16b, v0.16b, v2.16b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp uge <8 x i16> %a, %b
   %x = zext <8 x i1> %r to <8 x i16>
   ret <8 x i16> %x
@@ -1313,7 +1291,6 @@ define <2 x i32> @icmp_uge_v2i32(<2 x i32> %a, <2 x i32> %b) {
 ; ARM64-NEXT:    and v0.8b, v0.8b, v2.8b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp uge <2 x i32> %a, %b
   %x = zext <2 x i1> %r to <2 x i32>
   ret <2 x i32> %x
@@ -1372,7 +1349,6 @@ define <4 x i32> @icmp_uge_v4i32(<4 x i32> %a, <4 x i32> %b) {
 ; ARM64-NEXT:    and v0.16b, v0.16b, v2.16b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp uge <4 x i32> %a, %b
   %x = zext <4 x i1> %r to <4 x i32>
   ret <4 x i32> %x
@@ -2300,7 +2276,6 @@ define <8 x i8> @icmp_sgt_v8i8(<8 x i8> %a, <8 x i8> %b) {
 ; ARM64-NEXT:    and v0.8b, v0.8b, v2.8b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp sgt <8 x i8> %a, %b
   %x = zext <8 x i1> %r to <8 x i8>
   ret <8 x i8> %x
@@ -2349,7 +2324,6 @@ define <16 x i8> @icmp_sgt_v16i8(<16 x i8> %a, <16 x i8> %b) {
 ; ARM64-NEXT:    and v0.16b, v0.16b, v2.16b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp sgt <16 x i8> %a, %b
   %x = zext <16 x i1> %r to <16 x i8>
   ret <16 x i8> %x
@@ -2397,7 +2371,6 @@ define <4 x i16> @icmp_sgt_v4i16(<4 x i16> %a, <4 x i16> %b) {
 ; ARM64-NEXT:    and v0.8b, v0.8b, v2.8b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp sgt <4 x i16> %a, %b
   %x = zext <4 x i1> %r to <4 x i16>
   ret <4 x i16> %x
@@ -2444,7 +2417,6 @@ define <8 x i16> @icmp_sgt_v8i16(<8 x i16> %a, <8 x i16> %b) {
 ; ARM64-NEXT:    and v0.16b, v0.16b, v2.16b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp sgt <8 x i16> %a, %b
   %x = zext <8 x i1> %r to <8 x i16>
   ret <8 x i16> %x
@@ -2491,7 +2463,6 @@ define <2 x i32> @icmp_sgt_v2i32(<2 x i32> %a, <2 x i32> %b) {
 ; ARM64-NEXT:    and v0.8b, v0.8b, v2.8b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp sgt <2 x i32> %a, %b
   %x = zext <2 x i1> %r to <2 x i32>
   ret <2 x i32> %x
@@ -2538,7 +2509,6 @@ define <4 x i32> @icmp_sgt_v4i32(<4 x i32> %a, <4 x i32> %b) {
 ; ARM64-NEXT:    and v0.16b, v0.16b, v2.16b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp sgt <4 x i32> %a, %b
   %x = zext <4 x i1> %r to <4 x i32>
   ret <4 x i32> %x
@@ -2657,7 +2627,6 @@ define <8 x i8> @icmp_sge_v8i8(<8 x i8> %a, <8 x i8> %b) {
 ; ARM64-NEXT:    and v0.8b, v0.8b, v2.8b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp sge <8 x i8> %a, %b
   %x = zext <8 x i1> %r to <8 x i8>
   ret <8 x i8> %x
@@ -2708,7 +2677,6 @@ define <16 x i8> @icmp_sge_v16i8(<16 x i8> %a, <16 x i8> %b) {
 ; ARM64-NEXT:    and v0.16b, v0.16b, v2.16b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp sge <16 x i8> %a, %b
   %x = zext <16 x i1> %r to <16 x i8>
   ret <16 x i8> %x
@@ -2759,7 +2727,6 @@ define <4 x i16> @icmp_sge_v4i16(<4 x i16> %a, <4 x i16> %b) {
 ; ARM64-NEXT:    and v0.8b, v0.8b, v2.8b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp sge <4 x i16> %a, %b
   %x = zext <4 x i1> %r to <4 x i16>
   ret <4 x i16> %x
@@ -2810,7 +2777,6 @@ define <8 x i16> @icmp_sge_v8i16(<8 x i16> %a, <8 x i16> %b) {
 ; ARM64-NEXT:    and v0.16b, v0.16b, v2.16b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp sge <8 x i16> %a, %b
   %x = zext <8 x i1> %r to <8 x i16>
   ret <8 x i16> %x
@@ -2861,7 +2827,6 @@ define <2 x i32> @icmp_sge_v2i32(<2 x i32> %a, <2 x i32> %b) {
 ; ARM64-NEXT:    and v0.8b, v0.8b, v2.8b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp sge <2 x i32> %a, %b
   %x = zext <2 x i1> %r to <2 x i32>
   ret <2 x i32> %x
@@ -2912,7 +2877,6 @@ define <4 x i32> @icmp_sge_v4i32(<4 x i32> %a, <4 x i32> %b) {
 ; ARM64-NEXT:    and v0.16b, v0.16b, v2.16b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp sge <4 x i32> %a, %b
   %x = zext <4 x i1> %r to <4 x i32>
   ret <4 x i32> %x

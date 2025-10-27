@@ -71,7 +71,6 @@ define i8 @icmp_eq_i32_0_br(i32 %0) {
 ; ARM64-NEXT:    mov x0, #0x2 // =2
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   entry:
     %1 = icmp eq i32 %0, 0
     br i1 %1, label %block1, label %block2
@@ -108,7 +107,6 @@ define i8 @icmp_ne_i32_0_br(i32 %0) {
 ; ARM64-NEXT:    mov x0, #0x2 // =2
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   entry:
     %1 = icmp ne i32 %0, 0
     br i1 %1, label %block1, label %block2
@@ -145,7 +143,6 @@ define i8 @icmp_ne_i64_0_br(i64 %0) {
 ; ARM64-NEXT:    mov x0, #0x2 // =2
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   entry:
     %1 = icmp ne i64 %0, 0
     br i1 %1, label %block1, label %block2
@@ -659,7 +656,6 @@ define void @cbz_nophi(i32 %param) {
 ; ARM64-NEXT:    mov w2, #0x0 // =0
 ; ARM64-NEXT:    str w2, [x29, #0xa4]
 ; ARM64-NEXT:    b 0x534 <cbz_nophi+0x14>
-; ARM64-NEXT:    udf #0x0
   br label %1
 
 1:

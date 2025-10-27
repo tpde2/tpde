@@ -66,7 +66,6 @@ define i1 @fcmp_f128_oge(fp128 %0, fp128 %1) {
 ; ARM64-NEXT:    cset w0, ge
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %cmp = fcmp oge fp128 %0, %1
   ret i1 %cmp
 }
@@ -95,7 +94,6 @@ define i1 @fcmp_f128_ord(fp128 %0, fp128 %1) {
 ; ARM64-NEXT:    cset w0, eq
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %cmp = fcmp ord fp128 %0, %1
   ret i1 %cmp
 }
@@ -124,7 +122,6 @@ define i1 @fcmp_f128_oeq(fp128 %0, fp128 %1) {
 ; ARM64-NEXT:    cset w0, eq
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %cmp = fcmp oeq fp128 %0, %1
   ret i1 %cmp
 }
@@ -153,7 +150,6 @@ define i1 @fcmp_f128_ogt(fp128 %0, fp128 %1) {
 ; ARM64-NEXT:    cset w0, gt
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %cmp = fcmp ogt fp128 %0, %1
   ret i1 %cmp
 }
@@ -182,7 +178,6 @@ define i1 @fcmp_f128_olt(fp128 %0, fp128 %1) {
 ; ARM64-NEXT:    cset w0, lt
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %cmp = fcmp olt fp128 %0, %1
   ret i1 %cmp
 }
@@ -211,7 +206,6 @@ define i1 @fcmp_f128_ole(fp128 %0, fp128 %1) {
 ; ARM64-NEXT:    cset w0, le
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %cmp = fcmp ole fp128 %0, %1
   ret i1 %cmp
 }
@@ -240,7 +234,6 @@ define i1 @fcmp_f128_uno(fp128 %0, fp128 %1) {
 ; ARM64-NEXT:    cset w0, ne
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %cmp = fcmp uno fp128 %0, %1
   ret i1 %cmp
 }
@@ -269,7 +262,6 @@ define i1 @fcmp_f128_ugt(fp128 %0, fp128 %1) {
 ; ARM64-NEXT:    cset w0, gt
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %cmp = fcmp ugt fp128 %0, %1
   ret i1 %cmp
 }
@@ -298,7 +290,6 @@ define i1 @fcmp_f128_uge(fp128 %0, fp128 %1) {
 ; ARM64-NEXT:    cset w0, ge
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %cmp = fcmp uge fp128 %0, %1
   ret i1 %cmp
 }
@@ -327,7 +318,6 @@ define i1 @fcmp_f128_ult(fp128 %0, fp128 %1) {
 ; ARM64-NEXT:    cset w0, lt
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %cmp = fcmp ult fp128 %0, %1
   ret i1 %cmp
 }
@@ -356,7 +346,6 @@ define i1 @fcmp_f128_ule(fp128 %0, fp128 %1) {
 ; ARM64-NEXT:    cset w0, le
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %cmp = fcmp ule fp128 %0, %1
   ret i1 %cmp
 }

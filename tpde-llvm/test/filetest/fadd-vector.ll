@@ -23,7 +23,6 @@ define <2 x float> @fadd_v2f32_1(<2 x float> %0) {
 ; ARM64-NEXT:    fadd v0.2s, v0.2s, v1.2s
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = fadd <2 x float> %0, <float 1.0, float 1.0>
   ret <2 x float> %r
 }
@@ -77,7 +76,6 @@ define <2 x float> @fadd_v2f32_f32_spill(<2 x float> %0, <2 x float> %1) {
 ; ARM64-NEXT:    fadd v0.2s, v0.2s, v1.2s
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %c = call <2 x float> @fadd_v2f32_f32_spill(<2 x float> %0, <2 x float> %1)
   %a1 = fadd <2 x float> %c, %0
   %a2 = fadd <2 x float> %c, %1
@@ -104,7 +102,6 @@ define <4 x float> @fadd_v4f32_1(<4 x float> %0) {
 ; ARM64-NEXT:    fadd v0.4s, v0.4s, v1.4s
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = fadd <4 x float> %0, <float 1.0, float 1.0, float 1.0, float 1.0>
   ret <4 x float> %r
 }
@@ -147,7 +144,6 @@ define <2 x double> @fadd_v2f64_1(<2 x double> %0) {
 ; ARM64-NEXT:    fadd v0.2d, v0.2d, v1.2d
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = fadd <2 x double> %0, <double 1.0, double 1.0>
   ret <2 x double> %r
 }

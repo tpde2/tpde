@@ -69,7 +69,6 @@ define i32 @load() {
 ; ARM64-NEXT:    ldr w0, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %p = call ptr @llvm.threadlocal.address(ptr @t1)
   %l = load i32, ptr %p
   ret i32 %l

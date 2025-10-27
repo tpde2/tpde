@@ -98,7 +98,6 @@ define ptr @phi_twocycles() {
 ; ARM64-NEXT:    mov w21, w22
 ; ARM64-NEXT:    mov w22, w0
 ; ARM64-NEXT:    b 0x70 <phi_twocycles+0x20>
-; ARM64-NEXT:    udf #0x0
   br label %1
 
 1:                                                ; preds = %1, %0
@@ -137,7 +136,6 @@ define ptr @phi_cycles_selfref() {
 ; ARM64-NEXT:    mov w19, w20
 ; ARM64-NEXT:    mov w20, w0
 ; ARM64-NEXT:    b 0xac <phi_cycles_selfref+0x1c>
-; ARM64-NEXT:    udf #0x0
   br label %1
 
 1:                                                ; preds = %1, %0
@@ -182,7 +180,6 @@ define void @phi_cycle_i128(i1 %c, i128 %v1, i128 %v2) {
 ; ARM64-NEXT:    str x0, [x29, #0xb0]
 ; ARM64-NEXT:    str x1, [x29, #0xb8]
 ; ARM64-NEXT:    b 0xd8 <phi_cycle_i128+0x18>
-; ARM64-NEXT:    udf #0x0
   br label %1
 
 1:

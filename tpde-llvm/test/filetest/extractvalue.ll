@@ -28,7 +28,6 @@ define i8 @extract_i8_i32_0(ptr %0) {
 ; ARM64-NEXT:    mov w0, w1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %1 = load %struct.i8_i32, ptr %0
   %2 = extractvalue %struct.i8_i32 %1, 0
@@ -53,7 +52,6 @@ define i32 @extract_i8_i32_1(ptr %0) {
 ; ARM64-NEXT:    mov w0, w2
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %1 = load %struct.i8_i32, ptr %0
   %2 = extractvalue %struct.i8_i32 %1, 1
@@ -140,7 +138,6 @@ define ptr @extract_ptr_i32_0(ptr %0) {
 ; ARM64-NEXT:    mov x0, x1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %1 = load %struct.ptr_i32, ptr %0
   %2 = extractvalue %struct.ptr_i32 %1, 0
@@ -165,7 +162,6 @@ define i32 @extract_ptr_i32_1(ptr %0) {
 ; ARM64-NEXT:    mov w0, w2
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %1 = load %struct.ptr_i32, ptr %0
   %2 = extractvalue %struct.ptr_i32 %1, 1
@@ -274,7 +270,6 @@ define ptr @extract_f32_ptr_1(ptr %0) {
 ; ARM64-NEXT:    mov x0, x1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %1 = load %struct.f32_ptr, ptr %0
   %2 = extractvalue %struct.f32_ptr %1, 1

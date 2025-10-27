@@ -146,7 +146,6 @@ define i128 @load_i8_zext_i128(ptr %a) {
 ; ARM64-NEXT:    mov w1, #0x0 // =0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %l = load i8, ptr %a
   %x = zext i8 %l to i128
   ret i128 %x
@@ -174,7 +173,6 @@ define i128 @load_i8_sext_i128(ptr %a) {
 ; ARM64-NEXT:    asr x1, x0, #63
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %l = load i8, ptr %a
   %x = sext i8 %l to i128
   ret i128 %x
@@ -321,7 +319,6 @@ define i128 @load_i16_zext_i128(ptr %a) {
 ; ARM64-NEXT:    mov w1, #0x0 // =0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %l = load i16, ptr %a
   %x = zext i16 %l to i128
   ret i128 %x
@@ -349,7 +346,6 @@ define i128 @load_i16_sext_i128(ptr %a) {
 ; ARM64-NEXT:    asr x1, x0, #63
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %l = load i16, ptr %a
   %x = sext i16 %l to i128
   ret i128 %x
@@ -697,7 +693,6 @@ define i128 @load_i32_zext_i128(ptr %a) {
 ; ARM64-NEXT:    mov w1, #0x0 // =0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %l = load i32, ptr %a
   %x = zext i32 %l to i128
   ret i128 %x
@@ -725,7 +720,6 @@ define i128 @load_i32_sext_i128(ptr %a) {
 ; ARM64-NEXT:    asr x1, x0, #63
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %l = load i32, ptr %a
   %x = sext i32 %l to i128
   ret i128 %x

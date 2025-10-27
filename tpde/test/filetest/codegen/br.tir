@@ -318,7 +318,6 @@ define @loop1(%a, %b) {
 ; ARM64-FIXED-NEXT:    b 0x120 <loop1+0x10>
 ; ARM64-FIXED-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-FIXED-NEXT:    ret
-; ARM64-FIXED-NEXT:    udf #0x0
 entry:
   br ^loop_head
 loop_head:

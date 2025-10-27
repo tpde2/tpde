@@ -170,7 +170,6 @@ define i1 @usub_i32_1(i32 %0, i32 %1) {
 ; ARM64-NEXT:    mov w0, w1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %2 = call {i32, i1} @llvm.usub.with.overflow.i32(i32 %0, i32 %1)
   %3 = extractvalue {i32, i1} %2, 1
@@ -219,7 +218,6 @@ define i1 @usub_i64_1(i64 %0, i64 %1) {
 ; ARM64-NEXT:    mov w0, w1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %2 = call {i64, i1} @llvm.usub.with.overflow.i64(i64 %0, i64 %1)
   %3 = extractvalue {i64, i1} %2, 1
@@ -435,7 +433,6 @@ define i1 @ssub_i32_1(i32 %0, i32 %1) {
 ; ARM64-NEXT:    mov w0, w1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %2 = call {i32, i1} @llvm.ssub.with.overflow.i32(i32 %0, i32 %1)
   %3 = extractvalue {i32, i1} %2, 1
@@ -484,7 +481,6 @@ define i1 @ssub_i64_1(i64 %0, i64 %1) {
 ; ARM64-NEXT:    mov w0, w1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %2 = call {i64, i1} @llvm.ssub.with.overflow.i64(i64 %0, i64 %1)
   %3 = extractvalue {i64, i1} %2, 1

@@ -27,7 +27,6 @@ define void @store_glob(ptr %ptr) {
 ; ARM64-NEXT:    str x1, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   store ptr @glob, ptr %ptr
   ret void
 }
@@ -52,7 +51,6 @@ define void @store_glob_ptrtoint(ptr %ptr) {
 ; ARM64-NEXT:    str x1, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   store i64 ptrtoint (ptr @glob to i64), ptr %ptr
   ret void
 }
@@ -1035,7 +1033,6 @@ define void @phi_struct1(ptr %ptr) {
 ; ARM64-NEXT:    ldr x19, [sp, #0x10]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   br label %loop
 loop:
@@ -1180,7 +1177,6 @@ define void @phi_struct3(ptr %ptr) {
 ; ARM64-NEXT:    ldr x19, [sp, #0x10]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   br label %loop
 loop:
@@ -1330,7 +1326,6 @@ define void @phi_gep_before_icmp_twice() {
 ; ARM64-NEXT:    b 0x7c0 <phi_gep_before_icmp_twice+0x40>
 ; ARM64-NEXT:    mov w19, #0x0 // =0
 ; ARM64-NEXT:    b 0x7d8 <phi_gep_before_icmp_twice+0x58>
-; ARM64-NEXT:    udf #0x0
   br label %1
 
 1:                                                ; No predecessors!

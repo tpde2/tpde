@@ -890,7 +890,6 @@ define %struct.f32_ptr @ret_f32_ptr(ptr %0) {
 ; ARM64-NEXT:    mov x0, x1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %1 = load %struct.f32_ptr, ptr %0
   ret %struct.f32_ptr %1
@@ -956,7 +955,6 @@ define {float, {i8, double}} @ret_float_i8_double_const(ptr %0) {
 ; ARM64-NEXT:    fmov d1, #10.00000000
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   ret {float, {i8, double}} { float 1.0, {i8, double} { i8 32, double 10.0 } }
 }
 
@@ -979,7 +977,6 @@ define {i8, {i8, double}} @ret_i8_i8_double_const(ptr %0) {
 ; ARM64-NEXT:    fmov d0, #10.00000000
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   ret {i8, {i8, double}} { i8 123, {i8, double} { i8 32, double 10.0 } }
 }
 

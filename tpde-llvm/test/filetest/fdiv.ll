@@ -158,7 +158,6 @@ define float @fdiv_f32_no_salvage_imm(float %0) {
 ; ARM64-NEXT:    fdiv s0, s0, s1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   entry:
     %1 = fdiv float %0, 1.0
     %2 = fdiv float %0, %1
@@ -208,7 +207,6 @@ define double @fdiv_f64_no_salvage_imm(double %0) {
 ; ARM64-NEXT:    fdiv d0, d0, d1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   entry:
     %1 = fdiv double %0, 1.0
     %2 = fdiv double %0, %1

@@ -23,7 +23,6 @@ define <2 x float> @fmul_v2f32_1(<2 x float> %0) {
 ; ARM64-NEXT:    fmul v0.2s, v0.2s, v1.2s
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = fmul <2 x float> %0, <float 1.0, float 1.0>
   ret <2 x float> %r
 }
@@ -66,7 +65,6 @@ define <4 x float> @fmul_v4f32_1(<4 x float> %0) {
 ; ARM64-NEXT:    fmul v0.4s, v0.4s, v1.4s
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = fmul <4 x float> %0, <float 1.0, float 1.0, float 1.0, float 1.0>
   ret <4 x float> %r
 }
@@ -109,7 +107,6 @@ define <2 x double> @fmul_v2f64_1(<2 x double> %0) {
 ; ARM64-NEXT:    fmul v0.2d, v0.2d, v1.2d
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = fmul <2 x double> %0, <double 1.0, double 1.0>
   ret <2 x double> %r
 }

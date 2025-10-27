@@ -48,7 +48,6 @@ define double @copysignf64(double %0, double %1) {
 ; ARM64-NEXT:    bif v0.16b, v1.16b, v2.16b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %res = call double @llvm.copysign.f64(double %0, double %1)
   ret double %res
 }

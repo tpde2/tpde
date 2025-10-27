@@ -69,7 +69,6 @@ define ptr @dynalloca_empty_array(i64 %0) {
 ; ARM64-NEXT:    mov sp, x29
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
     %a = alloca {}, i64 %0
     ret ptr %a
 }
@@ -652,7 +651,6 @@ define i32 @dyn_alloca_dyn_si3_cnt_i32_no_salvage(i32 %0) {
 ; ARM64-NEXT:    ldr x19, [x29, #0x10]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
     br label %bb1
 bb1:
@@ -694,7 +692,6 @@ define i16 @dyn_alloca_dyn_si3_cnt_i16_no_salvage(i16 %0) {
 ; ARM64-NEXT:    ldr x19, [x29, #0x10]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
     br label %bb1
 bb1:
@@ -755,7 +752,6 @@ define ptr @dynalloca_align_16(i64 %0) {
 ; ARM64-NEXT:    ldr x19, [x29, #0x10]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %2 = alloca i8, i64 %0, align 16
   br label %3
 

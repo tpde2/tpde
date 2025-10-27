@@ -41,7 +41,6 @@ define i8 @umul_i8_0(i8 %0, i8 %1) {
 ; ARM64-NEXT:    mov w0, w2
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %2 = call {i8, i1} @llvm.umul.with.overflow.i8(i8 %0, i8 %1)
   %3 = extractvalue {i8, i1} %2, 0
@@ -72,7 +71,6 @@ define i1 @umul_i8_1(i8 %0, i8 %1) {
 ; ARM64-NEXT:    mov w0, w3
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %2 = call {i8, i1} @llvm.umul.with.overflow.i8(i8 %0, i8 %1)
   %3 = extractvalue {i8, i1} %2, 1
@@ -102,7 +100,6 @@ define i16 @umul_i16_0(i16 %0, i16 %1) {
 ; ARM64-NEXT:    mov w0, w2
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %2 = call {i16, i1} @llvm.umul.with.overflow.i16(i16 %0, i16 %1)
   %3 = extractvalue {i16, i1} %2, 0
@@ -133,7 +130,6 @@ define i1 @umul_i16_1(i16 %0, i16 %1) {
 ; ARM64-NEXT:    mov w0, w3
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %2 = call {i16, i1} @llvm.umul.with.overflow.i16(i16 %0, i16 %1)
   %3 = extractvalue {i16, i1} %2, 1
@@ -274,7 +270,6 @@ define i8 @smul_i8_0(i8 %0, i8 %1) {
 ; ARM64-NEXT:    mov w0, w2
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %2 = call {i8, i1} @llvm.smul.with.overflow.i8(i8 %0, i8 %1)
   %3 = extractvalue {i8, i1} %2, 0
@@ -305,7 +300,6 @@ define i1 @smul_i8_1(i8 %0, i8 %1) {
 ; ARM64-NEXT:    mov w0, w3
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %2 = call {i8, i1} @llvm.smul.with.overflow.i8(i8 %0, i8 %1)
   %3 = extractvalue {i8, i1} %2, 1
@@ -335,7 +329,6 @@ define i16 @smul_i16_0(i16 %0, i16 %1) {
 ; ARM64-NEXT:    mov w0, w2
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %2 = call {i16, i1} @llvm.smul.with.overflow.i16(i16 %0, i16 %1)
   %3 = extractvalue {i16, i1} %2, 0
@@ -364,7 +357,6 @@ define i1 @smul_i16_1(i16 %0, i16 %1) {
 ; ARM64-NEXT:    mov w0, w3
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %2 = call {i16, i1} @llvm.smul.with.overflow.i16(i16 %0, i16 %1)
   %3 = extractvalue {i16, i1} %2, 1

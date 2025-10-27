@@ -552,7 +552,6 @@ define <2 x ptr> @shufflevector_v2ptr_v2ptr_poison(<2 x ptr> %a) {
 ; ARM64-NEXT:    mov v0.16b, v1.16b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = shufflevector <2 x ptr> %a, <2 x ptr> poison, <2 x i32> <i32 1, i32 2>
   ret <2 x ptr> %r
 }

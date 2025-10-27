@@ -36,7 +36,6 @@ define void @srem_v1i8(ptr %p, ptr %q) {
 ; ARM64-NEXT:    strb w3, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %a = load <1 x i8>, ptr %p
   %b = load <1 x i8>, ptr %q
   %r = srem <1 x i8> %a, %b
@@ -149,7 +148,6 @@ define void @srem_v5i8(ptr %p, ptr %q) {
 ; ARM64-NEXT:    strb w11, [x0, #0x4]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %a = load <5 x i8>, ptr %p
   %b = load <5 x i8>, ptr %q
   %r = srem <5 x i8> %a, %b
@@ -1486,7 +1484,6 @@ define <2 x i32> @srem_v2i32(<2 x i32> %a, <2 x i32> %b) {
 ; ARM64-NEXT:    mov v0.16b, v2.16b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = srem <2 x i32> %a, %b
   ret <2 x i32> %r
 }

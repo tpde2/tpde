@@ -180,7 +180,6 @@ define i24 @load_i24_alt(ptr %a) {
 ; ARM64-NEXT:    mov w0, w2
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %b = load i24, ptr %a, align 2
   %c = load i24, ptr %a, align 2
@@ -332,7 +331,6 @@ define i40 @load_i40_alt(ptr %a) {
 ; ARM64-NEXT:    mov x0, x2
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %b = load i40, ptr %a, align 2
   %c = load i40, ptr %a, align 2
@@ -394,7 +392,6 @@ define i48 @load_i48_alt(ptr %a) {
 ; ARM64-NEXT:    mov x0, x2
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %b = load i48, ptr %a, align 2
   %c = load i48, ptr %a, align 2
@@ -1170,7 +1167,6 @@ define void @load_struct_i128_i1(ptr %0) {
 ; ARM64-NEXT:    ldrb w3, [x0, #0x10]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   entry:
 ; Make sure we are after the prologue
 ; A64: sub sp, sp

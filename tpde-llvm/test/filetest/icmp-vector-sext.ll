@@ -331,7 +331,6 @@ define <8 x i8> @icmp_ne_v8i8_0(<8 x i8> %a) {
 ; ARM64-NEXT:    mvn v0.8b, v0.8b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp ne <8 x i8> %a, zeroinitializer
   %x = sext <8 x i1> %r to <8 x i8>
   ret <8 x i8> %x
@@ -378,7 +377,6 @@ define <16 x i8> @icmp_ne_v16i8_0(<16 x i8> %a) {
 ; ARM64-NEXT:    mvn v0.16b, v0.16b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp ne <16 x i8> %a, zeroinitializer
   %x = sext <16 x i1> %r to <16 x i8>
   ret <16 x i8> %x
@@ -425,7 +423,6 @@ define <4 x i16> @icmp_ne_v4i16_0(<4 x i16> %a) {
 ; ARM64-NEXT:    mvn v0.8b, v0.8b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp ne <4 x i16> %a, zeroinitializer
   %x = sext <4 x i1> %r to <4 x i16>
   ret <4 x i16> %x
@@ -472,7 +469,6 @@ define <8 x i16> @icmp_ne_v8i16_0(<8 x i16> %a) {
 ; ARM64-NEXT:    mvn v0.16b, v0.16b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp ne <8 x i16> %a, zeroinitializer
   %x = sext <8 x i1> %r to <8 x i16>
   ret <8 x i16> %x
@@ -519,7 +515,6 @@ define <2 x i32> @icmp_ne_v2i32_0(<2 x i32> %a) {
 ; ARM64-NEXT:    mvn v0.8b, v0.8b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp ne <2 x i32> %a, zeroinitializer
   %x = sext <2 x i1> %r to <2 x i32>
   ret <2 x i32> %x
@@ -566,7 +561,6 @@ define <4 x i32> @icmp_ne_v4i32_0(<4 x i32> %a) {
 ; ARM64-NEXT:    mvn v0.16b, v0.16b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp ne <4 x i32> %a, zeroinitializer
   %x = sext <4 x i1> %r to <4 x i32>
   ret <4 x i32> %x
@@ -617,7 +611,6 @@ define <2 x i64> @icmp_ne_v2i64_0(<2 x i64> %a) {
 ; ARM64-NEXT:    mvn v0.16b, v0.16b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp ne <2 x i64> %a, zeroinitializer
   %x = sext <2 x i1> %r to <2 x i64>
   ret <2 x i64> %x
@@ -1354,7 +1347,6 @@ define <8 x i8> @icmp_ult_v8i8_0(<8 x i8> %a) {
 ; ARM64-NEXT:    mov v0.16b, v1.16b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp ult <8 x i8> %a, zeroinitializer
   %x = sext <8 x i1> %r to <8 x i8>
   ret <8 x i8> %x
@@ -1403,7 +1395,6 @@ define <16 x i8> @icmp_ult_v16i8_0(<16 x i8> %a) {
 ; ARM64-NEXT:    mov v0.16b, v1.16b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp ult <16 x i8> %a, zeroinitializer
   %x = sext <16 x i1> %r to <16 x i8>
   ret <16 x i8> %x
@@ -1456,7 +1447,6 @@ define <4 x i16> @icmp_ult_v4i16_0(<4 x i16> %a) {
 ; ARM64-NEXT:    mov v0.16b, v1.16b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp ult <4 x i16> %a, zeroinitializer
   %x = sext <4 x i1> %r to <4 x i16>
   ret <4 x i16> %x
@@ -1509,7 +1499,6 @@ define <8 x i16> @icmp_ult_v8i16_0(<8 x i16> %a) {
 ; ARM64-NEXT:    mov v0.16b, v1.16b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp ult <8 x i16> %a, zeroinitializer
   %x = sext <8 x i1> %r to <8 x i16>
   ret <8 x i16> %x
@@ -1562,7 +1551,6 @@ define <2 x i32> @icmp_ult_v2i32_0(<2 x i32> %a) {
 ; ARM64-NEXT:    mov v0.16b, v1.16b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp ult <2 x i32> %a, zeroinitializer
   %x = sext <2 x i1> %r to <2 x i32>
   ret <2 x i32> %x
@@ -1615,7 +1603,6 @@ define <4 x i32> @icmp_ult_v4i32_0(<4 x i32> %a) {
 ; ARM64-NEXT:    mov v0.16b, v1.16b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp ult <4 x i32> %a, zeroinitializer
   %x = sext <4 x i1> %r to <4 x i32>
   ret <4 x i32> %x
@@ -1680,7 +1667,6 @@ define <2 x i64> @icmp_ult_v2i64_0(<2 x i64> %a) {
 ; ARM64-NEXT:    mov v0.16b, v1.16b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp ult <2 x i64> %a, zeroinitializer
   %x = sext <2 x i1> %r to <2 x i64>
   ret <2 x i64> %x
@@ -1725,7 +1711,6 @@ define <8 x i8> @icmp_ule_v8i8_0(<8 x i8> %a) {
 ; ARM64-NEXT:    mov v0.16b, v1.16b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp ule <8 x i8> %a, zeroinitializer
   %x = sext <8 x i1> %r to <8 x i8>
   ret <8 x i8> %x
@@ -1770,7 +1755,6 @@ define <16 x i8> @icmp_ule_v16i8_0(<16 x i8> %a) {
 ; ARM64-NEXT:    mov v0.16b, v1.16b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp ule <16 x i8> %a, zeroinitializer
   %x = sext <16 x i1> %r to <16 x i8>
   ret <16 x i8> %x
@@ -1817,7 +1801,6 @@ define <4 x i16> @icmp_ule_v4i16_0(<4 x i16> %a) {
 ; ARM64-NEXT:    mov v0.16b, v1.16b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp ule <4 x i16> %a, zeroinitializer
   %x = sext <4 x i1> %r to <4 x i16>
   ret <4 x i16> %x
@@ -1864,7 +1847,6 @@ define <8 x i16> @icmp_ule_v8i16_0(<8 x i16> %a) {
 ; ARM64-NEXT:    mov v0.16b, v1.16b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp ule <8 x i16> %a, zeroinitializer
   %x = sext <8 x i1> %r to <8 x i16>
   ret <8 x i16> %x
@@ -1919,7 +1901,6 @@ define <2 x i32> @icmp_ule_v2i32_0(<2 x i32> %a) {
 ; ARM64-NEXT:    mov v0.16b, v1.16b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp ule <2 x i32> %a, zeroinitializer
   %x = sext <2 x i1> %r to <2 x i32>
   ret <2 x i32> %x
@@ -1974,7 +1955,6 @@ define <4 x i32> @icmp_ule_v4i32_0(<4 x i32> %a) {
 ; ARM64-NEXT:    mov v0.16b, v1.16b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp ule <4 x i32> %a, zeroinitializer
   %x = sext <4 x i1> %r to <4 x i32>
   ret <4 x i32> %x
@@ -2043,7 +2023,6 @@ define <2 x i64> @icmp_ule_v2i64_0(<2 x i64> %a) {
 ; ARM64-NEXT:    mov v0.16b, v1.16b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp ule <2 x i64> %a, zeroinitializer
   %x = sext <2 x i1> %r to <2 x i64>
   ret <2 x i64> %x
@@ -2720,7 +2699,6 @@ define <8 x i8> @icmp_slt_v8i8_0(<8 x i8> %a) {
 ; ARM64-NEXT:    mov v0.16b, v1.16b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp slt <8 x i8> %a, zeroinitializer
   %x = sext <8 x i1> %r to <8 x i8>
   ret <8 x i8> %x
@@ -2765,7 +2743,6 @@ define <16 x i8> @icmp_slt_v16i8_0(<16 x i8> %a) {
 ; ARM64-NEXT:    mov v0.16b, v1.16b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp slt <16 x i8> %a, zeroinitializer
   %x = sext <16 x i1> %r to <16 x i8>
   ret <16 x i8> %x
@@ -2810,7 +2787,6 @@ define <4 x i16> @icmp_slt_v4i16_0(<4 x i16> %a) {
 ; ARM64-NEXT:    mov v0.16b, v1.16b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp slt <4 x i16> %a, zeroinitializer
   %x = sext <4 x i1> %r to <4 x i16>
   ret <4 x i16> %x
@@ -2855,7 +2831,6 @@ define <8 x i16> @icmp_slt_v8i16_0(<8 x i16> %a) {
 ; ARM64-NEXT:    mov v0.16b, v1.16b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp slt <8 x i16> %a, zeroinitializer
   %x = sext <8 x i1> %r to <8 x i16>
   ret <8 x i16> %x
@@ -2900,7 +2875,6 @@ define <2 x i32> @icmp_slt_v2i32_0(<2 x i32> %a) {
 ; ARM64-NEXT:    mov v0.16b, v1.16b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp slt <2 x i32> %a, zeroinitializer
   %x = sext <2 x i1> %r to <2 x i32>
   ret <2 x i32> %x
@@ -2945,7 +2919,6 @@ define <4 x i32> @icmp_slt_v4i32_0(<4 x i32> %a) {
 ; ARM64-NEXT:    mov v0.16b, v1.16b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp slt <4 x i32> %a, zeroinitializer
   %x = sext <4 x i1> %r to <4 x i32>
   ret <4 x i32> %x
@@ -3010,7 +2983,6 @@ define <2 x i64> @icmp_slt_v2i64_0(<2 x i64> %a) {
 ; ARM64-NEXT:    mov v0.16b, v1.16b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp slt <2 x i64> %a, zeroinitializer
   %x = sext <2 x i1> %r to <2 x i64>
   ret <2 x i64> %x
@@ -3057,7 +3029,6 @@ define <8 x i8> @icmp_sle_v8i8_0(<8 x i8> %a) {
 ; ARM64-NEXT:    mov v0.16b, v1.16b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp sle <8 x i8> %a, zeroinitializer
   %x = sext <8 x i1> %r to <8 x i8>
   ret <8 x i8> %x
@@ -3104,7 +3075,6 @@ define <16 x i8> @icmp_sle_v16i8_0(<16 x i8> %a) {
 ; ARM64-NEXT:    mov v0.16b, v1.16b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp sle <16 x i8> %a, zeroinitializer
   %x = sext <16 x i1> %r to <16 x i8>
   ret <16 x i8> %x
@@ -3151,7 +3121,6 @@ define <4 x i16> @icmp_sle_v4i16_0(<4 x i16> %a) {
 ; ARM64-NEXT:    mov v0.16b, v1.16b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp sle <4 x i16> %a, zeroinitializer
   %x = sext <4 x i1> %r to <4 x i16>
   ret <4 x i16> %x
@@ -3198,7 +3167,6 @@ define <8 x i16> @icmp_sle_v8i16_0(<8 x i16> %a) {
 ; ARM64-NEXT:    mov v0.16b, v1.16b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp sle <8 x i16> %a, zeroinitializer
   %x = sext <8 x i1> %r to <8 x i16>
   ret <8 x i16> %x
@@ -3245,7 +3213,6 @@ define <2 x i32> @icmp_sle_v2i32_0(<2 x i32> %a) {
 ; ARM64-NEXT:    mov v0.16b, v1.16b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp sle <2 x i32> %a, zeroinitializer
   %x = sext <2 x i1> %r to <2 x i32>
   ret <2 x i32> %x
@@ -3292,7 +3259,6 @@ define <4 x i32> @icmp_sle_v4i32_0(<4 x i32> %a) {
 ; ARM64-NEXT:    mov v0.16b, v1.16b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp sle <4 x i32> %a, zeroinitializer
   %x = sext <4 x i1> %r to <4 x i32>
   ret <4 x i32> %x

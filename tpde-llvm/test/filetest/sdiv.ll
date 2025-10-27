@@ -26,7 +26,6 @@ define i8 @sdiv_i8_1(i8 %0) {
 ; ARM64-NEXT:    sdiv w0, w0, w1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %1 = sdiv i8 %0, 1
   ret i8 %1
@@ -52,7 +51,6 @@ define i8 @sdiv_i8_-1(i8 %0) {
 ; ARM64-NEXT:    sdiv w0, w0, w1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %1 = sdiv i8 %0, -1
   ret i8 %1
@@ -78,7 +76,6 @@ define i8 @sdiv_i8_28(i8 %0) {
 ; ARM64-NEXT:    sdiv w0, w0, w1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %1 = sdiv i8 %0, 28
   ret i8 %1
@@ -104,7 +101,6 @@ define i8 @sdiv_i8_i8(i8 %0, i8 %1) {
 ; ARM64-NEXT:    sdiv w0, w0, w1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %2 = sdiv i8 %0, %1
   ret i8 %2
@@ -130,7 +126,6 @@ define i8 @sdiv_i8_32(i8 %0) {
 ; ARM64-NEXT:    sdiv w0, w0, w1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %1 = sdiv i8 %0, 32
   ret i8 %1
@@ -156,7 +151,6 @@ define i16 @sdiv_i16_1(i16 %0) {
 ; ARM64-NEXT:    sdiv w0, w0, w1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %1 = sdiv i16 %0, 1
   ret i16 %1
@@ -182,7 +176,6 @@ define i16 @sdiv_i16_-1(i16 %0) {
 ; ARM64-NEXT:    sdiv w0, w0, w1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %1 = sdiv i16 %0, -1
   ret i16 %1
@@ -208,7 +201,6 @@ define i16 @sdiv_i16_28(i16 %0) {
 ; ARM64-NEXT:    sdiv w0, w0, w1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %1 = sdiv i16 %0, 28
   ret i16 %1
@@ -234,7 +226,6 @@ define i16 @sdiv_i16_32(i16 %0) {
 ; ARM64-NEXT:    sdiv w0, w0, w1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %1 = sdiv i16 %0, 32
   ret i16 %1
@@ -260,7 +251,6 @@ define i16 @sdiv_i16_i16(i16 %0, i16 %1) {
 ; ARM64-NEXT:    sdiv w0, w0, w1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %2 = sdiv i16 %0, %1
   ret i16 %2
@@ -512,7 +502,6 @@ define i8 @sdiv_i8_salvage(i8 %0, i8 %1) {
 ; ARM64-NEXT:    sdiv w0, w0, w1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %2 = sdiv i8 %0, %1
   ret i8 %2
@@ -538,7 +527,6 @@ define i16 @sdiv_i16_salvage(i16 %0, i16 %1) {
 ; ARM64-NEXT:    sdiv w0, w0, w1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %2 = sdiv i16 %0, %1
   ret i16 %2

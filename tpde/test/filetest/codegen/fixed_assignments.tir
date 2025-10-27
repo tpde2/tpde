@@ -162,7 +162,6 @@ define @salvage_from_fixed_to_nonfixed(%a!, %b) {
 ; ARM64-NEXT:    ldr x0, [x29, #0xa0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %c = add %a, %b
 

@@ -24,7 +24,6 @@ define i32 @select_i32_reg(i1 %0, i32 %1, i32 %2) {
 ; ARM64-NEXT:    mov w0, w2
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   entry:
     %3 = select i1 %0, i32 %1, i32 %2
     ret i32 %3
@@ -48,7 +47,6 @@ define i64 @select_i64_reg(i1 %0, i64 %1, i64 %2) {
 ; ARM64-NEXT:    mov x0, x2
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   entry:
     %3 = select i1 %0, i64 %1, i64 %2
     ret i64 %3
@@ -73,7 +71,6 @@ define ptr @select_ptr_reg(i1 %0, ptr %1, ptr %2) {
 ; ARM64-NEXT:    mov x0, x2
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   entry:
     %3 = select i1 %0, ptr %1, ptr %2
     ret ptr %3
@@ -125,7 +122,6 @@ define float @select_f32_reg(i1 %0, float %1, float %2) {
 ; ARM64-NEXT:    mov v0.16b, v1.16b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   entry:
     %3 = select i1 %0, float %1, float %2
     ret float %3
@@ -151,7 +147,6 @@ define double @select_f64_reg(i1 %0, double %1, double %2) {
 ; ARM64-NEXT:    mov v0.16b, v1.16b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   entry:
     %3 = select i1 %0, double %1, double %2
     ret double %3

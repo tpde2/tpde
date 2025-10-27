@@ -174,7 +174,6 @@ define void @store_global_ptr(ptr %0) {
 ; ARM64-NEXT:    str x0, [x1]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   store ptr %0, ptr @global_ptr
   ret void

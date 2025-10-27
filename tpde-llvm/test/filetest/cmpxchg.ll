@@ -31,7 +31,6 @@ define {i64, i1} @cmpxchg_mono_mono(ptr %0, i64 %1, i64 %2) {
 ; ARM64-NEXT:    ldrb w1, [x29, #0xa8]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = cmpxchg ptr %0, i64 %1, i64 %2 monotonic monotonic
   ret {i64, i1} %r
 }
@@ -61,7 +60,6 @@ define {i64, i1} @cmpxchg_acq_mono(ptr %0, i64 %1, i64 %2) {
 ; ARM64-NEXT:    ldrb w1, [x29, #0xa8]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = cmpxchg ptr %0, i64 %1, i64 %2 acquire monotonic
   ret {i64, i1} %r
 }
@@ -90,7 +88,6 @@ define {i64, i1} @cmpxchg_acq_acq(ptr %0, i64 %1, i64 %2) {
 ; ARM64-NEXT:    ldrb w1, [x29, #0xa8]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = cmpxchg ptr %0, i64 %1, i64 %2 acquire acquire
   ret {i64, i1} %r
 }
@@ -120,7 +117,6 @@ define {i64, i1} @cmpxchg_rel_mono(ptr %0, i64 %1, i64 %2) {
 ; ARM64-NEXT:    ldrb w1, [x29, #0xa8]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = cmpxchg ptr %0, i64 %1, i64 %2 release monotonic
   ret {i64, i1} %r
 }
@@ -149,7 +145,6 @@ define {i64, i1} @cmpxchg_rel_acq(ptr %0, i64 %1, i64 %2) {
 ; ARM64-NEXT:    ldrb w1, [x29, #0xa8]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = cmpxchg ptr %0, i64 %1, i64 %2 release acquire
   ret {i64, i1} %r
 }
@@ -179,7 +174,6 @@ define {i64, i1} @cmpxchg_acqrel_mono(ptr %0, i64 %1, i64 %2) {
 ; ARM64-NEXT:    ldrb w1, [x29, #0xa8]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = cmpxchg ptr %0, i64 %1, i64 %2 acq_rel monotonic
   ret {i64, i1} %r
 }
@@ -208,7 +202,6 @@ define {i64, i1} @cmpxchg_acqrel_acq(ptr %0, i64 %1, i64 %2) {
 ; ARM64-NEXT:    ldrb w1, [x29, #0xa8]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = cmpxchg ptr %0, i64 %1, i64 %2 acq_rel acquire
   ret {i64, i1} %r
 }
@@ -238,7 +231,6 @@ define {i64, i1} @cmpxchg_seqcst_mono(ptr %0, i64 %1, i64 %2) {
 ; ARM64-NEXT:    ldrb w1, [x29, #0xa8]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = cmpxchg ptr %0, i64 %1, i64 %2 seq_cst monotonic
   ret {i64, i1} %r
 }
@@ -267,7 +259,6 @@ define {i64, i1} @cmpxchg_seqcst_acq(ptr %0, i64 %1, i64 %2) {
 ; ARM64-NEXT:    ldrb w1, [x29, #0xa8]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = cmpxchg ptr %0, i64 %1, i64 %2 seq_cst acquire
   ret {i64, i1} %r
 }
@@ -296,7 +287,6 @@ define {i64, i1} @cmpxchg_seqcst_seqcst(ptr %0, i64 %1, i64 %2) {
 ; ARM64-NEXT:    ldrb w1, [x29, #0xa8]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = cmpxchg ptr %0, i64 %1, i64 %2 seq_cst seq_cst
   ret {i64, i1} %r
 }
@@ -327,7 +317,6 @@ define {i32, i1} @cmpxchg_mono_mono32(ptr %0, i32 %1, i32 %2) {
 ; ARM64-NEXT:    ldrb w1, [x29, #0xa4]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = cmpxchg ptr %0, i32 %1, i32 %2 monotonic monotonic
   ret {i32, i1} %r
 }
@@ -358,7 +347,6 @@ define {i32, i1} @cmpxchg_acq_mono32(ptr %0, i32 %1, i32 %2) {
 ; ARM64-NEXT:    ldrb w1, [x29, #0xa4]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = cmpxchg ptr %0, i32 %1, i32 %2 acquire monotonic
   ret {i32, i1} %r
 }
@@ -388,7 +376,6 @@ define {i32, i1} @cmpxchg_acq_acq32(ptr %0, i32 %1, i32 %2) {
 ; ARM64-NEXT:    ldrb w1, [x29, #0xa4]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = cmpxchg ptr %0, i32 %1, i32 %2 acquire acquire
   ret {i32, i1} %r
 }
@@ -419,7 +406,6 @@ define {i32, i1} @cmpxchg_rel_mono32(ptr %0, i32 %1, i32 %2) {
 ; ARM64-NEXT:    ldrb w1, [x29, #0xa4]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = cmpxchg ptr %0, i32 %1, i32 %2 release monotonic
   ret {i32, i1} %r
 }
@@ -449,7 +435,6 @@ define {i32, i1} @cmpxchg_rel_acq32(ptr %0, i32 %1, i32 %2) {
 ; ARM64-NEXT:    ldrb w1, [x29, #0xa4]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = cmpxchg ptr %0, i32 %1, i32 %2 release acquire
   ret {i32, i1} %r
 }
@@ -480,7 +465,6 @@ define {i32, i1} @cmpxchg_acqrel_mono32(ptr %0, i32 %1, i32 %2) {
 ; ARM64-NEXT:    ldrb w1, [x29, #0xa4]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = cmpxchg ptr %0, i32 %1, i32 %2 acq_rel monotonic
   ret {i32, i1} %r
 }
@@ -510,7 +494,6 @@ define {i32, i1} @cmpxchg_acqrel_acq32(ptr %0, i32 %1, i32 %2) {
 ; ARM64-NEXT:    ldrb w1, [x29, #0xa4]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = cmpxchg ptr %0, i32 %1, i32 %2 acq_rel acquire
   ret {i32, i1} %r
 }
@@ -541,7 +524,6 @@ define {i32, i1} @cmpxchg_seqcst_mono32(ptr %0, i32 %1, i32 %2) {
 ; ARM64-NEXT:    ldrb w1, [x29, #0xa4]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = cmpxchg ptr %0, i32 %1, i32 %2 seq_cst monotonic
   ret {i32, i1} %r
 }
@@ -571,7 +553,6 @@ define {i32, i1} @cmpxchg_seqcst_acq32(ptr %0, i32 %1, i32 %2) {
 ; ARM64-NEXT:    ldrb w1, [x29, #0xa4]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = cmpxchg ptr %0, i32 %1, i32 %2 seq_cst acquire
   ret {i32, i1} %r
 }
@@ -601,7 +582,6 @@ define {i32, i1} @cmpxchg_seqcst_seqcst32(ptr %0, i32 %1, i32 %2) {
 ; ARM64-NEXT:    ldrb w1, [x29, #0xa4]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = cmpxchg ptr %0, i32 %1, i32 %2 seq_cst seq_cst
   ret {i32, i1} %r
 }
@@ -632,7 +612,6 @@ define {i16, i1} @cmpxchg_mono_mono16(ptr %0, i16 %1, i16 %2) {
 ; ARM64-NEXT:    ldrb w1, [x29, #0xa2]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = cmpxchg ptr %0, i16 %1, i16 %2 monotonic monotonic
   ret {i16, i1} %r
 }
@@ -663,7 +642,6 @@ define {i16, i1} @cmpxchg_acq_mono16(ptr %0, i16 %1, i16 %2) {
 ; ARM64-NEXT:    ldrb w1, [x29, #0xa2]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = cmpxchg ptr %0, i16 %1, i16 %2 acquire monotonic
   ret {i16, i1} %r
 }
@@ -693,7 +671,6 @@ define {i16, i1} @cmpxchg_acq_acq16(ptr %0, i16 %1, i16 %2) {
 ; ARM64-NEXT:    ldrb w1, [x29, #0xa2]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = cmpxchg ptr %0, i16 %1, i16 %2 acquire acquire
   ret {i16, i1} %r
 }
@@ -724,7 +701,6 @@ define {i16, i1} @cmpxchg_rel_mono16(ptr %0, i16 %1, i16 %2) {
 ; ARM64-NEXT:    ldrb w1, [x29, #0xa2]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = cmpxchg ptr %0, i16 %1, i16 %2 release monotonic
   ret {i16, i1} %r
 }
@@ -754,7 +730,6 @@ define {i16, i1} @cmpxchg_rel_acq16(ptr %0, i16 %1, i16 %2) {
 ; ARM64-NEXT:    ldrb w1, [x29, #0xa2]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = cmpxchg ptr %0, i16 %1, i16 %2 release acquire
   ret {i16, i1} %r
 }
@@ -785,7 +760,6 @@ define {i16, i1} @cmpxchg_acqrel_mono16(ptr %0, i16 %1, i16 %2) {
 ; ARM64-NEXT:    ldrb w1, [x29, #0xa2]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = cmpxchg ptr %0, i16 %1, i16 %2 acq_rel monotonic
   ret {i16, i1} %r
 }
@@ -815,7 +789,6 @@ define {i16, i1} @cmpxchg_acqrel_acq16(ptr %0, i16 %1, i16 %2) {
 ; ARM64-NEXT:    ldrb w1, [x29, #0xa2]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = cmpxchg ptr %0, i16 %1, i16 %2 acq_rel acquire
   ret {i16, i1} %r
 }
@@ -846,7 +819,6 @@ define {i16, i1} @cmpxchg_seqcst_mono16(ptr %0, i16 %1, i16 %2) {
 ; ARM64-NEXT:    ldrb w1, [x29, #0xa2]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = cmpxchg ptr %0, i16 %1, i16 %2 seq_cst monotonic
   ret {i16, i1} %r
 }
@@ -876,7 +848,6 @@ define {i16, i1} @cmpxchg_seqcst_acq16(ptr %0, i16 %1, i16 %2) {
 ; ARM64-NEXT:    ldrb w1, [x29, #0xa2]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = cmpxchg ptr %0, i16 %1, i16 %2 seq_cst acquire
   ret {i16, i1} %r
 }
@@ -906,7 +877,6 @@ define {i16, i1} @cmpxchg_seqcst_seqcst16(ptr %0, i16 %1, i16 %2) {
 ; ARM64-NEXT:    ldrb w1, [x29, #0xa2]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = cmpxchg ptr %0, i16 %1, i16 %2 seq_cst seq_cst
   ret {i16, i1} %r
 }
@@ -937,7 +907,6 @@ define {i8, i1} @cmpxchg_mono_mono8(ptr %0, i8 %1, i8 %2) {
 ; ARM64-NEXT:    ldrb w1, [x29, #0xa1]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = cmpxchg ptr %0, i8 %1, i8 %2 monotonic monotonic
   ret {i8, i1} %r
 }
@@ -968,7 +937,6 @@ define {i8, i1} @cmpxchg_acq_mono8(ptr %0, i8 %1, i8 %2) {
 ; ARM64-NEXT:    ldrb w1, [x29, #0xa1]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = cmpxchg ptr %0, i8 %1, i8 %2 acquire monotonic
   ret {i8, i1} %r
 }
@@ -998,7 +966,6 @@ define {i8, i1} @cmpxchg_acq_acq8(ptr %0, i8 %1, i8 %2) {
 ; ARM64-NEXT:    ldrb w1, [x29, #0xa1]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = cmpxchg ptr %0, i8 %1, i8 %2 acquire acquire
   ret {i8, i1} %r
 }
@@ -1029,7 +996,6 @@ define {i8, i1} @cmpxchg_rel_mono8(ptr %0, i8 %1, i8 %2) {
 ; ARM64-NEXT:    ldrb w1, [x29, #0xa1]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = cmpxchg ptr %0, i8 %1, i8 %2 release monotonic
   ret {i8, i1} %r
 }
@@ -1059,7 +1025,6 @@ define {i8, i1} @cmpxchg_rel_acq8(ptr %0, i8 %1, i8 %2) {
 ; ARM64-NEXT:    ldrb w1, [x29, #0xa1]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = cmpxchg ptr %0, i8 %1, i8 %2 release acquire
   ret {i8, i1} %r
 }
@@ -1090,7 +1055,6 @@ define {i8, i1} @cmpxchg_acqrel_mono8(ptr %0, i8 %1, i8 %2) {
 ; ARM64-NEXT:    ldrb w1, [x29, #0xa1]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = cmpxchg ptr %0, i8 %1, i8 %2 acq_rel monotonic
   ret {i8, i1} %r
 }
@@ -1120,7 +1084,6 @@ define {i8, i1} @cmpxchg_acqrel_acq8(ptr %0, i8 %1, i8 %2) {
 ; ARM64-NEXT:    ldrb w1, [x29, #0xa1]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = cmpxchg ptr %0, i8 %1, i8 %2 acq_rel acquire
   ret {i8, i1} %r
 }
@@ -1151,7 +1114,6 @@ define {i8, i1} @cmpxchg_seqcst_mono8(ptr %0, i8 %1, i8 %2) {
 ; ARM64-NEXT:    ldrb w1, [x29, #0xa1]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = cmpxchg ptr %0, i8 %1, i8 %2 seq_cst monotonic
   ret {i8, i1} %r
 }
@@ -1181,7 +1143,6 @@ define {i8, i1} @cmpxchg_seqcst_acq8(ptr %0, i8 %1, i8 %2) {
 ; ARM64-NEXT:    ldrb w1, [x29, #0xa1]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = cmpxchg ptr %0, i8 %1, i8 %2 seq_cst acquire
   ret {i8, i1} %r
 }

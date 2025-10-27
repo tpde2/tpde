@@ -146,7 +146,6 @@ define void @store_i32_const(ptr %a) {
 ; ARM64-NEXT:    str w1, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   store i32 u0x13371337, ptr %a
   ret void
@@ -208,7 +207,6 @@ define void @store_i64_const1(ptr %a) {
 ; ARM64-NEXT:    str x1, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   store i64 u0x13371337, ptr %a
   ret void
@@ -231,7 +229,6 @@ define void @store_i64_const2(ptr %a) {
 ; ARM64-NEXT:    str x1, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   store i64 u0xF3371337, ptr %a
   ret void
@@ -373,7 +370,6 @@ define void @store_i128_const3(ptr %a) {
 ; ARM64-NEXT:    stp x1, x2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   store i128 -2, ptr %a
   ret void
@@ -542,7 +538,6 @@ define void @store_i24(ptr %a, i24 %b) {
 ; ARM64-NEXT:    strb w2, [x0, #0x2]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   store i24 %b, ptr %a
   ret void
@@ -566,7 +561,6 @@ define void @store_i24_alloca(i24 %b) {
 ; ARM64-NEXT:    strb w1, [x29, #0xa2]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %a = alloca i24
   store i24 %b, ptr %a
@@ -618,7 +612,6 @@ define void @store_i40(ptr %a, i40 %b) {
 ; ARM64-NEXT:    strb w2, [x0, #0x4]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   store i40 %b, ptr %a
   ret void
@@ -670,7 +663,6 @@ define void @store_i48(ptr %a, i48 %b) {
 ; ARM64-NEXT:    strh w2, [x0, #0x4]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   store i48 %b, ptr %a
   ret void
@@ -694,7 +686,6 @@ define void @store_i48_alloca(i48 %b) {
 ; ARM64-NEXT:    strh w1, [x29, #0xa4]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %a = alloca i48
   store i48 %b, ptr %a

@@ -32,7 +32,6 @@ define i8 @absi8(i8 %0) {
 ; ARM64-NEXT:    cneg w0, w0, mi
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %1 = call i8 @llvm.abs.i8(i8 %0, i1 1)
   ret i8 %1
@@ -57,7 +56,6 @@ define i16 @absi16(i16 %0) {
 ; ARM64-NEXT:    cneg w0, w0, mi
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %1 = call i16 @llvm.abs.i16(i16 %0, i1 1)
   ret i16 %1
@@ -83,7 +81,6 @@ define i17 @absi17(i17 %0) {
 ; ARM64-NEXT:    cneg w0, w0, mi
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %1 = call i17 @llvm.abs.i17(i17 %0, i1 1)
   ret i17 %1
@@ -131,7 +128,6 @@ define i37 @absi37(i37 %0) {
 ; ARM64-NEXT:    cneg x0, x0, mi
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
   %1 = call i37 @llvm.abs.i37(i37 %0, i1 1)
   ret i37 %1

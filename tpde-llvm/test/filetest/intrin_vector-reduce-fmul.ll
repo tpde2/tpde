@@ -23,7 +23,6 @@ define float @vr_fmul_v1f32(float %s, ptr %p) {
 ; ARM64-NEXT:    fmul s0, s0, s2
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %v = load <1 x float>, ptr %p
   %r = call float @llvm.vector.reduce.fmul(float %s, <1 x float> %v)
   ret float %r
@@ -107,7 +106,6 @@ define float @vr_fmul_v5f32(float %s, ptr %p) {
 ; ARM64-NEXT:    fmul s0, s0, s6
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %v = load <5 x float>, ptr %p
   %r = call float @llvm.vector.reduce.fmul(float %s, <5 x float> %v)
   ret float %r
@@ -186,7 +184,6 @@ define double @vr_fmul_v1f64(double %s, ptr %p) {
 ; ARM64-NEXT:    fmul d0, d0, d2
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %v = load <1 x double>, ptr %p
   %r = call double @llvm.vector.reduce.fmul(double %s, <1 x double> %v)
   ret double %r

@@ -29,7 +29,6 @@ define void @cttz_i8(i8 %0) {
 ; ARM64-NEXT:    clz w1, w0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   entry:
     %1 = call i8 @llvm.cttz.i8(i8 %0, i1 0)
     ret void
@@ -72,7 +71,6 @@ define void @cttz_i16(i16 %0) {
 ; ARM64-NEXT:    clz w1, w0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   entry:
     %1 = call i16 @llvm.cttz.i16(i16 %0, i1 0)
     ret void

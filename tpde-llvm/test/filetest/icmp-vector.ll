@@ -31,7 +31,6 @@ define void @icmp_eq_v8i8(ptr %p, <8 x i8> %a, <8 x i8> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp eq <8 x i8> %a, %b
   store <8 x i1> %r, ptr %p
   ret void
@@ -157,7 +156,6 @@ define void @icmp_eq_v4i16(ptr %p, <4 x i16> %a, <4 x i16> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp eq <4 x i16> %a, %b
   store <4 x i1> %r, ptr %p
   ret void
@@ -220,7 +218,6 @@ define void @icmp_eq_v8i16(ptr %p, <8 x i16> %a, <8 x i16> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp eq <8 x i16> %a, %b
   store <8 x i1> %r, ptr %p
   ret void
@@ -283,7 +280,6 @@ define void @icmp_eq_v2i32(ptr %p, <2 x i32> %a, <2 x i32> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp eq <2 x i32> %a, %b
   store <2 x i1> %r, ptr %p
   ret void
@@ -345,7 +341,6 @@ define void @icmp_eq_v4i32(ptr %p, <4 x i32> %a, <4 x i32> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp eq <4 x i32> %a, %b
   store <4 x i1> %r, ptr %p
   ret void
@@ -408,7 +403,6 @@ define void @icmp_eq_v2i64(ptr %p, <2 x i64> %a, <2 x i64> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp eq <2 x i64> %a, %b
   store <2 x i1> %r, ptr %p
   ret void
@@ -473,7 +467,6 @@ define void @icmp_eq_v2p0(ptr %p, <2 x ptr> %a, <2 x ptr> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp eq <2 x ptr> %a, %b
   store <2 x i1> %r, ptr %p
   ret void
@@ -537,7 +530,6 @@ define void @icmp_ne_v8i8(ptr %p, <8 x i8> %a, <8 x i8> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp ne <8 x i8> %a, %b
   store <8 x i1> %r, ptr %p
   ret void
@@ -667,7 +659,6 @@ define void @icmp_ne_v4i16(ptr %p, <4 x i16> %a, <4 x i16> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp ne <4 x i16> %a, %b
   store <4 x i1> %r, ptr %p
   ret void
@@ -732,7 +723,6 @@ define void @icmp_ne_v8i16(ptr %p, <8 x i16> %a, <8 x i16> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp ne <8 x i16> %a, %b
   store <8 x i1> %r, ptr %p
   ret void
@@ -797,7 +787,6 @@ define void @icmp_ne_v2i32(ptr %p, <2 x i32> %a, <2 x i32> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp ne <2 x i32> %a, %b
   store <2 x i1> %r, ptr %p
   ret void
@@ -861,7 +850,6 @@ define void @icmp_ne_v4i32(ptr %p, <4 x i32> %a, <4 x i32> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp ne <4 x i32> %a, %b
   store <4 x i1> %r, ptr %p
   ret void
@@ -926,7 +914,6 @@ define void @icmp_ne_v2i64(ptr %p, <2 x i64> %a, <2 x i64> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp ne <2 x i64> %a, %b
   store <2 x i1> %r, ptr %p
   ret void
@@ -992,7 +979,6 @@ define void @icmp_ugt_v8i8(ptr %p, <8 x i8> %a, <8 x i8> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp ugt <8 x i8> %a, %b
   store <8 x i1> %r, ptr %p
   ret void
@@ -1128,7 +1114,6 @@ define void @icmp_ugt_v4i16(ptr %p, <4 x i16> %a, <4 x i16> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp ugt <4 x i16> %a, %b
   store <4 x i1> %r, ptr %p
   ret void
@@ -1199,7 +1184,6 @@ define void @icmp_ugt_v8i16(ptr %p, <8 x i16> %a, <8 x i16> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp ugt <8 x i16> %a, %b
   store <8 x i1> %r, ptr %p
   ret void
@@ -1270,7 +1254,6 @@ define void @icmp_ugt_v2i32(ptr %p, <2 x i32> %a, <2 x i32> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp ugt <2 x i32> %a, %b
   store <2 x i1> %r, ptr %p
   ret void
@@ -1340,7 +1323,6 @@ define void @icmp_ugt_v4i32(ptr %p, <4 x i32> %a, <4 x i32> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp ugt <4 x i32> %a, %b
   store <4 x i1> %r, ptr %p
   ret void
@@ -1414,7 +1396,6 @@ define void @icmp_ugt_v2i64(ptr %p, <2 x i64> %a, <2 x i64> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp ugt <2 x i64> %a, %b
   store <2 x i1> %r, ptr %p
   ret void
@@ -1485,7 +1466,6 @@ define void @icmp_uge_v8i8(ptr %p, <8 x i8> %a, <8 x i8> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp uge <8 x i8> %a, %b
   store <8 x i1> %r, ptr %p
   ret void
@@ -1616,7 +1596,6 @@ define void @icmp_uge_v4i16(ptr %p, <4 x i16> %a, <4 x i16> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp uge <4 x i16> %a, %b
   store <4 x i1> %r, ptr %p
   ret void
@@ -1683,7 +1662,6 @@ define void @icmp_uge_v8i16(ptr %p, <8 x i16> %a, <8 x i16> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp uge <8 x i16> %a, %b
   store <8 x i1> %r, ptr %p
   ret void
@@ -1753,7 +1731,6 @@ define void @icmp_uge_v2i32(ptr %p, <2 x i32> %a, <2 x i32> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp uge <2 x i32> %a, %b
   store <2 x i1> %r, ptr %p
   ret void
@@ -1825,7 +1802,6 @@ define void @icmp_uge_v4i32(ptr %p, <4 x i32> %a, <4 x i32> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp uge <4 x i32> %a, %b
   store <4 x i1> %r, ptr %p
   ret void
@@ -1901,7 +1877,6 @@ define void @icmp_uge_v2i64(ptr %p, <2 x i64> %a, <2 x i64> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp uge <2 x i64> %a, %b
   store <2 x i1> %r, ptr %p
   ret void
@@ -1974,7 +1949,6 @@ define void @icmp_ult_v8i8(ptr %p, <8 x i8> %a, <8 x i8> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp ult <8 x i8> %a, %b
   store <8 x i1> %r, ptr %p
   ret void
@@ -2110,7 +2084,6 @@ define void @icmp_ult_v4i16(ptr %p, <4 x i16> %a, <4 x i16> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp ult <4 x i16> %a, %b
   store <4 x i1> %r, ptr %p
   ret void
@@ -2181,7 +2154,6 @@ define void @icmp_ult_v8i16(ptr %p, <8 x i16> %a, <8 x i16> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp ult <8 x i16> %a, %b
   store <8 x i1> %r, ptr %p
   ret void
@@ -2252,7 +2224,6 @@ define void @icmp_ult_v2i32(ptr %p, <2 x i32> %a, <2 x i32> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp ult <2 x i32> %a, %b
   store <2 x i1> %r, ptr %p
   ret void
@@ -2322,7 +2293,6 @@ define void @icmp_ult_v4i32(ptr %p, <4 x i32> %a, <4 x i32> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp ult <4 x i32> %a, %b
   store <4 x i1> %r, ptr %p
   ret void
@@ -2396,7 +2366,6 @@ define void @icmp_ult_v2i64(ptr %p, <2 x i64> %a, <2 x i64> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp ult <2 x i64> %a, %b
   store <2 x i1> %r, ptr %p
   ret void
@@ -2467,7 +2436,6 @@ define void @icmp_ule_v8i8(ptr %p, <8 x i8> %a, <8 x i8> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp ule <8 x i8> %a, %b
   store <8 x i1> %r, ptr %p
   ret void
@@ -2598,7 +2566,6 @@ define void @icmp_ule_v4i16(ptr %p, <4 x i16> %a, <4 x i16> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp ule <4 x i16> %a, %b
   store <4 x i1> %r, ptr %p
   ret void
@@ -2665,7 +2632,6 @@ define void @icmp_ule_v8i16(ptr %p, <8 x i16> %a, <8 x i16> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp ule <8 x i16> %a, %b
   store <8 x i1> %r, ptr %p
   ret void
@@ -2735,7 +2701,6 @@ define void @icmp_ule_v2i32(ptr %p, <2 x i32> %a, <2 x i32> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp ule <2 x i32> %a, %b
   store <2 x i1> %r, ptr %p
   ret void
@@ -2807,7 +2772,6 @@ define void @icmp_ule_v4i32(ptr %p, <4 x i32> %a, <4 x i32> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp ule <4 x i32> %a, %b
   store <4 x i1> %r, ptr %p
   ret void
@@ -2883,7 +2847,6 @@ define void @icmp_ule_v2i64(ptr %p, <2 x i64> %a, <2 x i64> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp ule <2 x i64> %a, %b
   store <2 x i1> %r, ptr %p
   ret void
@@ -2954,7 +2917,6 @@ define void @icmp_sgt_v8i8(ptr %p, <8 x i8> %a, <8 x i8> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp sgt <8 x i8> %a, %b
   store <8 x i1> %r, ptr %p
   ret void
@@ -3080,7 +3042,6 @@ define void @icmp_sgt_v4i16(ptr %p, <4 x i16> %a, <4 x i16> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp sgt <4 x i16> %a, %b
   store <4 x i1> %r, ptr %p
   ret void
@@ -3143,7 +3104,6 @@ define void @icmp_sgt_v8i16(ptr %p, <8 x i16> %a, <8 x i16> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp sgt <8 x i16> %a, %b
   store <8 x i1> %r, ptr %p
   ret void
@@ -3206,7 +3166,6 @@ define void @icmp_sgt_v2i32(ptr %p, <2 x i32> %a, <2 x i32> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp sgt <2 x i32> %a, %b
   store <2 x i1> %r, ptr %p
   ret void
@@ -3268,7 +3227,6 @@ define void @icmp_sgt_v4i32(ptr %p, <4 x i32> %a, <4 x i32> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp sgt <4 x i32> %a, %b
   store <4 x i1> %r, ptr %p
   ret void
@@ -3338,7 +3296,6 @@ define void @icmp_sgt_v2i64(ptr %p, <2 x i64> %a, <2 x i64> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp sgt <2 x i64> %a, %b
   store <2 x i1> %r, ptr %p
   ret void
@@ -3409,7 +3366,6 @@ define void @icmp_sge_v8i8(ptr %p, <8 x i8> %a, <8 x i8> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp sge <8 x i8> %a, %b
   store <8 x i1> %r, ptr %p
   ret void
@@ -3539,7 +3495,6 @@ define void @icmp_sge_v4i16(ptr %p, <4 x i16> %a, <4 x i16> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp sge <4 x i16> %a, %b
   store <4 x i1> %r, ptr %p
   ret void
@@ -3604,7 +3559,6 @@ define void @icmp_sge_v8i16(ptr %p, <8 x i16> %a, <8 x i16> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp sge <8 x i16> %a, %b
   store <8 x i1> %r, ptr %p
   ret void
@@ -3669,7 +3623,6 @@ define void @icmp_sge_v2i32(ptr %p, <2 x i32> %a, <2 x i32> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp sge <2 x i32> %a, %b
   store <2 x i1> %r, ptr %p
   ret void
@@ -3733,7 +3686,6 @@ define void @icmp_sge_v4i32(ptr %p, <4 x i32> %a, <4 x i32> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp sge <4 x i32> %a, %b
   store <4 x i1> %r, ptr %p
   ret void
@@ -3805,7 +3757,6 @@ define void @icmp_sge_v2i64(ptr %p, <2 x i64> %a, <2 x i64> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp sge <2 x i64> %a, %b
   store <2 x i1> %r, ptr %p
   ret void
@@ -3876,7 +3827,6 @@ define void @icmp_slt_v8i8(ptr %p, <8 x i8> %a, <8 x i8> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp slt <8 x i8> %a, %b
   store <8 x i1> %r, ptr %p
   ret void
@@ -4002,7 +3952,6 @@ define void @icmp_slt_v4i16(ptr %p, <4 x i16> %a, <4 x i16> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp slt <4 x i16> %a, %b
   store <4 x i1> %r, ptr %p
   ret void
@@ -4065,7 +4014,6 @@ define void @icmp_slt_v8i16(ptr %p, <8 x i16> %a, <8 x i16> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp slt <8 x i16> %a, %b
   store <8 x i1> %r, ptr %p
   ret void
@@ -4128,7 +4076,6 @@ define void @icmp_slt_v2i32(ptr %p, <2 x i32> %a, <2 x i32> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp slt <2 x i32> %a, %b
   store <2 x i1> %r, ptr %p
   ret void
@@ -4190,7 +4137,6 @@ define void @icmp_slt_v4i32(ptr %p, <4 x i32> %a, <4 x i32> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp slt <4 x i32> %a, %b
   store <4 x i1> %r, ptr %p
   ret void
@@ -4260,7 +4206,6 @@ define void @icmp_slt_v2i64(ptr %p, <2 x i64> %a, <2 x i64> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp slt <2 x i64> %a, %b
   store <2 x i1> %r, ptr %p
   ret void
@@ -4331,7 +4276,6 @@ define void @icmp_sle_v8i8(ptr %p, <8 x i8> %a, <8 x i8> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp sle <8 x i8> %a, %b
   store <8 x i1> %r, ptr %p
   ret void
@@ -4461,7 +4405,6 @@ define void @icmp_sle_v4i16(ptr %p, <4 x i16> %a, <4 x i16> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp sle <4 x i16> %a, %b
   store <4 x i1> %r, ptr %p
   ret void
@@ -4526,7 +4469,6 @@ define void @icmp_sle_v8i16(ptr %p, <8 x i16> %a, <8 x i16> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp sle <8 x i16> %a, %b
   store <8 x i1> %r, ptr %p
   ret void
@@ -4591,7 +4533,6 @@ define void @icmp_sle_v2i32(ptr %p, <2 x i32> %a, <2 x i32> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp sle <2 x i32> %a, %b
   store <2 x i1> %r, ptr %p
   ret void
@@ -4655,7 +4596,6 @@ define void @icmp_sle_v4i32(ptr %p, <4 x i32> %a, <4 x i32> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp sle <4 x i32> %a, %b
   store <4 x i1> %r, ptr %p
   ret void
@@ -4727,7 +4667,6 @@ define void @icmp_sle_v2i64(ptr %p, <2 x i64> %a, <2 x i64> %b) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = icmp sle <2 x i64> %a, %b
   store <2 x i1> %r, ptr %p
   ret void

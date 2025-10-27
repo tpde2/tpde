@@ -62,7 +62,6 @@ define i48 @bswapi48(i48 %x) {
 ; ARM64-NEXT:    mov x0, x1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %res = call i48 @llvm.bswap.i48(i48 %x)
   ret i48 %res
 }

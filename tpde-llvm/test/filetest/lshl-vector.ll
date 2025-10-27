@@ -53,7 +53,6 @@ define void @shl_v1i8_3(ptr %p) {
 ; ARM64-NEXT:    strb w1, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %a = load <1 x i8>, ptr %p
   %r = shl <1 x i8> %a, <i8 3>
   store <1 x i8> %r, ptr %p
@@ -176,7 +175,6 @@ define void @shl_v5i8_3(ptr %p) {
 ; ARM64-NEXT:    strb w5, [x0, #0x4]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %a = load <5 x i8>, ptr %p
   %r = shl <5 x i8> %a, <i8 3, i8 3, i8 3, i8 3, i8 3>
   store <5 x i8> %r, ptr %p

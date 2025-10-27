@@ -26,7 +26,6 @@ define void @ins_v5i1_0(ptr %p, i1 %e) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %v = load <5 x i1>, ptr %p
   %r = insertelement <5 x i1> %v, i1 %e, i32 0
   store <5 x i1> %r, ptr %p
@@ -54,7 +53,6 @@ define void @ins_v5i1_3(ptr %p, i1 %e) {
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %v = load <5 x i1>, ptr %p
   %r = insertelement <5 x i1> %v, i1 %e, i32 3
   store <5 x i1> %r, ptr %p
@@ -105,7 +103,6 @@ define void @ins_v5i1_chain(ptr %p, i1 %e0, i1 %e1, i1 %e2, i1 %e3, i1 %e4) {
 ; ARM64-NEXT:    strb w6, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r0 = insertelement <5 x i1> poison, i1 %e0, i32 0
   %r1 = insertelement <5 x i1> %r0, i1 %e1, i32 1
   %r2 = insertelement <5 x i1> %r1, i1 %e2, i32 2
@@ -169,7 +166,6 @@ define void @ins_v16i1_0(ptr %p, i1 %e) {
 ; ARM64-NEXT:    strh w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %v = load <16 x i1>, ptr %p
   %r = insertelement <16 x i1> %v, i1 %e, i32 0
   store <16 x i1> %r, ptr %p
@@ -197,7 +193,6 @@ define void @ins_v16i1_3(ptr %p, i1 %e) {
 ; ARM64-NEXT:    strh w2, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %v = load <16 x i1>, ptr %p
   %r = insertelement <16 x i1> %v, i1 %e, i32 3
   store <16 x i1> %r, ptr %p
@@ -248,7 +243,6 @@ define void @ins_v16i1_chain(ptr %p, i1 %e0, i1 %e1, i1 %e2, i1 %e3, i1 %e4) {
 ; ARM64-NEXT:    strh w6, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r0 = insertelement <16 x i1> poison, i1 %e0, i32 0
   %r1 = insertelement <16 x i1> %r0, i1 %e1, i32 1
   %r2 = insertelement <16 x i1> %r1, i1 %e2, i32 2
@@ -737,7 +731,6 @@ define void @ins_v32i8_dyn(ptr %p, i8 %e, i32 %i) {
 ; ARM64-NEXT:    str q0, [x0, #0x10]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xc0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %v = load <32 x i8>, ptr %p
   %r = insertelement <32 x i8> %v, i8 %e, i32 %i
   store <32 x i8> %r, ptr %p

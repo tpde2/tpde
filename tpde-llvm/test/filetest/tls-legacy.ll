@@ -72,7 +72,6 @@ define ptr @legacy_gep() {
 ; ARM64-NEXT:    add x0, x0, #0x1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   ret ptr getelementptr inbounds (i8, ptr @t1, i64 1)
 }
 

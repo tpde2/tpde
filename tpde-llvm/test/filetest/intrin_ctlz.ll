@@ -63,7 +63,6 @@ define void @ctlz_i8_zero_poison(i8 %0) {
 ; ARM64-NEXT:    sub w1, w0, #0x18
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   entry:
     %1 = call i8 @llvm.ctlz.i8(i8 %0, i1 1)
     ret void
@@ -118,7 +117,6 @@ define void @ctlz_i16_zero_poison(i16 %0) {
 ; ARM64-NEXT:    sub w1, w0, #0x10
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   entry:
     %1 = call i16 @llvm.ctlz.i16(i16 %0, i1 1)
     ret void

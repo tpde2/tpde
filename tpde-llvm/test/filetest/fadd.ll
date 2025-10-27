@@ -158,7 +158,6 @@ define float @fadd_f32_no_salvage_imm(float %0) {
 ; ARM64-NEXT:    fadd s0, s0, s1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   entry:
     %1 = fadd float %0, 1.0
     %2 = fadd float %0, %1
@@ -208,7 +207,6 @@ define double @fadd_f64_no_salvage_imm(double %0) {
 ; ARM64-NEXT:    fadd d0, d0, d1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   entry:
     %1 = fadd double %0, 1.0
     %2 = fadd double %0, %1

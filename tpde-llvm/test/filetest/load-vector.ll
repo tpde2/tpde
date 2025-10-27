@@ -279,7 +279,6 @@ define void @load_v3i8(ptr %p) {
 ; ARM64-NEXT:    ldrb w3, [x0, #0x2]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %l = load volatile <3 x i8>, ptr %p
   ret void
 }
@@ -302,7 +301,6 @@ define void @load_v3i16(ptr %p) {
 ; ARM64-NEXT:    ldrh w3, [x0, #0x4]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %l = load volatile <3 x i16>, ptr %p
   ret void
 }
@@ -325,7 +323,6 @@ define void @load_v3i32(ptr %p) {
 ; ARM64-NEXT:    ldr w3, [x0, #0x8]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %l = load volatile <3 x i32>, ptr %p
   ret void
 }
@@ -348,7 +345,6 @@ define void @load_v3i64(ptr %p) {
 ; ARM64-NEXT:    ldr x3, [x0, #0x10]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %l = load volatile <3 x i64>, ptr %p
   ret void
 }
@@ -371,7 +367,6 @@ define void @load_v3ptr(ptr %p) {
 ; ARM64-NEXT:    ldr x3, [x0, #0x10]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %l = load volatile <3 x ptr>, ptr %p
   ret void
 }
@@ -394,7 +389,6 @@ define void @load_v3f32(ptr %p) {
 ; ARM64-NEXT:    ldr s2, [x0, #0x8]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %l = load volatile <3 x float>, ptr %p
   ret void
 }
@@ -417,7 +411,6 @@ define void @load_v3f64(ptr %p) {
 ; ARM64-NEXT:    ldr d2, [x0, #0x10]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %l = load volatile <3 x double>, ptr %p
   ret void
 }

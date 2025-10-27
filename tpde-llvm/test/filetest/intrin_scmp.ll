@@ -34,7 +34,6 @@ define i17 @scmpi17(i17 %0, i17 %1) {
 ; ARM64-NEXT:    mov w0, w1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %res = call i17 @llvm.scmp(i17 %0, i17 %1)
   ret i17 %res
 }
@@ -93,7 +92,6 @@ define i37 @scmpi37(i37 %0, i37 %1) {
 ; ARM64-NEXT:    mov x0, x1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %res = call i37 @llvm.scmp(i37 %0, i37 %1)
   ret i37 %res
 }

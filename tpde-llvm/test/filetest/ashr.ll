@@ -308,7 +308,6 @@ define i128 @ashr_i128_74(i128 %0) {
 ; ARM64-NEXT:    mov x0, x2
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
     %1 = ashr i128 %0, 74
     ret i128 %1
@@ -383,7 +382,6 @@ define i128 @ashr_i128_i128(i128 %v, i128 %s) {
 ; ARM64-NEXT:    mov x0, x2
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = ashr i128 %v, %s
   ret i128 %r
 }

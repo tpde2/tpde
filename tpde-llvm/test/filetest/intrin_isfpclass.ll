@@ -107,7 +107,6 @@ define i1 @is_qnan_float(float %p) {
 ; ARM64-NEXT:    orr w0, w0, w2
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = call i1 @llvm.is.fpclass(float %p, i32 2)
   ret i1 %r
 }
@@ -140,7 +139,6 @@ define i1 @is_qnan_double(double %p) {
 ; ARM64-NEXT:    orr w0, w0, w2
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = call i1 @llvm.is.fpclass(double %p, i32 2)
   ret i1 %r
 }
@@ -493,7 +491,6 @@ define i1 @is_psnorm_float(float %p) {
 ; ARM64-NEXT:    orr w0, w0, w2
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = call i1 @llvm.is.fpclass(float %p, i32 128)
   ret i1 %r
 }
@@ -525,7 +522,6 @@ define i1 @is_psnorm_double(double %p) {
 ; ARM64-NEXT:    orr w0, w0, w2
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = call i1 @llvm.is.fpclass(double %p, i32 128)
   ret i1 %r
 }
@@ -877,7 +873,6 @@ define i1 @is_snan_psnorm_float(float %p) {
 ; ARM64-NEXT:    orr w0, w0, w2
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = call i1 @llvm.is.fpclass(float %p, i32 129)
   ret i1 %r
 }

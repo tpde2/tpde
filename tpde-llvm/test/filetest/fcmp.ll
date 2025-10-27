@@ -399,7 +399,6 @@ define i1 @fcmp_f32_oeq_0(float %0) {
 ; ARM64-NEXT:    cset w0, eq
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   entry:
     %2 = fcmp oeq float %0, 0.0
     ret i1 %2

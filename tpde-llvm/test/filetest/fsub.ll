@@ -158,7 +158,6 @@ define float @fsub_f32_no_salvage_imm(float %0) {
 ; ARM64-NEXT:    fsub s0, s0, s1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   entry:
     %1 = fsub float %0, 1.0
     %2 = fsub float %0, %1
@@ -208,7 +207,6 @@ define double @fsub_f64_no_salvage_imm(double %0) {
 ; ARM64-NEXT:    fsub d0, d0, d1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   entry:
     %1 = fsub double %0, 1.0
     %2 = fsub double %0, %1

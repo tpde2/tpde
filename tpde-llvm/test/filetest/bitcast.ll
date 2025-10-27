@@ -313,7 +313,6 @@ define fp128 @bitcast_i128_f128(i128 %a) {
 ; ARM64-NEXT:    ldr q0, [x29, #0xa0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = bitcast i128 %a to fp128
   ret fp128 %r
 }
@@ -336,7 +335,6 @@ define i128 @bitcast_f128_i128(fp128 %a) {
 ; ARM64-NEXT:    ldr x1, [x29, #0xa8]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = bitcast fp128 %a to i128
   ret i128 %r
 }

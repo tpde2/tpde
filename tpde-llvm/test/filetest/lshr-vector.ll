@@ -301,7 +301,6 @@ define <8 x i8> @lshr_v8i8_3(<8 x i8> %a) {
 ; ARM64-NEXT:    ushl v0.8b, v0.8b, v1.8b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = lshr <8 x i8> %a, <i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3>
   ret <8 x i8> %r
 }
@@ -401,7 +400,6 @@ define <16 x i8> @lshr_v16i8_3(<16 x i8> %a) {
 ; ARM64-NEXT:    ushl v0.16b, v0.16b, v1.16b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = lshr <16 x i8> %a, <i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3>
   ret <16 x i8> %r
 }
@@ -694,7 +692,6 @@ define <4 x i16> @lshr_v4i16_3(<4 x i16> %a) {
 ; ARM64-NEXT:    ushl v0.4h, v0.4h, v1.4h
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = lshr <4 x i16> %a, <i16 3, i16 3, i16 3, i16 3>
   ret <4 x i16> %r
 }
@@ -796,7 +793,6 @@ define <8 x i16> @lshr_v8i16_3(<8 x i16> %a) {
 ; ARM64-NEXT:    ushl v0.8h, v0.8h, v1.8h
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = lshr <8 x i16> %a, <i16 3, i16 3, i16 3, i16 3, i16 3, i16 3, i16 3, i16 3>
   ret <8 x i16> %r
 }
@@ -850,7 +846,6 @@ define <2 x i32> @lshr_v2i32_3(<2 x i32> %a) {
 ; ARM64-NEXT:    ushl v0.2s, v0.2s, v1.2s
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = lshr <2 x i32> %a, <i32 3, i32 3>
   ret <2 x i32> %r
 }
@@ -922,7 +917,6 @@ define <4 x i32> @lshr_v4i32_3(<4 x i32> %a) {
 ; ARM64-NEXT:    ushl v0.4s, v0.4s, v1.4s
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %r = lshr <4 x i32> %a, <i32 3, i32 3, i32 3, i32 3>
   ret <4 x i32> %r
 }

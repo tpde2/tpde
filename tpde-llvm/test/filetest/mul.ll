@@ -518,7 +518,6 @@ define void @mul_i64_no_salvage_imm(i64 %0) {
 ; ARM64-NEXT:    mul x1, x1, x0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   entry:
   %1 = mul nsw i64 %0, 1
   %2 = mul nsw i64 %0, %1
@@ -567,7 +566,6 @@ define void @mul_i37_no_salvage_imm(i37 %0) {
 ; ARM64-NEXT:    mul x1, x1, x0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
 entry:
     %1 = mul i37 %0, 3
     %2 = mul i37 %0, %1

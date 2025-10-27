@@ -363,7 +363,6 @@ define void @fcmp_one_f32_br(float, float, ptr %p) {
 ; ARM64-NEXT:    ldp d8, d9, [sp, #0x18]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %c = fcmp one float %0, %1
   br i1 %c, label %block1, label %block2
 block1:
@@ -471,7 +470,6 @@ define void @fcmp_ueq_f32_br(float, float, ptr %p) {
 ; ARM64-NEXT:    ldp d8, d9, [sp, #0x18]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %c = fcmp ueq float %0, %1
   br i1 %c, label %block1, label %block2
 block1:
@@ -1212,7 +1210,6 @@ define void @fcmp_one_f64_br(double, double, ptr %p) {
 ; ARM64-NEXT:    ldp d8, d9, [sp, #0x18]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %c = fcmp one double %0, %1
   br i1 %c, label %block1, label %block2
 block1:
@@ -1320,7 +1317,6 @@ define void @fcmp_ueq_f64_br(double, double, ptr %p) {
 ; ARM64-NEXT:    ldp d8, d9, [sp, #0x18]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-; ARM64-NEXT:    udf #0x0
   %c = fcmp ueq double %0, %1
   br i1 %c, label %block1, label %block2
 block1:
