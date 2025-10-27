@@ -726,7 +726,13 @@ double TARGET_V1 atomic_max_f64_seqcst(double *p, double v) { return __atomic_fe
 void TARGET_V1 fence_acq(void) { __atomic_thread_fence(__ATOMIC_ACQUIRE); }
 void TARGET_V1 fence_rel(void) { __atomic_thread_fence(__ATOMIC_RELEASE); }
 void TARGET_V1 fence_acqrel(void) { __atomic_thread_fence(__ATOMIC_ACQ_REL); }
+#ifdef __x86_64__
+// LLVM 21+ uses lock or [rsp+64], 0, which is more efficient, but unsupported
+// by encodegen.
+void TARGET_V1 fence_seqcst(void) { __builtin_ia32_mfence(); }
+#else
 void TARGET_V1 fence_seqcst(void) { __atomic_thread_fence(__ATOMIC_SEQ_CST); }
+#endif
 
 // --------------------------
 // select
