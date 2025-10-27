@@ -928,6 +928,9 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::finish_func(
     assert(final_frame_size < 16 * 1024 * 1024);
   }
 
+  u32 prologue_pad_offset;
+  u32 prologue_pad_size;
+
   this->text_writer.eh_begin_fde(this->get_personality_sym());
 
   {
@@ -1009,22 +1012,12 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::finish_func(
     this->text_writer.eh_writer.data()[fde_prologue_adv_off] =
         dwarf::DW_CFA_advance_loc | (prologue.size() - 1);
 
-    // Pad with NOPs so that func_prologue_alloc - prologue.size() is a
-    // multiple if 16 (the function alignment).
-    const auto nop_count = (func_prologue_alloc / 4 - prologue.size()) % 4;
-    const auto nop = de64_NOP();
-    for (auto i = 0u; i < nop_count; ++i) {
-      prologue.push_back(nop);
-    }
-
-    // Shrink function at the beginning
-    u32 skip = util::align_down(func_prologue_alloc - prologue.size() * 4, 16);
-    std::memset(this->text_writer.begin_ptr() + func_start_off, 0, skip);
-    func_start_off += skip;
-    this->text_writer.func_begin += skip;
     std::memcpy(this->text_writer.begin_ptr() + func_start_off,
                 prologue.data(),
                 prologue.size() * sizeof(u32));
+
+    prologue_pad_offset = func_start_off + prologue.size() * sizeof(u32);
+    prologue_pad_size = func_prologue_alloc - prologue.size() * 4;
   }
 
   if (func_arg_stack_add_off != ~0u) {
@@ -1038,6 +1031,8 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::finish_func(
   auto func_sec = this->text_writer.get_sec_ref();
 
   if (func_ret_offs.empty()) {
+    this->text_writer.remove_prologue_bytes(prologue_pad_offset,
+                                            prologue_pad_size);
     auto func_size = this->text_writer.offset() - func_start_off;
     this->assembler.sym_def(func_sym, func_sec, func_start_off, func_size);
     this->text_writer.eh_end_fde();
@@ -1117,6 +1112,8 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::finish_func(
     this->text_writer.cur_ptr() -= func_epilogue_alloc - ret_size;
   }
 
+  this->text_writer.remove_prologue_bytes(prologue_pad_offset,
+                                          prologue_pad_size);
   auto func_size = this->text_writer.offset() - func_start_off;
   this->assembler.sym_def(func_sym, func_sec, func_start_off, func_size);
   this->text_writer.eh_end_fde();

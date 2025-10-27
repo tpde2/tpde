@@ -9,8 +9,6 @@ define i1 @i1(i1 %p) {
 ; X64-LABEL: <i1>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov eax, edi
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -18,8 +16,6 @@ define i1 @i1(i1 %p) {
 ; ARM64-LABEL: <i1>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %r = call i1 @llvm.expect(i1 %p, i1 false)
@@ -30,8 +26,6 @@ define i8 @i8(i8 %p) {
 ; X64-LABEL: <i8>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov eax, edi
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -39,8 +33,6 @@ define i8 @i8(i8 %p) {
 ; ARM64-LABEL: <i8>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %r = call i8 @llvm.expect(i8 %p, i8 1)
@@ -51,8 +43,6 @@ define i37 @i37(i37 %p) {
 ; X64-LABEL: <i37>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov rax, rdi
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -60,8 +50,6 @@ define i37 @i37(i37 %p) {
 ; ARM64-LABEL: <i37>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %r = call i37 @llvm.expect(i37 %p, i37 1)
@@ -72,8 +60,6 @@ define i64 @i64(i64 %p) {
 ; X64-LABEL: <i64>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov rax, rdi
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -81,8 +67,6 @@ define i64 @i64(i64 %p) {
 ; ARM64-LABEL: <i64>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %r = call i64 @llvm.expect(i64 %p, i64 1)
@@ -93,8 +77,6 @@ define i128 @i128(i128 %p) {
 ; X64-LABEL: <i128>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov rax, rdi
 ; X64-NEXT:    mov rdx, rsi
 ; X64-NEXT:    pop rbp
@@ -103,8 +85,6 @@ define i128 @i128(i128 %p) {
 ; ARM64-LABEL: <i128>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %r = call i128 @llvm.expect(i128 %p, i128 1)

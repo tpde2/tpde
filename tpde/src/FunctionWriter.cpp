@@ -20,8 +20,10 @@ void FunctionWriterBase::begin_module(Assembler &assembler) noexcept {
 
 void FunctionWriterBase::begin_func() noexcept {
   func_begin = offset();
+  reloc_begin = section->reloc_count();
 
   label_offsets.clear();
+  label_skew = 0;
   label_fixups.clear();
 
   except_call_site_table.clear();
@@ -29,6 +31,27 @@ void FunctionWriterBase::begin_func() noexcept {
   except_type_info_table.clear();
   except_spec_table.clear();
   except_action_table.resize(2); // cleanup entry
+}
+
+void FunctionWriterBase::remove_prologue_bytes(u32 start, u32 size) noexcept {
+  assert(start >= func_begin);
+  assert(start + size <= offset());
+  // This should work, but is not tested.
+  assert(label_skew == 0 && "multiple calls to remove_bytes unsupported");
+  for ([[maybe_unused]] u32 label_offset : label_offsets) {
+    assert(label_offset - label_skew >= start + size &&
+           "label in function prologue?");
+  }
+
+  if (size == 0) {
+    return;
+  }
+
+  size_t move_len = offset() - (start + size);
+  std::memmove(data_begin + start, data_begin + start + size, move_len);
+  section->adjust_relocation_offsets(reloc_begin, size);
+  data_cur -= size;
+  label_skew += size;
 }
 
 void FunctionWriterBase::eh_align_frame() noexcept {
@@ -225,20 +248,21 @@ void FunctionWriterBase::except_encode_func() noexcept {
     for (auto &info : except_call_site_table) {
       ecst_writer.reserve(80);
 
-      if (info.start > cur) {
+      u64 start = info.start - label_skew;
+      if (start > cur) {
         // Encode padding entry
         ecst_writer.write_uleb_unchecked(cur - func_begin);
-        ecst_writer.write_uleb_unchecked(info.start - cur);
+        ecst_writer.write_uleb_unchecked(start - cur);
         ecst_writer.write_uleb_unchecked(0);
         ecst_writer.write_uleb_unchecked(0);
       }
-      ecst_writer.write_uleb_unchecked(info.start - func_begin);
+      ecst_writer.write_uleb_unchecked(start - func_begin);
       ecst_writer.write_uleb_unchecked(info.len);
       u64 fn_off = label_offset(info.landing_pad) - func_begin;
       assert(fn_off < (fn_end - func_begin));
       ecst_writer.write_uleb_unchecked(fn_off);
       ecst_writer.write_uleb_unchecked(info.action_entry);
-      cur = info.start + info.len;
+      cur = start + info.len;
     }
     if (cur < fn_end) {
       // Add padding until the end of the function

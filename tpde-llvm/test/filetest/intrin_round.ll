@@ -14,8 +14,6 @@ define float @roundf32(float %0) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    call <L0>
 ; X64-NEXT:     R_X86_64_PLT32 roundf-0x4
@@ -26,9 +24,7 @@ define float @roundf32(float %0) {
 ; ARM64-LABEL: <roundf32>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    bl 0x30 <roundf32+0x10>
+; ARM64-NEXT:    bl 0x8 <roundf32+0x8>
 ; ARM64-NEXT:     R_AARCH64_CALL26 roundf
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
@@ -42,8 +38,6 @@ define double @roundf64(double %0) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    call <L0>
 ; X64-NEXT:     R_X86_64_PLT32 round-0x4
@@ -54,9 +48,7 @@ define double @roundf64(double %0) {
 ; ARM64-LABEL: <roundf64>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    bl 0x70 <roundf64+0x10>
+; ARM64-NEXT:    bl 0x28 <roundf64+0x8>
 ; ARM64-NEXT:     R_AARCH64_CALL26 round
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret

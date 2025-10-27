@@ -10,8 +10,6 @@ define ptr @ptrmask_dyn(ptr %0, i64 %1) {
 ; X64-LABEL: <ptrmask_dyn>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    and rdi, rsi
 ; X64-NEXT:    mov rax, rdi
 ; X64-NEXT:    pop rbp
@@ -20,8 +18,6 @@ define ptr @ptrmask_dyn(ptr %0, i64 %1) {
 ; ARM64-LABEL: <ptrmask_dyn>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    and x1, x1, x0
 ; ARM64-NEXT:    mov x0, x1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -34,8 +30,6 @@ define ptr @ptrmask_c1(ptr %0) {
 ; X64-LABEL: <ptrmask_c1>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    and rdi, -0x10
 ; X64-NEXT:    mov rax, rdi
 ; X64-NEXT:    pop rbp
@@ -44,8 +38,6 @@ define ptr @ptrmask_c1(ptr %0) {
 ; ARM64-LABEL: <ptrmask_c1>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    and x0, x0, #0xfffffffffffffff0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
@@ -57,8 +49,6 @@ define ptr @ptrmask_c2(ptr %0) {
 ; X64-LABEL: <ptrmask_c2>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movabs rax, 0xfffffffffffff8
 ; X64-NEXT:    and rdi, rax
 ; X64-NEXT:    mov rax, rdi
@@ -68,8 +58,6 @@ define ptr @ptrmask_c2(ptr %0) {
 ; ARM64-LABEL: <ptrmask_c2>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    and x0, x0, #0xfffffffffffff8
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret

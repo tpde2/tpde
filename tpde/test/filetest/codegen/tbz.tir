@@ -9,8 +9,6 @@ define @tbz(%a) {
 ; X64-LABEL: <tbz>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    bt rdi, 0x2f
 ; X64-NEXT:    mov qword ptr [rbp - 0x30], rdi
 ; X64-NEXT:    jae <L0>
@@ -27,12 +25,10 @@ define @tbz(%a) {
 ; ARM64-LABEL: <tbz>:
 ; ARM64:         stp x29, x30, [sp, #-0xb0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    str x0, [x29, #0xa0]
-; ARM64-NEXT:    tbnz x0, #0x2f, 0x40 <tbz+0x20>
+; ARM64-NEXT:    tbnz x0, #0x2f, 0x18 <tbz+0x18>
 ; ARM64-NEXT:    sub x1, x0, x0
-; ARM64-NEXT:    b 0x48 <tbz+0x28>
+; ARM64-NEXT:    b 0x20 <tbz+0x20>
 ; ARM64-NEXT:    ldr x0, [x29, #0xa0]
 ; ARM64-NEXT:    add x1, x0, x0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
@@ -53,8 +49,6 @@ define @tbz_small(%a) {
 ; X64-LABEL: <tbz_small>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    bt rdi, 0x2f
 ; X64-NEXT:    mov qword ptr [rbp - 0x30], rdi
 ; X64-NEXT:    jae <L0>
@@ -73,14 +67,12 @@ define @tbz_small(%a) {
 ; ARM64-LABEL: <tbz_small>:
 ; ARM64:         stp x29, x30, [sp, #-0xb0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    str x0, [x29, #0xa0]
-; ARM64-NEXT:    tbnz x0, #0x2f, 0x880 <tbz_small+0x810>
-; ARM64-NEXT:    b 0x878 <tbz_small+0x808>
+; ARM64-NEXT:    tbnz x0, #0x2f, 0x838 <tbz_small+0x808>
+; ARM64-NEXT:    b 0x830 <tbz_small+0x800>
 ; ARM64-NEXT:     ...
 ; ARM64-NEXT:    sub x1, x0, x0
-; ARM64-NEXT:    b 0x888 <tbz_small+0x818>
+; ARM64-NEXT:    b 0x840 <tbz_small+0x810>
 ; ARM64-NEXT:    ldr x0, [x29, #0xa0]
 ; ARM64-NEXT:    add x1, x0, x0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
@@ -103,8 +95,6 @@ define @tbz_medium(%a) {
 ; X64-LABEL: <tbz_medium>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    bt rdi, 0x2f
 ; X64-NEXT:    mov qword ptr [rbp - 0x30], rdi
 ; X64-NEXT:    jae <L0>
@@ -123,16 +113,14 @@ define @tbz_medium(%a) {
 ; ARM64-LABEL: <tbz_medium>:
 ; ARM64:         stp x29, x30, [sp, #-0xb0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    str x0, [x29, #0xa0]
-; ARM64-NEXT:    tbnz x0, #0x2f, 0x87d8 <tbz_medium+0x7f28>
-; ARM64-NEXT:    b 0x8d0 <tbz_medium+0x20>
+; ARM64-NEXT:    tbnz x0, #0x2f, 0x8770 <tbz_medium+0x7f20>
+; ARM64-NEXT:    b 0x868 <tbz_medium+0x18>
 ; ARM64-NEXT:    udf #0x0
-; ARM64-NEXT:    b 0x87d0 <tbz_medium+0x7f20>
+; ARM64-NEXT:    b 0x8768 <tbz_medium+0x7f18>
 ; ARM64-NEXT:     ...
 ; ARM64-NEXT:    sub x1, x0, x0
-; ARM64-NEXT:    b 0x87e0 <tbz_medium+0x7f30>
+; ARM64-NEXT:    b 0x8778 <tbz_medium+0x7f28>
 ; ARM64-NEXT:    ldr x0, [x29, #0xa0]
 ; ARM64-NEXT:    add x1, x0, x0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
@@ -155,8 +143,6 @@ define @tbz_large(%a) {
 ; X64-LABEL: <tbz_large>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    bt rdi, 0x2f
 ; X64-NEXT:    mov qword ptr [rbp - 0x30], rdi
 ; X64-NEXT:    jae <L0>
@@ -175,16 +161,14 @@ define @tbz_large(%a) {
 ; ARM64-LABEL: <tbz_large>:
 ; ARM64:         stp x29, x30, [sp, #-0xb0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    str x0, [x29, #0xa0]
-; ARM64-NEXT:    tbnz x0, #0x2f, 0x882c <tbz_large+0x1c>
-; ARM64-NEXT:    b 0x8830 <tbz_large+0x20>
-; ARM64-NEXT:    b 0x10838 <tbz_large+0x8028>
-; ARM64-NEXT:    b 0x10830 <tbz_large+0x8020>
+; ARM64-NEXT:    tbnz x0, #0x2f, 0x87bc <tbz_large+0x3c>
+; ARM64-NEXT:    b 0x8798 <tbz_large+0x18>
+; ARM64-NEXT:    b 0x10778 <tbz_large+0x7ff8>
+; ARM64-NEXT:    b 0x10798 <tbz_large+0x8018>
 ; ARM64-NEXT:     ...
 ; ARM64-NEXT:    sub x1, x0, x0
-; ARM64-NEXT:    b 0x10840 <tbz_large+0x8030>
+; ARM64-NEXT:    b 0x107a8 <tbz_large+0x8028>
 ; ARM64-NEXT:    ldr x0, [x29, #0xa0]
 ; ARM64-NEXT:    add x1, x0, x0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0

@@ -9,14 +9,12 @@ define i32 @f32tou32(float %f) {
 ; X64-LABEL: <f32tou32>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    cvttss2si rax, xmm0
 ; X64-NEXT:    xor ecx, ecx
 ; X64-NEXT:    xorps xmm1, xmm1
 ; X64-NEXT:    ucomiss xmm0, xmm1
 ; X64-NEXT:    cmovae ecx, eax
-; X64-NEXT:    ucomiss xmm0, dword ptr <f32tou32+0x24>
+; X64-NEXT:    ucomiss xmm0, dword ptr <f32tou32+0x14>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    mov eax, 0xffffffff
 ; X64-NEXT:    cmovbe eax, ecx
@@ -26,8 +24,6 @@ define i32 @f32tou32(float %f) {
 ; ARM64-LABEL: <f32tou32>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fcvtzu w0, s0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
@@ -39,13 +35,11 @@ define i64 @f32tou64(float %f) {
 ; X64-LABEL: <f32tou64>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    cvttss2si rax, xmm0
 ; X64-NEXT:    mov rcx, rax
 ; X64-NEXT:    sar rcx, 0x3f
 ; X64-NEXT:    movapd xmm1, xmm0
-; X64-NEXT:    subss xmm1, dword ptr <f32tou64+0x24>
+; X64-NEXT:    subss xmm1, dword ptr <f32tou64+0x14>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    cvttss2si rdx, xmm1
 ; X64-NEXT:    and rdx, rcx
@@ -54,7 +48,7 @@ define i64 @f32tou64(float %f) {
 ; X64-NEXT:    xorps xmm1, xmm1
 ; X64-NEXT:    ucomiss xmm0, xmm1
 ; X64-NEXT:    cmovae rcx, rdx
-; X64-NEXT:    ucomiss xmm0, dword ptr <f32tou64+0x43>
+; X64-NEXT:    ucomiss xmm0, dword ptr <f32tou64+0x33>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    mov rax, -0x1
 ; X64-NEXT:    cmovbe rax, rcx
@@ -64,8 +58,6 @@ define i64 @f32tou64(float %f) {
 ; ARM64-LABEL: <f32tou64>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fcvtzu x0, s0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
@@ -77,11 +69,9 @@ define i32 @f64tou32(double %f) {
 ; X64-LABEL: <f64tou32>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    xorpd xmm1, xmm1
 ; X64-NEXT:    maxsd xmm1, xmm0
-; X64-NEXT:    movsd xmm0, qword ptr <f64tou32+0x1c>
+; X64-NEXT:    movsd xmm0, qword ptr <f64tou32+0xc>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    minsd xmm0, xmm1
 ; X64-NEXT:    cvttsd2si rax, xmm0
@@ -91,8 +81,6 @@ define i32 @f64tou32(double %f) {
 ; ARM64-LABEL: <f64tou32>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fcvtzu w0, d0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
@@ -104,13 +92,11 @@ define i64 @f64tou64(double %f) {
 ; X64-LABEL: <f64tou64>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    cvttsd2si rax, xmm0
 ; X64-NEXT:    mov rcx, rax
 ; X64-NEXT:    sar rcx, 0x3f
 ; X64-NEXT:    movapd xmm1, xmm0
-; X64-NEXT:    subsd xmm1, qword ptr <f64tou64+0x24>
+; X64-NEXT:    subsd xmm1, qword ptr <f64tou64+0x14>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    cvttsd2si rdx, xmm1
 ; X64-NEXT:    and rdx, rcx
@@ -119,7 +105,7 @@ define i64 @f64tou64(double %f) {
 ; X64-NEXT:    xorpd xmm1, xmm1
 ; X64-NEXT:    ucomisd xmm0, xmm1
 ; X64-NEXT:    cmovae rcx, rdx
-; X64-NEXT:    ucomisd xmm0, qword ptr <f64tou64+0x45>
+; X64-NEXT:    ucomisd xmm0, qword ptr <f64tou64+0x35>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    mov rax, -0x1
 ; X64-NEXT:    cmovbe rax, rcx
@@ -129,8 +115,6 @@ define i64 @f64tou64(double %f) {
 ; ARM64-LABEL: <f64tou64>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fcvtzu x0, d0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret

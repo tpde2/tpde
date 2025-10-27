@@ -10,8 +10,6 @@ define i16 @bswapi16(i16 %x) {
 ; X64-LABEL: <bswapi16>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    rol di, 0x8
 ; X64-NEXT:    mov eax, edi
 ; X64-NEXT:    pop rbp
@@ -20,8 +18,6 @@ define i16 @bswapi16(i16 %x) {
 ; ARM64-LABEL: <bswapi16>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    rev16 w0, w0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
@@ -33,8 +29,6 @@ define i32 @bswapi32(i32 %x) {
 ; X64-LABEL: <bswapi32>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    bswap edi
 ; X64-NEXT:    mov eax, edi
 ; X64-NEXT:    pop rbp
@@ -43,8 +37,6 @@ define i32 @bswapi32(i32 %x) {
 ; ARM64-LABEL: <bswapi32>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    rev w0, w0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
@@ -56,8 +48,6 @@ define i48 @bswapi48(i48 %x) {
 ; X64-LABEL: <bswapi48>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    bswap rdi
 ; X64-NEXT:    shr rdi, 0x10
 ; X64-NEXT:    mov rax, rdi
@@ -67,13 +57,12 @@ define i48 @bswapi48(i48 %x) {
 ; ARM64-LABEL: <bswapi48>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    rev x0, x0
 ; ARM64-NEXT:    lsr x1, x0, #16
 ; ARM64-NEXT:    mov x0, x1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
+; ARM64-NEXT:    udf #0x0
   %res = call i48 @llvm.bswap.i48(i48 %x)
   ret i48 %res
 }
@@ -82,8 +71,6 @@ define i64 @bswapi64(i64 %x) {
 ; X64-LABEL: <bswapi64>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    bswap rdi
 ; X64-NEXT:    mov rax, rdi
 ; X64-NEXT:    pop rbp
@@ -92,8 +79,6 @@ define i64 @bswapi64(i64 %x) {
 ; ARM64-LABEL: <bswapi64>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    rev x0, x0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
@@ -105,8 +90,6 @@ define i128 @bswapi128(i128 %x) {
 ; X64-LABEL: <bswapi128>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    bswap rsi
 ; X64-NEXT:    bswap rdi
 ; X64-NEXT:    mov rax, rsi
@@ -117,8 +100,6 @@ define i128 @bswapi128(i128 %x) {
 ; ARM64-LABEL: <bswapi128>:
 ; ARM64:         stp x29, x30, [sp, #-0xb0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    rev x1, x1
 ; ARM64-NEXT:    rev x0, x0
 ; ARM64-NEXT:    str x0, [x29, #0xa8]

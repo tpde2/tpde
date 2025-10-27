@@ -9,8 +9,6 @@ define i8 @icmp_fuse_zext8(i32, i32) {
 ; X64-LABEL: <icmp_fuse_zext8>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    cmp edi, esi
 ; X64-NEXT:    mov eax, 0x0
 ; X64-NEXT:    setl al
@@ -20,8 +18,6 @@ define i8 @icmp_fuse_zext8(i32, i32) {
 ; ARM64-LABEL: <icmp_fuse_zext8>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    cmp w0, w1
 ; ARM64-NEXT:    cset w0, lt
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -35,8 +31,6 @@ define i32 @icmp_fuse_zext32(i32, i32) {
 ; X64-LABEL: <icmp_fuse_zext32>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    cmp edi, esi
 ; X64-NEXT:    mov eax, 0x0
 ; X64-NEXT:    setl al
@@ -46,8 +40,6 @@ define i32 @icmp_fuse_zext32(i32, i32) {
 ; ARM64-LABEL: <icmp_fuse_zext32>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    cmp w0, w1
 ; ARM64-NEXT:    cset w0, lt
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -61,8 +53,6 @@ define i64 @icmp_fuse_zexti64(i32, i32) {
 ; X64-LABEL: <icmp_fuse_zexti64>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    cmp edi, esi
 ; X64-NEXT:    mov eax, 0x0
 ; X64-NEXT:    setl al
@@ -72,8 +62,6 @@ define i64 @icmp_fuse_zexti64(i32, i32) {
 ; ARM64-LABEL: <icmp_fuse_zexti64>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    cmp w0, w1
 ; ARM64-NEXT:    cset w0, lt
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -87,8 +75,6 @@ define i128 @icmp_fuse_zexti128(i32, i32) {
 ; X64-LABEL: <icmp_fuse_zexti128>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    cmp edi, esi
 ; X64-NEXT:    setl al
 ; X64-NEXT:    and eax, 0x1
@@ -100,8 +86,6 @@ define i128 @icmp_fuse_zexti128(i32, i32) {
 ; ARM64-LABEL: <icmp_fuse_zexti128>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    cmp w0, w1
 ; ARM64-NEXT:    cset w0, lt
 ; ARM64-NEXT:    ubfx x0, x0, #0, #1
@@ -117,8 +101,6 @@ define i8 @icmp_fuse_sext8(i32, i32) {
 ; X64-LABEL: <icmp_fuse_sext8>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    cmp edi, esi
 ; X64-NEXT:    mov eax, 0x0
 ; X64-NEXT:    setl al
@@ -129,8 +111,6 @@ define i8 @icmp_fuse_sext8(i32, i32) {
 ; ARM64-LABEL: <icmp_fuse_sext8>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    cmp w0, w1
 ; ARM64-NEXT:    csetm x0, lt
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -144,8 +124,6 @@ define i32 @icmp_fuse_sext32(i32, i32) {
 ; X64-LABEL: <icmp_fuse_sext32>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    cmp edi, esi
 ; X64-NEXT:    mov eax, 0x0
 ; X64-NEXT:    setl al
@@ -156,8 +134,6 @@ define i32 @icmp_fuse_sext32(i32, i32) {
 ; ARM64-LABEL: <icmp_fuse_sext32>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    cmp w0, w1
 ; ARM64-NEXT:    csetm x0, lt
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -171,8 +147,6 @@ define i37 @icmp_fuse_sext37(i32, i32) {
 ; X64-LABEL: <icmp_fuse_sext37>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    cmp edi, esi
 ; X64-NEXT:    mov eax, 0x0
 ; X64-NEXT:    setl al
@@ -183,8 +157,6 @@ define i37 @icmp_fuse_sext37(i32, i32) {
 ; ARM64-LABEL: <icmp_fuse_sext37>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    cmp w0, w1
 ; ARM64-NEXT:    csetm x0, lt
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -198,8 +170,6 @@ define i64 @icmp_fuse_sexti64(i32, i32) {
 ; X64-LABEL: <icmp_fuse_sexti64>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    cmp edi, esi
 ; X64-NEXT:    mov eax, 0x0
 ; X64-NEXT:    setl al
@@ -210,8 +180,6 @@ define i64 @icmp_fuse_sexti64(i32, i32) {
 ; ARM64-LABEL: <icmp_fuse_sexti64>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    cmp w0, w1
 ; ARM64-NEXT:    csetm x0, lt
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -225,8 +193,6 @@ define i128 @icmp_fuse_sexti128(i32, i32) {
 ; X64-LABEL: <icmp_fuse_sexti128>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    cmp edi, esi
 ; X64-NEXT:    setl al
 ; X64-NEXT:    shl rax, 0x3f
@@ -240,8 +206,6 @@ define i128 @icmp_fuse_sexti128(i32, i32) {
 ; ARM64-LABEL: <icmp_fuse_sexti128>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    cmp w0, w1
 ; ARM64-NEXT:    cset w0, lt
 ; ARM64-NEXT:    sbfx x0, x0, #0, #1
@@ -257,8 +221,6 @@ define i64 @icmp_ext_nofuse(i32, i32) {
 ; X64-LABEL: <icmp_ext_nofuse>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    cmp edi, esi
 ; X64-NEXT:    setl al
 ; X64-NEXT:    mov ecx, eax
@@ -273,8 +235,6 @@ define i64 @icmp_ext_nofuse(i32, i32) {
 ; ARM64-LABEL: <icmp_ext_nofuse>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    cmp w0, w1
 ; ARM64-NEXT:    cset w0, lt
 ; ARM64-NEXT:    ubfx x1, x0, #0, #1

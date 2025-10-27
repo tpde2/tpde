@@ -20,9 +20,7 @@ define i32 @load_basic_int() {
 ; X64-LABEL: <load_basic_int>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
-; X64-NEXT:    lea rax, <load_basic_int+0x13>
+; X64-NEXT:    lea rax, <load_basic_int+0x3>
 ; X64-NEXT:     R_X86_64_PC32 basic_int-0x4
 ; X64-NEXT:    mov ecx, dword ptr [rax]
 ; X64-NEXT:    mov eax, ecx
@@ -32,9 +30,7 @@ define i32 @load_basic_int() {
 ; ARM64-LABEL: <load_basic_int>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    adrp x0, 0x0 <.text>
+; ARM64-NEXT:    adrp x0, 0x0 <load_basic_int>
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21 basic_int
 ; ARM64-NEXT:    add x0, x0, #0x0
 ; ARM64-NEXT:     R_AARCH64_ADD_ABS_LO12_NC basic_int
@@ -51,9 +47,7 @@ define i32 @load_basic_int_twice() {
 ; X64-LABEL: <load_basic_int_twice>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
-; X64-NEXT:    lea rax, <load_basic_int_twice+0x13>
+; X64-NEXT:    lea rax, <load_basic_int_twice+0x3>
 ; X64-NEXT:     R_X86_64_PC32 basic_int-0x4
 ; X64-NEXT:    mov ecx, dword ptr [rax]
 ; X64-NEXT:    mov edx, dword ptr [rax]
@@ -65,9 +59,7 @@ define i32 @load_basic_int_twice() {
 ; ARM64-LABEL: <load_basic_int_twice>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    adrp x0, 0x0 <.text>
+; ARM64-NEXT:    adrp x0, 0x0 <load_basic_int>
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21 basic_int
 ; ARM64-NEXT:    add x0, x0, #0x0
 ; ARM64-NEXT:     R_AARCH64_ADD_ABS_LO12_NC basic_int
@@ -87,9 +79,7 @@ define i32 @load_global_int() {
 ; X64-LABEL: <load_global_int>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
-; X64-NEXT:    mov rax, qword ptr <load_global_int+0x13>
+; X64-NEXT:    mov rax, qword ptr <load_global_int+0x3>
 ; X64-NEXT:     R_X86_64_GOTPCREL global_int-0x4
 ; X64-NEXT:    mov ecx, dword ptr [rax]
 ; X64-NEXT:    mov eax, ecx
@@ -99,9 +89,7 @@ define i32 @load_global_int() {
 ; ARM64-LABEL: <load_global_int>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    adrp x0, 0x0 <.text>
+; ARM64-NEXT:    adrp x0, 0x0 <load_basic_int>
 ; ARM64-NEXT:     R_AARCH64_ADR_GOT_PAGE global_int
 ; ARM64-NEXT:    ldr x0, [x0]
 ; ARM64-NEXT:     R_AARCH64_LD64_GOT_LO12_NC global_int
@@ -117,9 +105,7 @@ define i32 @load_global_dso_local_int() {
 ; X64-LABEL: <load_global_dso_local_int>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
-; X64-NEXT:    mov rax, qword ptr <load_global_dso_local_int+0x13>
+; X64-NEXT:    mov rax, qword ptr <load_global_dso_local_int+0x3>
 ; X64-NEXT:     R_X86_64_GOTPCREL global_dso_local_int-0x4
 ; X64-NEXT:    mov ecx, dword ptr [rax]
 ; X64-NEXT:    mov eax, ecx
@@ -129,9 +115,7 @@ define i32 @load_global_dso_local_int() {
 ; ARM64-LABEL: <load_global_dso_local_int>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    adrp x0, 0x0 <.text>
+; ARM64-NEXT:    adrp x0, 0x0 <load_basic_int>
 ; ARM64-NEXT:     R_AARCH64_ADR_GOT_PAGE global_dso_local_int
 ; ARM64-NEXT:    ldr x0, [x0]
 ; ARM64-NEXT:     R_AARCH64_LD64_GOT_LO12_NC global_dso_local_int
@@ -147,9 +131,7 @@ define ptr @load_func_ptr() {
 ; X64-LABEL: <load_func_ptr>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
-; X64-NEXT:    mov rax, qword ptr <load_func_ptr+0x13>
+; X64-NEXT:    mov rax, qword ptr <load_func_ptr+0x3>
 ; X64-NEXT:     R_X86_64_GOTPCREL func_ptr-0x4
 ; X64-NEXT:    mov rcx, qword ptr [rax]
 ; X64-NEXT:    mov rax, rcx
@@ -159,9 +141,7 @@ define ptr @load_func_ptr() {
 ; ARM64-LABEL: <load_func_ptr>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    adrp x0, 0x0 <.text>
+; ARM64-NEXT:    adrp x0, 0x0 <load_basic_int>
 ; ARM64-NEXT:     R_AARCH64_ADR_GOT_PAGE func_ptr
 ; ARM64-NEXT:    ldr x0, [x0]
 ; ARM64-NEXT:     R_AARCH64_LD64_GOT_LO12_NC func_ptr
@@ -178,9 +158,7 @@ define void @store_global_ptr(ptr %0) {
 ; X64-LABEL: <store_global_ptr>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
-; X64-NEXT:    mov rax, qword ptr <store_global_ptr+0x13>
+; X64-NEXT:    mov rax, qword ptr <store_global_ptr+0x3>
 ; X64-NEXT:     R_X86_64_GOTPCREL global_ptr-0x4
 ; X64-NEXT:    mov qword ptr [rax], rdi
 ; X64-NEXT:    pop rbp
@@ -189,15 +167,14 @@ define void @store_global_ptr(ptr %0) {
 ; ARM64-LABEL: <store_global_ptr>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    adrp x1, 0x0 <.text>
+; ARM64-NEXT:    adrp x1, 0x0 <load_basic_int>
 ; ARM64-NEXT:     R_AARCH64_ADR_GOT_PAGE global_ptr
 ; ARM64-NEXT:    ldr x1, [x1]
 ; ARM64-NEXT:     R_AARCH64_LD64_GOT_LO12_NC global_ptr
 ; ARM64-NEXT:    str x0, [x1]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
+; ARM64-NEXT:    udf #0x0
 entry:
   store ptr %0, ptr @global_ptr
   ret void
@@ -207,9 +184,7 @@ define ptr @get_global() {
 ; X64-LABEL: <get_global>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
-; X64-NEXT:    lea rax, <get_global+0x13>
+; X64-NEXT:    lea rax, <get_global+0x3>
 ; X64-NEXT:     R_X86_64_PC32 basic_int-0x4
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -217,9 +192,7 @@ define ptr @get_global() {
 ; ARM64-LABEL: <get_global>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    adrp x0, 0x0 <.text>
+; ARM64-NEXT:    adrp x0, 0x0 <load_basic_int>
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21 basic_int
 ; ARM64-NEXT:    add x0, x0, #0x0
 ; ARM64-NEXT:     R_AARCH64_ADD_ABS_LO12_NC basic_int
@@ -233,9 +206,7 @@ define ptr @get_func1() {
 ; X64-LABEL: <get_func1>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
-; X64-NEXT:    mov rax, qword ptr <get_func1+0x13>
+; X64-NEXT:    mov rax, qword ptr <get_func1+0x3>
 ; X64-NEXT:     R_X86_64_GOTPCREL func_ptr-0x4
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -243,9 +214,7 @@ define ptr @get_func1() {
 ; ARM64-LABEL: <get_func1>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    adrp x0, 0x0 <.text>
+; ARM64-NEXT:    adrp x0, 0x0 <load_basic_int>
 ; ARM64-NEXT:     R_AARCH64_ADR_GOT_PAGE func_ptr
 ; ARM64-NEXT:    ldr x0, [x0]
 ; ARM64-NEXT:     R_AARCH64_LD64_GOT_LO12_NC func_ptr
@@ -259,9 +228,7 @@ define ptr @get_func2() {
 ; X64-LABEL: <get_func2>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
-; X64-NEXT:    mov rax, qword ptr <get_func2+0x13>
+; X64-NEXT:    mov rax, qword ptr <get_func2+0x3>
 ; X64-NEXT:     R_X86_64_GOTPCREL some_func-0x4
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -269,9 +236,7 @@ define ptr @get_func2() {
 ; ARM64-LABEL: <get_func2>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    adrp x0, 0x0 <.text>
+; ARM64-NEXT:    adrp x0, 0x0 <load_basic_int>
 ; ARM64-NEXT:     R_AARCH64_ADR_GOT_PAGE some_func
 ; ARM64-NEXT:    ldr x0, [x0]
 ; ARM64-NEXT:     R_AARCH64_LD64_GOT_LO12_NC some_func
@@ -285,11 +250,9 @@ define {ptr, ptr} @get_struct1() {
 ; X64-LABEL: <get_struct1>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
-; X64-NEXT:    mov rax, qword ptr <get_struct1+0x13>
+; X64-NEXT:    mov rax, qword ptr <get_struct1+0x3>
 ; X64-NEXT:     R_X86_64_GOTPCREL func_ptr-0x4
-; X64-NEXT:    lea rdx, <get_struct1+0x1a>
+; X64-NEXT:    lea rdx, <get_struct1+0xa>
 ; X64-NEXT:     R_X86_64_PC32 basic_int-0x4
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -297,13 +260,11 @@ define {ptr, ptr} @get_struct1() {
 ; ARM64-LABEL: <get_struct1>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    adrp x0, 0x0 <.text>
+; ARM64-NEXT:    adrp x0, 0x0 <load_basic_int>
 ; ARM64-NEXT:     R_AARCH64_ADR_GOT_PAGE func_ptr
 ; ARM64-NEXT:    ldr x0, [x0]
 ; ARM64-NEXT:     R_AARCH64_LD64_GOT_LO12_NC func_ptr
-; ARM64-NEXT:    adrp x1, 0x0 <.text>
+; ARM64-NEXT:    adrp x1, 0x0 <load_basic_int>
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21 basic_int
 ; ARM64-NEXT:    add x1, x1, #0x0
 ; ARM64-NEXT:     R_AARCH64_ADD_ABS_LO12_NC basic_int
@@ -316,11 +277,9 @@ define {ptr, ptr} @get_struct2() {
 ; X64-LABEL: <get_struct2>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
-; X64-NEXT:    mov rax, qword ptr <get_struct2+0x13>
+; X64-NEXT:    mov rax, qword ptr <get_struct2+0x3>
 ; X64-NEXT:     R_X86_64_GOTPCREL some_func-0x4
-; X64-NEXT:    mov rdx, qword ptr <get_struct2+0x1a>
+; X64-NEXT:    mov rdx, qword ptr <get_struct2+0xa>
 ; X64-NEXT:     R_X86_64_GOTPCREL get_struct2-0x4
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -328,13 +287,11 @@ define {ptr, ptr} @get_struct2() {
 ; ARM64-LABEL: <get_struct2>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    adrp x0, 0x0 <.text>
+; ARM64-NEXT:    adrp x0, 0x0 <load_basic_int>
 ; ARM64-NEXT:     R_AARCH64_ADR_GOT_PAGE some_func
 ; ARM64-NEXT:    ldr x0, [x0]
 ; ARM64-NEXT:     R_AARCH64_LD64_GOT_LO12_NC some_func
-; ARM64-NEXT:    adrp x1, 0x0 <.text>
+; ARM64-NEXT:    adrp x1, 0x0 <load_basic_int>
 ; ARM64-NEXT:     R_AARCH64_ADR_GOT_PAGE get_struct2
 ; ARM64-NEXT:    ldr x1, [x1]
 ; ARM64-NEXT:     R_AARCH64_LD64_GOT_LO12_NC get_struct2

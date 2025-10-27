@@ -9,8 +9,6 @@ define i8 @bitrev_i8(i8 %0) {
 ; X64-LABEL: <bitrev_i8>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    shl edi, 0x18
 ; X64-NEXT:    bswap edi
 ; X64-NEXT:    mov eax, edi
@@ -35,8 +33,6 @@ define i8 @bitrev_i8(i8 %0) {
 ; ARM64-LABEL: <bitrev_i8>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    lsl w0, w0, #24
 ; ARM64-NEXT:    rbit w0, w0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -49,8 +45,6 @@ define i16 @bitrev_i16(i16 %0) {
 ; X64-LABEL: <bitrev_i16>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    shl edi, 0x10
 ; X64-NEXT:    bswap edi
 ; X64-NEXT:    mov eax, edi
@@ -75,8 +69,6 @@ define i16 @bitrev_i16(i16 %0) {
 ; ARM64-LABEL: <bitrev_i16>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    lsl w0, w0, #16
 ; ARM64-NEXT:    rbit w0, w0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -89,8 +81,6 @@ define i23 @bitrev_i23(i23 %0) {
 ; X64-LABEL: <bitrev_i23>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    shl edi, 0x9
 ; X64-NEXT:    bswap edi
 ; X64-NEXT:    mov eax, edi
@@ -115,8 +105,6 @@ define i23 @bitrev_i23(i23 %0) {
 ; ARM64-LABEL: <bitrev_i23>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    lsl w0, w0, #9
 ; ARM64-NEXT:    rbit w0, w0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -129,8 +117,6 @@ define i32 @bitrev_i32(i32 %0) {
 ; X64-LABEL: <bitrev_i32>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    bswap edi
 ; X64-NEXT:    mov eax, edi
 ; X64-NEXT:    and eax, 0xf0f0f0f
@@ -154,8 +140,6 @@ define i32 @bitrev_i32(i32 %0) {
 ; ARM64-LABEL: <bitrev_i32>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    rbit w0, w0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
@@ -167,8 +151,6 @@ define i37 @bitrev_i37(i37 %0) {
 ; X64-LABEL: <bitrev_i37>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    shl rdi, 0x1b
 ; X64-NEXT:    bswap rdi
 ; X64-NEXT:    mov rax, rdi
@@ -196,8 +178,6 @@ define i37 @bitrev_i37(i37 %0) {
 ; ARM64-LABEL: <bitrev_i37>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    lsl x0, x0, #27
 ; ARM64-NEXT:    rbit x0, x0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -210,8 +190,6 @@ define i64 @bitrev_i64(i64 %0) {
 ; X64-LABEL: <bitrev_i64>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    bswap rdi
 ; X64-NEXT:    mov rax, rdi
 ; X64-NEXT:    shr rax, 0x4
@@ -238,8 +216,6 @@ define i64 @bitrev_i64(i64 %0) {
 ; ARM64-LABEL: <bitrev_i64>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    rbit x0, x0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret

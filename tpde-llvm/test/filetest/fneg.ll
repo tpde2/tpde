@@ -10,9 +10,7 @@ define float @fnegf32(float %0) {
 ; X64-LABEL: <fnegf32>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
-; X64-NEXT:    xorps xmm0, xmmword ptr <fnegf32+0x14>
+; X64-NEXT:    xorps xmm0, xmmword ptr <fnegf32+0x4>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -20,8 +18,6 @@ define float @fnegf32(float %0) {
 ; ARM64-LABEL: <fnegf32>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fneg s0, s0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
@@ -34,9 +30,7 @@ define double @fnegf64(double %0) {
 ; X64-LABEL: <fnegf64>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
-; X64-NEXT:    xorps xmm0, xmmword ptr <fnegf64+0x14>
+; X64-NEXT:    xorps xmm0, xmmword ptr <fnegf64+0x4>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -44,8 +38,6 @@ define double @fnegf64(double %0) {
 ; ARM64-LABEL: <fnegf64>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fneg d0, d0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
@@ -58,9 +50,7 @@ define fp128 @fnegf128(fp128 %v) {
 ; X64-LABEL: <fnegf128>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
-; X64-NEXT:    xorps xmm0, xmmword ptr <fnegf128+0x14>
+; X64-NEXT:    xorps xmm0, xmmword ptr <fnegf128+0x4>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -68,8 +58,6 @@ define fp128 @fnegf128(fp128 %v) {
 ; ARM64-LABEL: <fnegf128>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    str q0, [sp, #-0x10]!
 ; ARM64-NEXT:    ldrb w0, [sp, #0xf]
 ; ARM64-NEXT:    eor w0, w0, #0x80

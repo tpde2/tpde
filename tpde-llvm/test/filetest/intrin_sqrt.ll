@@ -9,8 +9,6 @@ define float @sqrtf32(float %0) {
 ; X64-LABEL: <sqrtf32>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    sqrtss xmm0, xmm0
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -18,8 +16,6 @@ define float @sqrtf32(float %0) {
 ; ARM64-LABEL: <sqrtf32>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fsqrt s0, s0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
@@ -31,8 +27,6 @@ define double @sqrtf64(double %0) {
 ; X64-LABEL: <sqrtf64>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    sqrtsd xmm0, xmm0
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -40,8 +34,6 @@ define double @sqrtf64(double %0) {
 ; ARM64-LABEL: <sqrtf64>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fsqrt d0, d0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret

@@ -9,8 +9,6 @@ define i8 @atomicrmw_max_i8_seq_cst(ptr %p, i8 %a) {
 ; X64-LABEL: <atomicrmw_max_i8_seq_cst>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movzx eax, byte ptr [rdi]
 ; X64-NEXT:    movzx esi, sil
 ; X64-NEXT:  <L0>:
@@ -28,8 +26,6 @@ define i8 @atomicrmw_max_i8_seq_cst(ptr %p, i8 %a) {
 ; ARM64-LABEL: <atomicrmw_max_i8_seq_cst>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldsmaxalb w1, w1, [x0]
 ; ARM64-NEXT:    sxtb w0, w1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -42,8 +38,6 @@ define void @atomicrmw_max_i8_seq_cst_nouse(ptr %p, i8 %a) {
 ; X64-LABEL: <atomicrmw_max_i8_seq_cst_nouse>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movzx eax, byte ptr [rdi]
 ; X64-NEXT:    movzx esi, sil
 ; X64-NEXT:  <L0>:
@@ -61,8 +55,6 @@ define void @atomicrmw_max_i8_seq_cst_nouse(ptr %p, i8 %a) {
 ; ARM64-LABEL: <atomicrmw_max_i8_seq_cst_nouse>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldsmaxalb w1, w1, [x0]
 ; ARM64-NEXT:    sxtb w0, w1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -75,8 +67,6 @@ define i16 @atomicrmw_max_i16_seq_cst(ptr %p, i16 %a) {
 ; X64-LABEL: <atomicrmw_max_i16_seq_cst>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movzx eax, word ptr [rdi]
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    cmp ax, si
@@ -92,8 +82,6 @@ define i16 @atomicrmw_max_i16_seq_cst(ptr %p, i16 %a) {
 ; ARM64-LABEL: <atomicrmw_max_i16_seq_cst>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldsmaxalh w1, w1, [x0]
 ; ARM64-NEXT:    sxth w0, w1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -106,8 +94,6 @@ define void @atomicrmw_max_i16_seq_cst_nouse(ptr %p, i16 %a) {
 ; X64-LABEL: <atomicrmw_max_i16_seq_cst_nouse>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movzx eax, word ptr [rdi]
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    cmp ax, si
@@ -123,8 +109,6 @@ define void @atomicrmw_max_i16_seq_cst_nouse(ptr %p, i16 %a) {
 ; ARM64-LABEL: <atomicrmw_max_i16_seq_cst_nouse>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldsmaxalh w1, w1, [x0]
 ; ARM64-NEXT:    sxth w0, w1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -137,8 +121,6 @@ define i32 @atomicrmw_max_i32_seq_cst(ptr %p, i32 %a) {
 ; X64-LABEL: <atomicrmw_max_i32_seq_cst>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov eax, dword ptr [rdi]
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    cmp eax, esi
@@ -153,8 +135,6 @@ define i32 @atomicrmw_max_i32_seq_cst(ptr %p, i32 %a) {
 ; ARM64-LABEL: <atomicrmw_max_i32_seq_cst>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldsmaxal w1, w1, [x0]
 ; ARM64-NEXT:    mov w0, w1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -167,8 +147,6 @@ define void @atomicrmw_max_i32_seq_cst_nouse(ptr %p, i32 %a) {
 ; X64-LABEL: <atomicrmw_max_i32_seq_cst_nouse>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov eax, dword ptr [rdi]
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    cmp eax, esi
@@ -183,8 +161,6 @@ define void @atomicrmw_max_i32_seq_cst_nouse(ptr %p, i32 %a) {
 ; ARM64-LABEL: <atomicrmw_max_i32_seq_cst_nouse>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldsmaxal w1, w1, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
@@ -196,8 +172,6 @@ define i64 @atomicrmw_max_i64_seq_cst(ptr %p, i64 %a) {
 ; X64-LABEL: <atomicrmw_max_i64_seq_cst>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov rax, qword ptr [rdi]
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    cmp rax, rsi
@@ -212,8 +186,6 @@ define i64 @atomicrmw_max_i64_seq_cst(ptr %p, i64 %a) {
 ; ARM64-LABEL: <atomicrmw_max_i64_seq_cst>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldsmaxal x1, x1, [x0]
 ; ARM64-NEXT:    mov x0, x1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -226,8 +198,6 @@ define void @atomicrmw_max_i64_seq_cst_nouse(ptr %p, i64 %a) {
 ; X64-LABEL: <atomicrmw_max_i64_seq_cst_nouse>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov rax, qword ptr [rdi]
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    cmp rax, rsi
@@ -242,8 +212,6 @@ define void @atomicrmw_max_i64_seq_cst_nouse(ptr %p, i64 %a) {
 ; ARM64-LABEL: <atomicrmw_max_i64_seq_cst_nouse>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldsmaxal x1, x1, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret

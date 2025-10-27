@@ -66,22 +66,23 @@ void FunctionWriterA64::more_space(u32 size) noexcept {
 void FunctionWriterA64::handle_fixups() noexcept {
   for (const LabelFixup &fixup : label_fixups) {
     u32 label_off = label_offset(fixup.label);
-    u32 *dst_ptr = reinterpret_cast<u32 *>(begin_ptr() + fixup.off);
+    u32 fixup_off = fixup.off - label_skew;
+    u32 *dst_ptr = reinterpret_cast<u32 *>(begin_ptr() + fixup_off);
 
     auto fix_condbr = [&](unsigned nbits) {
-      i64 diff = i64(label_off) - i64(fixup.off);
+      i64 diff = i64(label_off) - i64(fixup_off);
       assert(diff >= 0 && diff < 128 * 1024 * 1024);
       // lowest two bits are ignored, highest bit is sign bit
       if (diff >= (4 << (nbits - 1))) {
         auto veneer =
-            std::lower_bound(veneers.begin(), veneers.end(), fixup.off);
+            std::lower_bound(veneers.begin(), veneers.end(), fixup_off);
         assert(veneer != veneers.end());
 
         // Create intermediate branch at v.begin
-        auto *br = reinterpret_cast<u32 *>(begin_ptr() + *veneer);
+        auto *br = reinterpret_cast<u32 *>(begin_ptr() + *veneer - label_skew);
         assert(*br == 0 && "overwriting instructions with veneer branch");
         *br = de64_B((label_off - *veneer) / 4);
-        diff = *veneer - fixup.off;
+        diff = *veneer - fixup_off;
         *veneer += 4;
       }
       u32 off_mask = ((1 << nbits) - 1) << 5;
@@ -91,27 +92,27 @@ void FunctionWriterA64::handle_fixups() noexcept {
     switch (fixup.kind) {
     case LabelFixupKind::AARCH64_BR: {
       // diff from entry to label (should be positive tho)
-      i64 diff = i64(label_off) - i64(fixup.off);
+      i64 diff = i64(label_off) - i64(fixup_off);
       assert(diff >= 0 && diff < 128 * 1024 * 1024);
       *dst_ptr = de64_B(diff / 4);
       break;
     }
     case LabelFixupKind::AARCH64_COND_BR:
-      if (veneers.empty() || veneers.back() < fixup.off) {
+      if (veneers.empty() || veneers.back() < fixup_off) {
         assert(unresolved_cond_brs > 0);
         unresolved_cond_brs -= 1;
       }
       fix_condbr(19); // CBZ/CBNZ has 19 bits.
       break;
     case LabelFixupKind::AARCH64_TEST_BR:
-      if (veneers.empty() || veneers.back() < fixup.off) {
+      if (veneers.empty() || veneers.back() < fixup_off) {
         assert(unresolved_test_brs > 0);
         unresolved_test_brs -= 1;
       }
       fix_condbr(14); // TBZ/TBNZ has 14 bits.
       break;
     case LabelFixupKind::AARCH64_JUMP_TABLE: {
-      auto table_off = *dst_ptr;
+      auto table_off = *dst_ptr - label_skew;
       *dst_ptr = (i32)label_off - (i32)table_off;
       break;
     }

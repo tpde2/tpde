@@ -9,8 +9,6 @@ define i1 @ext_v5i1_0(ptr %p) {
 ; X64-LABEL: <ext_v5i1_0>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movzx edi, byte ptr [rdi]
 ; X64-NEXT:    mov eax, edi
 ; X64-NEXT:    pop rbp
@@ -19,8 +17,6 @@ define i1 @ext_v5i1_0(ptr %p) {
 ; ARM64-LABEL: <ext_v5i1_0>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrb w0, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
@@ -33,8 +29,6 @@ define i1 @ext_v5i1_3(ptr %p) {
 ; X64-LABEL: <ext_v5i1_3>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movzx edi, byte ptr [rdi]
 ; X64-NEXT:    shr rdi, 0x3
 ; X64-NEXT:    mov eax, edi
@@ -44,8 +38,6 @@ define i1 @ext_v5i1_3(ptr %p) {
 ; ARM64-LABEL: <ext_v5i1_3>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrb w0, [x0]
 ; ARM64-NEXT:    lsr x0, x0, #3
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -59,8 +51,6 @@ define i1 @ext_v5i1_3_twice(ptr %p) {
 ; X64-LABEL: <ext_v5i1_3_twice>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movzx edi, byte ptr [rdi]
 ; X64-NEXT:    mov rax, rdi
 ; X64-NEXT:    shr rax, 0x3
@@ -72,13 +62,12 @@ define i1 @ext_v5i1_3_twice(ptr %p) {
 ; ARM64-LABEL: <ext_v5i1_3_twice>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrb w0, [x0]
 ; ARM64-NEXT:    lsr x1, x0, #3
 ; ARM64-NEXT:    lsr x0, x0, #3
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
+; ARM64-NEXT:    udf #0x0
   %v = load <5 x i1>, ptr %p
   %r1 = extractelement <5 x i1> %v, i32 3
   %r2 = extractelement <5 x i1> %v, i32 3
@@ -89,8 +78,6 @@ define i1 @ext_v5i1_dyn(ptr %p, i32 %i) {
 ; X64-LABEL: <ext_v5i1_dyn>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movzx edi, byte ptr [rdi]
 ; X64-NEXT:    mov ecx, esi
 ; X64-NEXT:    shr rdi, cl
@@ -101,8 +88,6 @@ define i1 @ext_v5i1_dyn(ptr %p, i32 %i) {
 ; ARM64-LABEL: <ext_v5i1_dyn>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrb w0, [x0]
 ; ARM64-NEXT:    lsr x0, x0, x1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -116,8 +101,6 @@ define i1 @ext_v16i1_0(ptr %p) {
 ; X64-LABEL: <ext_v16i1_0>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movzx edi, word ptr [rdi]
 ; X64-NEXT:    mov eax, edi
 ; X64-NEXT:    pop rbp
@@ -126,8 +109,6 @@ define i1 @ext_v16i1_0(ptr %p) {
 ; ARM64-LABEL: <ext_v16i1_0>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrh w0, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
@@ -140,8 +121,6 @@ define i1 @ext_v16i1_3(ptr %p) {
 ; X64-LABEL: <ext_v16i1_3>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movzx edi, word ptr [rdi]
 ; X64-NEXT:    shr rdi, 0x3
 ; X64-NEXT:    mov eax, edi
@@ -151,8 +130,6 @@ define i1 @ext_v16i1_3(ptr %p) {
 ; ARM64-LABEL: <ext_v16i1_3>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrh w0, [x0]
 ; ARM64-NEXT:    lsr x0, x0, #3
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -166,8 +143,6 @@ define i1 @ext_v16i1_3_twice(ptr %p) {
 ; X64-LABEL: <ext_v16i1_3_twice>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movzx edi, word ptr [rdi]
 ; X64-NEXT:    mov rax, rdi
 ; X64-NEXT:    shr rax, 0x3
@@ -179,13 +154,12 @@ define i1 @ext_v16i1_3_twice(ptr %p) {
 ; ARM64-LABEL: <ext_v16i1_3_twice>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrh w0, [x0]
 ; ARM64-NEXT:    lsr x1, x0, #3
 ; ARM64-NEXT:    lsr x0, x0, #3
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
+; ARM64-NEXT:    udf #0x0
   %v = load <16 x i1>, ptr %p
   %r1 = extractelement <16 x i1> %v, i32 3
   %r2 = extractelement <16 x i1> %v, i32 3
@@ -196,8 +170,6 @@ define i1 @ext_v16i1_dyn(ptr %p, i32 %i) {
 ; X64-LABEL: <ext_v16i1_dyn>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movzx edi, word ptr [rdi]
 ; X64-NEXT:    mov ecx, esi
 ; X64-NEXT:    shr rdi, cl
@@ -208,8 +180,6 @@ define i1 @ext_v16i1_dyn(ptr %p, i32 %i) {
 ; ARM64-LABEL: <ext_v16i1_dyn>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrh w0, [x0]
 ; ARM64-NEXT:    lsr x0, x0, x1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -224,8 +194,6 @@ define i8 @ext_v5i8_0(ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    movzx eax, byte ptr [rdi]
 ; X64-NEXT:    movzx ecx, byte ptr [rdi + 0x1]
 ; X64-NEXT:    movzx edx, byte ptr [rdi + 0x2]
@@ -238,8 +206,6 @@ define i8 @ext_v5i8_0(ptr %p) {
 ; ARM64-LABEL: <ext_v5i8_0>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrb w1, [x0]
 ; ARM64-NEXT:    ldrb w2, [x0, #0x1]
 ; ARM64-NEXT:    ldrb w3, [x0, #0x2]
@@ -258,8 +224,6 @@ define i8 @ext_v5i8_3(ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    movzx eax, byte ptr [rdi]
 ; X64-NEXT:    movzx ecx, byte ptr [rdi + 0x1]
 ; X64-NEXT:    movzx edx, byte ptr [rdi + 0x2]
@@ -273,8 +237,6 @@ define i8 @ext_v5i8_3(ptr %p) {
 ; ARM64-LABEL: <ext_v5i8_3>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrb w1, [x0]
 ; ARM64-NEXT:    ldrb w2, [x0, #0x1]
 ; ARM64-NEXT:    ldrb w3, [x0, #0x2]
@@ -293,8 +255,6 @@ define i8 @ext_v5i8_3_twice(ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    movzx eax, byte ptr [rdi]
 ; X64-NEXT:    movzx ecx, byte ptr [rdi + 0x1]
 ; X64-NEXT:    movzx edx, byte ptr [rdi + 0x2]
@@ -310,8 +270,6 @@ define i8 @ext_v5i8_3_twice(ptr %p) {
 ; ARM64-LABEL: <ext_v5i8_3_twice>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrb w1, [x0]
 ; ARM64-NEXT:    ldrb w2, [x0, #0x1]
 ; ARM64-NEXT:    ldrb w3, [x0, #0x2]
@@ -334,8 +292,6 @@ define i8 @ext_v5i8_dyn(ptr %p, i32 %i) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    movzx eax, byte ptr [rdi]
 ; X64-NEXT:    movzx ecx, byte ptr [rdi + 0x1]
 ; X64-NEXT:    movzx edx, byte ptr [rdi + 0x2]
@@ -358,8 +314,6 @@ define i8 @ext_v5i8_dyn(ptr %p, i32 %i) {
 ; ARM64-LABEL: <ext_v5i8_dyn>:
 ; ARM64:         stp x29, x30, [sp, #-0xb0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrb w2, [x0]
 ; ARM64-NEXT:    ldrb w3, [x0, #0x1]
 ; ARM64-NEXT:    ldrb w4, [x0, #0x2]
@@ -387,8 +341,6 @@ define i8 @ext_v16i8_0(<16 x i8> %v) {
 ; X64-LABEL: <ext_v16i8_0>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movapd xmmword ptr [rbp - 0x40], xmm0
 ; X64-NEXT:    movzx eax, byte ptr [rbp - 0x40]
 ; X64-NEXT:    pop rbp
@@ -397,8 +349,6 @@ define i8 @ext_v16i8_0(<16 x i8> %v) {
 ; ARM64-LABEL: <ext_v16i8_0>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    umov w0, v0.b[0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
@@ -410,8 +360,6 @@ define i8 @ext_v16i8_11(<16 x i8> %v) {
 ; X64-LABEL: <ext_v16i8_11>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movapd xmmword ptr [rbp - 0x40], xmm0
 ; X64-NEXT:    movzx eax, byte ptr [rbp - 0x35]
 ; X64-NEXT:    pop rbp
@@ -420,8 +368,6 @@ define i8 @ext_v16i8_11(<16 x i8> %v) {
 ; ARM64-LABEL: <ext_v16i8_11>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    umov w0, v0.b[11]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
@@ -433,8 +379,6 @@ define i8 @ext_v16i8_dyn(<16 x i8> %v, i32 %i) {
 ; X64-LABEL: <ext_v16i8_dyn>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movapd xmmword ptr [rbp - 0x40], xmm0
 ; X64-NEXT:    and rdi, 0xf
 ; X64-NEXT:    movzx eax, byte ptr [rbp + rdi - 0x40]
@@ -444,8 +388,6 @@ define i8 @ext_v16i8_dyn(<16 x i8> %v, i32 %i) {
 ; ARM64-LABEL: <ext_v16i8_dyn>:
 ; ARM64:         stp x29, x30, [sp, #-0xb0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    str q0, [x29, #0xa0]
 ; ARM64-NEXT:    and x0, x0, #0xf
 ; ARM64-NEXT:    add x0, x29, x0
@@ -461,8 +403,6 @@ define i8 @ext_v64i8_0(ptr %p) {
 ; X64-LABEL: <ext_v64i8_0>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movups xmm0, xmmword ptr [rdi]
 ; X64-NEXT:    movups xmm1, xmmword ptr [rdi + 0x10]
 ; X64-NEXT:    movups xmm2, xmmword ptr [rdi + 0x20]
@@ -475,8 +415,6 @@ define i8 @ext_v64i8_0(ptr %p) {
 ; ARM64-LABEL: <ext_v64i8_0>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr q0, [x0]
 ; ARM64-NEXT:    ldr q1, [x0, #0x10]
 ; ARM64-NEXT:    ldr q2, [x0, #0x20]
@@ -493,8 +431,6 @@ define i8 @ext_v64i8_43(ptr %p) {
 ; X64-LABEL: <ext_v64i8_43>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movups xmm0, xmmword ptr [rdi]
 ; X64-NEXT:    movups xmm1, xmmword ptr [rdi + 0x10]
 ; X64-NEXT:    movups xmm2, xmmword ptr [rdi + 0x20]
@@ -507,8 +443,6 @@ define i8 @ext_v64i8_43(ptr %p) {
 ; ARM64-LABEL: <ext_v64i8_43>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr q0, [x0]
 ; ARM64-NEXT:    ldr q1, [x0, #0x10]
 ; ARM64-NEXT:    ldr q2, [x0, #0x20]
@@ -525,8 +459,6 @@ define i8 @ext_v64i8_43_twice(ptr %p) {
 ; X64-LABEL: <ext_v64i8_43_twice>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movups xmm0, xmmword ptr [rdi]
 ; X64-NEXT:    movups xmm1, xmmword ptr [rdi + 0x10]
 ; X64-NEXT:    movups xmm2, xmmword ptr [rdi + 0x20]
@@ -541,8 +473,6 @@ define i8 @ext_v64i8_43_twice(ptr %p) {
 ; ARM64-LABEL: <ext_v64i8_43_twice>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr q0, [x0]
 ; ARM64-NEXT:    ldr q1, [x0, #0x10]
 ; ARM64-NEXT:    ldr q2, [x0, #0x20]
@@ -564,8 +494,6 @@ define i8 @ext_v64i8_dyn(ptr %p, i32 %i) {
 ; X64-LABEL: <ext_v64i8_dyn>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movups xmm0, xmmword ptr [rdi]
 ; X64-NEXT:    movups xmm1, xmmword ptr [rdi + 0x10]
 ; X64-NEXT:    movups xmm2, xmmword ptr [rdi + 0x20]
@@ -582,8 +510,6 @@ define i8 @ext_v64i8_dyn(ptr %p, i32 %i) {
 ; ARM64-LABEL: <ext_v64i8_dyn>:
 ; ARM64:         stp x29, x30, [sp, #-0xe0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr q0, [x0]
 ; ARM64-NEXT:    ldr q1, [x0, #0x10]
 ; ARM64-NEXT:    ldr q2, [x0, #0x20]
@@ -597,6 +523,7 @@ define i8 @ext_v64i8_dyn(ptr %p, i32 %i) {
 ; ARM64-NEXT:    ldrb w0, [x1, #0xa0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xe0
 ; ARM64-NEXT:    ret
+; ARM64-NEXT:    udf #0x0
   %v = load <64 x i8>, ptr %p
   %r = extractelement <64 x i8> %v, i32 %i
   ret i8 %r
@@ -606,8 +533,6 @@ define i32 @ext_v4i32_0(<4 x i32> %v) {
 ; X64-LABEL: <ext_v4i32_0>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movapd xmmword ptr [rbp - 0x40], xmm0
 ; X64-NEXT:    mov eax, dword ptr [rbp - 0x40]
 ; X64-NEXT:    pop rbp
@@ -616,8 +541,6 @@ define i32 @ext_v4i32_0(<4 x i32> %v) {
 ; ARM64-LABEL: <ext_v4i32_0>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov w0, v0.s[0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
@@ -629,8 +552,6 @@ define i32 @ext_v4i32_3(<4 x i32> %v) {
 ; X64-LABEL: <ext_v4i32_3>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movapd xmmword ptr [rbp - 0x40], xmm0
 ; X64-NEXT:    mov eax, dword ptr [rbp - 0x34]
 ; X64-NEXT:    pop rbp
@@ -639,8 +560,6 @@ define i32 @ext_v4i32_3(<4 x i32> %v) {
 ; ARM64-LABEL: <ext_v4i32_3>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov w0, v0.s[3]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
@@ -652,8 +571,6 @@ define i32 @ext_v4i32_dyn(<4 x i32> %v, i32 %i) {
 ; X64-LABEL: <ext_v4i32_dyn>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movapd xmmword ptr [rbp - 0x40], xmm0
 ; X64-NEXT:    and rdi, 0x3
 ; X64-NEXT:    mov eax, dword ptr [rbp + 4*rdi - 0x40]
@@ -663,8 +580,6 @@ define i32 @ext_v4i32_dyn(<4 x i32> %v, i32 %i) {
 ; ARM64-LABEL: <ext_v4i32_dyn>:
 ; ARM64:         stp x29, x30, [sp, #-0xb0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    str q0, [x29, #0xa0]
 ; ARM64-NEXT:    and x0, x0, #0x3
 ; ARM64-NEXT:    add x0, x29, x0, lsl #2
@@ -680,8 +595,6 @@ define double @ext_v2f64_0(<2 x double> %v) {
 ; X64-LABEL: <ext_v2f64_0>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movapd xmmword ptr [rbp - 0x40], xmm0
 ; X64-NEXT:    movsd xmm1, qword ptr [rbp - 0x40]
 ; X64-NEXT:    movapd xmm0, xmm1
@@ -691,8 +604,6 @@ define double @ext_v2f64_0(<2 x double> %v) {
 ; ARM64-LABEL: <ext_v2f64_0>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov d1, v0.d[0]
 ; ARM64-NEXT:    mov v0.16b, v1.16b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -705,8 +616,6 @@ define double @ext_v2f64_1(<2 x double> %v) {
 ; X64-LABEL: <ext_v2f64_1>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movapd xmmword ptr [rbp - 0x40], xmm0
 ; X64-NEXT:    movsd xmm1, qword ptr [rbp - 0x38]
 ; X64-NEXT:    movapd xmm0, xmm1
@@ -716,8 +625,6 @@ define double @ext_v2f64_1(<2 x double> %v) {
 ; ARM64-LABEL: <ext_v2f64_1>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov d1, v0.d[1]
 ; ARM64-NEXT:    mov v0.16b, v1.16b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -730,8 +637,6 @@ define double @ext_v2f64_dyn(<2 x double> %v, i32 %i) {
 ; X64-LABEL: <ext_v2f64_dyn>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movapd xmmword ptr [rbp - 0x40], xmm0
 ; X64-NEXT:    and rdi, 0x1
 ; X64-NEXT:    movsd xmm1, qword ptr [rbp + 8*rdi - 0x40]
@@ -742,8 +647,6 @@ define double @ext_v2f64_dyn(<2 x double> %v, i32 %i) {
 ; ARM64-LABEL: <ext_v2f64_dyn>:
 ; ARM64:         stp x29, x30, [sp, #-0xb0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    str q0, [x29, #0xa0]
 ; ARM64-NEXT:    and x0, x0, #0x1
 ; ARM64-NEXT:    add x0, x29, x0, lsl #3

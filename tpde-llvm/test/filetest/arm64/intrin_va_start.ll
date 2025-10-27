@@ -12,8 +12,6 @@ define void @f(i64 %0, i64 %1, i64 %2, i64 %3, i64 %4, i64 %5, i64 %6, i64 %7, i
 ; ARM64-LABEL: <f>:
 ; ARM64:         stp x29, x30, [sp, #-0x190]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    stp x0, x1, [sp, #0xa0]
 ; ARM64-NEXT:    stp x2, x3, [sp, #0xb0]
 ; ARM64-NEXT:    stp x4, x5, [sp, #0xc0]

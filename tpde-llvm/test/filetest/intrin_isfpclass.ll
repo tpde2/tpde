@@ -10,8 +10,6 @@ define i1 @is_snan_float(float %p) {
 ; X64-LABEL: <is_snan_float>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    movd ecx, xmm0
 ; X64-NEXT:    and ecx, 0x7fffffff
@@ -28,8 +26,6 @@ define i1 @is_snan_float(float %p) {
 ; ARM64-LABEL: <is_snan_float>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov w0, #0x0 // =0
 ; ARM64-NEXT:    fmov w1, s0
 ; ARM64-NEXT:    mov w2, #0x7f800000 // =2139095040
@@ -50,8 +46,6 @@ define i1 @is_snan_double(double %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    movq rcx, xmm0
 ; X64-NEXT:    movabs rdx, 0x7fffffffffffffff
@@ -72,8 +66,6 @@ define i1 @is_snan_double(double %p) {
 ; ARM64-LABEL: <is_snan_double>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov w0, #0x0 // =0
 ; ARM64-NEXT:    fmov x1, d0
 ; ARM64-NEXT:    mov x2, #0x7ff0000000000000 // =9218868437227405312
@@ -93,8 +85,6 @@ define i1 @is_qnan_float(float %p) {
 ; X64-LABEL: <is_qnan_float>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    movd ecx, xmm0
 ; X64-NEXT:    and ecx, 0x7fffffff
@@ -108,8 +98,6 @@ define i1 @is_qnan_float(float %p) {
 ; ARM64-LABEL: <is_qnan_float>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov w0, #0x0 // =0
 ; ARM64-NEXT:    fmov w1, s0
 ; ARM64-NEXT:    mov w2, #0x7fbfffff // =2143289343
@@ -119,6 +107,7 @@ define i1 @is_qnan_float(float %p) {
 ; ARM64-NEXT:    orr w0, w0, w2
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
+; ARM64-NEXT:    udf #0x0
   %r = call i1 @llvm.is.fpclass(float %p, i32 2)
   ret i1 %r
 }
@@ -127,8 +116,6 @@ define i1 @is_qnan_double(double %p) {
 ; X64-LABEL: <is_qnan_double>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    movq rcx, xmm0
 ; X64-NEXT:    movabs rdx, 0x7fffffffffffffff
@@ -144,8 +131,6 @@ define i1 @is_qnan_double(double %p) {
 ; ARM64-LABEL: <is_qnan_double>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov w0, #0x0 // =0
 ; ARM64-NEXT:    fmov x1, d0
 ; ARM64-NEXT:    mov x2, #0x7ff7ffffffffffff // =9221120237041090559
@@ -155,6 +140,7 @@ define i1 @is_qnan_double(double %p) {
 ; ARM64-NEXT:    orr w0, w0, w2
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
+; ARM64-NEXT:    udf #0x0
   %r = call i1 @llvm.is.fpclass(double %p, i32 2)
   ret i1 %r
 }
@@ -163,10 +149,8 @@ define i1 @is_ninf_float(float %p) {
 ; X64-LABEL: <is_ninf_float>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    xor eax, eax
-; X64-NEXT:    movss xmm1, dword ptr <is_ninf_float+0x16>
+; X64-NEXT:    movss xmm1, dword ptr <is_ninf_float+0x6>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    ucomiss xmm1, xmm0
 ; X64-NEXT:    setae cl
@@ -178,8 +162,6 @@ define i1 @is_ninf_float(float %p) {
 ; ARM64-LABEL: <is_ninf_float>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov w0, #0x0 // =0
 ; ARM64-NEXT:    mov w1, #-0x800000 // =-8388608
 ; ARM64-NEXT:    fmov s1, w1
@@ -196,10 +178,8 @@ define i1 @is_ninf_double(double %p) {
 ; X64-LABEL: <is_ninf_double>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    xor eax, eax
-; X64-NEXT:    movsd xmm1, qword ptr <is_ninf_double+0x16>
+; X64-NEXT:    movsd xmm1, qword ptr <is_ninf_double+0x6>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    ucomisd xmm1, xmm0
 ; X64-NEXT:    setae cl
@@ -211,8 +191,6 @@ define i1 @is_ninf_double(double %p) {
 ; ARM64-LABEL: <is_ninf_double>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov w0, #0x0 // =0
 ; ARM64-NEXT:    mov x1, #-0x10000000000000 // =-4503599627370496
 ; ARM64-NEXT:    fmov d1, x1
@@ -229,8 +207,6 @@ define i1 @is_nnorm_float(float %p) {
 ; X64-LABEL: <is_nnorm_float>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    movd ecx, xmm0
 ; X64-NEXT:    test ecx, ecx
@@ -248,8 +224,6 @@ define i1 @is_nnorm_float(float %p) {
 ; ARM64-LABEL: <is_nnorm_float>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov w0, #0x0 // =0
 ; ARM64-NEXT:    fmov w1, s0
 ; ARM64-NEXT:    and w2, w1, #0x7fffffff
@@ -270,8 +244,6 @@ define i1 @is_nnorm_double(double %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    movq rcx, xmm0
 ; X64-NEXT:    movabs rdx, 0x7fffffffffffffff
@@ -293,8 +265,6 @@ define i1 @is_nnorm_double(double %p) {
 ; ARM64-LABEL: <is_nnorm_double>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov w0, #0x0 // =0
 ; ARM64-NEXT:    fmov x1, d0
 ; ARM64-NEXT:    mov x2, #-0x10000000000000 // =-4503599627370496
@@ -315,8 +285,6 @@ define i1 @is_nsnorm_float(float %p) {
 ; X64-LABEL: <is_nsnorm_float>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    movd ecx, xmm0
 ; X64-NEXT:    test ecx, ecx
@@ -334,8 +302,6 @@ define i1 @is_nsnorm_float(float %p) {
 ; ARM64-LABEL: <is_nsnorm_float>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov w0, #0x0 // =0
 ; ARM64-NEXT:    fmov w1, s0
 ; ARM64-NEXT:    mov w2, #0x7fffff // =8388607
@@ -356,8 +322,6 @@ define i1 @is_nsnorm_double(double %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    movq rcx, xmm0
 ; X64-NEXT:    movabs rdx, 0x7fffffffffffffff
@@ -378,8 +342,6 @@ define i1 @is_nsnorm_double(double %p) {
 ; ARM64-LABEL: <is_nsnorm_double>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov w0, #0x0 // =0
 ; ARM64-NEXT:    fmov x1, d0
 ; ARM64-NEXT:    mov x2, #0xfffffffffffff // =4503599627370495
@@ -399,8 +361,6 @@ define i1 @is_nzero_float(float %p) {
 ; X64-LABEL: <is_nzero_float>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    movd ecx, xmm0
 ; X64-NEXT:    neg ecx
@@ -413,8 +373,6 @@ define i1 @is_nzero_float(float %p) {
 ; ARM64-LABEL: <is_nzero_float>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov w0, #0x0 // =0
 ; ARM64-NEXT:    fmov w1, s0
 ; ARM64-NEXT:    mov w2, #-0x80000000 // =-2147483648
@@ -431,8 +389,6 @@ define i1 @is_nzero_double(double %p) {
 ; X64-LABEL: <is_nzero_double>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    movq rcx, xmm0
 ; X64-NEXT:    neg rcx
@@ -445,8 +401,6 @@ define i1 @is_nzero_double(double %p) {
 ; ARM64-LABEL: <is_nzero_double>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov w0, #0x0 // =0
 ; ARM64-NEXT:    fmov x1, d0
 ; ARM64-NEXT:    mov x2, #-0x8000000000000000 // =-9223372036854775808
@@ -463,8 +417,6 @@ define i1 @is_pzero_float(float %p) {
 ; X64-LABEL: <is_pzero_float>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    movd ecx, xmm0
 ; X64-NEXT:    test ecx, ecx
@@ -477,8 +429,6 @@ define i1 @is_pzero_float(float %p) {
 ; ARM64-LABEL: <is_pzero_float>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov w0, #0x0 // =0
 ; ARM64-NEXT:    fmov w1, s0
 ; ARM64-NEXT:    cmp w1, #0x0
@@ -494,8 +444,6 @@ define i1 @is_pzero_double(double %p) {
 ; X64-LABEL: <is_pzero_double>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    movq rcx, xmm0
 ; X64-NEXT:    test rcx, rcx
@@ -508,8 +456,6 @@ define i1 @is_pzero_double(double %p) {
 ; ARM64-LABEL: <is_pzero_double>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov w0, #0x0 // =0
 ; ARM64-NEXT:    fmov x1, d0
 ; ARM64-NEXT:    cmp x1, #0x0
@@ -525,8 +471,6 @@ define i1 @is_psnorm_float(float %p) {
 ; X64-LABEL: <is_psnorm_float>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    movd ecx, xmm0
 ; X64-NEXT:    dec ecx
@@ -540,8 +484,6 @@ define i1 @is_psnorm_float(float %p) {
 ; ARM64-LABEL: <is_psnorm_float>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov w0, #0x0 // =0
 ; ARM64-NEXT:    fmov w1, s0
 ; ARM64-NEXT:    mov w2, #0x7fffff // =8388607
@@ -551,6 +493,7 @@ define i1 @is_psnorm_float(float %p) {
 ; ARM64-NEXT:    orr w0, w0, w2
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
+; ARM64-NEXT:    udf #0x0
   %r = call i1 @llvm.is.fpclass(float %p, i32 128)
   ret i1 %r
 }
@@ -559,8 +502,6 @@ define i1 @is_psnorm_double(double %p) {
 ; X64-LABEL: <is_psnorm_double>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    movq rcx, xmm0
 ; X64-NEXT:    dec rcx
@@ -575,8 +516,6 @@ define i1 @is_psnorm_double(double %p) {
 ; ARM64-LABEL: <is_psnorm_double>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov w0, #0x0 // =0
 ; ARM64-NEXT:    fmov x1, d0
 ; ARM64-NEXT:    mov x2, #0xfffffffffffff // =4503599627370495
@@ -586,6 +525,7 @@ define i1 @is_psnorm_double(double %p) {
 ; ARM64-NEXT:    orr w0, w0, w2
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
+; ARM64-NEXT:    udf #0x0
   %r = call i1 @llvm.is.fpclass(double %p, i32 128)
   ret i1 %r
 }
@@ -594,8 +534,6 @@ define i1 @is_pnorm_float(float %p) {
 ; X64-LABEL: <is_pnorm_float>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    movd ecx, xmm0
 ; X64-NEXT:    test ecx, ecx
@@ -613,8 +551,6 @@ define i1 @is_pnorm_float(float %p) {
 ; ARM64-LABEL: <is_pnorm_float>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov w0, #0x0 // =0
 ; ARM64-NEXT:    fmov w1, s0
 ; ARM64-NEXT:    and w2, w1, #0x7fffffff
@@ -635,8 +571,6 @@ define i1 @is_pnorm_double(double %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    movq rcx, xmm0
 ; X64-NEXT:    movabs rdx, 0x7fffffffffffffff
@@ -658,8 +592,6 @@ define i1 @is_pnorm_double(double %p) {
 ; ARM64-LABEL: <is_pnorm_double>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov w0, #0x0 // =0
 ; ARM64-NEXT:    fmov x1, d0
 ; ARM64-NEXT:    mov x2, #-0x10000000000000 // =-4503599627370496
@@ -680,10 +612,8 @@ define i1 @is_pinf_float(float %p) {
 ; X64-LABEL: <is_pinf_float>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    xor eax, eax
-; X64-NEXT:    ucomiss xmm0, dword ptr <is_pinf_float+0x16>
+; X64-NEXT:    ucomiss xmm0, dword ptr <is_pinf_float+0x6>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    setae cl
 ; X64-NEXT:    or cl, al
@@ -694,8 +624,6 @@ define i1 @is_pinf_float(float %p) {
 ; ARM64-LABEL: <is_pinf_float>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov w0, #0x0 // =0
 ; ARM64-NEXT:    mov w1, #0x7f800000 // =2139095040
 ; ARM64-NEXT:    fmov s1, w1
@@ -711,10 +639,8 @@ define i1 @is_pinf_double(double %p) {
 ; X64-LABEL: <is_pinf_double>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    xor eax, eax
-; X64-NEXT:    ucomisd xmm0, qword ptr <is_pinf_double+0x16>
+; X64-NEXT:    ucomisd xmm0, qword ptr <is_pinf_double+0x6>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    setae cl
 ; X64-NEXT:    or cl, al
@@ -725,8 +651,6 @@ define i1 @is_pinf_double(double %p) {
 ; ARM64-LABEL: <is_pinf_double>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov w0, #0x0 // =0
 ; ARM64-NEXT:    mov x1, #0x7ff0000000000000 // =9218868437227405312
 ; ARM64-NEXT:    fmov d1, x1
@@ -745,8 +669,6 @@ define i1 @is_ninf_pinf_float(float %p) {
 ; X64-LABEL: <is_ninf_pinf_float>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movd eax, xmm0
 ; X64-NEXT:    and eax, 0x7fffffff
 ; X64-NEXT:    cmp eax, 0x7f800000
@@ -758,8 +680,6 @@ define i1 @is_ninf_pinf_float(float %p) {
 ; ARM64-LABEL: <is_ninf_pinf_float>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fmov w0, s0
 ; ARM64-NEXT:    mov w1, #0x7f800000 // =2139095040
 ; ARM64-NEXT:    and w0, w0, #0x7fffffff
@@ -777,8 +697,6 @@ define i1 @is_ninf_pinf_double(double %p) {
 ; X64-LABEL: <is_ninf_pinf_double>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movq rax, xmm0
 ; X64-NEXT:    movabs rcx, 0x7fffffffffffffff
 ; X64-NEXT:    and rcx, rax
@@ -792,8 +710,6 @@ define i1 @is_ninf_pinf_double(double %p) {
 ; ARM64-LABEL: <is_ninf_pinf_double>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fmov x0, d0
 ; ARM64-NEXT:    mov x1, #0x7ff0000000000000 // =9218868437227405312
 ; ARM64-NEXT:    and x0, x0, #0x7fffffffffffffff
@@ -812,8 +728,6 @@ define i1 @is_snan_qnan_float(float %p) {
 ; X64-LABEL: <is_snan_qnan_float>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    ucomiss xmm0, xmm0
 ; X64-NEXT:    setp al
 ; X64-NEXT:    or al, 0x0
@@ -823,8 +737,6 @@ define i1 @is_snan_qnan_float(float %p) {
 ; ARM64-LABEL: <is_snan_qnan_float>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fcmp s0, s0
 ; ARM64-NEXT:    cset w0, vs
 ; ARM64-NEXT:    mov w1, #0x0 // =0
@@ -839,8 +751,6 @@ define i1 @is_snan_qnan_double(double %p) {
 ; X64-LABEL: <is_snan_qnan_double>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    ucomisd xmm0, xmm0
 ; X64-NEXT:    setp al
 ; X64-NEXT:    or al, 0x0
@@ -850,8 +760,6 @@ define i1 @is_snan_qnan_double(double %p) {
 ; ARM64-LABEL: <is_snan_qnan_double>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fcmp d0, d0
 ; ARM64-NEXT:    cset w0, vs
 ; ARM64-NEXT:    mov w1, #0x0 // =0
@@ -867,8 +775,6 @@ define i1 @is_nnorm_pnorm_float(float %p) {
 ; X64-LABEL: <is_nnorm_pnorm_float>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movd eax, xmm0
 ; X64-NEXT:    and eax, 0x7fffffff
 ; X64-NEXT:    add eax, 0xff800000
@@ -881,8 +787,6 @@ define i1 @is_nnorm_pnorm_float(float %p) {
 ; ARM64-LABEL: <is_nnorm_pnorm_float>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fmov w0, s0
 ; ARM64-NEXT:    and w0, w0, #0x7fffffff
 ; ARM64-NEXT:    sub w0, w0, #0x800, lsl #12 // =0x800000
@@ -901,8 +805,6 @@ define i1 @is_nnorm_pnorm_double(double %p) {
 ; X64-LABEL: <is_nnorm_pnorm_double>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movq rax, xmm0
 ; X64-NEXT:    movabs rcx, 0x7fffffffffffffff
 ; X64-NEXT:    and rcx, rax
@@ -918,8 +820,6 @@ define i1 @is_nnorm_pnorm_double(double %p) {
 ; ARM64-LABEL: <is_nnorm_pnorm_double>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fmov x0, d0
 ; ARM64-NEXT:    mov x1, #-0x10000000000000 // =-4503599627370496
 ; ARM64-NEXT:    and x0, x0, #0x7fffffffffffffff
@@ -940,8 +840,6 @@ define i1 @is_snan_psnorm_float(float %p) {
 ; X64-LABEL: <is_snan_psnorm_float>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    movd ecx, xmm0
 ; X64-NEXT:    and ecx, 0x7fffffff
@@ -962,8 +860,6 @@ define i1 @is_snan_psnorm_float(float %p) {
 ; ARM64-LABEL: <is_snan_psnorm_float>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov w0, #0x0 // =0
 ; ARM64-NEXT:    fmov w1, s0
 ; ARM64-NEXT:    mov w2, #0x7f800000 // =2139095040
@@ -981,6 +877,7 @@ define i1 @is_snan_psnorm_float(float %p) {
 ; ARM64-NEXT:    orr w0, w0, w2
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
+; ARM64-NEXT:    udf #0x0
   %r = call i1 @llvm.is.fpclass(float %p, i32 129)
   ret i1 %r
 }
@@ -989,8 +886,6 @@ define i1 @is_snan_psnorm_double(double %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    movq rcx, xmm0
 ; X64-NEXT:    movabs rdx, 0x7fffffffffffffff
@@ -1016,8 +911,6 @@ define i1 @is_snan_psnorm_double(double %p) {
 ; ARM64-LABEL: <is_snan_psnorm_double>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov w0, #0x0 // =0
 ; ARM64-NEXT:    fmov x1, d0
 ; ARM64-NEXT:    mov x2, #0x7ff0000000000000 // =9218868437227405312

@@ -12,8 +12,6 @@ define void @test() {
 ; X64-LABEL: <test>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    ud2
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -21,8 +19,6 @@ define void @test() {
 ; ARM64-LABEL: <test>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    brk #0x1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret

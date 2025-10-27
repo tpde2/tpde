@@ -22,8 +22,6 @@ define i8 @umul_i8_0(i8 %0, i8 %1) {
 ; X64-LABEL: <umul_i8_0>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    xor ecx, ecx
 ; X64-NEXT:    mov eax, edi
 ; X64-NEXT:    mul sil
@@ -34,8 +32,6 @@ define i8 @umul_i8_0(i8 %0, i8 %1) {
 ; ARM64-LABEL: <umul_i8_0>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    and w1, w1, #0xff
 ; ARM64-NEXT:    and w0, w0, #0xff
 ; ARM64-NEXT:    mul w1, w0, w1
@@ -45,6 +41,7 @@ define i8 @umul_i8_0(i8 %0, i8 %1) {
 ; ARM64-NEXT:    mov w0, w2
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
+; ARM64-NEXT:    udf #0x0
 entry:
   %2 = call {i8, i1} @llvm.umul.with.overflow.i8(i8 %0, i8 %1)
   %3 = extractvalue {i8, i1} %2, 0
@@ -55,8 +52,6 @@ define i1 @umul_i8_1(i8 %0, i8 %1) {
 ; X64-LABEL: <umul_i8_1>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    xor ecx, ecx
 ; X64-NEXT:    mov eax, edi
 ; X64-NEXT:    mul sil
@@ -68,8 +63,6 @@ define i1 @umul_i8_1(i8 %0, i8 %1) {
 ; ARM64-LABEL: <umul_i8_1>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    and w1, w1, #0xff
 ; ARM64-NEXT:    and w0, w0, #0xff
 ; ARM64-NEXT:    mul w1, w0, w1
@@ -79,6 +72,7 @@ define i1 @umul_i8_1(i8 %0, i8 %1) {
 ; ARM64-NEXT:    mov w0, w3
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
+; ARM64-NEXT:    udf #0x0
 entry:
   %2 = call {i8, i1} @llvm.umul.with.overflow.i8(i8 %0, i8 %1)
   %3 = extractvalue {i8, i1} %2, 1
@@ -89,8 +83,6 @@ define i16 @umul_i16_0(i16 %0, i16 %1) {
 ; X64-LABEL: <umul_i16_0>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    xor ecx, ecx
 ; X64-NEXT:    mov eax, edi
 ; X64-NEXT:    mul si
@@ -101,8 +93,6 @@ define i16 @umul_i16_0(i16 %0, i16 %1) {
 ; ARM64-LABEL: <umul_i16_0>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    and w1, w1, #0xffff
 ; ARM64-NEXT:    and w0, w0, #0xffff
 ; ARM64-NEXT:    mul w1, w0, w1
@@ -112,6 +102,7 @@ define i16 @umul_i16_0(i16 %0, i16 %1) {
 ; ARM64-NEXT:    mov w0, w2
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
+; ARM64-NEXT:    udf #0x0
 entry:
   %2 = call {i16, i1} @llvm.umul.with.overflow.i16(i16 %0, i16 %1)
   %3 = extractvalue {i16, i1} %2, 0
@@ -122,8 +113,6 @@ define i1 @umul_i16_1(i16 %0, i16 %1) {
 ; X64-LABEL: <umul_i16_1>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    xor ecx, ecx
 ; X64-NEXT:    mov eax, edi
 ; X64-NEXT:    mul si
@@ -135,8 +124,6 @@ define i1 @umul_i16_1(i16 %0, i16 %1) {
 ; ARM64-LABEL: <umul_i16_1>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    and w1, w1, #0xffff
 ; ARM64-NEXT:    and w0, w0, #0xffff
 ; ARM64-NEXT:    mul w1, w0, w1
@@ -146,6 +133,7 @@ define i1 @umul_i16_1(i16 %0, i16 %1) {
 ; ARM64-NEXT:    mov w0, w3
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
+; ARM64-NEXT:    udf #0x0
 entry:
   %2 = call {i16, i1} @llvm.umul.with.overflow.i16(i16 %0, i16 %1)
   %3 = extractvalue {i16, i1} %2, 1
@@ -156,8 +144,6 @@ define i32 @umul_i32_0(i32 %0, i32 %1) {
 ; X64-LABEL: <umul_i32_0>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    xor ecx, ecx
 ; X64-NEXT:    mov eax, edi
 ; X64-NEXT:    mul esi
@@ -168,8 +154,6 @@ define i32 @umul_i32_0(i32 %0, i32 %1) {
 ; ARM64-LABEL: <umul_i32_0>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    umull x0, w0, w1
 ; ARM64-NEXT:    tst x0, #0xffffffff00000000
 ; ARM64-NEXT:    mov w1, w0
@@ -187,8 +171,6 @@ define i1 @umul_i32_1(i32 %0, i32 %1) {
 ; X64-LABEL: <umul_i32_1>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    xor ecx, ecx
 ; X64-NEXT:    mov eax, edi
 ; X64-NEXT:    mul esi
@@ -200,8 +182,6 @@ define i1 @umul_i32_1(i32 %0, i32 %1) {
 ; ARM64-LABEL: <umul_i32_1>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    umull x0, w0, w1
 ; ARM64-NEXT:    tst x0, #0xffffffff00000000
 ; ARM64-NEXT:    mov w1, w0
@@ -219,8 +199,6 @@ define i64 @umul_i64_0(i64 %0, i64 %1) {
 ; X64-LABEL: <umul_i64_0>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    xor ecx, ecx
 ; X64-NEXT:    mov rax, rdi
 ; X64-NEXT:    mul rsi
@@ -231,8 +209,6 @@ define i64 @umul_i64_0(i64 %0, i64 %1) {
 ; ARM64-LABEL: <umul_i64_0>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    umulh x2, x0, x1
 ; ARM64-NEXT:    mul x0, x0, x1
 ; ARM64-NEXT:    cmp xzr, x2
@@ -249,8 +225,6 @@ define i1 @umul_i64_1(i64 %0, i64 %1) {
 ; X64-LABEL: <umul_i64_1>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    xor ecx, ecx
 ; X64-NEXT:    mov rax, rdi
 ; X64-NEXT:    mul rsi
@@ -262,8 +236,6 @@ define i1 @umul_i64_1(i64 %0, i64 %1) {
 ; ARM64-LABEL: <umul_i64_1>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    umulh x2, x0, x1
 ; ARM64-NEXT:    mul x0, x0, x1
 ; ARM64-NEXT:    cmp xzr, x2
@@ -283,8 +255,6 @@ define i8 @smul_i8_0(i8 %0, i8 %1) {
 ; X64-LABEL: <smul_i8_0>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    xor ecx, ecx
 ; X64-NEXT:    mov eax, edi
 ; X64-NEXT:    imul sil
@@ -295,8 +265,6 @@ define i8 @smul_i8_0(i8 %0, i8 %1) {
 ; ARM64-LABEL: <smul_i8_0>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    sxtb w1, w1
 ; ARM64-NEXT:    sxtb w0, w0
 ; ARM64-NEXT:    mul w1, w0, w1
@@ -306,6 +274,7 @@ define i8 @smul_i8_0(i8 %0, i8 %1) {
 ; ARM64-NEXT:    mov w0, w2
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
+; ARM64-NEXT:    udf #0x0
 entry:
   %2 = call {i8, i1} @llvm.smul.with.overflow.i8(i8 %0, i8 %1)
   %3 = extractvalue {i8, i1} %2, 0
@@ -316,8 +285,6 @@ define i1 @smul_i8_1(i8 %0, i8 %1) {
 ; X64-LABEL: <smul_i8_1>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    xor ecx, ecx
 ; X64-NEXT:    mov eax, edi
 ; X64-NEXT:    imul sil
@@ -329,8 +296,6 @@ define i1 @smul_i8_1(i8 %0, i8 %1) {
 ; ARM64-LABEL: <smul_i8_1>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    sxtb w1, w1
 ; ARM64-NEXT:    sxtb w0, w0
 ; ARM64-NEXT:    mul w1, w0, w1
@@ -340,6 +305,7 @@ define i1 @smul_i8_1(i8 %0, i8 %1) {
 ; ARM64-NEXT:    mov w0, w3
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
+; ARM64-NEXT:    udf #0x0
 entry:
   %2 = call {i8, i1} @llvm.smul.with.overflow.i8(i8 %0, i8 %1)
   %3 = extractvalue {i8, i1} %2, 1
@@ -350,8 +316,6 @@ define i16 @smul_i16_0(i16 %0, i16 %1) {
 ; X64-LABEL: <smul_i16_0>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    imul di, si
 ; X64-NEXT:    seto al
@@ -362,8 +326,6 @@ define i16 @smul_i16_0(i16 %0, i16 %1) {
 ; ARM64-LABEL: <smul_i16_0>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    sxth w1, w1
 ; ARM64-NEXT:    sxth w0, w0
 ; ARM64-NEXT:    mul w1, w0, w1
@@ -373,6 +335,7 @@ define i16 @smul_i16_0(i16 %0, i16 %1) {
 ; ARM64-NEXT:    mov w0, w2
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
+; ARM64-NEXT:    udf #0x0
 entry:
   %2 = call {i16, i1} @llvm.smul.with.overflow.i16(i16 %0, i16 %1)
   %3 = extractvalue {i16, i1} %2, 0
@@ -383,8 +346,6 @@ define i1 @smul_i16_1(i16 %0, i16 %1) {
 ; X64-LABEL: <smul_i16_1>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    imul di, si
 ; X64-NEXT:    seto al
@@ -394,8 +355,6 @@ define i1 @smul_i16_1(i16 %0, i16 %1) {
 ; ARM64-LABEL: <smul_i16_1>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    sxth w1, w1
 ; ARM64-NEXT:    sxth w0, w0
 ; ARM64-NEXT:    mul w1, w0, w1
@@ -405,6 +364,7 @@ define i1 @smul_i16_1(i16 %0, i16 %1) {
 ; ARM64-NEXT:    mov w0, w3
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
+; ARM64-NEXT:    udf #0x0
 entry:
   %2 = call {i16, i1} @llvm.smul.with.overflow.i16(i16 %0, i16 %1)
   %3 = extractvalue {i16, i1} %2, 1
@@ -415,8 +375,6 @@ define i32 @smul_i32_0(i32 %0, i32 %1) {
 ; X64-LABEL: <smul_i32_0>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    imul edi, esi
 ; X64-NEXT:    seto al
@@ -427,8 +385,6 @@ define i32 @smul_i32_0(i32 %0, i32 %1) {
 ; ARM64-LABEL: <smul_i32_0>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    smull x0, w0, w1
 ; ARM64-NEXT:    cmp x0, w0, sxtw
 ; ARM64-NEXT:    mov w1, w0
@@ -446,8 +402,6 @@ define i1 @smul_i32_1(i32 %0, i32 %1) {
 ; X64-LABEL: <smul_i32_1>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    imul edi, esi
 ; X64-NEXT:    seto al
@@ -457,8 +411,6 @@ define i1 @smul_i32_1(i32 %0, i32 %1) {
 ; ARM64-LABEL: <smul_i32_1>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    smull x0, w0, w1
 ; ARM64-NEXT:    cmp x0, w0, sxtw
 ; ARM64-NEXT:    mov w1, w0
@@ -476,8 +428,6 @@ define i64 @smul_i64_0(i64 %0, i64 %1) {
 ; X64-LABEL: <smul_i64_0>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    imul rdi, rsi
 ; X64-NEXT:    seto al
@@ -488,8 +438,6 @@ define i64 @smul_i64_0(i64 %0, i64 %1) {
 ; ARM64-LABEL: <smul_i64_0>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mul x2, x0, x1
 ; ARM64-NEXT:    smulh x0, x0, x1
 ; ARM64-NEXT:    mov x1, x2
@@ -508,8 +456,6 @@ define i1 @smul_i64_1(i64 %0, i64 %1) {
 ; X64-LABEL: <smul_i64_1>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    imul rdi, rsi
 ; X64-NEXT:    seto al
@@ -519,8 +465,6 @@ define i1 @smul_i64_1(i64 %0, i64 %1) {
 ; ARM64-LABEL: <smul_i64_1>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mul x2, x0, x1
 ; ARM64-NEXT:    smulh x0, x0, x1
 ; ARM64-NEXT:    mov x1, x2

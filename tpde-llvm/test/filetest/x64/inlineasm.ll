@@ -8,8 +8,6 @@ define void @inlineasm() {
 ; X64-LABEL: <inlineasm>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
   call void asm "", "~{dirflag},~{fpsr},~{flags}"()

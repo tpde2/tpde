@@ -10,8 +10,6 @@ define void @mul_i8_1(i8 %0) {
 ; X64-LABEL: <mul_i8_1>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov eax, 0x1
 ; X64-NEXT:    imul edi, eax
 ; X64-NEXT:    pop rbp
@@ -20,8 +18,6 @@ define void @mul_i8_1(i8 %0) {
 ; ARM64-LABEL: <mul_i8_1>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov x1, #0x1 // =1
 ; ARM64-NEXT:    mul w1, w1, w0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -35,8 +31,6 @@ define void @mul_i8_-1(i8 %0) {
 ; X64-LABEL: <mul_i8_-1>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov eax, 0xff
 ; X64-NEXT:    imul edi, eax
 ; X64-NEXT:    pop rbp
@@ -45,8 +39,6 @@ define void @mul_i8_-1(i8 %0) {
 ; ARM64-LABEL: <mul_i8_-1>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov x1, #0xff // =255
 ; ARM64-NEXT:    mul w1, w1, w0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -60,8 +52,6 @@ define void @mul_i8_i8(i8 %0, i8 %1) {
 ; X64-LABEL: <mul_i8_i8>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    imul edi, esi
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -69,8 +59,6 @@ define void @mul_i8_i8(i8 %0, i8 %1) {
 ; ARM64-LABEL: <mul_i8_i8>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mul w1, w1, w0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
@@ -83,8 +71,6 @@ define void @mul_i16_1(i16 %0) {
 ; X64-LABEL: <mul_i16_1>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov eax, 0x1
 ; X64-NEXT:    imul edi, eax
 ; X64-NEXT:    pop rbp
@@ -93,8 +79,6 @@ define void @mul_i16_1(i16 %0) {
 ; ARM64-LABEL: <mul_i16_1>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov x1, #0x1 // =1
 ; ARM64-NEXT:    mul w1, w1, w0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -108,8 +92,6 @@ define void @mul_i16_-1(i16 %0) {
 ; X64-LABEL: <mul_i16_-1>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov eax, 0xffff
 ; X64-NEXT:    imul edi, eax
 ; X64-NEXT:    pop rbp
@@ -118,8 +100,6 @@ define void @mul_i16_-1(i16 %0) {
 ; ARM64-LABEL: <mul_i16_-1>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov x1, #0xffff // =65535
 ; ARM64-NEXT:    mul w1, w1, w0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -133,8 +113,6 @@ define void @mul_i16_i16(i16 %0, i16 %1) {
 ; X64-LABEL: <mul_i16_i16>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    imul edi, esi
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -142,8 +120,6 @@ define void @mul_i16_i16(i16 %0, i16 %1) {
 ; ARM64-LABEL: <mul_i16_i16>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mul w1, w1, w0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
@@ -156,8 +132,6 @@ define void @mul_i32_1(i32 %0) {
 ; X64-LABEL: <mul_i32_1>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov eax, 0x1
 ; X64-NEXT:    imul edi, eax
 ; X64-NEXT:    pop rbp
@@ -166,8 +140,6 @@ define void @mul_i32_1(i32 %0) {
 ; ARM64-LABEL: <mul_i32_1>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov x1, #0x1 // =1
 ; ARM64-NEXT:    mul w1, w1, w0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -181,8 +153,6 @@ define void @mul_i32_-1(i32 %0) {
 ; X64-LABEL: <mul_i32_-1>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov eax, 0xffffffff
 ; X64-NEXT:    imul edi, eax
 ; X64-NEXT:    pop rbp
@@ -191,8 +161,6 @@ define void @mul_i32_-1(i32 %0) {
 ; ARM64-LABEL: <mul_i32_-1>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov x1, #0xffffffff // =4294967295
 ; ARM64-NEXT:    mul w1, w1, w0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -206,8 +174,6 @@ define void @mul_i32_i32(i32 %0, i32 %1) {
 ; X64-LABEL: <mul_i32_i32>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    imul edi, esi
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -215,8 +181,6 @@ define void @mul_i32_i32(i32 %0, i32 %1) {
 ; ARM64-LABEL: <mul_i32_i32>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mul w1, w1, w0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
@@ -229,8 +193,6 @@ define void @mul_i37_1(i37 %0) {
 ; X64-LABEL: <mul_i37_1>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov eax, 0x1
 ; X64-NEXT:    imul rdi, rax
 ; X64-NEXT:    pop rbp
@@ -239,8 +201,6 @@ define void @mul_i37_1(i37 %0) {
 ; ARM64-LABEL: <mul_i37_1>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov x1, #0x1 // =1
 ; ARM64-NEXT:    mul x1, x1, x0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -254,8 +214,6 @@ define void @mul_i37_-1(i37 %0) {
 ; X64-LABEL: <mul_i37_-1>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movabs rax, 0x1fffffffff
 ; X64-NEXT:    imul rdi, rax
 ; X64-NEXT:    pop rbp
@@ -264,8 +222,6 @@ define void @mul_i37_-1(i37 %0) {
 ; ARM64-LABEL: <mul_i37_-1>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov x1, #0x1fffffffff // =137438953471
 ; ARM64-NEXT:    mul x1, x1, x0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -279,8 +235,6 @@ define void @mul_i37_i37(i37 %0, i37 %1) {
 ; X64-LABEL: <mul_i37_i37>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    imul rdi, rsi
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -288,8 +242,6 @@ define void @mul_i37_i37(i37 %0, i37 %1) {
 ; ARM64-LABEL: <mul_i37_i37>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mul x1, x1, x0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
@@ -302,8 +254,6 @@ define void @mul_i64_1(i64 %0) {
 ; X64-LABEL: <mul_i64_1>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov eax, 0x1
 ; X64-NEXT:    imul rdi, rax
 ; X64-NEXT:    pop rbp
@@ -312,8 +262,6 @@ define void @mul_i64_1(i64 %0) {
 ; ARM64-LABEL: <mul_i64_1>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov x1, #0x1 // =1
 ; ARM64-NEXT:    mul x1, x1, x0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -327,8 +275,6 @@ define void @mul_i64_-1(i64 %0) {
 ; X64-LABEL: <mul_i64_-1>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov rax, -0x1
 ; X64-NEXT:    imul rdi, rax
 ; X64-NEXT:    pop rbp
@@ -337,8 +283,6 @@ define void @mul_i64_-1(i64 %0) {
 ; ARM64-LABEL: <mul_i64_-1>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov x1, #-0x1 // =-1
 ; ARM64-NEXT:    mul x1, x1, x0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -352,8 +296,6 @@ define void @mul_i64_i64(i64 %0, i64 %1) {
 ; X64-LABEL: <mul_i64_i64>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    imul rdi, rsi
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -361,8 +303,6 @@ define void @mul_i64_i64(i64 %0, i64 %1) {
 ; ARM64-LABEL: <mul_i64_i64>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mul x1, x1, x0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
@@ -375,8 +315,6 @@ define void @mul_i128_1(i128 %0) {
 ; X64-LABEL: <mul_i128_1>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov ecx, 0x1
 ; X64-NEXT:    imul rsi, rcx
 ; X64-NEXT:    mov rax, rcx
@@ -391,8 +329,6 @@ define void @mul_i128_1(i128 %0) {
 ; ARM64-LABEL: <mul_i128_1>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov x2, #0x1 // =1
 ; ARM64-NEXT:    umulh x3, x2, x0
 ; ARM64-NEXT:    madd x3, x2, x1, x3
@@ -410,8 +346,6 @@ define void @mul_i128_1_reorder(i128 %0) {
 ; X64-LABEL: <mul_i128_1_reorder>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov ecx, 0x1
 ; X64-NEXT:    imul rsi, rcx
 ; X64-NEXT:    mov rax, rcx
@@ -426,8 +360,6 @@ define void @mul_i128_1_reorder(i128 %0) {
 ; ARM64-LABEL: <mul_i128_1_reorder>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov x2, #0x1 // =1
 ; ARM64-NEXT:    umulh x3, x2, x0
 ; ARM64-NEXT:    madd x3, x2, x1, x3
@@ -445,8 +377,6 @@ define void @mul_i128_1001_1002(i128 %0) {
 ; X64-LABEL: <mul_i128_1001_1002>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov ecx, 0x1002
 ; X64-NEXT:    imul rsi, rcx
 ; X64-NEXT:    mov rax, rcx
@@ -461,8 +391,6 @@ define void @mul_i128_1001_1002(i128 %0) {
 ; ARM64-LABEL: <mul_i128_1001_1002>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov x2, #0x1002 // =4098
 ; ARM64-NEXT:    umulh x3, x2, x0
 ; ARM64-NEXT:    madd x3, x2, x1, x3
@@ -481,8 +409,6 @@ define void @mul_i128_i128(i128 %0, i128 %1) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    mov qword ptr [rbp - 0x40], rdx
 ; X64-NEXT:    imul rsi, qword ptr [rbp - 0x40]
 ; X64-NEXT:    mov rbx, qword ptr [rbp - 0x40]
@@ -498,8 +424,6 @@ define void @mul_i128_i128(i128 %0, i128 %1) {
 ; ARM64-LABEL: <mul_i128_i128>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    umulh x4, x2, x0
 ; ARM64-NEXT:    madd x4, x2, x1, x4
 ; ARM64-NEXT:    madd x3, x3, x0, x4
@@ -517,8 +441,6 @@ define void @mul_i128_salvage_imm(i128 %0) {
 ; X64-LABEL: <mul_i128_salvage_imm>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov ecx, 0x1
 ; X64-NEXT:    imul rsi, rcx
 ; X64-NEXT:    mov rax, rcx
@@ -533,8 +455,6 @@ define void @mul_i128_salvage_imm(i128 %0) {
 ; ARM64-LABEL: <mul_i128_salvage_imm>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov x2, #0x1 // =1
 ; ARM64-NEXT:    umulh x3, x2, x0
 ; ARM64-NEXT:    madd x3, x2, x1, x3
@@ -553,8 +473,6 @@ define void @mul_i128_salvage_reg(i128 %0, i128 %1) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    mov qword ptr [rbp - 0x40], rdx
 ; X64-NEXT:    imul rsi, qword ptr [rbp - 0x40]
 ; X64-NEXT:    mov rbx, qword ptr [rbp - 0x40]
@@ -570,8 +488,6 @@ define void @mul_i128_salvage_reg(i128 %0, i128 %1) {
 ; ARM64-LABEL: <mul_i128_salvage_reg>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    umulh x4, x2, x0
 ; ARM64-NEXT:    madd x4, x2, x1, x4
 ; ARM64-NEXT:    madd x3, x3, x0, x4
@@ -587,8 +503,6 @@ define void @mul_i64_no_salvage_imm(i64 %0) {
 ; X64-LABEL: <mul_i64_no_salvage_imm>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov rax, rdi
 ; X64-NEXT:    mov ecx, 0x1
 ; X64-NEXT:    imul rax, rcx
@@ -599,13 +513,12 @@ define void @mul_i64_no_salvage_imm(i64 %0) {
 ; ARM64-LABEL: <mul_i64_no_salvage_imm>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov x1, #0x1 // =1
 ; ARM64-NEXT:    mul x1, x1, x0
 ; ARM64-NEXT:    mul x1, x1, x0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
+; ARM64-NEXT:    udf #0x0
   entry:
   %1 = mul nsw i64 %0, 1
   %2 = mul nsw i64 %0, %1
@@ -616,8 +529,6 @@ define void @mul_i64_no_salvage_reg(i64 %0, i64 %1) {
 ; X64-LABEL: <mul_i64_no_salvage_reg>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov rax, rdi
 ; X64-NEXT:    imul rax, rsi
 ; X64-NEXT:    imul rdi, rax
@@ -627,8 +538,6 @@ define void @mul_i64_no_salvage_reg(i64 %0, i64 %1) {
 ; ARM64-LABEL: <mul_i64_no_salvage_reg>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mul x1, x1, x0
 ; ARM64-NEXT:    mul x1, x1, x0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -643,8 +552,6 @@ define void @mul_i37_no_salvage_imm(i37 %0) {
 ; X64-LABEL: <mul_i37_no_salvage_imm>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov rax, rdi
 ; X64-NEXT:    mov ecx, 0x3
 ; X64-NEXT:    imul rax, rcx
@@ -655,13 +562,12 @@ define void @mul_i37_no_salvage_imm(i37 %0) {
 ; ARM64-LABEL: <mul_i37_no_salvage_imm>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov x1, #0x3 // =3
 ; ARM64-NEXT:    mul x1, x1, x0
 ; ARM64-NEXT:    mul x1, x1, x0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
+; ARM64-NEXT:    udf #0x0
 entry:
     %1 = mul i37 %0, 3
     %2 = mul i37 %0, %1
@@ -672,8 +578,6 @@ define void @mul_i37_no_salvage_reg(i37 %0, i37 %1) {
 ; X64-LABEL: <mul_i37_no_salvage_reg>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov rax, rdi
 ; X64-NEXT:    imul rax, rsi
 ; X64-NEXT:    imul rdi, rax
@@ -683,8 +587,6 @@ define void @mul_i37_no_salvage_reg(i37 %0, i37 %1) {
 ; ARM64-LABEL: <mul_i37_no_salvage_reg>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mul x1, x1, x0
 ; ARM64-NEXT:    mul x1, x1, x0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -700,8 +602,6 @@ define void @mul_i128_no_salvage_imm_1(i128 %0) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    mov rcx, rsi
 ; X64-NEXT:    mov ebx, 0x1
 ; X64-NEXT:    imul rcx, rbx
@@ -728,8 +628,6 @@ define void @mul_i128_no_salvage_imm_1(i128 %0) {
 ; ARM64-LABEL: <mul_i128_no_salvage_imm_1>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov x2, #0x1 // =1
 ; ARM64-NEXT:    umulh x3, x2, x0
 ; ARM64-NEXT:    madd x3, x2, x1, x3
@@ -753,8 +651,6 @@ define void @mul_i128_no_salvage_imm_1001_1002(i128 %0) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    mov rcx, rsi
 ; X64-NEXT:    mov ebx, 0x1002
 ; X64-NEXT:    imul rcx, rbx
@@ -781,8 +677,6 @@ define void @mul_i128_no_salvage_imm_1001_1002(i128 %0) {
 ; ARM64-LABEL: <mul_i128_no_salvage_imm_1001_1002>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov x2, #0x1002 // =4098
 ; ARM64-NEXT:    umulh x3, x2, x0
 ; ARM64-NEXT:    madd x3, x2, x1, x3
@@ -806,8 +700,6 @@ define void @mul_i128_no_salvage_reg(i128 %0, i128 %1) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    mov qword ptr [rbp - 0x40], rdx
 ; X64-NEXT:    mov rbx, rsi
 ; X64-NEXT:    imul rbx, qword ptr [rbp - 0x40]
@@ -834,8 +726,6 @@ define void @mul_i128_no_salvage_reg(i128 %0, i128 %1) {
 ; ARM64-LABEL: <mul_i128_no_salvage_reg>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    umulh x4, x2, x0
 ; ARM64-NEXT:    madd x4, x2, x1, x4
 ; ARM64-NEXT:    madd x3, x3, x0, x4

@@ -24,11 +24,11 @@
 ; EH-EMPTY:
 
 define @add1(%a, %b) {
-; EH-LABEL: FDE cie=00000000 pc=00000020...0000003c
+; EH-LABEL: FDE cie=00000000 pc=00000000...00000014
 ; EH-NEXT:   Format:       DWARF32
-; EH-NEXT:   DW_CFA_advance_loc: 4 to 0x24
+; EH-NEXT:   DW_CFA_advance_loc: 4 to 0x4
 ; EH-NEXT:   DW_CFA_def_cfa_offset: +160
-; EH-NEXT:   DW_CFA_advance_loc: 4 to 0x28
+; EH-NEXT:   DW_CFA_advance_loc: 4 to 0x8
 ; EH-NEXT:   DW_CFA_def_cfa_register: W29
 ; EH-NEXT:   DW_CFA_offset: W29 -160
 ; EH-NEXT:   DW_CFA_offset: W30 -152
@@ -38,24 +38,22 @@ define @add1(%a, %b) {
 ; EH-NEXT:   DW_CFA_nop:
 ; EH-EMPTY:
 ; ASM-LABEL: <add1>:
-; ASM:         20: stp x29, x30, [sp, #-0xa0]!
-; ASM-NEXT:    24: mov x29, sp
-; ASM-NEXT:    28: nop
-; ASM-NEXT:    2c: nop
-; ASM-NEXT:    30: add x0, x0, x1
-; ASM-NEXT:    34: ldp x29, x30, [sp], #0xa0
-; ASM-NEXT:    38: ret
+; ASM:         0: stp x29, x30, [sp, #-0xa0]!
+; ASM-NEXT:    4: mov x29, sp
+; ASM-NEXT:    8: add x0, x0, x1
+; ASM-NEXT:    c: ldp x29, x30, [sp], #0xa0
+; ASM-NEXT:    10: ret
 entry:
   %res = add %a, %b
   ret %res
 }
 
 define @add2(%a, %b) {
-; EH-LABEL: FDE cie=00000000 pc=00000050...000001b4
+; EH-LABEL: FDE cie=00000000 pc=00000020...00000180
 ; EH-NEXT: Format:       DWARF32
-; EH-NEXT: DW_CFA_advance_loc: 4 to 0x54
+; EH-NEXT: DW_CFA_advance_loc: 4 to 0x24
 ; EH-NEXT: DW_CFA_def_cfa_offset: +208
-; EH-NEXT: DW_CFA_advance_loc: 24 to 0x6c
+; EH-NEXT: DW_CFA_advance_loc: 24 to 0x3c
 ; EH-NEXT: DW_CFA_def_cfa_register: W29
 ; EH-NEXT: DW_CFA_offset: W29 -208
 ; EH-NEXT: DW_CFA_offset: W30 -200
@@ -71,95 +69,94 @@ define @add2(%a, %b) {
 ; EH-NEXT: DW_CFA_offset: W28 -120
 ; EH-EMPTY:
 ; ASM-LABEL: <add2>:
-; ASM:         50: stp x29, x30, [sp, #-0xd0]!
-; ASM-NEXT:    54: mov x29, sp
-; ASM-NEXT:    58: stp x19, x20, [sp, #0x10]
-; ASM-NEXT:    5c: stp x21, x22, [sp, #0x20]
-; ASM-NEXT:    60: stp x23, x24, [sp, #0x30]
-; ASM-NEXT:    64: stp x25, x26, [sp, #0x40]
-; ASM-NEXT:    68: stp x27, x28, [sp, #0x50]
-; ASM-NEXT:    6c: nop
-; ASM-NEXT:    70: add x2, x0, x1
-; ASM-NEXT:    74: add x3, x0, x1
-; ASM-NEXT:    78: add x4, x0, x1
-; ASM-NEXT:    7c: add x5, x0, x1
-; ASM-NEXT:    80: add x6, x0, x1
-; ASM-NEXT:    84: add x7, x0, x1
-; ASM-NEXT:    88: add x8, x0, x1
-; ASM-NEXT:    8c: add x9, x0, x1
-; ASM-NEXT:    90: add x10, x0, x1
-; ASM-NEXT:    94: add x11, x0, x1
-; ASM-NEXT:    98: add x12, x0, x1
-; ASM-NEXT:    9c: add x13, x0, x1
-; ASM-NEXT:    a0: add x14, x0, x1
-; ASM-NEXT:    a4: add x15, x0, x1
-; ASM-NEXT:    a8: add x18, x0, x1
-; ASM-NEXT:    ac: add x19, x0, x1
-; ASM-NEXT:    b0: add x20, x0, x1
-; ASM-NEXT:    b4: add x21, x0, x1
-; ASM-NEXT:    b8: add x22, x0, x1
-; ASM-NEXT:    bc: add x23, x0, x1
-; ASM-NEXT:    c0: add x24, x0, x1
-; ASM-NEXT:    c4: add x25, x0, x1
-; ASM-NEXT:    c8: add x26, x0, x1
-; ASM-NEXT:    cc: add x27, x0, x1
-; ASM-NEXT:    d0: add x28, x0, x1
-; ASM-NEXT:    d4: add x30, x0, x1
-; ASM-NEXT:    d8: str x2, [x29, #0xa0]
-; ASM-NEXT:    dc: add x2, x0, x1
-; ASM-NEXT:    e0: str x2, [x29, #0xa8]
-; ASM-NEXT:    e4: add x2, x0, x1
-; ASM-NEXT:    e8: str x2, [x29, #0xb0]
-; ASM-NEXT:    ec: add x2, x0, x1
-; ASM-NEXT:    f0: str x2, [x29, #0xb8]
-; ASM-NEXT:    f4: add x2, x0, x1
-; ASM-NEXT:    f8: str x2, [x29, #0xc0]
-; ASM-NEXT:    fc: add x2, x0, x1
-; ASM-NEXT:    100: add x0, x0, x1
-; ASM-NEXT:    104: ldr x1, [x29, #0xa0]
-; ASM-NEXT:    108: add x1, x1, x3
-; ASM-NEXT:    10c: add x1, x1, x4
-; ASM-NEXT:    110: add x1, x1, x5
-; ASM-NEXT:    114: add x1, x1, x6
-; ASM-NEXT:    118: add x1, x1, x7
-; ASM-NEXT:    11c: add x1, x1, x8
-; ASM-NEXT:    120: add x1, x1, x9
-; ASM-NEXT:    124: add x1, x1, x10
-; ASM-NEXT:    128: add x1, x1, x11
-; ASM-NEXT:    12c: add x1, x1, x12
-; ASM-NEXT:    130: add x1, x1, x13
-; ASM-NEXT:    134: add x1, x1, x14
-; ASM-NEXT:    138: add x1, x1, x15
-; ASM-NEXT:    13c: add x1, x1, x18
-; ASM-NEXT:    140: add x1, x1, x19
-; ASM-NEXT:    144: add x1, x1, x20
-; ASM-NEXT:    148: add x1, x1, x21
-; ASM-NEXT:    14c: add x1, x1, x22
-; ASM-NEXT:    150: add x1, x1, x23
-; ASM-NEXT:    154: add x1, x1, x24
-; ASM-NEXT:    158: add x1, x1, x25
-; ASM-NEXT:    15c: add x1, x1, x26
-; ASM-NEXT:    160: add x1, x1, x27
-; ASM-NEXT:    164: add x1, x1, x28
-; ASM-NEXT:    168: add x1, x1, x30
-; ASM-NEXT:    16c: ldr x3, [x29, #0xa8]
-; ASM-NEXT:    170: add x1, x1, x3
-; ASM-NEXT:    174: ldr x3, [x29, #0xb0]
-; ASM-NEXT:    178: add x1, x1, x3
-; ASM-NEXT:    17c: ldr x3, [x29, #0xb8]
-; ASM-NEXT:    180: add x1, x1, x3
-; ASM-NEXT:    184: ldr x3, [x29, #0xc0]
-; ASM-NEXT:    188: add x1, x1, x3
-; ASM-NEXT:    18c: add x1, x1, x2
-; ASM-NEXT:    190: add x1, x1, x0
-; ASM-NEXT:    194: mov x0, x1
-; ASM-NEXT:    198: ldp x19, x20, [sp, #0x10]
-; ASM-NEXT:    19c: ldp x21, x22, [sp, #0x20]
-; ASM-NEXT:    1a0: ldp x23, x24, [sp, #0x30]
-; ASM-NEXT:    1a4: ldp x25, x26, [sp, #0x40]
-; ASM-NEXT:    1a8: ldp x27, x28, [sp, #0x50]
-; ASM-NEXT:    1ac: ldp x29, x30, [sp], #0xd0
-; ASM-NEXT:    1b0: ret
+; ASM:         20: stp x29, x30, [sp, #-0xd0]!
+; ASM-NEXT:    24: mov x29, sp
+; ASM-NEXT:    28: stp x19, x20, [sp, #0x10]
+; ASM-NEXT:    2c: stp x21, x22, [sp, #0x20]
+; ASM-NEXT:    30: stp x23, x24, [sp, #0x30]
+; ASM-NEXT:    34: stp x25, x26, [sp, #0x40]
+; ASM-NEXT:    38: stp x27, x28, [sp, #0x50]
+; ASM-NEXT:    3c: add x2, x0, x1
+; ASM-NEXT:    40: add x3, x0, x1
+; ASM-NEXT:    44: add x4, x0, x1
+; ASM-NEXT:    48: add x5, x0, x1
+; ASM-NEXT:    4c: add x6, x0, x1
+; ASM-NEXT:    50: add x7, x0, x1
+; ASM-NEXT:    54: add x8, x0, x1
+; ASM-NEXT:    58: add x9, x0, x1
+; ASM-NEXT:    5c: add x10, x0, x1
+; ASM-NEXT:    60: add x11, x0, x1
+; ASM-NEXT:    64: add x12, x0, x1
+; ASM-NEXT:    68: add x13, x0, x1
+; ASM-NEXT:    6c: add x14, x0, x1
+; ASM-NEXT:    70: add x15, x0, x1
+; ASM-NEXT:    74: add x18, x0, x1
+; ASM-NEXT:    78: add x19, x0, x1
+; ASM-NEXT:    7c: add x20, x0, x1
+; ASM-NEXT:    80: add x21, x0, x1
+; ASM-NEXT:    84: add x22, x0, x1
+; ASM-NEXT:    88: add x23, x0, x1
+; ASM-NEXT:    8c: add x24, x0, x1
+; ASM-NEXT:    90: add x25, x0, x1
+; ASM-NEXT:    94: add x26, x0, x1
+; ASM-NEXT:    98: add x27, x0, x1
+; ASM-NEXT:    9c: add x28, x0, x1
+; ASM-NEXT:    a0: add x30, x0, x1
+; ASM-NEXT:    a4: str x2, [x29, #0xa0]
+; ASM-NEXT:    a8: add x2, x0, x1
+; ASM-NEXT:    ac: str x2, [x29, #0xa8]
+; ASM-NEXT:    b0: add x2, x0, x1
+; ASM-NEXT:    b4: str x2, [x29, #0xb0]
+; ASM-NEXT:    b8: add x2, x0, x1
+; ASM-NEXT:    bc: str x2, [x29, #0xb8]
+; ASM-NEXT:    c0: add x2, x0, x1
+; ASM-NEXT:    c4: str x2, [x29, #0xc0]
+; ASM-NEXT:    c8: add x2, x0, x1
+; ASM-NEXT:    cc: add x0, x0, x1
+; ASM-NEXT:    d0: ldr x1, [x29, #0xa0]
+; ASM-NEXT:    d4: add x1, x1, x3
+; ASM-NEXT:    d8: add x1, x1, x4
+; ASM-NEXT:    dc: add x1, x1, x5
+; ASM-NEXT:    e0: add x1, x1, x6
+; ASM-NEXT:    e4: add x1, x1, x7
+; ASM-NEXT:    e8: add x1, x1, x8
+; ASM-NEXT:    ec: add x1, x1, x9
+; ASM-NEXT:    f0: add x1, x1, x10
+; ASM-NEXT:    f4: add x1, x1, x11
+; ASM-NEXT:    f8: add x1, x1, x12
+; ASM-NEXT:    fc: add x1, x1, x13
+; ASM-NEXT:    100: add x1, x1, x14
+; ASM-NEXT:    104: add x1, x1, x15
+; ASM-NEXT:    108: add x1, x1, x18
+; ASM-NEXT:    10c: add x1, x1, x19
+; ASM-NEXT:    110: add x1, x1, x20
+; ASM-NEXT:    114: add x1, x1, x21
+; ASM-NEXT:    118: add x1, x1, x22
+; ASM-NEXT:    11c: add x1, x1, x23
+; ASM-NEXT:    120: add x1, x1, x24
+; ASM-NEXT:    124: add x1, x1, x25
+; ASM-NEXT:    128: add x1, x1, x26
+; ASM-NEXT:    12c: add x1, x1, x27
+; ASM-NEXT:    130: add x1, x1, x28
+; ASM-NEXT:    134: add x1, x1, x30
+; ASM-NEXT:    138: ldr x3, [x29, #0xa8]
+; ASM-NEXT:    13c: add x1, x1, x3
+; ASM-NEXT:    140: ldr x3, [x29, #0xb0]
+; ASM-NEXT:    144: add x1, x1, x3
+; ASM-NEXT:    148: ldr x3, [x29, #0xb8]
+; ASM-NEXT:    14c: add x1, x1, x3
+; ASM-NEXT:    150: ldr x3, [x29, #0xc0]
+; ASM-NEXT:    154: add x1, x1, x3
+; ASM-NEXT:    158: add x1, x1, x2
+; ASM-NEXT:    15c: add x1, x1, x0
+; ASM-NEXT:    160: mov x0, x1
+; ASM-NEXT:    164: ldp x19, x20, [sp, #0x10]
+; ASM-NEXT:    168: ldp x21, x22, [sp, #0x20]
+; ASM-NEXT:    16c: ldp x23, x24, [sp, #0x30]
+; ASM-NEXT:    170: ldp x25, x26, [sp, #0x40]
+; ASM-NEXT:    174: ldp x27, x28, [sp, #0x50]
+; ASM-NEXT:    178: ldp x29, x30, [sp], #0xd0
+; ASM-NEXT:    17c: ret
 entry:
   %a0 = add %a, %b
   %a1 = add %a, %b

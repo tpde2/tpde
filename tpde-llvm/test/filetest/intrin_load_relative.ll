@@ -9,8 +9,6 @@ define ptr @loadrel_i64(ptr %p, i64 %o) {
 ; X64-LABEL: <loadrel_i64>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movsxd rsi, dword ptr [rdi + rsi]
 ; X64-NEXT:    add rsi, rdi
 ; X64-NEXT:    mov rax, rsi
@@ -20,8 +18,6 @@ define ptr @loadrel_i64(ptr %p, i64 %o) {
 ; ARM64-LABEL: <loadrel_i64>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrsw x1, [x0, x1]
 ; ARM64-NEXT:    add x0, x0, x1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0

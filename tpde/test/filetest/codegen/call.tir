@@ -12,8 +12,6 @@ define @impl_func(%p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov qword ptr [rbp - 0x30], rdi
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    call <L0>
@@ -30,13 +28,11 @@ define @impl_func(%p) {
 ; ARM64-LABEL: <impl_func>:
 ; ARM64:         stp x29, x30, [sp, #-0xb0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    str x0, [x29, #0xa0]
-; ARM64-NEXT:    bl 0x34 <impl_func+0x14>
+; ARM64-NEXT:    bl 0xc <impl_func+0xc>
 ; ARM64-NEXT:     R_AARCH64_CALL26 ext_func2
 ; ARM64-NEXT:    ldr x1, [x29, #0xa0]
-; ARM64-NEXT:    bl 0x3c <impl_func+0x1c>
+; ARM64-NEXT:    bl 0x14 <impl_func+0x14>
 ; ARM64-NEXT:     R_AARCH64_CALL26 ext_func
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret

@@ -14,8 +14,6 @@ define i128 @umul_i128_0(i128 %0, i128 %1) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    mov qword ptr [rbp - 0x40], rdx
 ; X64-NEXT:    test rcx, rcx
 ; X64-NEXT:    setne al
@@ -53,8 +51,6 @@ define i1 @umul_i128_1(i128 %0, i128 %1) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    mov qword ptr [rbp - 0x40], rdx
 ; X64-NEXT:    test rcx, rcx
 ; X64-NEXT:    setne al
@@ -92,8 +88,6 @@ define i128 @smul_i128_0(i128 %0, i128 %1) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    mov qword ptr [rbp - 0x40], rdx
 ; X64-NEXT:    mov rbx, rsi
 ; X64-NEXT:    sar rbx, 0x3f
@@ -148,8 +142,6 @@ define i1 @smul_i128_1(i128 %0, i128 %1) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    mov qword ptr [rbp - 0x40], rdx
 ; X64-NEXT:    mov rbx, rsi
 ; X64-NEXT:    sar rbx, 0x3f

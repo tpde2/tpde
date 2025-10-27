@@ -9,8 +9,6 @@ define i17 @umaxi17(i17 %0, i17 %1) {
 ; X64-LABEL: <umaxi17>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    and edi, 0x1ffff
 ; X64-NEXT:    and esi, 0x1ffff
 ; X64-NEXT:    cmp edi, esi
@@ -22,8 +20,6 @@ define i17 @umaxi17(i17 %0, i17 %1) {
 ; ARM64-LABEL: <umaxi17>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ubfx w0, w0, #0, #17
 ; ARM64-NEXT:    ubfx w1, w1, #0, #17
 ; ARM64-NEXT:    cmp w0, w1
@@ -38,8 +34,6 @@ define i32 @umaxi32(i32 %0, i32 %1) {
 ; X64-LABEL: <umaxi32>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    cmp edi, esi
 ; X64-NEXT:    cmova esi, edi
 ; X64-NEXT:    mov eax, esi
@@ -49,8 +43,6 @@ define i32 @umaxi32(i32 %0, i32 %1) {
 ; ARM64-LABEL: <umaxi32>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    cmp w0, w1
 ; ARM64-NEXT:    csel w0, w0, w1, hi
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -63,8 +55,6 @@ define i37 @umaxi37(i37 %0, i37 %1) {
 ; X64-LABEL: <umaxi37>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movabs rax, 0x1fffffffff
 ; X64-NEXT:    and rdi, rax
 ; X64-NEXT:    movabs rax, 0x1fffffffff
@@ -78,8 +68,6 @@ define i37 @umaxi37(i37 %0, i37 %1) {
 ; ARM64-LABEL: <umaxi37>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ubfx x0, x0, #0, #37
 ; ARM64-NEXT:    ubfx x1, x1, #0, #37
 ; ARM64-NEXT:    cmp x0, x1
@@ -94,8 +82,6 @@ define i64 @umaxi64(i64 %0, i64 %1) {
 ; X64-LABEL: <umaxi64>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    cmp rdi, rsi
 ; X64-NEXT:    cmova rsi, rdi
 ; X64-NEXT:    mov rax, rsi
@@ -105,8 +91,6 @@ define i64 @umaxi64(i64 %0, i64 %1) {
 ; ARM64-LABEL: <umaxi64>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    cmp x0, x1
 ; ARM64-NEXT:    csel x0, x0, x1, hi
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0

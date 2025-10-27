@@ -792,15 +792,12 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::finish_func(
   this->text_writer.eh_writer.data()[fde_prologue_adv_off] =
       dwarf::DW_CFA_advance_loc | (prologue_size - 4);
 
-  // nop out the rest
-  if (u32 nop_len = func_prologue_alloc - prologue_size) {
-    fe64_NOP(write_ptr, nop_len);
-  }
-
   auto func_sym = this->func_syms[func_idx];
   auto func_sec = this->text_writer.get_sec_ref();
   if (func_ret_offs.empty()) {
     // TODO(ts): honor cur_needs_unwind_info
+    this->text_writer.remove_prologue_bytes(
+        func_start_off + prologue_size, func_prologue_alloc - prologue_size);
     auto func_size = this->text_writer.offset() - func_start_off;
     this->assembler.sym_def(func_sym, func_sec, func_start_off, func_size);
     this->text_writer.eh_end_fde();
@@ -859,6 +856,8 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::finish_func(
   // Do sym_def at the very end; we shorten the function here again, so only at
   // this point we know the actual size of the function.
   // TODO(ts): honor cur_needs_unwind_info
+  this->text_writer.remove_prologue_bytes(func_start_off + prologue_size,
+                                          func_prologue_alloc - prologue_size);
   auto func_size = this->text_writer.offset() - func_start_off;
   this->assembler.sym_def(func_sym, func_sec, func_start_off, func_size);
   this->text_writer.eh_end_fde();

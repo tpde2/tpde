@@ -13,8 +13,6 @@ define @arg_special_case(%a!, %b!, %c!, %d!, %e!, %f!) {
 ; X64-LABEL: <arg_special_case>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov r10, rdi
 ; X64-NEXT:    mov rdi, rsi
 ; X64-NEXT:    mov rsi, rdx
@@ -36,8 +34,6 @@ define @arg_special_case(%a!, %b!, %c!, %d!, %e!, %f!) {
 ; ARM64-LABEL: <arg_special_case>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov x9, x0
 ; ARM64-NEXT:    mov x10, x1
 ; ARM64-NEXT:    mov x11, x2
@@ -45,7 +41,7 @@ define @arg_special_case(%a!, %b!, %c!, %d!, %e!, %f!) {
 ; ARM64-NEXT:    mov x2, x4
 ; ARM64-NEXT:    mov x2, x5
 ; ARM64-NEXT:    cmp x9, #0x0
-; ARM64-NEXT:    b.eq 0x84 <arg_special_case+0x64>
+; ARM64-NEXT:    b.eq 0x5c <arg_special_case+0x5c>
 ; ARM64-NEXT:    mov x0, x9
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
@@ -65,8 +61,6 @@ define @fixed_stack_arg(%a, %b, %c, %d, %e, %f, %g!) {
 ; X64-LABEL: <fixed_stack_arg>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov rsi, qword ptr [rbp + 0x10]
 ; X64-NEXT:    test rdi, rdi
 ; X64-NEXT:    je <L0>
@@ -83,11 +77,9 @@ define @fixed_stack_arg(%a, %b, %c, %d, %e, %f, %g!) {
 ; ARM64-LABEL: <fixed_stack_arg>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov x2, x6
 ; ARM64-NEXT:    cmp x0, #0x0
-; ARM64-NEXT:    b.eq 0xfc <fixed_stack_arg+0x4c>
+; ARM64-NEXT:    b.eq 0xb4 <fixed_stack_arg+0x44>
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 ; ARM64-NEXT:     ...
@@ -110,8 +102,6 @@ define @fixed_with_call(%a!) {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
 ; X64-NEXT:    sub rsp, 0x28
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop
 ; X64-NEXT:    mov rbx, rdi
 ; X64-NEXT:    mov rdi, rbx
 ; X64-NEXT:  <L0>:
@@ -126,10 +116,9 @@ define @fixed_with_call(%a!) {
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    str x19, [sp, #0x10]
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov x19, x0
 ; ARM64-NEXT:    mov x0, x19
-; ARM64-NEXT:    bl 0x148 <fixed_with_call+0x18>
+; ARM64-NEXT:    bl 0xd4 <fixed_with_call+0x14>
 ; ARM64-NEXT:     R_AARCH64_CALL26 extern_func
 ; ARM64-NEXT:    ldr x19, [sp, #0x10]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -143,8 +132,6 @@ define @salvage_from_fixed_to_nonfixed(%a!, %b) {
 ; X64-LABEL: <salvage_from_fixed_to_nonfixed>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov r10, rdi
 ; X64-NEXT:    add r10, rsi
 ; X64-NEXT:    test rsi, rsi
@@ -163,13 +150,11 @@ define @salvage_from_fixed_to_nonfixed(%a!, %b) {
 ; ARM64-LABEL: <salvage_from_fixed_to_nonfixed>:
 ; ARM64:         stp x29, x30, [sp, #-0xb0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov x9, x0
 ; ARM64-NEXT:    add x9, x9, x1
 ; ARM64-NEXT:    cmp x1, #0x0
 ; ARM64-NEXT:    str x9, [x29, #0xa0]
-; ARM64-NEXT:    b.eq 0x1d8 <salvage_from_fixed_to_nonfixed+0x58>
+; ARM64-NEXT:    b.eq 0x140 <salvage_from_fixed_to_nonfixed+0x50>
 ; ARM64-NEXT:    mov x0, x9
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
@@ -177,6 +162,7 @@ define @salvage_from_fixed_to_nonfixed(%a!, %b) {
 ; ARM64-NEXT:    ldr x0, [x29, #0xa0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
+; ARM64-NEXT:    udf #0x0
 entry:
   %c = add %a, %b
 
@@ -193,8 +179,6 @@ define @salvage_from_fixed_to_fixed(%a!, %b) {
 ; X64-LABEL: <salvage_from_fixed_to_fixed>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov r10, rdi
 ; X64-NEXT:    lea rdi, [r10 + rsi]
 ; X64-NEXT:    test rsi, rsi
@@ -212,12 +196,10 @@ define @salvage_from_fixed_to_fixed(%a!, %b) {
 ; ARM64-LABEL: <salvage_from_fixed_to_fixed>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov x9, x0
 ; ARM64-NEXT:    add x2, x9, x1
 ; ARM64-NEXT:    cmp x1, #0x0
-; ARM64-NEXT:    b.eq 0x264 <salvage_from_fixed_to_fixed+0x54>
+; ARM64-NEXT:    b.eq 0x19c <salvage_from_fixed_to_fixed+0x4c>
 ; ARM64-NEXT:    mov x0, x2
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
@@ -240,8 +222,6 @@ define @salvage_from_nonfixed_to_fixed(%a, %b) {
 ; X64-LABEL: <salvage_from_nonfixed_to_fixed>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    lea r8, [rdi + rsi]
 ; X64-NEXT:    test rsi, rsi
 ; X64-NEXT:    je <L0>
@@ -258,11 +238,9 @@ define @salvage_from_nonfixed_to_fixed(%a, %b) {
 ; ARM64-LABEL: <salvage_from_nonfixed_to_fixed>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    add x2, x0, x1
 ; ARM64-NEXT:    cmp x1, #0x0
-; ARM64-NEXT:    b.eq 0x2e0 <salvage_from_nonfixed_to_fixed+0x50>
+; ARM64-NEXT:    b.eq 0x1f8 <salvage_from_nonfixed_to_fixed+0x48>
 ; ARM64-NEXT:    mov x0, x2
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret

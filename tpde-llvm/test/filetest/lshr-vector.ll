@@ -9,8 +9,6 @@ define void @lshr_v1i8(ptr %p, ptr %q) {
 ; X64-LABEL: <lshr_v1i8>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movzx eax, byte ptr [rdi]
 ; X64-NEXT:    movzx ecx, byte ptr [rsi]
 ; X64-NEXT:    movzx eax, al
@@ -25,8 +23,6 @@ define void @lshr_v1i8(ptr %p, ptr %q) {
 ; ARM64-LABEL: <lshr_v1i8>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrb w2, [x0]
 ; ARM64-NEXT:    ldrb w3, [x1]
 ; ARM64-NEXT:    uxtb w2, w2
@@ -45,8 +41,6 @@ define void @lshr_v1i8_3(ptr %p) {
 ; X64-LABEL: <lshr_v1i8_3>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movzx eax, byte ptr [rdi]
 ; X64-NEXT:    movzx eax, al
 ; X64-NEXT:    shr eax, 0x3
@@ -57,8 +51,6 @@ define void @lshr_v1i8_3(ptr %p) {
 ; ARM64-LABEL: <lshr_v1i8_3>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrb w1, [x0]
 ; ARM64-NEXT:    uxtb w1, w1
 ; ARM64-NEXT:    lsr w1, w1, #3
@@ -78,8 +70,6 @@ define void @lshr_v5i8(ptr %p, ptr %q) {
 ; X64-NEXT:    push rbx
 ; X64-NEXT:    push r12
 ; X64-NEXT:    push r13
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop
 ; X64-NEXT:    movzx eax, byte ptr [rdi]
 ; X64-NEXT:    movzx ecx, byte ptr [rdi + 0x1]
 ; X64-NEXT:    movzx edx, byte ptr [rdi + 0x2]
@@ -122,8 +112,6 @@ define void @lshr_v5i8(ptr %p, ptr %q) {
 ; ARM64-LABEL: <lshr_v5i8>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrb w2, [x0]
 ; ARM64-NEXT:    ldrb w3, [x0, #0x1]
 ; ARM64-NEXT:    ldrb w4, [x0, #0x2]
@@ -163,8 +151,6 @@ define void @lshr_v5i8_3(ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    movzx eax, byte ptr [rdi]
 ; X64-NEXT:    movzx ecx, byte ptr [rdi + 0x1]
 ; X64-NEXT:    movzx edx, byte ptr [rdi + 0x2]
@@ -192,8 +178,6 @@ define void @lshr_v5i8_3(ptr %p) {
 ; ARM64-LABEL: <lshr_v5i8_3>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrb w1, [x0]
 ; ARM64-NEXT:    ldrb w2, [x0, #0x1]
 ; ARM64-NEXT:    ldrb w3, [x0, #0x2]
@@ -226,8 +210,6 @@ define <8 x i8> @lshr_v8i8(<8 x i8> %a, <8 x i8> %b) {
 ; X64-LABEL: <lshr_v8i8>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    psllw xmm1, 0x5
 ; X64-NEXT:    pxor xmm2, xmm2
 ; X64-NEXT:    pxor xmm3, xmm3
@@ -236,7 +218,7 @@ define <8 x i8> @lshr_v8i8(<8 x i8> %a, <8 x i8> %b) {
 ; X64-NEXT:    pandn xmm4, xmm0
 ; X64-NEXT:    psrlw xmm0, 0x4
 ; X64-NEXT:    pand xmm0, xmm3
-; X64-NEXT:    pand xmm0, xmmword ptr <lshr_v8i8+0x36>
+; X64-NEXT:    pand xmm0, xmmword ptr <lshr_v8i8+0x26>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    por xmm0, xmm4
 ; X64-NEXT:    paddb xmm1, xmm1
@@ -246,7 +228,7 @@ define <8 x i8> @lshr_v8i8(<8 x i8> %a, <8 x i8> %b) {
 ; X64-NEXT:    pandn xmm4, xmm0
 ; X64-NEXT:    psrlw xmm0, 0x2
 ; X64-NEXT:    pand xmm0, xmm3
-; X64-NEXT:    pand xmm0, xmmword ptr <lshr_v8i8+0x5f>
+; X64-NEXT:    pand xmm0, xmmword ptr <lshr_v8i8+0x4f>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    por xmm0, xmm4
 ; X64-NEXT:    paddb xmm1, xmm1
@@ -255,7 +237,7 @@ define <8 x i8> @lshr_v8i8(<8 x i8> %a, <8 x i8> %b) {
 ; X64-NEXT:    pandn xmm1, xmm0
 ; X64-NEXT:    psrlw xmm0, 0x1
 ; X64-NEXT:    pand xmm0, xmm2
-; X64-NEXT:    pand xmm0, xmmword ptr <lshr_v8i8+0x84>
+; X64-NEXT:    pand xmm0, xmmword ptr <lshr_v8i8+0x74>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    por xmm0, xmm1
 ; X64-NEXT:    pop rbp
@@ -264,8 +246,6 @@ define <8 x i8> @lshr_v8i8(<8 x i8> %a, <8 x i8> %b) {
 ; ARM64-LABEL: <lshr_v8i8>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    neg v1.8b, v1.8b
 ; ARM64-NEXT:    ushl v0.8b, v0.8b, v1.8b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -278,8 +258,6 @@ define <8 x i8> @lshr_v8i8_3(<8 x i8> %a) {
 ; X64-LABEL: <lshr_v8i8_3>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movabs rax, 0x303030303030303
 ; X64-NEXT:    movq xmm1, rax
 ; X64-NEXT:    psllw xmm1, 0x5
@@ -290,7 +268,7 @@ define <8 x i8> @lshr_v8i8_3(<8 x i8> %a) {
 ; X64-NEXT:    pandn xmm4, xmm0
 ; X64-NEXT:    psrlw xmm0, 0x4
 ; X64-NEXT:    pand xmm0, xmm3
-; X64-NEXT:    pand xmm0, xmmword ptr <lshr_v8i8_3+0x45>
+; X64-NEXT:    pand xmm0, xmmword ptr <lshr_v8i8_3+0x35>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    por xmm0, xmm4
 ; X64-NEXT:    paddb xmm1, xmm1
@@ -300,7 +278,7 @@ define <8 x i8> @lshr_v8i8_3(<8 x i8> %a) {
 ; X64-NEXT:    pandn xmm4, xmm0
 ; X64-NEXT:    psrlw xmm0, 0x2
 ; X64-NEXT:    pand xmm0, xmm3
-; X64-NEXT:    pand xmm0, xmmword ptr <lshr_v8i8_3+0x6e>
+; X64-NEXT:    pand xmm0, xmmword ptr <lshr_v8i8_3+0x5e>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    por xmm0, xmm4
 ; X64-NEXT:    paddb xmm1, xmm1
@@ -309,7 +287,7 @@ define <8 x i8> @lshr_v8i8_3(<8 x i8> %a) {
 ; X64-NEXT:    pandn xmm1, xmm0
 ; X64-NEXT:    psrlw xmm0, 0x1
 ; X64-NEXT:    pand xmm0, xmm2
-; X64-NEXT:    pand xmm0, xmmword ptr <lshr_v8i8_3+0x93>
+; X64-NEXT:    pand xmm0, xmmword ptr <lshr_v8i8_3+0x83>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    por xmm0, xmm1
 ; X64-NEXT:    pop rbp
@@ -318,13 +296,12 @@ define <8 x i8> @lshr_v8i8_3(<8 x i8> %a) {
 ; ARM64-LABEL: <lshr_v8i8_3>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    movi v1.8b, #0x3
 ; ARM64-NEXT:    neg v1.8b, v1.8b
 ; ARM64-NEXT:    ushl v0.8b, v0.8b, v1.8b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
+; ARM64-NEXT:    udf #0x0
   %r = lshr <8 x i8> %a, <i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3>
   ret <8 x i8> %r
 }
@@ -333,8 +310,6 @@ define <16 x i8> @lshr_v16i8(<16 x i8> %a, <16 x i8> %b) {
 ; X64-LABEL: <lshr_v16i8>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    psllw xmm1, 0x5
 ; X64-NEXT:    pxor xmm2, xmm2
 ; X64-NEXT:    pxor xmm3, xmm3
@@ -343,7 +318,7 @@ define <16 x i8> @lshr_v16i8(<16 x i8> %a, <16 x i8> %b) {
 ; X64-NEXT:    pandn xmm4, xmm0
 ; X64-NEXT:    psrlw xmm0, 0x4
 ; X64-NEXT:    pand xmm0, xmm3
-; X64-NEXT:    pand xmm0, xmmword ptr <lshr_v16i8+0x36>
+; X64-NEXT:    pand xmm0, xmmword ptr <lshr_v16i8+0x26>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    por xmm0, xmm4
 ; X64-NEXT:    paddb xmm1, xmm1
@@ -353,7 +328,7 @@ define <16 x i8> @lshr_v16i8(<16 x i8> %a, <16 x i8> %b) {
 ; X64-NEXT:    pandn xmm4, xmm0
 ; X64-NEXT:    psrlw xmm0, 0x2
 ; X64-NEXT:    pand xmm0, xmm3
-; X64-NEXT:    pand xmm0, xmmword ptr <lshr_v16i8+0x5f>
+; X64-NEXT:    pand xmm0, xmmword ptr <lshr_v16i8+0x4f>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    por xmm0, xmm4
 ; X64-NEXT:    paddb xmm1, xmm1
@@ -362,7 +337,7 @@ define <16 x i8> @lshr_v16i8(<16 x i8> %a, <16 x i8> %b) {
 ; X64-NEXT:    pandn xmm1, xmm0
 ; X64-NEXT:    psrlw xmm0, 0x1
 ; X64-NEXT:    pand xmm0, xmm2
-; X64-NEXT:    pand xmm0, xmmword ptr <lshr_v16i8+0x84>
+; X64-NEXT:    pand xmm0, xmmword ptr <lshr_v16i8+0x74>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    por xmm0, xmm1
 ; X64-NEXT:    pop rbp
@@ -371,8 +346,6 @@ define <16 x i8> @lshr_v16i8(<16 x i8> %a, <16 x i8> %b) {
 ; ARM64-LABEL: <lshr_v16i8>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    neg v1.16b, v1.16b
 ; ARM64-NEXT:    ushl v0.16b, v0.16b, v1.16b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -385,9 +358,7 @@ define <16 x i8> @lshr_v16i8_3(<16 x i8> %a) {
 ; X64-LABEL: <lshr_v16i8_3>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
-; X64-NEXT:    movaps xmm1, xmmword ptr <lshr_v16i8_3+0x13>
+; X64-NEXT:    movaps xmm1, xmmword ptr <lshr_v16i8_3+0x3>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    psllw xmm1, 0x5
 ; X64-NEXT:    pxor xmm2, xmm2
@@ -397,7 +368,7 @@ define <16 x i8> @lshr_v16i8_3(<16 x i8> %a) {
 ; X64-NEXT:    pandn xmm4, xmm0
 ; X64-NEXT:    psrlw xmm0, 0x4
 ; X64-NEXT:    pand xmm0, xmm3
-; X64-NEXT:    pand xmm0, xmmword ptr <lshr_v16i8_3+0x3d>
+; X64-NEXT:    pand xmm0, xmmword ptr <lshr_v16i8_3+0x2d>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    por xmm0, xmm4
 ; X64-NEXT:    paddb xmm1, xmm1
@@ -407,7 +378,7 @@ define <16 x i8> @lshr_v16i8_3(<16 x i8> %a) {
 ; X64-NEXT:    pandn xmm4, xmm0
 ; X64-NEXT:    psrlw xmm0, 0x2
 ; X64-NEXT:    pand xmm0, xmm3
-; X64-NEXT:    pand xmm0, xmmword ptr <lshr_v16i8_3+0x66>
+; X64-NEXT:    pand xmm0, xmmword ptr <lshr_v16i8_3+0x56>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    por xmm0, xmm4
 ; X64-NEXT:    paddb xmm1, xmm1
@@ -416,7 +387,7 @@ define <16 x i8> @lshr_v16i8_3(<16 x i8> %a) {
 ; X64-NEXT:    pandn xmm1, xmm0
 ; X64-NEXT:    psrlw xmm0, 0x1
 ; X64-NEXT:    pand xmm0, xmm2
-; X64-NEXT:    pand xmm0, xmmword ptr <lshr_v16i8_3+0x8b>
+; X64-NEXT:    pand xmm0, xmmword ptr <lshr_v16i8_3+0x7b>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    por xmm0, xmm1
 ; X64-NEXT:    pop rbp
@@ -425,13 +396,12 @@ define <16 x i8> @lshr_v16i8_3(<16 x i8> %a) {
 ; ARM64-LABEL: <lshr_v16i8_3>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    movi v1.16b, #0x3
 ; ARM64-NEXT:    neg v1.16b, v1.16b
 ; ARM64-NEXT:    ushl v0.16b, v0.16b, v1.16b
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
+; ARM64-NEXT:    udf #0x0
   %r = lshr <16 x i8> %a, <i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3, i8 3>
   ret <16 x i8> %r
 }
@@ -440,8 +410,6 @@ define void @lshr_v32i8(ptr %p, ptr %q) {
 ; X64-LABEL: <lshr_v32i8>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movups xmm0, xmmword ptr [rdi]
 ; X64-NEXT:    movups xmm1, xmmword ptr [rdi + 0x10]
 ; X64-NEXT:    movups xmm2, xmmword ptr [rsi]
@@ -454,7 +422,7 @@ define void @lshr_v32i8(ptr %p, ptr %q) {
 ; X64-NEXT:    pandn xmm6, xmm0
 ; X64-NEXT:    psrlw xmm0, 0x4
 ; X64-NEXT:    pand xmm0, xmm5
-; X64-NEXT:    pand xmm0, xmmword ptr <lshr_v32i8+0x44>
+; X64-NEXT:    pand xmm0, xmmword ptr <lshr_v32i8+0x34>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    por xmm0, xmm6
 ; X64-NEXT:    paddb xmm2, xmm2
@@ -464,7 +432,7 @@ define void @lshr_v32i8(ptr %p, ptr %q) {
 ; X64-NEXT:    pandn xmm6, xmm0
 ; X64-NEXT:    psrlw xmm0, 0x2
 ; X64-NEXT:    pand xmm0, xmm5
-; X64-NEXT:    pand xmm0, xmmword ptr <lshr_v32i8+0x6d>
+; X64-NEXT:    pand xmm0, xmmword ptr <lshr_v32i8+0x5d>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    por xmm0, xmm6
 ; X64-NEXT:    paddb xmm2, xmm2
@@ -473,7 +441,7 @@ define void @lshr_v32i8(ptr %p, ptr %q) {
 ; X64-NEXT:    pandn xmm2, xmm0
 ; X64-NEXT:    psrlw xmm0, 0x1
 ; X64-NEXT:    pand xmm0, xmm4
-; X64-NEXT:    pand xmm0, xmmword ptr <lshr_v32i8+0x92>
+; X64-NEXT:    pand xmm0, xmmword ptr <lshr_v32i8+0x82>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    por xmm0, xmm2
 ; X64-NEXT:    psllw xmm3, 0x5
@@ -484,7 +452,7 @@ define void @lshr_v32i8(ptr %p, ptr %q) {
 ; X64-NEXT:    pandn xmm5, xmm1
 ; X64-NEXT:    psrlw xmm1, 0x4
 ; X64-NEXT:    pand xmm1, xmm4
-; X64-NEXT:    pand xmm1, xmmword ptr <lshr_v32i8+0xc0>
+; X64-NEXT:    pand xmm1, xmmword ptr <lshr_v32i8+0xb0>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    por xmm1, xmm5
 ; X64-NEXT:    paddb xmm3, xmm3
@@ -494,7 +462,7 @@ define void @lshr_v32i8(ptr %p, ptr %q) {
 ; X64-NEXT:    pandn xmm5, xmm1
 ; X64-NEXT:    psrlw xmm1, 0x2
 ; X64-NEXT:    pand xmm1, xmm4
-; X64-NEXT:    pand xmm1, xmmword ptr <lshr_v32i8+0xe9>
+; X64-NEXT:    pand xmm1, xmmword ptr <lshr_v32i8+0xd9>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    por xmm1, xmm5
 ; X64-NEXT:    paddb xmm3, xmm3
@@ -503,7 +471,7 @@ define void @lshr_v32i8(ptr %p, ptr %q) {
 ; X64-NEXT:    pandn xmm3, xmm1
 ; X64-NEXT:    psrlw xmm1, 0x1
 ; X64-NEXT:    pand xmm1, xmm2
-; X64-NEXT:    pand xmm1, xmmword ptr <lshr_v32i8+0x10e>
+; X64-NEXT:    pand xmm1, xmmword ptr <lshr_v32i8+0xfe>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    por xmm1, xmm3
 ; X64-NEXT:    movups xmmword ptr [rdi], xmm0
@@ -514,8 +482,6 @@ define void @lshr_v32i8(ptr %p, ptr %q) {
 ; ARM64-LABEL: <lshr_v32i8>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr q0, [x0]
 ; ARM64-NEXT:    ldr q1, [x0, #0x10]
 ; ARM64-NEXT:    ldr q2, [x1]
@@ -539,11 +505,9 @@ define void @lshr_v32i8_3(ptr %p) {
 ; X64-LABEL: <lshr_v32i8_3>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movups xmm0, xmmword ptr [rdi]
 ; X64-NEXT:    movups xmm1, xmmword ptr [rdi + 0x10]
-; X64-NEXT:    movaps xmm2, xmmword ptr <lshr_v32i8_3+0x1a>
+; X64-NEXT:    movaps xmm2, xmmword ptr <lshr_v32i8_3+0xa>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    psllw xmm2, 0x5
 ; X64-NEXT:    pxor xmm3, xmm3
@@ -553,7 +517,7 @@ define void @lshr_v32i8_3(ptr %p) {
 ; X64-NEXT:    pandn xmm5, xmm0
 ; X64-NEXT:    psrlw xmm0, 0x4
 ; X64-NEXT:    pand xmm0, xmm4
-; X64-NEXT:    pand xmm0, xmmword ptr <lshr_v32i8_3+0x44>
+; X64-NEXT:    pand xmm0, xmmword ptr <lshr_v32i8_3+0x34>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    por xmm0, xmm5
 ; X64-NEXT:    paddb xmm2, xmm2
@@ -563,7 +527,7 @@ define void @lshr_v32i8_3(ptr %p) {
 ; X64-NEXT:    pandn xmm5, xmm0
 ; X64-NEXT:    psrlw xmm0, 0x2
 ; X64-NEXT:    pand xmm0, xmm4
-; X64-NEXT:    pand xmm0, xmmword ptr <lshr_v32i8_3+0x6d>
+; X64-NEXT:    pand xmm0, xmmword ptr <lshr_v32i8_3+0x5d>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    por xmm0, xmm5
 ; X64-NEXT:    paddb xmm2, xmm2
@@ -572,10 +536,10 @@ define void @lshr_v32i8_3(ptr %p) {
 ; X64-NEXT:    pandn xmm2, xmm0
 ; X64-NEXT:    psrlw xmm0, 0x1
 ; X64-NEXT:    pand xmm0, xmm3
-; X64-NEXT:    pand xmm0, xmmword ptr <lshr_v32i8_3+0x92>
+; X64-NEXT:    pand xmm0, xmmword ptr <lshr_v32i8_3+0x82>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    por xmm0, xmm2
-; X64-NEXT:    movaps xmm2, xmmword ptr <lshr_v32i8_3+0x9d>
+; X64-NEXT:    movaps xmm2, xmmword ptr <lshr_v32i8_3+0x8d>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    psllw xmm2, 0x5
 ; X64-NEXT:    pxor xmm3, xmm3
@@ -585,7 +549,7 @@ define void @lshr_v32i8_3(ptr %p) {
 ; X64-NEXT:    pandn xmm5, xmm1
 ; X64-NEXT:    psrlw xmm1, 0x4
 ; X64-NEXT:    pand xmm1, xmm4
-; X64-NEXT:    pand xmm1, xmmword ptr <lshr_v32i8_3+0xc7>
+; X64-NEXT:    pand xmm1, xmmword ptr <lshr_v32i8_3+0xb7>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    por xmm1, xmm5
 ; X64-NEXT:    paddb xmm2, xmm2
@@ -595,7 +559,7 @@ define void @lshr_v32i8_3(ptr %p) {
 ; X64-NEXT:    pandn xmm5, xmm1
 ; X64-NEXT:    psrlw xmm1, 0x2
 ; X64-NEXT:    pand xmm1, xmm4
-; X64-NEXT:    pand xmm1, xmmword ptr <lshr_v32i8_3+0xf0>
+; X64-NEXT:    pand xmm1, xmmword ptr <lshr_v32i8_3+0xe0>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    por xmm1, xmm5
 ; X64-NEXT:    paddb xmm2, xmm2
@@ -604,7 +568,7 @@ define void @lshr_v32i8_3(ptr %p) {
 ; X64-NEXT:    pandn xmm2, xmm1
 ; X64-NEXT:    psrlw xmm1, 0x1
 ; X64-NEXT:    pand xmm1, xmm3
-; X64-NEXT:    pand xmm1, xmmword ptr <lshr_v32i8_3+0x115>
+; X64-NEXT:    pand xmm1, xmmword ptr <lshr_v32i8_3+0x105>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    por xmm1, xmm2
 ; X64-NEXT:    movups xmmword ptr [rdi], xmm0
@@ -615,8 +579,6 @@ define void @lshr_v32i8_3(ptr %p) {
 ; ARM64-LABEL: <lshr_v32i8_3>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr q0, [x0]
 ; ARM64-NEXT:    ldr q1, [x0, #0x10]
 ; ARM64-NEXT:    movi v2.16b, #0x3
@@ -639,8 +601,6 @@ define <4 x i16> @lshr_v4i16(<4 x i16> %a, <4 x i16> %b) {
 ; X64-LABEL: <lshr_v4i16>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    psllw xmm1, 0xc
 ; X64-NEXT:    movdqa xmm2, xmm1
 ; X64-NEXT:    psraw xmm2, 0xf
@@ -678,8 +638,6 @@ define <4 x i16> @lshr_v4i16(<4 x i16> %a, <4 x i16> %b) {
 ; ARM64-LABEL: <lshr_v4i16>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    neg v1.4h, v1.4h
 ; ARM64-NEXT:    ushl v0.4h, v0.4h, v1.4h
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -692,8 +650,6 @@ define <4 x i16> @lshr_v4i16_3(<4 x i16> %a) {
 ; X64-LABEL: <lshr_v4i16_3>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movabs rax, 0x3000300030003
 ; X64-NEXT:    movq xmm1, rax
 ; X64-NEXT:    psllw xmm1, 0xc
@@ -733,13 +689,12 @@ define <4 x i16> @lshr_v4i16_3(<4 x i16> %a) {
 ; ARM64-LABEL: <lshr_v4i16_3>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    movi v1.4h, #0x3
 ; ARM64-NEXT:    neg v1.4h, v1.4h
 ; ARM64-NEXT:    ushl v0.4h, v0.4h, v1.4h
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
+; ARM64-NEXT:    udf #0x0
   %r = lshr <4 x i16> %a, <i16 3, i16 3, i16 3, i16 3>
   ret <4 x i16> %r
 }
@@ -748,8 +703,6 @@ define <8 x i16> @lshr_v8i16(<8 x i16> %a, <8 x i16> %b) {
 ; X64-LABEL: <lshr_v8i16>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    psllw xmm1, 0xc
 ; X64-NEXT:    movdqa xmm2, xmm1
 ; X64-NEXT:    psraw xmm2, 0xf
@@ -787,8 +740,6 @@ define <8 x i16> @lshr_v8i16(<8 x i16> %a, <8 x i16> %b) {
 ; ARM64-LABEL: <lshr_v8i16>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    neg v1.8h, v1.8h
 ; ARM64-NEXT:    ushl v0.8h, v0.8h, v1.8h
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -801,9 +752,7 @@ define <8 x i16> @lshr_v8i16_3(<8 x i16> %a) {
 ; X64-LABEL: <lshr_v8i16_3>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
-; X64-NEXT:    movaps xmm1, xmmword ptr <lshr_v8i16_3+0x13>
+; X64-NEXT:    movaps xmm1, xmmword ptr <lshr_v8i16_3+0x3>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    psllw xmm1, 0xc
 ; X64-NEXT:    movdqa xmm2, xmm1
@@ -842,13 +791,12 @@ define <8 x i16> @lshr_v8i16_3(<8 x i16> %a) {
 ; ARM64-LABEL: <lshr_v8i16_3>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    movi v1.8h, #0x3
 ; ARM64-NEXT:    neg v1.8h, v1.8h
 ; ARM64-NEXT:    ushl v0.8h, v0.8h, v1.8h
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
+; ARM64-NEXT:    udf #0x0
   %r = lshr <8 x i16> %a, <i16 3, i16 3, i16 3, i16 3, i16 3, i16 3, i16 3, i16 3>
   ret <8 x i16> %r
 }
@@ -857,8 +805,6 @@ define <2 x i32> @lshr_v2i32(<2 x i32> %a, <2 x i32> %b) {
 ; X64-LABEL: <lshr_v2i32>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pshuflw {{.*#+}} xmm2 = xmm1[2,3,3,3,4,5,6,7]
 ; X64-NEXT:    movapd xmm3, xmm0
 ; X64-NEXT:    shufps {{.*#+}} xmm3 = xmm3[1,1],xmm0[1,1]
@@ -872,8 +818,6 @@ define <2 x i32> @lshr_v2i32(<2 x i32> %a, <2 x i32> %b) {
 ; ARM64-LABEL: <lshr_v2i32>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    neg v1.2s, v1.2s
 ; ARM64-NEXT:    ushl v0.2s, v0.2s, v1.2s
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -886,8 +830,6 @@ define <2 x i32> @lshr_v2i32_3(<2 x i32> %a) {
 ; X64-LABEL: <lshr_v2i32_3>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movabs rax, 0x300000003
 ; X64-NEXT:    movq xmm1, rax
 ; X64-NEXT:    pshuflw {{.*#+}} xmm2 = xmm1[2,3,3,3,4,5,6,7]
@@ -903,13 +845,12 @@ define <2 x i32> @lshr_v2i32_3(<2 x i32> %a) {
 ; ARM64-LABEL: <lshr_v2i32_3>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    movi v1.2s, #0x3
 ; ARM64-NEXT:    neg v1.2s, v1.2s
 ; ARM64-NEXT:    ushl v0.2s, v0.2s, v1.2s
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
+; ARM64-NEXT:    udf #0x0
   %r = lshr <2 x i32> %a, <i32 3, i32 3>
   ret <2 x i32> %r
 }
@@ -918,8 +859,6 @@ define <4 x i32> @lshr_v4i32(<4 x i32> %a, <4 x i32> %b) {
 ; X64-LABEL: <lshr_v4i32>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pshuflw {{.*#+}} xmm2 = xmm1[2,3,3,3,4,5,6,7]
 ; X64-NEXT:    movapd xmm3, xmm0
 ; X64-NEXT:    psrld xmm3, xmm2
@@ -942,8 +881,6 @@ define <4 x i32> @lshr_v4i32(<4 x i32> %a, <4 x i32> %b) {
 ; ARM64-LABEL: <lshr_v4i32>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    neg v1.4s, v1.4s
 ; ARM64-NEXT:    ushl v0.4s, v0.4s, v1.4s
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -956,9 +893,7 @@ define <4 x i32> @lshr_v4i32_3(<4 x i32> %a) {
 ; X64-LABEL: <lshr_v4i32_3>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
-; X64-NEXT:    movaps xmm1, xmmword ptr <lshr_v4i32_3+0x13>
+; X64-NEXT:    movaps xmm1, xmmword ptr <lshr_v4i32_3+0x3>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    pshuflw {{.*#+}} xmm2 = xmm1[2,3,3,3,4,5,6,7]
 ; X64-NEXT:    movapd xmm3, xmm0
@@ -982,13 +917,12 @@ define <4 x i32> @lshr_v4i32_3(<4 x i32> %a) {
 ; ARM64-LABEL: <lshr_v4i32_3>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    movi v1.4s, #0x3
 ; ARM64-NEXT:    neg v1.4s, v1.4s
 ; ARM64-NEXT:    ushl v0.4s, v0.4s, v1.4s
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
+; ARM64-NEXT:    udf #0x0
   %r = lshr <4 x i32> %a, <i32 3, i32 3, i32 3, i32 3>
   ret <4 x i32> %r
 }
@@ -997,8 +931,6 @@ define <2 x i64> @lshr_v2i64(<2 x i64> %a, <2 x i64> %b) {
 ; X64-LABEL: <lshr_v2i64>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movapd xmm2, xmm0
 ; X64-NEXT:    psrlq xmm2, xmm1
 ; X64-NEXT:    pshufd {{.*#+}} xmm1 = xmm1[2,3,2,3]
@@ -1010,8 +942,6 @@ define <2 x i64> @lshr_v2i64(<2 x i64> %a, <2 x i64> %b) {
 ; ARM64-LABEL: <lshr_v2i64>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    neg v1.2d, v1.2d
 ; ARM64-NEXT:    ushl v0.2d, v0.2d, v1.2d
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -1024,10 +954,8 @@ define <2 x i64> @lshr_v2i64_3(<2 x i64> %a) {
 ; X64-LABEL: <lshr_v2i64_3>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movapd xmm1, xmm0
-; X64-NEXT:    movaps xmm2, xmmword ptr <lshr_v2i64_3+0x17>
+; X64-NEXT:    movaps xmm2, xmmword ptr <lshr_v2i64_3+0x7>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    psrlq xmm1, xmm2
 ; X64-NEXT:    pshufd {{.*#+}} xmm2 = xmm2[2,3,2,3]
@@ -1039,9 +967,7 @@ define <2 x i64> @lshr_v2i64_3(<2 x i64> %a) {
 ; ARM64-LABEL: <lshr_v2i64_3>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    adrp x16, 0x0 <.text>
+; ARM64-NEXT:    adrp x16, 0x0 <lshr_v1i8>
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
 ; ARM64-NEXT:    ldr q1, [x16]
 ; ARM64-NEXT:     R_AARCH64_LDST128_ABS_LO12_NC

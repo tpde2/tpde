@@ -11,8 +11,6 @@ define i1 @trunc_i64_i1(i64 %0) {
 ; X64-LABEL: <trunc_i64_i1>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov eax, edi
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -20,8 +18,6 @@ define i1 @trunc_i64_i1(i64 %0) {
 ; ARM64-LABEL: <trunc_i64_i1>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
@@ -33,8 +29,6 @@ define i8 @trunc_i64_i8(i64 %0) {
 ; X64-LABEL: <trunc_i64_i8>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov eax, edi
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -42,8 +36,6 @@ define i8 @trunc_i64_i8(i64 %0) {
 ; ARM64-LABEL: <trunc_i64_i8>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
@@ -55,8 +47,6 @@ define i16 @trunc_i64_i16(i64 %0) {
 ; X64-LABEL: <trunc_i64_i16>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov eax, edi
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -64,8 +54,6 @@ define i16 @trunc_i64_i16(i64 %0) {
 ; ARM64-LABEL: <trunc_i64_i16>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
@@ -77,8 +65,6 @@ define i32 @trunc_i64_i32(i64 %0) {
 ; X64-LABEL: <trunc_i64_i32>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov eax, edi
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -86,8 +72,6 @@ define i32 @trunc_i64_i32(i64 %0) {
 ; ARM64-LABEL: <trunc_i64_i32>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
@@ -99,8 +83,6 @@ define i37 @trunc_i64_i37(i64 %0) {
 ; X64-LABEL: <trunc_i64_i37>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov rax, rdi
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -108,8 +90,6 @@ define i37 @trunc_i64_i37(i64 %0) {
 ; ARM64-LABEL: <trunc_i64_i37>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
@@ -121,8 +101,6 @@ define i64 @trunc_i128_i64(i128 %0) {
 ; X64-LABEL: <trunc_i128_i64>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov rax, rdi
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -130,8 +108,6 @@ define i64 @trunc_i128_i64(i128 %0) {
 ; ARM64-LABEL: <trunc_i128_i64>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
@@ -143,8 +119,6 @@ define i1 @trunc_i64_i37_no_salvage(i64 %0) {
 ; X64-LABEL: <trunc_i64_i37_no_salvage>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov rax, rdi
 ; X64-NEXT:    mov eax, edi
 ; X64-NEXT:    pop rbp
@@ -153,8 +127,6 @@ define i1 @trunc_i64_i37_no_salvage(i64 %0) {
 ; ARM64-LABEL: <trunc_i64_i37_no_salvage>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov x1, x0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret

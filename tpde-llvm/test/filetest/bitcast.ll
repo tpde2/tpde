@@ -10,8 +10,6 @@ define i32 @bitcast_f32_to_i32(float %0) {
 ; X64-LABEL: <bitcast_f32_to_i32>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movd eax, xmm0
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -19,8 +17,6 @@ define i32 @bitcast_f32_to_i32(float %0) {
 ; ARM64-LABEL: <bitcast_f32_to_i32>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fmov w0, s0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
@@ -33,8 +29,6 @@ define float @bitcast_i32_to_f32(i32 %0) {
 ; X64-LABEL: <bitcast_i32_to_f32>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movd xmm0, edi
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -42,8 +36,6 @@ define float @bitcast_i32_to_f32(i32 %0) {
 ; ARM64-LABEL: <bitcast_i32_to_f32>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fmov s0, w0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
@@ -57,8 +49,6 @@ define i64 @bitcast_f64_to_i64(double %0) {
 ; X64-LABEL: <bitcast_f64_to_i64>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movq rax, xmm0
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -66,8 +56,6 @@ define i64 @bitcast_f64_to_i64(double %0) {
 ; ARM64-LABEL: <bitcast_f64_to_i64>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fmov x0, d0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
@@ -80,8 +68,6 @@ define double @bitcast_i64_to_f64(i64 %0) {
 ; X64-LABEL: <bitcast_i64_to_f64>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movq xmm0, rdi
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -89,8 +75,6 @@ define double @bitcast_i64_to_f64(i64 %0) {
 ; ARM64-LABEL: <bitcast_i64_to_f64>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    fmov d0, x0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
@@ -104,16 +88,12 @@ define <4 x float> @bitcast_i8vec_to_f32vec(<16 x i8> %0) {
 ; X64-LABEL: <bitcast_i8vec_to_f32vec>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <bitcast_i8vec_to_f32vec>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
@@ -125,8 +105,6 @@ define void @bitcast_v16i32_v16f32(ptr %src, ptr %dst) {
 ; X64-LABEL: <bitcast_v16i32_v16f32>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movups xmm0, xmmword ptr [rdi]
 ; X64-NEXT:    movups xmm1, xmmword ptr [rdi + 0x10]
 ; X64-NEXT:    movups xmm2, xmmword ptr [rdi + 0x20]
@@ -141,8 +119,6 @@ define void @bitcast_v16i32_v16f32(ptr %src, ptr %dst) {
 ; ARM64-LABEL: <bitcast_v16i32_v16f32>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr q0, [x0]
 ; ARM64-NEXT:    ldr q1, [x0, #0x10]
 ; ARM64-NEXT:    ldr q2, [x0, #0x20]
@@ -163,8 +139,6 @@ define void @bitcast_v24i8_v6f32(ptr %src, ptr %dst) {
 ; X64-LABEL: <bitcast_v24i8_v6f32>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movsd xmm0, qword ptr [rdi]
 ; X64-NEXT:    movsd xmm1, qword ptr [rdi + 0x8]
 ; X64-NEXT:    movsd xmm2, qword ptr [rdi + 0x10]
@@ -177,8 +151,6 @@ define void @bitcast_v24i8_v6f32(ptr %src, ptr %dst) {
 ; ARM64-LABEL: <bitcast_v24i8_v6f32>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr d0, [x0]
 ; ARM64-NEXT:    ldr d1, [x0, #0x8]
 ; ARM64-NEXT:    ldr d2, [x0, #0x10]
@@ -198,8 +170,6 @@ define void @bitcast_v6i8_v3i16(ptr %src, ptr %dst) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    movzx eax, byte ptr [rdi]
 ; X64-NEXT:    movzx ecx, byte ptr [rdi + 0x1]
 ; X64-NEXT:    movzx edx, byte ptr [rdi + 0x2]
@@ -225,8 +195,6 @@ define void @bitcast_v6i8_v3i16(ptr %src, ptr %dst) {
 ; ARM64-LABEL: <bitcast_v6i8_v3i16>:
 ; ARM64:         stp x29, x30, [sp, #-0xb0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrb w2, [x0]
 ; ARM64-NEXT:    ldrb w3, [x0, #0x1]
 ; ARM64-NEXT:    ldrb w4, [x0, #0x2]
@@ -257,8 +225,6 @@ define void @bitcast_v16i1_v2i8(ptr %src, ptr %dst) {
 ; X64-LABEL: <bitcast_v16i1_v2i8>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movzx edi, word ptr [rdi]
 ; X64-NEXT:    mov word ptr [rbp - 0x2a], di
 ; X64-NEXT:    movzx eax, byte ptr [rbp - 0x2a]
@@ -271,8 +237,6 @@ define void @bitcast_v16i1_v2i8(ptr %src, ptr %dst) {
 ; ARM64-LABEL: <bitcast_v16i1_v2i8>:
 ; ARM64:         stp x29, x30, [sp, #-0xb0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrh w0, [x0]
 ; ARM64-NEXT:    strh w0, [x29, #0xa0]
 ; ARM64-NEXT:    ldrb w0, [x29, #0xa0]
@@ -291,8 +255,6 @@ define void @bitcast_v8i1_i8(ptr %src, ptr %dst) {
 ; X64-LABEL: <bitcast_v8i1_i8>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movzx edi, byte ptr [rdi]
 ; X64-NEXT:    mov byte ptr [rsi], dil
 ; X64-NEXT:    pop rbp
@@ -301,8 +263,6 @@ define void @bitcast_v8i1_i8(ptr %src, ptr %dst) {
 ; ARM64-LABEL: <bitcast_v8i1_i8>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrb w0, [x0]
 ; ARM64-NEXT:    strb w0, [x1]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -317,8 +277,6 @@ define void @bitcast_v16i1_i16(ptr %src, ptr %dst) {
 ; X64-LABEL: <bitcast_v16i1_i16>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movzx edi, word ptr [rdi]
 ; X64-NEXT:    mov word ptr [rsi], di
 ; X64-NEXT:    pop rbp
@@ -327,8 +285,6 @@ define void @bitcast_v16i1_i16(ptr %src, ptr %dst) {
 ; ARM64-LABEL: <bitcast_v16i1_i16>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrh w0, [x0]
 ; ARM64-NEXT:    strh w0, [x1]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -343,8 +299,6 @@ define fp128 @bitcast_i128_f128(i128 %a) {
 ; X64-LABEL: <bitcast_i128_f128>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov qword ptr [rbp - 0x40], rdi
 ; X64-NEXT:    mov qword ptr [rbp - 0x38], rsi
 ; X64-NEXT:    movapd xmm0, xmmword ptr [rbp - 0x40]
@@ -354,13 +308,12 @@ define fp128 @bitcast_i128_f128(i128 %a) {
 ; ARM64-LABEL: <bitcast_i128_f128>:
 ; ARM64:         stp x29, x30, [sp, #-0xb0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    str x0, [x29, #0xa0]
 ; ARM64-NEXT:    str x1, [x29, #0xa8]
 ; ARM64-NEXT:    ldr q0, [x29, #0xa0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
+; ARM64-NEXT:    udf #0x0
   %r = bitcast i128 %a to fp128
   ret fp128 %r
 }
@@ -369,8 +322,6 @@ define i128 @bitcast_f128_i128(fp128 %a) {
 ; X64-LABEL: <bitcast_f128_i128>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movapd xmmword ptr [rbp - 0x40], xmm0
 ; X64-NEXT:    mov rax, qword ptr [rbp - 0x40]
 ; X64-NEXT:    mov rdx, qword ptr [rbp - 0x38]
@@ -380,13 +331,12 @@ define i128 @bitcast_f128_i128(fp128 %a) {
 ; ARM64-LABEL: <bitcast_f128_i128>:
 ; ARM64:         stp x29, x30, [sp, #-0xb0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    str q0, [x29, #0xa0]
 ; ARM64-NEXT:    ldr x0, [x29, #0xa0]
 ; ARM64-NEXT:    ldr x1, [x29, #0xa8]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
+; ARM64-NEXT:    udf #0x0
   %r = bitcast fp128 %a to i128
   ret i128 %r
 }
@@ -395,8 +345,6 @@ define i128 @bitcast_f128_v2i64(<2 x i64> %a) {
 ; X64-LABEL: <bitcast_f128_v2i64>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movapd xmmword ptr [rbp - 0x40], xmm0
 ; X64-NEXT:    mov rax, qword ptr [rbp - 0x40]
 ; X64-NEXT:    mov rdx, qword ptr [rbp - 0x38]
@@ -406,8 +354,6 @@ define i128 @bitcast_f128_v2i64(<2 x i64> %a) {
 ; ARM64-LABEL: <bitcast_f128_v2i64>:
 ; ARM64:         stp x29, x30, [sp, #-0xb0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    str q0, [x29, #0xa0]
 ; ARM64-NEXT:    ldr x0, [x29, #0xa0]
 ; ARM64-NEXT:    ldr x1, [x29, #0xa8]

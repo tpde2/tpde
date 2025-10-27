@@ -10,8 +10,6 @@ define i17 @scmpi17(i17 %0, i17 %1) {
 ; X64-LABEL: <scmpi17>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    shl edi, 0xf
 ; X64-NEXT:    sar edi, 0xf
 ; X64-NEXT:    shl esi, 0xf
@@ -27,8 +25,6 @@ define i17 @scmpi17(i17 %0, i17 %1) {
 ; ARM64-LABEL: <scmpi17>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    sbfx w0, w0, #0, #17
 ; ARM64-NEXT:    sbfx w1, w1, #0, #17
 ; ARM64-NEXT:    cmp w0, w1
@@ -38,6 +34,7 @@ define i17 @scmpi17(i17 %0, i17 %1) {
 ; ARM64-NEXT:    mov w0, w1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
+; ARM64-NEXT:    udf #0x0
   %res = call i17 @llvm.scmp(i17 %0, i17 %1)
   ret i17 %res
 }
@@ -46,8 +43,6 @@ define i32 @scmpi32(i32 %0, i32 %1) {
 ; X64-LABEL: <scmpi32>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    cmp edi, esi
 ; X64-NEXT:    setl al
 ; X64-NEXT:    setg cl
@@ -59,8 +54,6 @@ define i32 @scmpi32(i32 %0, i32 %1) {
 ; ARM64-LABEL: <scmpi32>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    cmp w0, w1
 ; ARM64-NEXT:    cset w0, gt
 ; ARM64-NEXT:    csinv w0, w0, wzr, ge
@@ -76,8 +69,6 @@ define i37 @scmpi37(i37 %0, i37 %1) {
 ; X64-LABEL: <scmpi37>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    shl rdi, 0x1b
 ; X64-NEXT:    sar rdi, 0x1b
 ; X64-NEXT:    shl rsi, 0x1b
@@ -93,8 +84,6 @@ define i37 @scmpi37(i37 %0, i37 %1) {
 ; ARM64-LABEL: <scmpi37>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    sbfx x0, x0, #0, #37
 ; ARM64-NEXT:    sbfx x1, x1, #0, #37
 ; ARM64-NEXT:    cmp x0, x1
@@ -104,6 +93,7 @@ define i37 @scmpi37(i37 %0, i37 %1) {
 ; ARM64-NEXT:    mov x0, x1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
+; ARM64-NEXT:    udf #0x0
   %res = call i37 @llvm.scmp(i37 %0, i37 %1)
   ret i37 %res
 }
@@ -112,8 +102,6 @@ define i64 @scmpi64(i64 %0, i64 %1) {
 ; X64-LABEL: <scmpi64>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    cmp rdi, rsi
 ; X64-NEXT:    setl al
 ; X64-NEXT:    setg cl
@@ -125,8 +113,6 @@ define i64 @scmpi64(i64 %0, i64 %1) {
 ; ARM64-LABEL: <scmpi64>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    cmp x0, x1
 ; ARM64-NEXT:    cset w0, gt
 ; ARM64-NEXT:    csinv w0, w0, wzr, ge
@@ -142,8 +128,6 @@ define i32 @scmpi64_32(i64 %0, i64 %1) {
 ; X64-LABEL: <scmpi64_32>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    cmp rdi, rsi
 ; X64-NEXT:    setl al
 ; X64-NEXT:    setg cl
@@ -155,8 +139,6 @@ define i32 @scmpi64_32(i64 %0, i64 %1) {
 ; ARM64-LABEL: <scmpi64_32>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    cmp x0, x1
 ; ARM64-NEXT:    cset w0, gt
 ; ARM64-NEXT:    csinv w0, w0, wzr, ge

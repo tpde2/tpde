@@ -51,9 +51,10 @@ protected:
   u8 *data_cur = nullptr;
   u8 *data_reserve_end = nullptr;
 
-public:
-  u32 func_begin; ///< Begin offset of the current function.
+  u32 func_begin;  ///< Begin offset of the current function.
+  u32 reloc_begin; ///< Begin of relocations for current function.
 
+  u32 label_skew; ///< Offset to subtract from all label offsets.
   /// Label offsets into section, ~0u indicates unplaced label.
   util::SmallVector<u32> label_offsets;
 
@@ -153,6 +154,11 @@ public:
 
   void more_space(size_t size) noexcept;
 
+  /// Remove bytes and adjust labels/relocations accordingly. The covered region
+  /// must be before the first label, i.e., this function can only be used to
+  /// cut out bytes from the function prologue.
+  void remove_prologue_bytes(u32 start, u32 size) noexcept;
+
   void flush() noexcept {
     if (data_cur != data_reserve_end) {
       section->data.resize(offset());
@@ -180,11 +186,12 @@ public:
 
   u32 label_offset(Label label) const noexcept {
     assert(!label_is_pending(label));
-    return label_offsets[u32(label)];
+    return label_offsets[u32(label)] - label_skew;
   }
 
   /// Place unplaced label at the specified offset inside the section.
   void label_place(Label label, u32 off) noexcept {
+    assert(label_skew == 0 && "label_place called after prologue truncation");
     assert(label_is_pending(label));
     label_offsets[u32(label)] = off;
   }

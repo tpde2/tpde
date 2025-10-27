@@ -9,8 +9,6 @@ define void @load_v1i8(ptr %p) {
 ; X64-LABEL: <load_v1i8>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movzx eax, byte ptr [rdi]
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -18,8 +16,6 @@ define void @load_v1i8(ptr %p) {
 ; ARM64-LABEL: <load_v1i8>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrb w1, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
@@ -31,8 +27,6 @@ define void @load_v1i16(ptr %p) {
 ; X64-LABEL: <load_v1i16>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movzx eax, word ptr [rdi]
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -40,8 +34,6 @@ define void @load_v1i16(ptr %p) {
 ; ARM64-LABEL: <load_v1i16>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrh w1, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
@@ -53,8 +45,6 @@ define void @load_v1i32(ptr %p) {
 ; X64-LABEL: <load_v1i32>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov eax, dword ptr [rdi]
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -62,8 +52,6 @@ define void @load_v1i32(ptr %p) {
 ; ARM64-LABEL: <load_v1i32>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr w1, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
@@ -75,8 +63,6 @@ define void @load_v1i64(ptr %p) {
 ; X64-LABEL: <load_v1i64>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov rax, qword ptr [rdi]
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -84,8 +70,6 @@ define void @load_v1i64(ptr %p) {
 ; ARM64-LABEL: <load_v1i64>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr x1, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
@@ -97,8 +81,6 @@ define void @load_v1ptr(ptr %p) {
 ; X64-LABEL: <load_v1ptr>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov rax, qword ptr [rdi]
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -106,8 +88,6 @@ define void @load_v1ptr(ptr %p) {
 ; ARM64-LABEL: <load_v1ptr>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr x1, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
@@ -119,8 +99,6 @@ define void @load_v1f32(ptr %p) {
 ; X64-LABEL: <load_v1f32>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movss xmm0, dword ptr [rdi]
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -128,8 +106,6 @@ define void @load_v1f32(ptr %p) {
 ; ARM64-LABEL: <load_v1f32>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr s0, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
@@ -141,8 +117,6 @@ define void @load_v1f64(ptr %p) {
 ; X64-LABEL: <load_v1f64>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movsd xmm0, qword ptr [rdi]
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -150,8 +124,6 @@ define void @load_v1f64(ptr %p) {
 ; ARM64-LABEL: <load_v1f64>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr d0, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
@@ -163,8 +135,6 @@ define void @load_v2i8(ptr %p) {
 ; X64-LABEL: <load_v2i8>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movzx eax, byte ptr [rdi]
 ; X64-NEXT:    movzx ecx, byte ptr [rdi + 0x1]
 ; X64-NEXT:    pop rbp
@@ -173,8 +143,6 @@ define void @load_v2i8(ptr %p) {
 ; ARM64-LABEL: <load_v2i8>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrb w1, [x0]
 ; ARM64-NEXT:    ldrb w2, [x0, #0x1]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -187,8 +155,6 @@ define void @load_v2i16(ptr %p) {
 ; X64-LABEL: <load_v2i16>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movzx eax, word ptr [rdi]
 ; X64-NEXT:    movzx ecx, word ptr [rdi + 0x2]
 ; X64-NEXT:    pop rbp
@@ -197,8 +163,6 @@ define void @load_v2i16(ptr %p) {
 ; ARM64-LABEL: <load_v2i16>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrh w1, [x0]
 ; ARM64-NEXT:    ldrh w2, [x0, #0x2]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -211,8 +175,6 @@ define void @load_v2i32(ptr %p) {
 ; X64-LABEL: <load_v2i32>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movsd xmm0, qword ptr [rdi]
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -220,8 +182,6 @@ define void @load_v2i32(ptr %p) {
 ; ARM64-LABEL: <load_v2i32>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr d0, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
@@ -233,8 +193,6 @@ define void @load_v2i64(ptr %p) {
 ; X64-LABEL: <load_v2i64>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movups xmm0, xmmword ptr [rdi]
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -242,8 +200,6 @@ define void @load_v2i64(ptr %p) {
 ; ARM64-LABEL: <load_v2i64>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr q0, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
@@ -255,8 +211,6 @@ define <2 x ptr> @load_v2ptr(ptr %p) {
 ; X64-LABEL: <load_v2ptr>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movups xmm0, xmmword ptr [rdi]
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -264,8 +218,6 @@ define <2 x ptr> @load_v2ptr(ptr %p) {
 ; ARM64-LABEL: <load_v2ptr>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr q0, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
@@ -277,8 +229,6 @@ define void @load_v2f32(ptr %p) {
 ; X64-LABEL: <load_v2f32>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movsd xmm0, qword ptr [rdi]
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -286,8 +236,6 @@ define void @load_v2f32(ptr %p) {
 ; ARM64-LABEL: <load_v2f32>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr d0, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
@@ -299,8 +247,6 @@ define void @load_v2f64(ptr %p) {
 ; X64-LABEL: <load_v2f64>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movups xmm0, xmmword ptr [rdi]
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -308,8 +254,6 @@ define void @load_v2f64(ptr %p) {
 ; ARM64-LABEL: <load_v2f64>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr q0, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
@@ -321,8 +265,6 @@ define void @load_v3i8(ptr %p) {
 ; X64-LABEL: <load_v3i8>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movzx eax, byte ptr [rdi]
 ; X64-NEXT:    movzx ecx, byte ptr [rdi + 0x1]
 ; X64-NEXT:    movzx edx, byte ptr [rdi + 0x2]
@@ -332,13 +274,12 @@ define void @load_v3i8(ptr %p) {
 ; ARM64-LABEL: <load_v3i8>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrb w1, [x0]
 ; ARM64-NEXT:    ldrb w2, [x0, #0x1]
 ; ARM64-NEXT:    ldrb w3, [x0, #0x2]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
+; ARM64-NEXT:    udf #0x0
   %l = load volatile <3 x i8>, ptr %p
   ret void
 }
@@ -347,8 +288,6 @@ define void @load_v3i16(ptr %p) {
 ; X64-LABEL: <load_v3i16>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movzx eax, word ptr [rdi]
 ; X64-NEXT:    movzx ecx, word ptr [rdi + 0x2]
 ; X64-NEXT:    movzx edx, word ptr [rdi + 0x4]
@@ -358,13 +297,12 @@ define void @load_v3i16(ptr %p) {
 ; ARM64-LABEL: <load_v3i16>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrh w1, [x0]
 ; ARM64-NEXT:    ldrh w2, [x0, #0x2]
 ; ARM64-NEXT:    ldrh w3, [x0, #0x4]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
+; ARM64-NEXT:    udf #0x0
   %l = load volatile <3 x i16>, ptr %p
   ret void
 }
@@ -373,8 +311,6 @@ define void @load_v3i32(ptr %p) {
 ; X64-LABEL: <load_v3i32>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov eax, dword ptr [rdi]
 ; X64-NEXT:    mov ecx, dword ptr [rdi + 0x4]
 ; X64-NEXT:    mov edx, dword ptr [rdi + 0x8]
@@ -384,13 +320,12 @@ define void @load_v3i32(ptr %p) {
 ; ARM64-LABEL: <load_v3i32>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr w1, [x0]
 ; ARM64-NEXT:    ldr w2, [x0, #0x4]
 ; ARM64-NEXT:    ldr w3, [x0, #0x8]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
+; ARM64-NEXT:    udf #0x0
   %l = load volatile <3 x i32>, ptr %p
   ret void
 }
@@ -399,8 +334,6 @@ define void @load_v3i64(ptr %p) {
 ; X64-LABEL: <load_v3i64>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov rax, qword ptr [rdi]
 ; X64-NEXT:    mov rcx, qword ptr [rdi + 0x8]
 ; X64-NEXT:    mov rdx, qword ptr [rdi + 0x10]
@@ -410,13 +343,12 @@ define void @load_v3i64(ptr %p) {
 ; ARM64-LABEL: <load_v3i64>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr x1, [x0]
 ; ARM64-NEXT:    ldr x2, [x0, #0x8]
 ; ARM64-NEXT:    ldr x3, [x0, #0x10]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
+; ARM64-NEXT:    udf #0x0
   %l = load volatile <3 x i64>, ptr %p
   ret void
 }
@@ -425,8 +357,6 @@ define void @load_v3ptr(ptr %p) {
 ; X64-LABEL: <load_v3ptr>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov rax, qword ptr [rdi]
 ; X64-NEXT:    mov rcx, qword ptr [rdi + 0x8]
 ; X64-NEXT:    mov rdx, qword ptr [rdi + 0x10]
@@ -436,13 +366,12 @@ define void @load_v3ptr(ptr %p) {
 ; ARM64-LABEL: <load_v3ptr>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr x1, [x0]
 ; ARM64-NEXT:    ldr x2, [x0, #0x8]
 ; ARM64-NEXT:    ldr x3, [x0, #0x10]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
+; ARM64-NEXT:    udf #0x0
   %l = load volatile <3 x ptr>, ptr %p
   ret void
 }
@@ -451,8 +380,6 @@ define void @load_v3f32(ptr %p) {
 ; X64-LABEL: <load_v3f32>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movss xmm0, dword ptr [rdi]
 ; X64-NEXT:    movss xmm1, dword ptr [rdi + 0x4]
 ; X64-NEXT:    movss xmm2, dword ptr [rdi + 0x8]
@@ -462,13 +389,12 @@ define void @load_v3f32(ptr %p) {
 ; ARM64-LABEL: <load_v3f32>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr s0, [x0]
 ; ARM64-NEXT:    ldr s1, [x0, #0x4]
 ; ARM64-NEXT:    ldr s2, [x0, #0x8]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
+; ARM64-NEXT:    udf #0x0
   %l = load volatile <3 x float>, ptr %p
   ret void
 }
@@ -477,8 +403,6 @@ define void @load_v3f64(ptr %p) {
 ; X64-LABEL: <load_v3f64>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movsd xmm0, qword ptr [rdi]
 ; X64-NEXT:    movsd xmm1, qword ptr [rdi + 0x8]
 ; X64-NEXT:    movsd xmm2, qword ptr [rdi + 0x10]
@@ -488,13 +412,12 @@ define void @load_v3f64(ptr %p) {
 ; ARM64-LABEL: <load_v3f64>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr d0, [x0]
 ; ARM64-NEXT:    ldr d1, [x0, #0x8]
 ; ARM64-NEXT:    ldr d2, [x0, #0x10]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
+; ARM64-NEXT:    udf #0x0
   %l = load volatile <3 x double>, ptr %p
   ret void
 }
@@ -504,8 +427,6 @@ define void @load_v4i8(ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    movzx eax, byte ptr [rdi]
 ; X64-NEXT:    movzx ecx, byte ptr [rdi + 0x1]
 ; X64-NEXT:    movzx edx, byte ptr [rdi + 0x2]
@@ -517,8 +438,6 @@ define void @load_v4i8(ptr %p) {
 ; ARM64-LABEL: <load_v4i8>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrb w1, [x0]
 ; ARM64-NEXT:    ldrb w2, [x0, #0x1]
 ; ARM64-NEXT:    ldrb w3, [x0, #0x2]
@@ -533,8 +452,6 @@ define void @load_v4i16(ptr %p) {
 ; X64-LABEL: <load_v4i16>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movsd xmm0, qword ptr [rdi]
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -542,8 +459,6 @@ define void @load_v4i16(ptr %p) {
 ; ARM64-LABEL: <load_v4i16>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr d0, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
@@ -555,8 +470,6 @@ define void @load_v4i32(ptr %p) {
 ; X64-LABEL: <load_v4i32>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movups xmm0, xmmword ptr [rdi]
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -564,8 +477,6 @@ define void @load_v4i32(ptr %p) {
 ; ARM64-LABEL: <load_v4i32>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr q0, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
@@ -577,8 +488,6 @@ define void @load_v4i64(ptr %p) {
 ; X64-LABEL: <load_v4i64>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movups xmm0, xmmword ptr [rdi]
 ; X64-NEXT:    movups xmm1, xmmword ptr [rdi + 0x10]
 ; X64-NEXT:    pop rbp
@@ -587,8 +496,6 @@ define void @load_v4i64(ptr %p) {
 ; ARM64-LABEL: <load_v4i64>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr q0, [x0]
 ; ARM64-NEXT:    ldr q1, [x0, #0x10]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -601,8 +508,6 @@ define void @load_v4ptr(ptr %p) {
 ; X64-LABEL: <load_v4ptr>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movups xmm0, xmmword ptr [rdi]
 ; X64-NEXT:    movups xmm1, xmmword ptr [rdi + 0x10]
 ; X64-NEXT:    pop rbp
@@ -611,8 +516,6 @@ define void @load_v4ptr(ptr %p) {
 ; ARM64-LABEL: <load_v4ptr>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr q0, [x0]
 ; ARM64-NEXT:    ldr q1, [x0, #0x10]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -625,8 +528,6 @@ define void @load_v4f32(ptr %p) {
 ; X64-LABEL: <load_v4f32>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movups xmm0, xmmword ptr [rdi]
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -634,8 +535,6 @@ define void @load_v4f32(ptr %p) {
 ; ARM64-LABEL: <load_v4f32>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr q0, [x0]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
@@ -647,8 +546,6 @@ define void @load_v4f64(ptr %p) {
 ; X64-LABEL: <load_v4f64>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movups xmm0, xmmword ptr [rdi]
 ; X64-NEXT:    movups xmm1, xmmword ptr [rdi + 0x10]
 ; X64-NEXT:    pop rbp
@@ -657,8 +554,6 @@ define void @load_v4f64(ptr %p) {
 ; ARM64-LABEL: <load_v4f64>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr q0, [x0]
 ; ARM64-NEXT:    ldr q1, [x0, #0x10]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -671,8 +566,6 @@ define void @load_v64i8(ptr %p) {
 ; X64-LABEL: <load_v64i8>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movups xmm0, xmmword ptr [rdi]
 ; X64-NEXT:    movups xmm1, xmmword ptr [rdi + 0x10]
 ; X64-NEXT:    movups xmm2, xmmword ptr [rdi + 0x20]
@@ -683,8 +576,6 @@ define void @load_v64i8(ptr %p) {
 ; ARM64-LABEL: <load_v64i8>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr q0, [x0]
 ; ARM64-NEXT:    ldr q1, [x0, #0x10]
 ; ARM64-NEXT:    ldr q2, [x0, #0x20]
@@ -699,8 +590,6 @@ define void @load_v64i16(ptr %p) {
 ; X64-LABEL: <load_v64i16>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movups xmm0, xmmword ptr [rdi]
 ; X64-NEXT:    movups xmm1, xmmword ptr [rdi + 0x10]
 ; X64-NEXT:    movups xmm2, xmmword ptr [rdi + 0x20]
@@ -715,8 +604,6 @@ define void @load_v64i16(ptr %p) {
 ; ARM64-LABEL: <load_v64i16>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr q0, [x0]
 ; ARM64-NEXT:    ldr q1, [x0, #0x10]
 ; ARM64-NEXT:    ldr q2, [x0, #0x20]
@@ -735,8 +622,6 @@ define void @load_v64i32(ptr %p) {
 ; X64-LABEL: <load_v64i32>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movups xmm0, xmmword ptr [rdi]
 ; X64-NEXT:    movups xmm1, xmmword ptr [rdi + 0x10]
 ; X64-NEXT:    movups xmm2, xmmword ptr [rdi + 0x20]
@@ -763,8 +648,6 @@ define void @load_v64i32(ptr %p) {
 ; ARM64-NEXT:    stp d10, d11, [sp, #0x20]
 ; ARM64-NEXT:    stp d12, d13, [sp, #0x30]
 ; ARM64-NEXT:    stp d14, d15, [sp, #0x40]
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr q0, [x0]
 ; ARM64-NEXT:    ldr q1, [x0, #0x10]
 ; ARM64-NEXT:    ldr q2, [x0, #0x20]
@@ -796,7 +679,6 @@ define void @load_v64i64(ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    sub rsp, 0x230
-; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    movups xmm0, xmmword ptr [rdi]
 ; X64-NEXT:    movups xmm1, xmmword ptr [rdi + 0x10]
 ; X64-NEXT:    movups xmm2, xmmword ptr [rdi + 0x20]
@@ -856,8 +738,6 @@ define void @load_v64i64(ptr %p) {
 ; ARM64-NEXT:    stp d10, d11, [sp, #0x20]
 ; ARM64-NEXT:    stp d12, d13, [sp, #0x30]
 ; ARM64-NEXT:    stp d14, d15, [sp, #0x40]
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr q0, [x0]
 ; ARM64-NEXT:    ldr q1, [x0, #0x10]
 ; ARM64-NEXT:    ldr q2, [x0, #0x20]
@@ -905,7 +785,6 @@ define void @load_v64ptr(ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    sub rsp, 0x230
-; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    movups xmm0, xmmword ptr [rdi]
 ; X64-NEXT:    movups xmm1, xmmword ptr [rdi + 0x10]
 ; X64-NEXT:    movups xmm2, xmmword ptr [rdi + 0x20]
@@ -965,8 +844,6 @@ define void @load_v64ptr(ptr %p) {
 ; ARM64-NEXT:    stp d10, d11, [sp, #0x20]
 ; ARM64-NEXT:    stp d12, d13, [sp, #0x30]
 ; ARM64-NEXT:    stp d14, d15, [sp, #0x40]
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr q0, [x0]
 ; ARM64-NEXT:    ldr q1, [x0, #0x10]
 ; ARM64-NEXT:    ldr q2, [x0, #0x20]
@@ -1013,8 +890,6 @@ define void @load_v64f32(ptr %p) {
 ; X64-LABEL: <load_v64f32>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movups xmm0, xmmword ptr [rdi]
 ; X64-NEXT:    movups xmm1, xmmword ptr [rdi + 0x10]
 ; X64-NEXT:    movups xmm2, xmmword ptr [rdi + 0x20]
@@ -1041,8 +916,6 @@ define void @load_v64f32(ptr %p) {
 ; ARM64-NEXT:    stp d10, d11, [sp, #0x20]
 ; ARM64-NEXT:    stp d12, d13, [sp, #0x30]
 ; ARM64-NEXT:    stp d14, d15, [sp, #0x40]
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr q0, [x0]
 ; ARM64-NEXT:    ldr q1, [x0, #0x10]
 ; ARM64-NEXT:    ldr q2, [x0, #0x20]
@@ -1074,7 +947,6 @@ define void @load_v64f64(ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    sub rsp, 0x230
-; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    movups xmm0, xmmword ptr [rdi]
 ; X64-NEXT:    movups xmm1, xmmword ptr [rdi + 0x10]
 ; X64-NEXT:    movups xmm2, xmmword ptr [rdi + 0x20]
@@ -1134,8 +1006,6 @@ define void @load_v64f64(ptr %p) {
 ; ARM64-NEXT:    stp d10, d11, [sp, #0x20]
 ; ARM64-NEXT:    stp d12, d13, [sp, #0x30]
 ; ARM64-NEXT:    stp d14, d15, [sp, #0x40]
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr q0, [x0]
 ; ARM64-NEXT:    ldr q1, [x0, #0x10]
 ; ARM64-NEXT:    ldr q2, [x0, #0x20]

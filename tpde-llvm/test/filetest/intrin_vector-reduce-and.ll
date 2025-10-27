@@ -9,8 +9,6 @@ define i8 @vr_and_v1i8(ptr %p) {
 ; X64-LABEL: <vr_and_v1i8>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movzx eax, byte ptr [rdi]
 ; X64-NEXT:    mov ecx, eax
 ; X64-NEXT:    mov eax, ecx
@@ -20,8 +18,6 @@ define i8 @vr_and_v1i8(ptr %p) {
 ; ARM64-LABEL: <vr_and_v1i8>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrb w1, [x0]
 ; ARM64-NEXT:    mov w0, w1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -36,8 +32,6 @@ define i8 @vr_and_v5i8(ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    movzx eax, byte ptr [rdi]
 ; X64-NEXT:    movzx ecx, byte ptr [rdi + 0x1]
 ; X64-NEXT:    movzx edx, byte ptr [rdi + 0x2]
@@ -60,8 +54,6 @@ define i8 @vr_and_v5i8(ptr %p) {
 ; ARM64-LABEL: <vr_and_v5i8>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrb w1, [x0]
 ; ARM64-NEXT:    ldrb w2, [x0, #0x1]
 ; ARM64-NEXT:    ldrb w3, [x0, #0x2]
@@ -87,8 +79,6 @@ define i8 @vr_and_v8i8(ptr %p) {
 ; X64-LABEL: <vr_and_v8i8>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movsd xmm0, qword ptr [rdi]
 ; X64-NEXT:    movq qword ptr [rbp - 0x30], xmm0
 ; X64-NEXT:    movzx eax, byte ptr [rbp - 0x30]
@@ -112,8 +102,6 @@ define i8 @vr_and_v8i8(ptr %p) {
 ; ARM64-LABEL: <vr_and_v8i8>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr d0, [x0]
 ; ARM64-NEXT:    umov w0, v0.b[0]
 ; ARM64-NEXT:    umov w1, v0.b[1]
@@ -142,8 +130,6 @@ define i8 @vr_and_v16i8(ptr %p) {
 ; X64-LABEL: <vr_and_v16i8>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movups xmm0, xmmword ptr [rdi]
 ; X64-NEXT:    movapd xmmword ptr [rbp - 0x40], xmm0
 ; X64-NEXT:    movzx eax, byte ptr [rbp - 0x40]
@@ -183,8 +169,6 @@ define i8 @vr_and_v16i8(ptr %p) {
 ; ARM64-LABEL: <vr_and_v16i8>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr q0, [x0]
 ; ARM64-NEXT:    umov w0, v0.b[0]
 ; ARM64-NEXT:    umov w1, v0.b[1]
@@ -229,8 +213,6 @@ define i8 @vr_and_v32i8(ptr %p) {
 ; X64-LABEL: <vr_and_v32i8>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movups xmm0, xmmword ptr [rdi]
 ; X64-NEXT:    movups xmm1, xmmword ptr [rdi + 0x10]
 ; X64-NEXT:    movapd xmmword ptr [rbp - 0x50], xmm0
@@ -304,8 +286,6 @@ define i8 @vr_and_v32i8(ptr %p) {
 ; ARM64-LABEL: <vr_and_v32i8>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr q0, [x0]
 ; ARM64-NEXT:    ldr q1, [x0, #0x10]
 ; ARM64-NEXT:    umov w0, v0.b[0]
@@ -383,8 +363,6 @@ define i16 @vr_and_v1i16(ptr %p) {
 ; X64-LABEL: <vr_and_v1i16>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movzx eax, word ptr [rdi]
 ; X64-NEXT:    mov ecx, eax
 ; X64-NEXT:    mov eax, ecx
@@ -394,8 +372,6 @@ define i16 @vr_and_v1i16(ptr %p) {
 ; ARM64-LABEL: <vr_and_v1i16>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrh w1, [x0]
 ; ARM64-NEXT:    mov w0, w1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -410,8 +386,6 @@ define i16 @vr_and_v5i16(ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    movzx eax, word ptr [rdi]
 ; X64-NEXT:    movzx ecx, word ptr [rdi + 0x2]
 ; X64-NEXT:    movzx edx, word ptr [rdi + 0x4]
@@ -434,8 +408,6 @@ define i16 @vr_and_v5i16(ptr %p) {
 ; ARM64-LABEL: <vr_and_v5i16>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldrh w1, [x0]
 ; ARM64-NEXT:    ldrh w2, [x0, #0x2]
 ; ARM64-NEXT:    ldrh w3, [x0, #0x4]
@@ -461,8 +433,6 @@ define i16 @vr_and_v8i16(ptr %p) {
 ; X64-LABEL: <vr_and_v8i16>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movups xmm0, xmmword ptr [rdi]
 ; X64-NEXT:    movapd xmmword ptr [rbp - 0x40], xmm0
 ; X64-NEXT:    movzx eax, word ptr [rbp - 0x40]
@@ -486,8 +456,6 @@ define i16 @vr_and_v8i16(ptr %p) {
 ; ARM64-LABEL: <vr_and_v8i16>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr q0, [x0]
 ; ARM64-NEXT:    umov w0, v0.h[0]
 ; ARM64-NEXT:    umov w1, v0.h[1]
@@ -516,8 +484,6 @@ define i16 @vr_and_v16i16(ptr %p) {
 ; X64-LABEL: <vr_and_v16i16>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movups xmm0, xmmword ptr [rdi]
 ; X64-NEXT:    movups xmm1, xmmword ptr [rdi + 0x10]
 ; X64-NEXT:    movapd xmmword ptr [rbp - 0x50], xmm0
@@ -559,8 +525,6 @@ define i16 @vr_and_v16i16(ptr %p) {
 ; ARM64-LABEL: <vr_and_v16i16>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr q0, [x0]
 ; ARM64-NEXT:    ldr q1, [x0, #0x10]
 ; ARM64-NEXT:    umov w0, v0.h[0]
@@ -606,8 +570,6 @@ define i32 @vr_and_v1i32(ptr %p) {
 ; X64-LABEL: <vr_and_v1i32>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov eax, dword ptr [rdi]
 ; X64-NEXT:    mov ecx, eax
 ; X64-NEXT:    mov eax, ecx
@@ -617,8 +579,6 @@ define i32 @vr_and_v1i32(ptr %p) {
 ; ARM64-LABEL: <vr_and_v1i32>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr w1, [x0]
 ; ARM64-NEXT:    mov w0, w1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -632,8 +592,6 @@ define i32 @vr_and_v4i32(ptr %p) {
 ; X64-LABEL: <vr_and_v4i32>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movups xmm0, xmmword ptr [rdi]
 ; X64-NEXT:    movapd xmmword ptr [rbp - 0x40], xmm0
 ; X64-NEXT:    mov eax, dword ptr [rbp - 0x40]
@@ -649,8 +607,6 @@ define i32 @vr_and_v4i32(ptr %p) {
 ; ARM64-LABEL: <vr_and_v4i32>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr q0, [x0]
 ; ARM64-NEXT:    mov w0, v0.s[0]
 ; ARM64-NEXT:    mov w1, v0.s[1]
@@ -672,8 +628,6 @@ define i32 @vr_and_v5i32(ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    mov eax, dword ptr [rdi]
 ; X64-NEXT:    mov ecx, dword ptr [rdi + 0x4]
 ; X64-NEXT:    mov edx, dword ptr [rdi + 0x8]
@@ -696,8 +650,6 @@ define i32 @vr_and_v5i32(ptr %p) {
 ; ARM64-LABEL: <vr_and_v5i32>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr w1, [x0]
 ; ARM64-NEXT:    ldr w2, [x0, #0x4]
 ; ARM64-NEXT:    ldr w3, [x0, #0x8]
@@ -723,8 +675,6 @@ define i32 @vr_and_v8i32(ptr %p) {
 ; X64-LABEL: <vr_and_v8i32>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movups xmm0, xmmword ptr [rdi]
 ; X64-NEXT:    movups xmm1, xmmword ptr [rdi + 0x10]
 ; X64-NEXT:    movapd xmmword ptr [rbp - 0x50], xmm0
@@ -750,8 +700,6 @@ define i32 @vr_and_v8i32(ptr %p) {
 ; ARM64-LABEL: <vr_and_v8i32>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr q0, [x0]
 ; ARM64-NEXT:    ldr q1, [x0, #0x10]
 ; ARM64-NEXT:    mov w0, v0.s[0]
@@ -781,8 +729,6 @@ define i64 @vr_and_v1i64(ptr %p) {
 ; X64-LABEL: <vr_and_v1i64>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    mov rax, qword ptr [rdi]
 ; X64-NEXT:    mov rcx, rax
 ; X64-NEXT:    mov rax, rcx
@@ -792,8 +738,6 @@ define i64 @vr_and_v1i64(ptr %p) {
 ; ARM64-LABEL: <vr_and_v1i64>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr x1, [x0]
 ; ARM64-NEXT:    mov x0, x1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -807,8 +751,6 @@ define i64 @vr_and_v2i64(ptr %p) {
 ; X64-LABEL: <vr_and_v2i64>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    movups xmm0, xmmword ptr [rdi]
 ; X64-NEXT:    movapd xmmword ptr [rbp - 0x40], xmm0
 ; X64-NEXT:    mov rax, qword ptr [rbp - 0x40]
@@ -820,8 +762,6 @@ define i64 @vr_and_v2i64(ptr %p) {
 ; ARM64-LABEL: <vr_and_v2i64>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr q0, [x0]
 ; ARM64-NEXT:    mov x0, v0.d[0]
 ; ARM64-NEXT:    mov x1, v0.d[1]
@@ -839,8 +779,6 @@ define i64 @vr_and_v5i64(ptr %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop word ptr [rax + rax]
 ; X64-NEXT:    mov rax, qword ptr [rdi]
 ; X64-NEXT:    mov rcx, qword ptr [rdi + 0x8]
 ; X64-NEXT:    mov rdx, qword ptr [rdi + 0x10]
@@ -863,8 +801,6 @@ define i64 @vr_and_v5i64(ptr %p) {
 ; ARM64-LABEL: <vr_and_v5i64>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    ldr x1, [x0]
 ; ARM64-NEXT:    ldr x2, [x0, #0x8]
 ; ARM64-NEXT:    ldr x3, [x0, #0x10]

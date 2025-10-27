@@ -126,6 +126,20 @@ public:
     data.resize_uninitialized(data.size() + sizeof(T));
     std::memcpy(data.data() + off, &t, sizeof(T));
   }
+
+  size_t reloc_count() const {
+    assert(!is_virtual);
+    assert(has_relocs);
+    return relocs.size();
+  }
+
+  /// Moves all offsets of relocations backwards by the specified offset.
+  void adjust_relocation_offsets(const size_t reloc_start_off,
+                                 const u32 offset) {
+    for (size_t i = reloc_start_off; i < relocs.size(); i++) {
+      relocs[i].offset -= offset;
+    }
+  }
 };
 
 /// Assembler base class.

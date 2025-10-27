@@ -9,8 +9,6 @@ define @alloca1() {
 ; X64-LABEL: <alloca1>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    lea rax, [rbp - 0x30]
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -18,8 +16,6 @@ define @alloca1() {
 ; ARM64-LABEL: <alloca1>:
 ; ARM64:         stp x29, x30, [sp, #-0xb0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    add x0, x29, #0xa0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
@@ -32,8 +28,6 @@ define @alloca2() {
 ; X64-LABEL: <alloca2>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    lea rax, [rbp - 0x50]
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -41,8 +35,6 @@ define @alloca2() {
 ; ARM64-LABEL: <alloca2>:
 ; ARM64:         stp x29, x30, [sp, #-0xc0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    add x0, x29, #0xa0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xc0
 ; ARM64-NEXT:    ret
@@ -55,8 +47,6 @@ define @alloca3() {
 ; X64-LABEL: <alloca3>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    lea rax, [rbp - 0x50]
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -64,8 +54,6 @@ define @alloca3() {
 ; ARM64-LABEL: <alloca3>:
 ; ARM64:         stp x29, x30, [sp, #-0xc0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    add x0, x29, #0xa0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xc0
 ; ARM64-NEXT:    ret
@@ -79,8 +67,6 @@ define @alloca4() {
 ; X64-LABEL: <alloca4>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    lea rax, [rbp - 0x30]
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -88,8 +74,6 @@ define @alloca4() {
 ; ARM64-LABEL: <alloca4>:
 ; ARM64:         stp x29, x30, [sp, #-0xd0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    add x0, x29, #0xc0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xd0
 ; ARM64-NEXT:    ret
@@ -103,8 +87,6 @@ define @alloca5() {
 ; X64-LABEL: <alloca5>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    lea rax, [rbp - 0x50]
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -112,8 +94,6 @@ define @alloca5() {
 ; ARM64-LABEL: <alloca5>:
 ; ARM64:         stp x29, x30, [sp, #-0xd0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    add x0, x29, #0xa0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xd0
 ; ARM64-NEXT:    ret
@@ -129,8 +109,6 @@ define @alloca6() {
 ; X64-LABEL: <alloca6>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    lea rax, [rbp - 0x29]
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -138,8 +116,6 @@ define @alloca6() {
 ; ARM64-LABEL: <alloca6>:
 ; ARM64:         stp x29, x30, [sp, #-0xb0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    add x0, x29, #0xa0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
@@ -152,8 +128,6 @@ define @alloca7() {
 ; X64-LABEL: <alloca7>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    lea rax, [rbp - 0x2a]
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -161,8 +135,6 @@ define @alloca7() {
 ; ARM64-LABEL: <alloca7>:
 ; ARM64:         stp x29, x30, [sp, #-0xb0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    add x0, x29, #0xa0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
@@ -175,8 +147,6 @@ define @alloca8() {
 ; X64-LABEL: <alloca8>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    lea rax, [rbp - 0x2c]
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -184,8 +154,6 @@ define @alloca8() {
 ; ARM64-LABEL: <alloca8>:
 ; ARM64:         stp x29, x30, [sp, #-0xb0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    add x0, x29, #0xa0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
@@ -198,8 +166,6 @@ define @alloca9() {
 ; X64-LABEL: <alloca9>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    lea rax, [rbp - 0x30]
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -207,8 +173,6 @@ define @alloca9() {
 ; ARM64-LABEL: <alloca9>:
 ; ARM64:         stp x29, x30, [sp, #-0xb0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    add x0, x29, #0xa0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
@@ -221,8 +185,6 @@ define @alloca10() {
 ; X64-LABEL: <alloca10>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    lea rax, [rbp - 0x40]
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -230,8 +192,6 @@ define @alloca10() {
 ; ARM64-LABEL: <alloca10>:
 ; ARM64:         stp x29, x30, [sp, #-0xb0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    add x0, x29, #0xa0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
@@ -245,8 +205,6 @@ define @alloca11() {
 ; X64-LABEL: <alloca11>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    lea rax, [rbp - 0x29]
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -254,8 +212,6 @@ define @alloca11() {
 ; ARM64-LABEL: <alloca11>:
 ; ARM64:         stp x29, x30, [sp, #-0xb0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    add x0, x29, #0xa0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
@@ -269,8 +225,6 @@ define @alloca12() {
 ; X64-LABEL: <alloca12>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    lea rax, [rbp - 0x2a]
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -278,8 +232,6 @@ define @alloca12() {
 ; ARM64-LABEL: <alloca12>:
 ; ARM64:         stp x29, x30, [sp, #-0xb0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    add x0, x29, #0xa1
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
@@ -294,8 +246,6 @@ define @alloca13() {
 ; X64-LABEL: <alloca13>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    lea rax, [rbp - 0x30]
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -303,8 +253,6 @@ define @alloca13() {
 ; ARM64-LABEL: <alloca13>:
 ; ARM64:         stp x29, x30, [sp, #-0xb0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    add x0, x29, #0xa4
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret
@@ -318,8 +266,6 @@ define @alloca14() {
 ; X64-LABEL: <alloca14>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    lea rax, [rbp - 0x2c]
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -327,8 +273,6 @@ define @alloca14() {
 ; ARM64-LABEL: <alloca14>:
 ; ARM64:         stp x29, x30, [sp, #-0xb0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    add x0, x29, #0xa2
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
 ; ARM64-NEXT:    ret

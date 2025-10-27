@@ -10,8 +10,6 @@ define void @free_intrinsics(ptr %p) {
 ; X64-LABEL: <free_intrinsics>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -19,8 +17,6 @@ define void @free_intrinsics(ptr %p) {
 ; ARM64-LABEL: <free_intrinsics>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    mov w0, #0x0 // =0
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret

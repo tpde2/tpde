@@ -9,8 +9,6 @@ define @eq(%a, %b) {
 ; X64-LABEL: <eq>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    cmp rdi, rsi
 ; X64-NEXT:    cmovne rdi, rsi
 ; X64-NEXT:    mov rax, rdi
@@ -20,8 +18,6 @@ define @eq(%a, %b) {
 ; ARM64-LABEL: <eq>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    cmp x0, x1
 ; ARM64-NEXT:    csel x0, x0, x1, eq
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -35,8 +31,6 @@ define @neq(%a, %b) {
 ; X64-LABEL: <neq>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    cmp rdi, rsi
 ; X64-NEXT:    cmove rdi, rsi
 ; X64-NEXT:    mov rax, rdi
@@ -46,8 +40,6 @@ define @neq(%a, %b) {
 ; ARM64-LABEL: <neq>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    cmp x0, x1
 ; ARM64-NEXT:    csel x0, x0, x1, ne
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -61,8 +53,6 @@ define @uge(%a, %b) {
 ; X64-LABEL: <uge>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    cmp rdi, rsi
 ; X64-NEXT:    cmovb rdi, rsi
 ; X64-NEXT:    mov rax, rdi
@@ -72,8 +62,6 @@ define @uge(%a, %b) {
 ; ARM64-LABEL: <uge>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    cmp x0, x1
 ; ARM64-NEXT:    csel x0, x0, x1, hs
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -87,8 +75,6 @@ define @ugt(%a, %b) {
 ; X64-LABEL: <ugt>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    cmp rdi, rsi
 ; X64-NEXT:    cmovbe rdi, rsi
 ; X64-NEXT:    mov rax, rdi
@@ -98,8 +84,6 @@ define @ugt(%a, %b) {
 ; ARM64-LABEL: <ugt>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    cmp x0, x1
 ; ARM64-NEXT:    csel x0, x0, x1, hi
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -113,8 +97,6 @@ define @ule(%a, %b) {
 ; X64-LABEL: <ule>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    cmp rdi, rsi
 ; X64-NEXT:    cmova rdi, rsi
 ; X64-NEXT:    mov rax, rdi
@@ -124,8 +106,6 @@ define @ule(%a, %b) {
 ; ARM64-LABEL: <ule>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    cmp x0, x1
 ; ARM64-NEXT:    csel x0, x0, x1, ls
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -139,8 +119,6 @@ define @ult(%a, %b) {
 ; X64-LABEL: <ult>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    cmp rdi, rsi
 ; X64-NEXT:    cmovae rdi, rsi
 ; X64-NEXT:    mov rax, rdi
@@ -150,8 +128,6 @@ define @ult(%a, %b) {
 ; ARM64-LABEL: <ult>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    cmp x0, x1
 ; ARM64-NEXT:    csel x0, x0, x1, lo
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -165,8 +141,6 @@ define @sge(%a, %b) {
 ; X64-LABEL: <sge>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    cmp rdi, rsi
 ; X64-NEXT:    cmovl rdi, rsi
 ; X64-NEXT:    mov rax, rdi
@@ -176,8 +150,6 @@ define @sge(%a, %b) {
 ; ARM64-LABEL: <sge>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    cmp x0, x1
 ; ARM64-NEXT:    csel x0, x0, x1, ge
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -191,8 +163,6 @@ define @sgt(%a, %b) {
 ; X64-LABEL: <sgt>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    cmp rdi, rsi
 ; X64-NEXT:    cmovle rdi, rsi
 ; X64-NEXT:    mov rax, rdi
@@ -202,8 +172,6 @@ define @sgt(%a, %b) {
 ; ARM64-LABEL: <sgt>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    cmp x0, x1
 ; ARM64-NEXT:    csel x0, x0, x1, gt
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -217,8 +185,6 @@ define @sle(%a, %b) {
 ; X64-LABEL: <sle>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    cmp rdi, rsi
 ; X64-NEXT:    cmovg rdi, rsi
 ; X64-NEXT:    mov rax, rdi
@@ -228,8 +194,6 @@ define @sle(%a, %b) {
 ; ARM64-LABEL: <sle>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    cmp x0, x1
 ; ARM64-NEXT:    csel x0, x0, x1, le
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -243,8 +207,6 @@ define @slt(%a, %b) {
 ; X64-LABEL: <slt>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
 ; X64-NEXT:    cmp rdi, rsi
 ; X64-NEXT:    cmovge rdi, rsi
 ; X64-NEXT:    mov rax, rdi
@@ -254,8 +216,6 @@ define @slt(%a, %b) {
 ; ARM64-LABEL: <slt>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    nop
-; ARM64-NEXT:    nop
 ; ARM64-NEXT:    cmp x0, x1
 ; ARM64-NEXT:    csel x0, x0, x1, lt
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
