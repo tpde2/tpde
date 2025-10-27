@@ -257,9 +257,6 @@ bool generate_inst(std::string &buf,
     } else if (Name == "MEMBARRIER") {
       state.fmt_line(buf, 4, "// MEMBARRIER is a no-op");
       return true;
-    } else {
-      llvm::errs() << "ERROR: unhandled pseudo: " << *inst << "\n";
-      return false;
     }
   }
 

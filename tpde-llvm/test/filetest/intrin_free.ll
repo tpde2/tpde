@@ -27,7 +27,7 @@ define void @free_intrinsics(ptr %p) {
   call void @llvm.donothing()
 ; %a0 = call i32 @llvm.annotation.i32(i32 undef, ptr undef, ptr undef, i32 undef)
   call void @llvm.assume(i1 undef)
-  call void @llvm.assume(i1 undef) ["nonnull"(ptr %p)]
+  call void @llvm.assume(i1 true) ["nonnull"(ptr %p)]
   call void @llvm.experimental.noalias.scope.decl(metadata !4)
   call void @llvm.sideeffect()
   call void @llvm.dbg.assign(metadata ptr undef, metadata !0, metadata !DIExpression(), metadata !10, metadata ptr undef, metadata !DIExpression()), !dbg !8

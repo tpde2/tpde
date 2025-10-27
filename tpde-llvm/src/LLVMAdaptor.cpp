@@ -370,7 +370,11 @@ bool LLVMAdaptor::switch_func(const IRFuncRef function) noexcept {
           auto ins_before = block->getTerminator()->getIterator();
           if (block->begin() != ins_before) {
             // ins_before.getP
+#if LLVM_VERSION_MAJOR >= 22
+            auto *prev_inst = ins_before->getPrevNode();
+#else
             auto *prev_inst = ins_before->getPrevNonDebugInstruction();
+#endif
             if (prev_inst && llvm::isa<llvm::CmpInst>(prev_inst)) {
               // make sure fusing can still happen
               ins_before = prev_inst->getIterator();

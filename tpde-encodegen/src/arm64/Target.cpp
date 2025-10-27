@@ -804,6 +804,9 @@ void EncodingTargetArm64::get_inst_candidates(
   case_default("FNEGv2f32", "FNEG2s");
   case_default("FNEGv4f32", "FNEG4s");
   case_default("FNEGv2f64", "FNEG2d");
+  if (Name == "FMOVS0") {
+    handle_noimm("MOVId", ", 0");
+  }
   if (Name == "MOVIv2d_ns") {
     uint64_t imm = 0;
     unsigned op = mi.getOperand(1).getImm();
