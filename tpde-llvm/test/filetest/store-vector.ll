@@ -14,11 +14,8 @@ define void @store_v1i8(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_v1i8>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    mov x1, #0x7b // =123
+; ARM64:         mov x1, #0x7b // =123
 ; ARM64-NEXT:    strb w1, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   store <1 x i8> <i8 123>, ptr %p
   ret void
@@ -33,11 +30,8 @@ define void @store_v1i16(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_v1i16>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    mov x1, #0x7b // =123
+; ARM64:         mov x1, #0x7b // =123
 ; ARM64-NEXT:    strh w1, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   store <1 x i16> <i16 123>, ptr %p
   ret void
@@ -52,11 +46,8 @@ define void @store_v1i32(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_v1i32>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    mov x1, #0x7b // =123
+; ARM64:         mov x1, #0x7b // =123
 ; ARM64-NEXT:    str w1, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   store <1 x i32> <i32 123>, ptr %p
   ret void
@@ -71,11 +62,8 @@ define void @store_v1i64(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_v1i64>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    mov x1, #0x7b // =123
+; ARM64:         mov x1, #0x7b // =123
 ; ARM64-NEXT:    str x1, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   store <1 x i64> <i64 123>, ptr %p
   ret void
@@ -90,11 +78,8 @@ define void @store_v1ptr(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_v1ptr>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    mov w1, #0x0 // =0
+; ARM64:         mov w1, #0x0 // =0
 ; ARM64-NEXT:    str x1, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   store <1 x ptr> <ptr null>, ptr %p
   ret void
@@ -111,12 +96,9 @@ define void @store_v1f32(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_v1f32>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    mov x16, #0x42800000 // =1115684864
+; ARM64:         mov x16, #0x42800000 // =1115684864
 ; ARM64-NEXT:    fmov s0, w16
 ; ARM64-NEXT:    str s0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   store <1 x float> <float 64.0>, ptr %p
   ret void
@@ -133,12 +115,9 @@ define void @store_v1f64(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_v1f64>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    mov x16, #0x4050000000000000 // =4634204016564240384
+; ARM64:         mov x16, #0x4050000000000000 // =4634204016564240384
 ; ARM64-NEXT:    fmov d0, x16
 ; ARM64-NEXT:    str d0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   store <1 x double> <double 64.0>, ptr %p
   ret void
@@ -154,13 +133,10 @@ define void @store_v2i8(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_v2i8>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    mov x1, #0x7b // =123
+; ARM64:         mov x1, #0x7b // =123
 ; ARM64-NEXT:    strb w1, [x0]
 ; ARM64-NEXT:    mov x1, #0xc // =12
 ; ARM64-NEXT:    strb w1, [x0, #0x1]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   store <2 x i8> <i8 123, i8 12>, ptr %p
   ret void
@@ -176,13 +152,10 @@ define void @store_v2i16(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_v2i16>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    mov x1, #0x7b // =123
+; ARM64:         mov x1, #0x7b // =123
 ; ARM64-NEXT:    strh w1, [x0]
 ; ARM64-NEXT:    mov x1, #0xc // =12
 ; ARM64-NEXT:    strh w1, [x0, #0x2]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   store <2 x i16> <i16 123, i16 12>, ptr %p
   ret void
@@ -199,13 +172,10 @@ define void @store_v2i32(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_v2i32>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    mov x16, #0x7b // =123
+; ARM64:         mov x16, #0x7b // =123
 ; ARM64-NEXT:    movk x16, #0xc, lsl #32
 ; ARM64-NEXT:    fmov d0, x16
 ; ARM64-NEXT:    str d0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   store <2 x i32> <i32 123, i32 12>, ptr %p
   ret void
@@ -222,14 +192,11 @@ define void @store_v2i64(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_v2i64>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    adrp x16, 0x0 <store_v1i8>
+; ARM64:         adrp x16, 0x0 <store_v1i8>
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
 ; ARM64-NEXT:    ldr q0, [x16]
 ; ARM64-NEXT:     R_AARCH64_LDST128_ABS_LO12_NC
 ; ARM64-NEXT:    str q0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   store <2 x i64> <i64 123, i64 12>, ptr %p
   ret void
@@ -245,11 +212,8 @@ define void @store_v2ptr(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_v2ptr>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    movi v0.16b, #0x0
+; ARM64:         movi v0.16b, #0x0
 ; ARM64-NEXT:    str q0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   store <2 x ptr> <ptr null, ptr null>, ptr %p
   ret void
@@ -266,13 +230,10 @@ define void @store_v2f32(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_v2f32>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    mov x16, #0x42800000 // =1115684864
+; ARM64:         mov x16, #0x42800000 // =1115684864
 ; ARM64-NEXT:    movk x16, #0x4280, lsl #48
 ; ARM64-NEXT:    fmov d0, x16
 ; ARM64-NEXT:    str d0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   store <2 x float> <float 64.0, float 64.0>, ptr %p
   ret void
@@ -289,14 +250,11 @@ define void @store_v2f64(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_v2f64>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    adrp x16, 0x0 <store_v1i8>
+; ARM64:         adrp x16, 0x0 <store_v1i8>
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
 ; ARM64-NEXT:    ldr q0, [x16]
 ; ARM64-NEXT:     R_AARCH64_LDST128_ABS_LO12_NC
 ; ARM64-NEXT:    str q0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   store <2 x double> <double 64.0, double 64.0>, ptr %p
   ret void
@@ -313,15 +271,12 @@ define void @store_v3i8(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_v3i8>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    mov w1, #0x0 // =0
+; ARM64:         mov w1, #0x0 // =0
 ; ARM64-NEXT:    strb w1, [x0]
 ; ARM64-NEXT:    mov w1, #0x0 // =0
 ; ARM64-NEXT:    strb w1, [x0, #0x1]
 ; ARM64-NEXT:    mov w1, #0x0 // =0
 ; ARM64-NEXT:    strb w1, [x0, #0x2]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   store <3 x i8> zeroinitializer, ptr %p
   ret void
@@ -338,15 +293,12 @@ define void @store_v3i16(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_v3i16>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    mov w1, #0x0 // =0
+; ARM64:         mov w1, #0x0 // =0
 ; ARM64-NEXT:    strh w1, [x0]
 ; ARM64-NEXT:    mov w1, #0x0 // =0
 ; ARM64-NEXT:    strh w1, [x0, #0x2]
 ; ARM64-NEXT:    mov w1, #0x0 // =0
 ; ARM64-NEXT:    strh w1, [x0, #0x4]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   store <3 x i16> zeroinitializer, ptr %p
   ret void
@@ -363,15 +315,12 @@ define void @store_v3i32(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_v3i32>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    mov w1, #0x0 // =0
+; ARM64:         mov w1, #0x0 // =0
 ; ARM64-NEXT:    str w1, [x0]
 ; ARM64-NEXT:    mov w1, #0x0 // =0
 ; ARM64-NEXT:    str w1, [x0, #0x4]
 ; ARM64-NEXT:    mov w1, #0x0 // =0
 ; ARM64-NEXT:    str w1, [x0, #0x8]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   store <3 x i32> zeroinitializer, ptr %p
   ret void
@@ -388,15 +337,12 @@ define void @store_v3i64(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_v3i64>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    mov w1, #0x0 // =0
+; ARM64:         mov w1, #0x0 // =0
 ; ARM64-NEXT:    str x1, [x0]
 ; ARM64-NEXT:    mov w1, #0x0 // =0
 ; ARM64-NEXT:    str x1, [x0, #0x8]
 ; ARM64-NEXT:    mov w1, #0x0 // =0
 ; ARM64-NEXT:    str x1, [x0, #0x10]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   store <3 x i64> zeroinitializer, ptr %p
   ret void
@@ -413,15 +359,12 @@ define void @store_v3ptr(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_v3ptr>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    mov w1, #0x0 // =0
+; ARM64:         mov w1, #0x0 // =0
 ; ARM64-NEXT:    str x1, [x0]
 ; ARM64-NEXT:    mov w1, #0x0 // =0
 ; ARM64-NEXT:    str x1, [x0, #0x8]
 ; ARM64-NEXT:    mov w1, #0x0 // =0
 ; ARM64-NEXT:    str x1, [x0, #0x10]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   store <3 x ptr> zeroinitializer, ptr %p
   ret void
@@ -441,15 +384,12 @@ define void @store_v3f32(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_v3f32>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    movi v0.8b, #0x0
+; ARM64:         movi v0.8b, #0x0
 ; ARM64-NEXT:    str s0, [x0]
 ; ARM64-NEXT:    movi v0.8b, #0x0
 ; ARM64-NEXT:    str s0, [x0, #0x4]
 ; ARM64-NEXT:    movi v0.8b, #0x0
 ; ARM64-NEXT:    str s0, [x0, #0x8]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   store <3 x float> zeroinitializer, ptr %p
   ret void
@@ -469,15 +409,12 @@ define void @store_v3f64(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_v3f64>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    movi v0.8b, #0x0
+; ARM64:         movi v0.8b, #0x0
 ; ARM64-NEXT:    str d0, [x0]
 ; ARM64-NEXT:    movi v0.8b, #0x0
 ; ARM64-NEXT:    str d0, [x0, #0x8]
 ; ARM64-NEXT:    movi v0.8b, #0x0
 ; ARM64-NEXT:    str d0, [x0, #0x10]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   store <3 x double> zeroinitializer, ptr %p
   ret void
@@ -495,9 +432,7 @@ define void @store_v4i8(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_v4i8>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    mov w1, #0x0 // =0
+; ARM64:         mov w1, #0x0 // =0
 ; ARM64-NEXT:    strb w1, [x0]
 ; ARM64-NEXT:    mov w1, #0x0 // =0
 ; ARM64-NEXT:    strb w1, [x0, #0x1]
@@ -505,7 +440,6 @@ define void @store_v4i8(ptr %p) {
 ; ARM64-NEXT:    strb w1, [x0, #0x2]
 ; ARM64-NEXT:    mov w1, #0x0 // =0
 ; ARM64-NEXT:    strb w1, [x0, #0x3]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   store <4 x i8> zeroinitializer, ptr %p
   ret void
@@ -521,11 +455,8 @@ define void @store_v4i16(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_v4i16>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    movi v0.8b, #0x0
+; ARM64:         movi v0.8b, #0x0
 ; ARM64-NEXT:    str d0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   store <4 x i16> zeroinitializer, ptr %p
   ret void
@@ -541,11 +472,8 @@ define void @store_v4i32(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_v4i32>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    movi v0.16b, #0x0
+; ARM64:         movi v0.16b, #0x0
 ; ARM64-NEXT:    str q0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   store <4 x i32> zeroinitializer, ptr %p
   ret void
@@ -563,13 +491,10 @@ define void @store_v4i64(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_v4i64>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    movi v0.16b, #0x0
+; ARM64:         movi v0.16b, #0x0
 ; ARM64-NEXT:    str q0, [x0]
 ; ARM64-NEXT:    movi v0.16b, #0x0
 ; ARM64-NEXT:    str q0, [x0, #0x10]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   store <4 x i64> zeroinitializer, ptr %p
   ret void
@@ -587,13 +512,10 @@ define void @store_v4ptr(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_v4ptr>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    movi v0.16b, #0x0
+; ARM64:         movi v0.16b, #0x0
 ; ARM64-NEXT:    str q0, [x0]
 ; ARM64-NEXT:    movi v0.16b, #0x0
 ; ARM64-NEXT:    str q0, [x0, #0x10]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   store <4 x ptr> zeroinitializer, ptr %p
   ret void
@@ -609,11 +531,8 @@ define void @store_v4f32(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_v4f32>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    movi v0.16b, #0x0
+; ARM64:         movi v0.16b, #0x0
 ; ARM64-NEXT:    str q0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   store <4 x float> zeroinitializer, ptr %p
   ret void
@@ -631,13 +550,10 @@ define void @store_v4f64(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_v4f64>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    movi v0.16b, #0x0
+; ARM64:         movi v0.16b, #0x0
 ; ARM64-NEXT:    str q0, [x0]
 ; ARM64-NEXT:    movi v0.16b, #0x0
 ; ARM64-NEXT:    str q0, [x0, #0x10]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   store <4 x double> zeroinitializer, ptr %p
   ret void
@@ -659,9 +575,7 @@ define void @store_v64i8(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_v64i8>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    movi v0.16b, #0x0
+; ARM64:         movi v0.16b, #0x0
 ; ARM64-NEXT:    str q0, [x0]
 ; ARM64-NEXT:    movi v0.16b, #0x0
 ; ARM64-NEXT:    str q0, [x0, #0x10]
@@ -669,7 +583,6 @@ define void @store_v64i8(ptr %p) {
 ; ARM64-NEXT:    str q0, [x0, #0x20]
 ; ARM64-NEXT:    movi v0.16b, #0x0
 ; ARM64-NEXT:    str q0, [x0, #0x30]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   store <64 x i8> zeroinitializer, ptr %p
   ret void
@@ -699,9 +612,7 @@ define void @store_v64i16(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_v64i16>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    movi v0.16b, #0x0
+; ARM64:         movi v0.16b, #0x0
 ; ARM64-NEXT:    str q0, [x0]
 ; ARM64-NEXT:    movi v0.16b, #0x0
 ; ARM64-NEXT:    str q0, [x0, #0x10]
@@ -717,7 +628,6 @@ define void @store_v64i16(ptr %p) {
 ; ARM64-NEXT:    str q0, [x0, #0x60]
 ; ARM64-NEXT:    movi v0.16b, #0x0
 ; ARM64-NEXT:    str q0, [x0, #0x70]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   store <64 x i16> zeroinitializer, ptr %p
   ret void
@@ -763,9 +673,7 @@ define void @store_v64i32(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_v64i32>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    movi v0.16b, #0x0
+; ARM64:         movi v0.16b, #0x0
 ; ARM64-NEXT:    str q0, [x0]
 ; ARM64-NEXT:    movi v0.16b, #0x0
 ; ARM64-NEXT:    str q0, [x0, #0x10]
@@ -797,7 +705,6 @@ define void @store_v64i32(ptr %p) {
 ; ARM64-NEXT:    str q0, [x0, #0xe0]
 ; ARM64-NEXT:    movi v0.16b, #0x0
 ; ARM64-NEXT:    str q0, [x0, #0xf0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   store <64 x i32> zeroinitializer, ptr %p
   ret void
@@ -875,9 +782,7 @@ define void @store_v64i64(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_v64i64>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    movi v0.16b, #0x0
+; ARM64:         movi v0.16b, #0x0
 ; ARM64-NEXT:    str q0, [x0]
 ; ARM64-NEXT:    movi v0.16b, #0x0
 ; ARM64-NEXT:    str q0, [x0, #0x10]
@@ -941,7 +846,6 @@ define void @store_v64i64(ptr %p) {
 ; ARM64-NEXT:    str q0, [x0, #0x1e0]
 ; ARM64-NEXT:    movi v0.16b, #0x0
 ; ARM64-NEXT:    str q0, [x0, #0x1f0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   store <64 x i64> zeroinitializer, ptr %p
   ret void
@@ -1019,9 +923,7 @@ define void @store_v64ptr(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_v64ptr>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    movi v0.16b, #0x0
+; ARM64:         movi v0.16b, #0x0
 ; ARM64-NEXT:    str q0, [x0]
 ; ARM64-NEXT:    movi v0.16b, #0x0
 ; ARM64-NEXT:    str q0, [x0, #0x10]
@@ -1085,7 +987,6 @@ define void @store_v64ptr(ptr %p) {
 ; ARM64-NEXT:    str q0, [x0, #0x1e0]
 ; ARM64-NEXT:    movi v0.16b, #0x0
 ; ARM64-NEXT:    str q0, [x0, #0x1f0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   store <64 x ptr> zeroinitializer, ptr %p
   ret void
@@ -1131,9 +1032,7 @@ define void @store_v64f32(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_v64f32>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    movi v0.16b, #0x0
+; ARM64:         movi v0.16b, #0x0
 ; ARM64-NEXT:    str q0, [x0]
 ; ARM64-NEXT:    movi v0.16b, #0x0
 ; ARM64-NEXT:    str q0, [x0, #0x10]
@@ -1165,7 +1064,6 @@ define void @store_v64f32(ptr %p) {
 ; ARM64-NEXT:    str q0, [x0, #0xe0]
 ; ARM64-NEXT:    movi v0.16b, #0x0
 ; ARM64-NEXT:    str q0, [x0, #0xf0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   store <64 x float> zeroinitializer, ptr %p
   ret void
@@ -1243,9 +1141,7 @@ define void @store_v64f64(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_v64f64>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    movi v0.16b, #0x0
+; ARM64:         movi v0.16b, #0x0
 ; ARM64-NEXT:    str q0, [x0]
 ; ARM64-NEXT:    movi v0.16b, #0x0
 ; ARM64-NEXT:    str q0, [x0, #0x10]
@@ -1309,7 +1205,6 @@ define void @store_v64f64(ptr %p) {
 ; ARM64-NEXT:    str q0, [x0, #0x1e0]
 ; ARM64-NEXT:    movi v0.16b, #0x0
 ; ARM64-NEXT:    str q0, [x0, #0x1f0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   store <64 x double> zeroinitializer, ptr %p
   ret void

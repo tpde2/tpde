@@ -30,14 +30,11 @@ define i8 @ctpop_i8(i8 %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ctpop_i8>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    uxtb w0, w0
+; ARM64:         uxtb w0, w0
 ; ARM64-NEXT:    fmov s0, w0
 ; ARM64-NEXT:    cnt v0.8b, v0.8b
 ; ARM64-NEXT:    addv b0, v0.8b
 ; ARM64-NEXT:    fmov w0, s0
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %res = call i8 @llvm.ctpop.i8(i8 %0)
   ret i8 %res
@@ -67,14 +64,11 @@ define i16 @ctpop_i16(i16 %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ctpop_i16>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    uxth w0, w0
+; ARM64:         uxth w0, w0
 ; ARM64-NEXT:    fmov s0, w0
 ; ARM64-NEXT:    cnt v0.8b, v0.8b
 ; ARM64-NEXT:    addv b0, v0.8b
 ; ARM64-NEXT:    fmov w0, s0
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %res = call i16 @llvm.ctpop.i16(i16 %0)
   ret i16 %res
@@ -104,14 +98,11 @@ define i23 @ctpop_i23(i23 %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ctpop_i23>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ubfx w0, w0, #0, #23
+; ARM64:         ubfx w0, w0, #0, #23
 ; ARM64-NEXT:    fmov s0, w0
 ; ARM64-NEXT:    cnt v0.8b, v0.8b
 ; ARM64-NEXT:    addv b0, v0.8b
 ; ARM64-NEXT:    fmov w0, s0
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %res = call i23 @llvm.ctpop.i23(i23 %0)
   ret i23 %res
@@ -140,13 +131,10 @@ define i32 @ctpop_i32(i32 %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ctpop_i32>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    fmov s0, w0
+; ARM64:         fmov s0, w0
 ; ARM64-NEXT:    cnt v0.8b, v0.8b
 ; ARM64-NEXT:    addv b0, v0.8b
 ; ARM64-NEXT:    fmov w0, s0
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %res = call i32 @llvm.ctpop.i32(i32 %0)
   ret i32 %res
@@ -181,14 +169,11 @@ define i37 @ctpop_i37(i37 %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ctpop_i37>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ubfx x0, x0, #0, #37
+; ARM64:         ubfx x0, x0, #0, #37
 ; ARM64-NEXT:    fmov d0, x0
 ; ARM64-NEXT:    cnt v0.8b, v0.8b
 ; ARM64-NEXT:    addv b0, v0.8b
 ; ARM64-NEXT:    fmov x0, d0
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %res = call i37 @llvm.ctpop.i37(i37 %0)
   ret i37 %res
@@ -221,13 +206,10 @@ define i64 @ctpop_i64(i64 %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ctpop_i64>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    fmov d0, x0
+; ARM64:         fmov d0, x0
 ; ARM64-NEXT:    cnt v0.8b, v0.8b
 ; ARM64-NEXT:    addv b0, v0.8b
 ; ARM64-NEXT:    fmov x0, d0
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %res = call i64 @llvm.ctpop.i64(i64 %0)
   ret i64 %res

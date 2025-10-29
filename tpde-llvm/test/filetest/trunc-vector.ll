@@ -17,10 +17,7 @@ define <8 x i8> @trunc_v8i16_8(<8 x i16> %v) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <trunc_v8i16_8>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    xtn v0.8b, v0.8h
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         xtn v0.8b, v0.8h
 ; ARM64-NEXT:    ret
   %r = trunc <8 x i16> %v to <8 x i8>
   ret <8 x i8> %r
@@ -36,10 +33,7 @@ define <4 x i16> @trunc_v4i32_16(<4 x i32> %v) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <trunc_v4i32_16>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    xtn v0.4h, v0.4s
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         xtn v0.4h, v0.4s
 ; ARM64-NEXT:    ret
   %r = trunc <4 x i32> %v to <4 x i16>
   ret <4 x i16> %r
@@ -53,10 +47,7 @@ define <2 x i32> @trunc_v2i64_32(<2 x i64> %v) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <trunc_v2i64_32>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    xtn v0.2s, v0.2d
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         xtn v0.2s, v0.2d
 ; ARM64-NEXT:    ret
   %r = trunc <2 x i64> %v to <2 x i32>
   ret <2 x i32> %r
@@ -75,9 +66,7 @@ define void @trunc_v8i8_1(ptr %p, <8 x i8> %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <trunc_v8i8_1>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    shl v0.8b, v0.8b, #0x7
+; ARM64:         shl v0.8b, v0.8b, #0x7
 ; ARM64-NEXT:    adrp x1, 0x0 <trunc_v8i16_8>
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
 ; ARM64-NEXT:    ldr d1, [x1]
@@ -87,7 +76,6 @@ define void @trunc_v8i8_1(ptr %p, <8 x i8> %a) {
 ; ARM64-NEXT:    addv b0, v0.8b
 ; ARM64-NEXT:    fmov w2, s0
 ; ARM64-NEXT:    strb w2, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %r = trunc <8 x i8> %a to <8 x i1>
   store <8 x i1> %r, ptr %p
@@ -105,9 +93,7 @@ define void @trunc_v16i8_1(ptr %p, <16 x i8> %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <trunc_v16i8_1>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    shl v0.16b, v0.16b, #0x7
+; ARM64:         shl v0.16b, v0.16b, #0x7
 ; ARM64-NEXT:    adrp x1, 0x0 <trunc_v8i16_8>
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
 ; ARM64-NEXT:    ldr q1, [x1]
@@ -119,7 +105,6 @@ define void @trunc_v16i8_1(ptr %p, <16 x i8> %a) {
 ; ARM64-NEXT:    addv h0, v0.8h
 ; ARM64-NEXT:    fmov w2, s0
 ; ARM64-NEXT:    strh w2, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %r = trunc <16 x i8> %a to <16 x i1>
   store <16 x i1> %r, ptr %p
@@ -140,9 +125,7 @@ define void @trunc_v4i16_1(ptr %p, <4 x i16> %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <trunc_v4i16_1>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    shl v0.4h, v0.4h, #0xf
+; ARM64:         shl v0.4h, v0.4h, #0xf
 ; ARM64-NEXT:    adrp x1, 0x0 <trunc_v8i16_8>
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
 ; ARM64-NEXT:    ldr d1, [x1]
@@ -152,7 +135,6 @@ define void @trunc_v4i16_1(ptr %p, <4 x i16> %a) {
 ; ARM64-NEXT:    addv h0, v0.4h
 ; ARM64-NEXT:    fmov w2, s0
 ; ARM64-NEXT:    strb w2, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %r = trunc <4 x i16> %a to <4 x i1>
   store <4 x i1> %r, ptr %p
@@ -171,9 +153,7 @@ define void @trunc_v8i16_1(ptr %p, <8 x i16> %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <trunc_v8i16_1>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    shl v0.8h, v0.8h, #0xf
+; ARM64:         shl v0.8h, v0.8h, #0xf
 ; ARM64-NEXT:    adrp x1, 0x0 <trunc_v8i16_8>
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
 ; ARM64-NEXT:    ldr q1, [x1]
@@ -183,7 +163,6 @@ define void @trunc_v8i16_1(ptr %p, <8 x i16> %a) {
 ; ARM64-NEXT:    addv h0, v0.8h
 ; ARM64-NEXT:    fmov w2, s0
 ; ARM64-NEXT:    strb w2, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %r = trunc <8 x i16> %a to <8 x i1>
   store <8 x i1> %r, ptr %p
@@ -207,9 +186,7 @@ define void @trunc_v2i32_1(ptr %p, <2 x i32> %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <trunc_v2i32_1>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    shl v0.2s, v0.2s, #0x1f
+; ARM64:         shl v0.2s, v0.2s, #0x1f
 ; ARM64-NEXT:    adrp x1, 0x0 <trunc_v8i16_8>
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
 ; ARM64-NEXT:    ldr d1, [x1]
@@ -219,7 +196,6 @@ define void @trunc_v2i32_1(ptr %p, <2 x i32> %a) {
 ; ARM64-NEXT:    addp v0.2s, v0.2s, v0.2s
 ; ARM64-NEXT:    fmov w2, s0
 ; ARM64-NEXT:    strb w2, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %r = trunc <2 x i32> %a to <2 x i1>
   store <2 x i1> %r, ptr %p
@@ -241,9 +217,7 @@ define void @trunc_v4i32_1(ptr %p, <4 x i32> %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <trunc_v4i32_1>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    shl v0.4s, v0.4s, #0x1f
+; ARM64:         shl v0.4s, v0.4s, #0x1f
 ; ARM64-NEXT:    adrp x1, 0x0 <trunc_v8i16_8>
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
 ; ARM64-NEXT:    ldr q1, [x1]
@@ -253,7 +227,6 @@ define void @trunc_v4i32_1(ptr %p, <4 x i32> %a) {
 ; ARM64-NEXT:    addv s0, v0.4s
 ; ARM64-NEXT:    fmov w2, s0
 ; ARM64-NEXT:    strb w2, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %r = trunc <4 x i32> %a to <4 x i1>
   store <4 x i1> %r, ptr %p
@@ -274,9 +247,7 @@ define void @trunc_v2i64_1(ptr %p, <2 x i64> %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <trunc_v2i64_1>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    shl v0.2d, v0.2d, #0x3f
+; ARM64:         shl v0.2d, v0.2d, #0x3f
 ; ARM64-NEXT:    adrp x1, 0x0 <trunc_v8i16_8>
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
 ; ARM64-NEXT:    ldr q1, [x1]
@@ -286,7 +257,6 @@ define void @trunc_v2i64_1(ptr %p, <2 x i64> %a) {
 ; ARM64-NEXT:    addp d0, v0.2d
 ; ARM64-NEXT:    fmov w2, s0
 ; ARM64-NEXT:    strb w2, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %r = trunc <2 x i64> %a to <2 x i1>
   store <2 x i1> %r, ptr %p

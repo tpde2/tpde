@@ -16,11 +16,8 @@ define ptr @loadrel_i64(ptr %p, i64 %o) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <loadrel_i64>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldrsw x1, [x0, x1]
+; ARM64:         ldrsw x1, [x0, x1]
 ; ARM64-NEXT:    add x0, x0, x1
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %l = call ptr @llvm.load.relative.i64(ptr %p, i64 %o)
   ret ptr %l

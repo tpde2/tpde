@@ -18,13 +18,10 @@ define i17 @umini17(i17 %0, i17 %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <umini17>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ubfx w0, w0, #0, #17
+; ARM64:         ubfx w0, w0, #0, #17
 ; ARM64-NEXT:    ubfx w1, w1, #0, #17
 ; ARM64-NEXT:    cmp w0, w1
 ; ARM64-NEXT:    csel w0, w0, w1, lo
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %res = call i17 @llvm.umin.i17(i17 %0, i17 %1)
   ret i17 %res
@@ -41,11 +38,8 @@ define i32 @umini32(i32 %0, i32 %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <umini32>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    cmp w0, w1
+; ARM64:         cmp w0, w1
 ; ARM64-NEXT:    csel w0, w0, w1, lo
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %res = call i32 @llvm.umin.i32(i32 %0, i32 %1)
   ret i32 %res
@@ -66,13 +60,10 @@ define i37 @umini37(i37 %0, i37 %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <umini37>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ubfx x0, x0, #0, #37
+; ARM64:         ubfx x0, x0, #0, #37
 ; ARM64-NEXT:    ubfx x1, x1, #0, #37
 ; ARM64-NEXT:    cmp x0, x1
 ; ARM64-NEXT:    csel x0, x0, x1, lo
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %res = call i37 @llvm.umin.i37(i37 %0, i37 %1)
   ret i37 %res
@@ -89,11 +80,8 @@ define i64 @umini64(i64 %0, i64 %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <umini64>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    cmp x0, x1
+; ARM64:         cmp x0, x1
 ; ARM64-NEXT:    csel x0, x0, x1, lo
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %res = call i64 @llvm.umin.i64(i64 %0, i64 %1)
   ret i64 %res

@@ -20,16 +20,13 @@ define i17 @ucmpi17(i17 %0, i17 %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ucmpi17>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ubfx w0, w0, #0, #17
+; ARM64:         ubfx w0, w0, #0, #17
 ; ARM64-NEXT:    ubfx w1, w1, #0, #17
 ; ARM64-NEXT:    cmp w0, w1
 ; ARM64-NEXT:    cset w0, hi
 ; ARM64-NEXT:    csinv w0, w0, wzr, hs
 ; ARM64-NEXT:    sxtw x1, w0
 ; ARM64-NEXT:    mov w0, w1
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %res = call i17 @llvm.ucmp(i17 %0, i17 %1)
   ret i17 %res
@@ -47,14 +44,11 @@ define i32 @ucmpi32(i32 %0, i32 %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ucmpi32>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    cmp w0, w1
+; ARM64:         cmp w0, w1
 ; ARM64-NEXT:    cset w0, hi
 ; ARM64-NEXT:    csinv w0, w0, wzr, hs
 ; ARM64-NEXT:    sxtw x1, w0
 ; ARM64-NEXT:    mov w0, w1
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %res = call i32 @llvm.ucmp(i32 %0, i32 %1)
   ret i32 %res
@@ -76,16 +70,13 @@ define i37 @ucmpi37(i37 %0, i37 %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ucmpi37>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ubfx x0, x0, #0, #37
+; ARM64:         ubfx x0, x0, #0, #37
 ; ARM64-NEXT:    ubfx x1, x1, #0, #37
 ; ARM64-NEXT:    cmp x0, x1
 ; ARM64-NEXT:    cset w0, hi
 ; ARM64-NEXT:    csinv w0, w0, wzr, hs
 ; ARM64-NEXT:    sxtw x1, w0
 ; ARM64-NEXT:    mov x0, x1
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %res = call i37 @llvm.ucmp(i37 %0, i37 %1)
   ret i37 %res
@@ -103,14 +94,11 @@ define i64 @ucmpi64(i64 %0, i64 %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ucmpi64>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    cmp x0, x1
+; ARM64:         cmp x0, x1
 ; ARM64-NEXT:    cset w0, hi
 ; ARM64-NEXT:    csinv w0, w0, wzr, hs
 ; ARM64-NEXT:    sxtw x1, w0
 ; ARM64-NEXT:    mov x0, x1
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %res = call i64 @llvm.ucmp(i64 %0, i64 %1)
   ret i64 %res

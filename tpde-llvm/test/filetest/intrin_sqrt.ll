@@ -14,10 +14,7 @@ define float @sqrtf32(float %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <sqrtf32>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    fsqrt s0, s0
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         fsqrt s0, s0
 ; ARM64-NEXT:    ret
   %res = call float @llvm.sqrt.f32(float %0)
   ret float %res
@@ -32,10 +29,7 @@ define double @sqrtf64(double %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <sqrtf64>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    fsqrt d0, d0
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         fsqrt d0, d0
 ; ARM64-NEXT:    ret
   %res = call double @llvm.sqrt.f64(double %0)
   ret double %res

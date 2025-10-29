@@ -14,10 +14,7 @@ define void @store_atomic_i8_monotonic(ptr %p, i8 %v) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_atomic_i8_monotonic>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    strb w1, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         strb w1, [x0]
 ; ARM64-NEXT:    ret
   store atomic i8 %v, ptr %p monotonic, align 1
   ret void
@@ -32,10 +29,7 @@ define void @store_atomic_i16_monotonic(ptr %p, i16 %v) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_atomic_i16_monotonic>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    strh w1, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         strh w1, [x0]
 ; ARM64-NEXT:    ret
   store atomic i16 %v, ptr %p monotonic, align 2
   ret void
@@ -50,10 +44,7 @@ define void @store_atomic_i32_monotonic(ptr %p, i32 %v) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_atomic_i32_monotonic>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    str w1, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         str w1, [x0]
 ; ARM64-NEXT:    ret
   store atomic i32 %v, ptr %p monotonic, align 4
   ret void
@@ -68,10 +59,7 @@ define void @store_atomic_i64_monotonic(ptr %p, i64 %v) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_atomic_i64_monotonic>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    str x1, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         str x1, [x0]
 ; ARM64-NEXT:    ret
   store atomic i64 %v, ptr %p monotonic, align 8
   ret void
@@ -87,10 +75,7 @@ define void @store_atomic_i8_release(ptr %p, i8 %v) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_atomic_i8_release>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    stlrb w1, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         stlrb w1, [x0]
 ; ARM64-NEXT:    ret
   store atomic i8 %v, ptr %p release, align 1
   ret void
@@ -105,10 +90,7 @@ define void @store_atomic_i16_release(ptr %p, i16 %v) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_atomic_i16_release>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    stlrh w1, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         stlrh w1, [x0]
 ; ARM64-NEXT:    ret
   store atomic i16 %v, ptr %p release, align 2
   ret void
@@ -123,10 +105,7 @@ define void @store_atomic_i32_release(ptr %p, i32 %v) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_atomic_i32_release>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    stlr w1, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         stlr w1, [x0]
 ; ARM64-NEXT:    ret
   store atomic i32 %v, ptr %p release, align 4
   ret void
@@ -141,10 +120,7 @@ define void @store_atomic_i64_release(ptr %p, i64 %v) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_atomic_i64_release>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    stlr x1, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         stlr x1, [x0]
 ; ARM64-NEXT:    ret
   store atomic i64 %v, ptr %p release, align 8
   ret void
@@ -160,10 +136,7 @@ define void @store_atomic_i8_seq_cst(ptr %p, i8 %v) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_atomic_i8_seq_cst>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    stlrb w1, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         stlrb w1, [x0]
 ; ARM64-NEXT:    ret
   store atomic i8 %v, ptr %p seq_cst, align 1
   ret void
@@ -178,10 +151,7 @@ define void @store_atomic_i16_seq_cst(ptr %p, i16 %v) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_atomic_i16_seq_cst>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    stlrh w1, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         stlrh w1, [x0]
 ; ARM64-NEXT:    ret
   store atomic i16 %v, ptr %p seq_cst, align 2
   ret void
@@ -196,10 +166,7 @@ define void @store_atomic_i32_seq_cst(ptr %p, i32 %v) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_atomic_i32_seq_cst>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    stlr w1, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         stlr w1, [x0]
 ; ARM64-NEXT:    ret
   store atomic i32 %v, ptr %p seq_cst, align 4
   ret void
@@ -214,10 +181,7 @@ define void @store_atomic_i64_seq_cst(ptr %p, i64 %v) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_atomic_i64_seq_cst>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    stlr x1, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         stlr x1, [x0]
 ; ARM64-NEXT:    ret
   store atomic i64 %v, ptr %p seq_cst, align 8
   ret void

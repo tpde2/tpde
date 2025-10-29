@@ -6,10 +6,7 @@
 
 define void @inlineasm() {
 ; ARM64-LABEL: <inlineasm>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
-; ARM64-NEXT:    ret
+; ARM64:         ret
   call void asm "", ""()
   call void asm sideeffect "", ""()
   call void asm unwind "", ""()

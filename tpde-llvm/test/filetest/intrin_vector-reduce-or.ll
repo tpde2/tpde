@@ -16,11 +16,8 @@ define i8 @vr_or_v1i8(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <vr_or_v1i8>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldrb w1, [x0]
+; ARM64:         ldrb w1, [x0]
 ; ARM64-NEXT:    mov w0, w1
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %v = load <1 x i8>, ptr %p
   %r = call i8 @llvm.vector.reduce.or(<1 x i8> %v)
@@ -52,9 +49,7 @@ define i8 @vr_or_v5i8(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <vr_or_v5i8>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldrb w1, [x0]
+; ARM64:         ldrb w1, [x0]
 ; ARM64-NEXT:    ldrb w2, [x0, #0x1]
 ; ARM64-NEXT:    ldrb w3, [x0, #0x2]
 ; ARM64-NEXT:    ldrb w4, [x0, #0x3]
@@ -68,7 +63,6 @@ define i8 @vr_or_v5i8(ptr %p) {
 ; ARM64-NEXT:    orr w6, w6, w0
 ; ARM64-NEXT:    mov w0, w5
 ; ARM64-NEXT:    orr w0, w0, w6
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %v = load <5 x i8>, ptr %p
   %r = call i8 @llvm.vector.reduce.or(<5 x i8> %v)
@@ -100,9 +94,7 @@ define i8 @vr_or_v8i8(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <vr_or_v8i8>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldr d0, [x0]
+; ARM64:         ldr d0, [x0]
 ; ARM64-NEXT:    umov w0, v0.b[0]
 ; ARM64-NEXT:    umov w1, v0.b[1]
 ; ARM64-NEXT:    orr w1, w1, w0
@@ -119,7 +111,6 @@ define i8 @vr_or_v8i8(ptr %p) {
 ; ARM64-NEXT:    umov w1, v0.b[7]
 ; ARM64-NEXT:    orr w1, w1, w0
 ; ARM64-NEXT:    mov w0, w1
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %v = load <8 x i8>, ptr %p
   %r = call i8 @llvm.vector.reduce.or(<8 x i8> %v)
@@ -167,9 +158,7 @@ define i8 @vr_or_v16i8(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <vr_or_v16i8>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldr q0, [x0]
+; ARM64:         ldr q0, [x0]
 ; ARM64-NEXT:    umov w0, v0.b[0]
 ; ARM64-NEXT:    umov w1, v0.b[1]
 ; ARM64-NEXT:    orr w1, w1, w0
@@ -202,7 +191,6 @@ define i8 @vr_or_v16i8(ptr %p) {
 ; ARM64-NEXT:    umov w1, v0.b[15]
 ; ARM64-NEXT:    orr w1, w1, w0
 ; ARM64-NEXT:    mov w0, w1
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %v = load <16 x i8>, ptr %p
   %r = call i8 @llvm.vector.reduce.or(<16 x i8> %v)
@@ -284,9 +272,7 @@ define i8 @vr_or_v32i8(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <vr_or_v32i8>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldr q0, [x0]
+; ARM64:         ldr q0, [x0]
 ; ARM64-NEXT:    ldr q1, [x0, #0x10]
 ; ARM64-NEXT:    umov w0, v0.b[0]
 ; ARM64-NEXT:    umov w1, v0.b[1]
@@ -352,7 +338,6 @@ define i8 @vr_or_v32i8(ptr %p) {
 ; ARM64-NEXT:    umov w1, v1.b[15]
 ; ARM64-NEXT:    orr w1, w1, w0
 ; ARM64-NEXT:    mov w0, w1
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %v = load <32 x i8>, ptr %p
   %r = call i8 @llvm.vector.reduce.or(<32 x i8> %v)
@@ -370,11 +355,8 @@ define i16 @vr_or_v1i16(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <vr_or_v1i16>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldrh w1, [x0]
+; ARM64:         ldrh w1, [x0]
 ; ARM64-NEXT:    mov w0, w1
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %v = load <1 x i16>, ptr %p
   %r = call i16 @llvm.vector.reduce.or(<1 x i16> %v)
@@ -406,9 +388,7 @@ define i16 @vr_or_v5i16(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <vr_or_v5i16>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldrh w1, [x0]
+; ARM64:         ldrh w1, [x0]
 ; ARM64-NEXT:    ldrh w2, [x0, #0x2]
 ; ARM64-NEXT:    ldrh w3, [x0, #0x4]
 ; ARM64-NEXT:    ldrh w4, [x0, #0x6]
@@ -422,7 +402,6 @@ define i16 @vr_or_v5i16(ptr %p) {
 ; ARM64-NEXT:    orr w6, w6, w0
 ; ARM64-NEXT:    mov w0, w5
 ; ARM64-NEXT:    orr w0, w0, w6
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %v = load <5 x i16>, ptr %p
   %r = call i16 @llvm.vector.reduce.or(<5 x i16> %v)
@@ -454,9 +433,7 @@ define i16 @vr_or_v8i16(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <vr_or_v8i16>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldr q0, [x0]
+; ARM64:         ldr q0, [x0]
 ; ARM64-NEXT:    umov w0, v0.h[0]
 ; ARM64-NEXT:    umov w1, v0.h[1]
 ; ARM64-NEXT:    orr w1, w1, w0
@@ -473,7 +450,6 @@ define i16 @vr_or_v8i16(ptr %p) {
 ; ARM64-NEXT:    umov w1, v0.h[7]
 ; ARM64-NEXT:    orr w1, w1, w0
 ; ARM64-NEXT:    mov w0, w1
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %v = load <8 x i16>, ptr %p
   %r = call i16 @llvm.vector.reduce.or(<8 x i16> %v)
@@ -523,9 +499,7 @@ define i16 @vr_or_v16i16(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <vr_or_v16i16>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldr q0, [x0]
+; ARM64:         ldr q0, [x0]
 ; ARM64-NEXT:    ldr q1, [x0, #0x10]
 ; ARM64-NEXT:    umov w0, v0.h[0]
 ; ARM64-NEXT:    umov w1, v0.h[1]
@@ -559,7 +533,6 @@ define i16 @vr_or_v16i16(ptr %p) {
 ; ARM64-NEXT:    umov w1, v1.h[7]
 ; ARM64-NEXT:    orr w1, w1, w0
 ; ARM64-NEXT:    mov w0, w1
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %v = load <16 x i16>, ptr %p
   %r = call i16 @llvm.vector.reduce.or(<16 x i16> %v)
@@ -577,11 +550,8 @@ define i32 @vr_or_v1i32(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <vr_or_v1i32>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldr w1, [x0]
+; ARM64:         ldr w1, [x0]
 ; ARM64-NEXT:    mov w0, w1
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %v = load <1 x i32>, ptr %p
   %r = call i32 @llvm.vector.reduce.or(<1 x i32> %v)
@@ -605,9 +575,7 @@ define i32 @vr_or_v4i32(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <vr_or_v4i32>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldr q0, [x0]
+; ARM64:         ldr q0, [x0]
 ; ARM64-NEXT:    mov w0, v0.s[0]
 ; ARM64-NEXT:    mov w1, v0.s[1]
 ; ARM64-NEXT:    orr w1, w1, w0
@@ -616,7 +584,6 @@ define i32 @vr_or_v4i32(ptr %p) {
 ; ARM64-NEXT:    mov w1, v0.s[3]
 ; ARM64-NEXT:    orr w1, w1, w0
 ; ARM64-NEXT:    mov w0, w1
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %v = load <4 x i32>, ptr %p
   %r = call i32 @llvm.vector.reduce.or(<4 x i32> %v)
@@ -648,9 +615,7 @@ define i32 @vr_or_v5i32(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <vr_or_v5i32>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldr w1, [x0]
+; ARM64:         ldr w1, [x0]
 ; ARM64-NEXT:    ldr w2, [x0, #0x4]
 ; ARM64-NEXT:    ldr w3, [x0, #0x8]
 ; ARM64-NEXT:    ldr w4, [x0, #0xc]
@@ -664,7 +629,6 @@ define i32 @vr_or_v5i32(ptr %p) {
 ; ARM64-NEXT:    orr w6, w6, w0
 ; ARM64-NEXT:    mov w0, w5
 ; ARM64-NEXT:    orr w0, w0, w6
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %v = load <5 x i32>, ptr %p
   %r = call i32 @llvm.vector.reduce.or(<5 x i32> %v)
@@ -698,9 +662,7 @@ define i32 @vr_or_v8i32(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <vr_or_v8i32>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldr q0, [x0]
+; ARM64:         ldr q0, [x0]
 ; ARM64-NEXT:    ldr q1, [x0, #0x10]
 ; ARM64-NEXT:    mov w0, v0.s[0]
 ; ARM64-NEXT:    mov w1, v0.s[1]
@@ -718,7 +680,6 @@ define i32 @vr_or_v8i32(ptr %p) {
 ; ARM64-NEXT:    mov w1, v1.s[3]
 ; ARM64-NEXT:    orr w1, w1, w0
 ; ARM64-NEXT:    mov w0, w1
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %v = load <8 x i32>, ptr %p
   %r = call i32 @llvm.vector.reduce.or(<8 x i32> %v)
@@ -736,11 +697,8 @@ define i64 @vr_or_v1i64(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <vr_or_v1i64>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldr x1, [x0]
+; ARM64:         ldr x1, [x0]
 ; ARM64-NEXT:    mov x0, x1
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %v = load <1 x i64>, ptr %p
   %r = call i64 @llvm.vector.reduce.or(<1 x i64> %v)
@@ -760,14 +718,11 @@ define i64 @vr_or_v2i64(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <vr_or_v2i64>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldr q0, [x0]
+; ARM64:         ldr q0, [x0]
 ; ARM64-NEXT:    mov x0, v0.d[0]
 ; ARM64-NEXT:    mov x1, v0.d[1]
 ; ARM64-NEXT:    orr x1, x1, x0
 ; ARM64-NEXT:    mov x0, x1
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %v = load <2 x i64>, ptr %p
   %r = call i64 @llvm.vector.reduce.or(<2 x i64> %v)
@@ -799,9 +754,7 @@ define i64 @vr_or_v5i64(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <vr_or_v5i64>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldr x1, [x0]
+; ARM64:         ldr x1, [x0]
 ; ARM64-NEXT:    ldr x2, [x0, #0x8]
 ; ARM64-NEXT:    ldr x3, [x0, #0x10]
 ; ARM64-NEXT:    ldr x4, [x0, #0x18]
@@ -815,7 +768,6 @@ define i64 @vr_or_v5i64(ptr %p) {
 ; ARM64-NEXT:    orr x6, x6, x0
 ; ARM64-NEXT:    mov x0, x5
 ; ARM64-NEXT:    orr x0, x0, x6
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %v = load <5 x i64>, ptr %p
   %r = call i64 @llvm.vector.reduce.or(<5 x i64> %v)

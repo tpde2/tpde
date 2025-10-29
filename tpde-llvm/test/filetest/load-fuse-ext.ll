@@ -15,10 +15,7 @@ define i32 @load_i8_zext_i32(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i8_zext_i32>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldrb w0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         ldrb w0, [x0]
 ; ARM64-NEXT:    ret
   %l = load i8, ptr %a
   %x = zext i8 %l to i32
@@ -35,10 +32,7 @@ define i32 @load_i8_sext_i32(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i8_sext_i32>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldrsb x0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         ldrsb x0, [x0]
 ; ARM64-NEXT:    ret
   %l = load i8, ptr %a
   %x = sext i8 %l to i32
@@ -55,10 +49,7 @@ define i37 @load_i8_zext_i37(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i8_zext_i37>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldrb w0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         ldrb w0, [x0]
 ; ARM64-NEXT:    ret
   %l = load i8, ptr %a
   %x = zext i8 %l to i37
@@ -75,10 +66,7 @@ define i37 @load_i8_sext_i37(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i8_sext_i37>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldrsb x0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         ldrsb x0, [x0]
 ; ARM64-NEXT:    ret
   %l = load i8, ptr %a
   %x = sext i8 %l to i37
@@ -95,10 +83,7 @@ define i64 @load_i8_zext_i64(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i8_zext_i64>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldrb w0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         ldrb w0, [x0]
 ; ARM64-NEXT:    ret
   %l = load i8, ptr %a
   %x = zext i8 %l to i64
@@ -115,10 +100,7 @@ define i64 @load_i8_sext_i64(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i8_sext_i64>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldrsb x0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         ldrsb x0, [x0]
 ; ARM64-NEXT:    ret
   %l = load i8, ptr %a
   %x = sext i8 %l to i64
@@ -139,12 +121,9 @@ define i128 @load_i8_zext_i128(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i8_zext_i128>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldrb w0, [x0]
+; ARM64:         ldrb w0, [x0]
 ; ARM64-NEXT:    ubfx x0, x0, #0, #8
 ; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %l = load i8, ptr %a
   %x = zext i8 %l to i128
@@ -166,12 +145,9 @@ define i128 @load_i8_sext_i128(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i8_sext_i128>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldrb w0, [x0]
+; ARM64:         ldrb w0, [x0]
 ; ARM64-NEXT:    sxtb x0, w0
 ; ARM64-NEXT:    asr x1, x0, #63
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %l = load i8, ptr %a
   %x = sext i8 %l to i128
@@ -188,10 +164,7 @@ define i32 @load_i16_zext_i32(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i16_zext_i32>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldrh w0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         ldrh w0, [x0]
 ; ARM64-NEXT:    ret
   %l = load i16, ptr %a
   %x = zext i16 %l to i32
@@ -208,10 +181,7 @@ define i32 @load_i16_sext_i32(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i16_sext_i32>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldrsh x0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         ldrsh x0, [x0]
 ; ARM64-NEXT:    ret
   %l = load i16, ptr %a
   %x = sext i16 %l to i32
@@ -228,10 +198,7 @@ define i37 @load_i16_zext_i37(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i16_zext_i37>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldrh w0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         ldrh w0, [x0]
 ; ARM64-NEXT:    ret
   %l = load i16, ptr %a
   %x = zext i16 %l to i37
@@ -248,10 +215,7 @@ define i37 @load_i16_sext_i37(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i16_sext_i37>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldrsh x0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         ldrsh x0, [x0]
 ; ARM64-NEXT:    ret
   %l = load i16, ptr %a
   %x = sext i16 %l to i37
@@ -268,10 +232,7 @@ define i64 @load_i16_zext_i64(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i16_zext_i64>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldrh w0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         ldrh w0, [x0]
 ; ARM64-NEXT:    ret
   %l = load i16, ptr %a
   %x = zext i16 %l to i64
@@ -288,10 +249,7 @@ define i64 @load_i16_sext_i64(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i16_sext_i64>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldrsh x0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         ldrsh x0, [x0]
 ; ARM64-NEXT:    ret
   %l = load i16, ptr %a
   %x = sext i16 %l to i64
@@ -312,12 +270,9 @@ define i128 @load_i16_zext_i128(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i16_zext_i128>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldrh w0, [x0]
+; ARM64:         ldrh w0, [x0]
 ; ARM64-NEXT:    ubfx x0, x0, #0, #16
 ; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %l = load i16, ptr %a
   %x = zext i16 %l to i128
@@ -339,12 +294,9 @@ define i128 @load_i16_sext_i128(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i16_sext_i128>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldrh w0, [x0]
+; ARM64:         ldrh w0, [x0]
 ; ARM64-NEXT:    sxth x0, w0
 ; ARM64-NEXT:    asr x1, x0, #63
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %l = load i16, ptr %a
   %x = sext i16 %l to i128
@@ -365,14 +317,11 @@ define i32 @load_i24_zext_i32(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i24_zext_i32>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldrb w1, [x0, #0x2]
+; ARM64:         ldrb w1, [x0, #0x2]
 ; ARM64-NEXT:    ldrh w0, [x0]
 ; ARM64-NEXT:    orr w2, w0, w1, lsl #16
 ; ARM64-NEXT:    ubfx w2, w2, #0, #24
 ; ARM64-NEXT:    mov w0, w2
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %l = load i24, ptr %a
   %x = zext i24 %l to i32
@@ -394,14 +343,11 @@ define i32 @load_i24_sext_i32(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i24_sext_i32>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldrb w1, [x0, #0x2]
+; ARM64:         ldrb w1, [x0, #0x2]
 ; ARM64-NEXT:    ldrh w0, [x0]
 ; ARM64-NEXT:    orr w2, w0, w1, lsl #16
 ; ARM64-NEXT:    sbfx w2, w2, #0, #24
 ; ARM64-NEXT:    mov w0, w2
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %l = load i24, ptr %a
   %x = sext i24 %l to i32
@@ -422,14 +368,11 @@ define i37 @load_i24_zext_i37(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i24_zext_i37>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldrb w1, [x0, #0x2]
+; ARM64:         ldrb w1, [x0, #0x2]
 ; ARM64-NEXT:    ldrh w0, [x0]
 ; ARM64-NEXT:    orr w2, w0, w1, lsl #16
 ; ARM64-NEXT:    ubfx x2, x2, #0, #24
 ; ARM64-NEXT:    mov x0, x2
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %l = load i24, ptr %a
   %x = zext i24 %l to i37
@@ -451,14 +394,11 @@ define i37 @load_i24_sext_i37(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i24_sext_i37>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldrb w1, [x0, #0x2]
+; ARM64:         ldrb w1, [x0, #0x2]
 ; ARM64-NEXT:    ldrh w0, [x0]
 ; ARM64-NEXT:    orr w2, w0, w1, lsl #16
 ; ARM64-NEXT:    sbfx x2, x2, #0, #24
 ; ARM64-NEXT:    mov x0, x2
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %l = load i24, ptr %a
   %x = sext i24 %l to i37
@@ -479,14 +419,11 @@ define i64 @load_i24_zext_i64(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i24_zext_i64>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldrb w1, [x0, #0x2]
+; ARM64:         ldrb w1, [x0, #0x2]
 ; ARM64-NEXT:    ldrh w0, [x0]
 ; ARM64-NEXT:    orr w2, w0, w1, lsl #16
 ; ARM64-NEXT:    ubfx x2, x2, #0, #24
 ; ARM64-NEXT:    mov x0, x2
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %l = load i24, ptr %a
   %x = zext i24 %l to i64
@@ -508,14 +445,11 @@ define i64 @load_i24_sext_i64(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i24_sext_i64>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldrb w1, [x0, #0x2]
+; ARM64:         ldrb w1, [x0, #0x2]
 ; ARM64-NEXT:    ldrh w0, [x0]
 ; ARM64-NEXT:    orr w2, w0, w1, lsl #16
 ; ARM64-NEXT:    sbfx x2, x2, #0, #24
 ; ARM64-NEXT:    mov x0, x2
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %l = load i24, ptr %a
   %x = sext i24 %l to i64
@@ -602,10 +536,7 @@ define i37 @load_i32_zext_i37(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i32_zext_i37>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldr w0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         ldr w0, [x0]
 ; ARM64-NEXT:    ret
   %l = load i32, ptr %a
   %x = zext i32 %l to i37
@@ -622,10 +553,7 @@ define i37 @load_i32_sext_i37(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i32_sext_i37>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldrsw x0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         ldrsw x0, [x0]
 ; ARM64-NEXT:    ret
   %l = load i32, ptr %a
   %x = sext i32 %l to i37
@@ -642,10 +570,7 @@ define i64 @load_i32_zext_i64(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i32_zext_i64>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldr w0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         ldr w0, [x0]
 ; ARM64-NEXT:    ret
   %l = load i32, ptr %a
   %x = zext i32 %l to i64
@@ -662,10 +587,7 @@ define i64 @load_i32_sext_i64(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i32_sext_i64>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldrsw x0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         ldrsw x0, [x0]
 ; ARM64-NEXT:    ret
   %l = load i32, ptr %a
   %x = sext i32 %l to i64
@@ -686,12 +608,9 @@ define i128 @load_i32_zext_i128(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i32_zext_i128>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldr w0, [x0]
+; ARM64:         ldr w0, [x0]
 ; ARM64-NEXT:    ubfx x0, x0, #0, #32
 ; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %l = load i32, ptr %a
   %x = zext i32 %l to i128
@@ -713,12 +632,9 @@ define i128 @load_i32_sext_i128(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i32_sext_i128>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldr w0, [x0]
+; ARM64:         ldr w0, [x0]
 ; ARM64-NEXT:    sxtw x0, w0
 ; ARM64-NEXT:    asr x1, x0, #63
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %l = load i32, ptr %a
   %x = sext i32 %l to i128
@@ -740,14 +656,11 @@ define i37 @load_i33_zext_i37(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i33_zext_i37>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldrb w1, [x0, #0x4]
+; ARM64:         ldrb w1, [x0, #0x4]
 ; ARM64-NEXT:    ldr w0, [x0]
 ; ARM64-NEXT:    orr x2, x0, x1, lsl #32
 ; ARM64-NEXT:    ubfx x2, x2, #0, #33
 ; ARM64-NEXT:    mov x0, x2
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %l = load i33, ptr %a
   %x = zext i33 %l to i37
@@ -769,14 +682,11 @@ define i37 @load_i33_sext_i37(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i33_sext_i37>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldrb w1, [x0, #0x4]
+; ARM64:         ldrb w1, [x0, #0x4]
 ; ARM64-NEXT:    ldr w0, [x0]
 ; ARM64-NEXT:    orr x2, x0, x1, lsl #32
 ; ARM64-NEXT:    sbfx x2, x2, #0, #33
 ; ARM64-NEXT:    mov x0, x2
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %l = load i33, ptr %a
   %x = sext i33 %l to i37
@@ -798,14 +708,11 @@ define i64 @load_i33_zext_i64(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i33_zext_i64>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldrb w1, [x0, #0x4]
+; ARM64:         ldrb w1, [x0, #0x4]
 ; ARM64-NEXT:    ldr w0, [x0]
 ; ARM64-NEXT:    orr x2, x0, x1, lsl #32
 ; ARM64-NEXT:    ubfx x2, x2, #0, #33
 ; ARM64-NEXT:    mov x0, x2
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %l = load i33, ptr %a
   %x = zext i33 %l to i64
@@ -827,14 +734,11 @@ define i64 @load_i33_sext_i64(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i33_sext_i64>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldrb w1, [x0, #0x4]
+; ARM64:         ldrb w1, [x0, #0x4]
 ; ARM64-NEXT:    ldr w0, [x0]
 ; ARM64-NEXT:    orr x2, x0, x1, lsl #32
 ; ARM64-NEXT:    sbfx x2, x2, #0, #33
 ; ARM64-NEXT:    mov x0, x2
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %l = load i33, ptr %a
   %x = sext i33 %l to i64

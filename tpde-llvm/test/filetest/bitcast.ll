@@ -15,10 +15,7 @@ define i32 @bitcast_f32_to_i32(float %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <bitcast_f32_to_i32>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    fmov w0, s0
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         fmov w0, s0
 ; ARM64-NEXT:    ret
 entry:
   %1 = bitcast float %0 to i32
@@ -34,10 +31,7 @@ define float @bitcast_i32_to_f32(i32 %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <bitcast_i32_to_f32>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    fmov s0, w0
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         fmov s0, w0
 ; ARM64-NEXT:    ret
 entry:
   %1 = bitcast i32 %0 to float
@@ -54,10 +48,7 @@ define i64 @bitcast_f64_to_i64(double %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <bitcast_f64_to_i64>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    fmov x0, d0
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         fmov x0, d0
 ; ARM64-NEXT:    ret
 entry:
   %1 = bitcast double %0 to i64
@@ -73,10 +64,7 @@ define double @bitcast_i64_to_f64(i64 %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <bitcast_i64_to_f64>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    fmov d0, x0
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         fmov d0, x0
 ; ARM64-NEXT:    ret
 entry:
   %1 = bitcast i64 %0 to double
@@ -92,10 +80,7 @@ define <4 x float> @bitcast_i8vec_to_f32vec(<16 x i8> %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <bitcast_i8vec_to_f32vec>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
-; ARM64-NEXT:    ret
+; ARM64:         ret
 entry:
   %1 = bitcast <16 x i8> %0 to <4 x float>
   ret <4 x float> %1
@@ -117,9 +102,7 @@ define void @bitcast_v16i32_v16f32(ptr %src, ptr %dst) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <bitcast_v16i32_v16f32>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldr q0, [x0]
+; ARM64:         ldr q0, [x0]
 ; ARM64-NEXT:    ldr q1, [x0, #0x10]
 ; ARM64-NEXT:    ldr q2, [x0, #0x20]
 ; ARM64-NEXT:    ldr q3, [x0, #0x30]
@@ -127,7 +110,6 @@ define void @bitcast_v16i32_v16f32(ptr %src, ptr %dst) {
 ; ARM64-NEXT:    str q1, [x1, #0x10]
 ; ARM64-NEXT:    str q2, [x1, #0x20]
 ; ARM64-NEXT:    str q3, [x1, #0x30]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %a = load <16 x i32>, ptr %src
   %r = bitcast <16 x i32> %a to <16 x float>
@@ -149,15 +131,12 @@ define void @bitcast_v24i8_v6f32(ptr %src, ptr %dst) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <bitcast_v24i8_v6f32>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldr d0, [x0]
+; ARM64:         ldr d0, [x0]
 ; ARM64-NEXT:    ldr d1, [x0, #0x8]
 ; ARM64-NEXT:    ldr d2, [x0, #0x10]
 ; ARM64-NEXT:    str d0, [x1]
 ; ARM64-NEXT:    str d1, [x1, #0x8]
 ; ARM64-NEXT:    str d2, [x1, #0x10]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %a = load <24 x i8>, ptr %src
   %r = bitcast <24 x i8> %a to <6 x float>
@@ -261,11 +240,8 @@ define void @bitcast_v8i1_i8(ptr %src, ptr %dst) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <bitcast_v8i1_i8>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldrb w0, [x0]
+; ARM64:         ldrb w0, [x0]
 ; ARM64-NEXT:    strb w0, [x1]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %a = load <8 x i1>, ptr %src
   %r = bitcast <8 x i1> %a to i8
@@ -283,11 +259,8 @@ define void @bitcast_v16i1_i16(ptr %src, ptr %dst) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <bitcast_v16i1_i16>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldrh w0, [x0]
+; ARM64:         ldrh w0, [x0]
 ; ARM64-NEXT:    strh w0, [x1]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %a = load <16 x i1>, ptr %src
   %r = bitcast <16 x i1> %a to i16

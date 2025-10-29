@@ -15,10 +15,7 @@ define double @fpext_f32tof64(float %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fpext_f32tof64>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    fcvt d0, s0
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         fcvt d0, s0
 ; ARM64-NEXT:    ret
 entry:
   %1 = fpext float %0 to double
@@ -40,7 +37,7 @@ define fp128 @fpext_f32tof128(float %in) {
 ; ARM64-LABEL: <fpext_f32tof128>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    bl 0x28 <fpext_f32tof128+0x8>
+; ARM64-NEXT:    bl 0x18 <fpext_f32tof128+0x8>
 ; ARM64-NEXT:     R_AARCH64_CALL26 __extendsftf2
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
@@ -63,7 +60,7 @@ define fp128 @fpext_f64tof128(double %in) {
 ; ARM64-LABEL: <fpext_f64tof128>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    bl 0x48 <fpext_f64tof128+0x8>
+; ARM64-NEXT:    bl 0x38 <fpext_f64tof128+0x8>
 ; ARM64-NEXT:     R_AARCH64_CALL26 __extenddftf2
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
@@ -88,7 +85,7 @@ define fp128 @fpext_f64tof128_fixed_reg(fp128 %p) {
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    movi v0.8b, #0x0
-; ARM64-NEXT:    bl 0x6c <fpext_f64tof128_fixed_reg+0xc>
+; ARM64-NEXT:    bl 0x5c <fpext_f64tof128_fixed_reg+0xc>
 ; ARM64-NEXT:     R_AARCH64_CALL26 __extenddftf2
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret

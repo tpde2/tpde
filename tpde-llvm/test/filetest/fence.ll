@@ -13,10 +13,7 @@ define void @f0_seq_cst() {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <f0_seq_cst>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
-; ARM64-NEXT:    ret
+; ARM64:         ret
   fence syncscope("singlethread") seq_cst
   ret void
 }
@@ -29,10 +26,7 @@ define void @f1_acquire() {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <f1_acquire>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    dmb ishld
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         dmb ishld
 ; ARM64-NEXT:    ret
   fence acquire
   ret void
@@ -46,10 +40,7 @@ define void @f1_release() {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <f1_release>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    dmb ish
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         dmb ish
 ; ARM64-NEXT:    ret
   fence release
   ret void
@@ -63,10 +54,7 @@ define void @f1_acq_rel() {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <f1_acq_rel>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    dmb ish
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         dmb ish
 ; ARM64-NEXT:    ret
   fence acq_rel
   ret void
@@ -81,10 +69,7 @@ define void @f1_seq_cst() {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <f1_seq_cst>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    dmb ish
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         dmb ish
 ; ARM64-NEXT:    ret
   fence seq_cst
   ret void

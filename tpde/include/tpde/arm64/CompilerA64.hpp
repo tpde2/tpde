@@ -881,6 +881,7 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::gen_func_prolog_and_args(
   // compute the offset from the frame pointer. But we have a stack_reg here,
   // so use it for var args.
   if (this->adaptor->cur_is_vararg()) [[unlikely]] {
+    this->stack.frame_used = true;
     AsmReg stack_reg = AsmReg::R17;
     // TODO: allocate an actual scratch register for this.
     assert(!(this->register_file.allocatable & (u64{1} << stack_reg.id())) &&
@@ -928,12 +929,17 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::finish_func(
     assert(final_frame_size < 16 * 1024 * 1024);
   }
 
-  u32 prologue_pad_offset;
-  u32 prologue_pad_size;
+  u32 prologue_pad_offset = func_start_off;
+  u32 prologue_pad_size = func_prologue_alloc;
+
+  bool needs_stack_frame =
+      this->stack.frame_used || this->stack.generated_call ||
+      this->stack.has_dynamic_alloca || saved_regs != 0 ||
+      (this->register_file.clobbered & (u64{1} << AsmReg::LR));
 
   this->text_writer.eh_begin_fde(this->get_personality_sym());
 
-  {
+  if (needs_stack_frame) [[likely]] {
     // NB: code alignment factor 4, data alignment factor -8.
     util::SmallVector<u32, 16> prologue;
     this->text_writer.eh_write_inst(dwarf::DW_CFA_advance_loc, 1);
@@ -1016,14 +1022,18 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::finish_func(
                 prologue.data(),
                 prologue.size() * sizeof(u32));
 
-    prologue_pad_offset = func_start_off + prologue.size() * sizeof(u32);
-    prologue_pad_size = func_prologue_alloc - prologue.size() * 4;
+    prologue_pad_offset += prologue.size() * sizeof(u32);
+    prologue_pad_size -= prologue.size() * sizeof(u32);
   }
 
   if (func_arg_stack_add_off != ~0u) {
-    auto *inst_ptr = this->text_writer.begin_ptr() + func_arg_stack_add_off;
-    *reinterpret_cast<u32 *>(inst_ptr) =
-        de64_ADDxi(func_arg_stack_add_reg, DA_SP, final_frame_size);
+    auto *raw_inst_ptr = this->text_writer.begin_ptr() + func_arg_stack_add_off;
+    u32 *inst_ptr = reinterpret_cast<u32 *>(raw_inst_ptr);
+    if (needs_stack_frame) {
+      *inst_ptr = de64_ADDxi(func_arg_stack_add_reg, DA_SP, final_frame_size);
+    } else {
+      *inst_ptr = de64_MOV_SPx(func_arg_stack_add_reg, DA_SP);
+    }
   }
 
   // TODO(ts): honor cur_needs_unwind_info
@@ -1086,12 +1096,14 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::finish_func(
       }
     }
 
-    if (final_frame_size <= 0x1f8) {
-      *write_ptr++ =
-          de64_LDPx_post(DA_GP(29), DA_GP(30), DA_SP, final_frame_size);
-    } else {
-      *write_ptr++ = de64_LDPx(DA_GP(29), DA_GP(30), DA_SP, 0);
-      *write_ptr++ = de64_ADDxi(DA_SP, DA_SP, final_frame_size);
+    if (needs_stack_frame) {
+      if (final_frame_size <= 0x1f8) {
+        *write_ptr++ =
+            de64_LDPx_post(DA_GP(29), DA_GP(30), DA_SP, final_frame_size);
+      } else {
+        *write_ptr++ = de64_LDPx(DA_GP(29), DA_GP(30), DA_SP, 0);
+        *write_ptr++ = de64_ADDxi(DA_SP, DA_SP, final_frame_size);
+      }
     }
 
     *write_ptr++ = de64_RET(DA_GP(30));
@@ -2087,6 +2099,8 @@ CompilerA64<Adaptor, Derived, BaseTy, Config>::ScratchReg
   switch (model) {
   default: // TODO: implement optimized access for non-gd-model
   case TLSModel::GlobalDynamic: {
+    assert(!this->stack.is_leaf_function);
+    this->stack.generated_call = true;
     ScratchReg r0_scratch{this};
     AsmReg r0 = r0_scratch.alloc_specific(AsmReg::R0);
     ScratchReg r1_scratch{this};

@@ -16,11 +16,8 @@ define i8 @icmp_fuse_zext8(i32, i32) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_fuse_zext8>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    cmp w0, w1
+; ARM64:         cmp w0, w1
 ; ARM64-NEXT:    cset w0, lt
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %c = icmp slt i32 %0, %1
   %r = zext i1 %c to i8
@@ -38,11 +35,8 @@ define i32 @icmp_fuse_zext32(i32, i32) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_fuse_zext32>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    cmp w0, w1
+; ARM64:         cmp w0, w1
 ; ARM64-NEXT:    cset w0, lt
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %c = icmp slt i32 %0, %1
   %r = zext i1 %c to i32
@@ -60,11 +54,8 @@ define i64 @icmp_fuse_zexti64(i32, i32) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_fuse_zexti64>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    cmp w0, w1
+; ARM64:         cmp w0, w1
 ; ARM64-NEXT:    cset w0, lt
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %c = icmp slt i32 %0, %1
   %r = zext i1 %c to i64
@@ -84,13 +75,10 @@ define i128 @icmp_fuse_zexti128(i32, i32) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_fuse_zexti128>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    cmp w0, w1
+; ARM64:         cmp w0, w1
 ; ARM64-NEXT:    cset w0, lt
 ; ARM64-NEXT:    ubfx x0, x0, #0, #1
 ; ARM64-NEXT:    mov w1, #0x0 // =0
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %c = icmp slt i32 %0, %1
   %r = zext i1 %c to i128
@@ -109,11 +97,8 @@ define i8 @icmp_fuse_sext8(i32, i32) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_fuse_sext8>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    cmp w0, w1
+; ARM64:         cmp w0, w1
 ; ARM64-NEXT:    csetm x0, lt
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %c = icmp slt i32 %0, %1
   %r = sext i1 %c to i8
@@ -132,11 +117,8 @@ define i32 @icmp_fuse_sext32(i32, i32) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_fuse_sext32>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    cmp w0, w1
+; ARM64:         cmp w0, w1
 ; ARM64-NEXT:    csetm x0, lt
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %c = icmp slt i32 %0, %1
   %r = sext i1 %c to i32
@@ -155,11 +137,8 @@ define i37 @icmp_fuse_sext37(i32, i32) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_fuse_sext37>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    cmp w0, w1
+; ARM64:         cmp w0, w1
 ; ARM64-NEXT:    csetm x0, lt
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %c = icmp slt i32 %0, %1
   %r = sext i1 %c to i37
@@ -178,11 +157,8 @@ define i64 @icmp_fuse_sexti64(i32, i32) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_fuse_sexti64>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    cmp w0, w1
+; ARM64:         cmp w0, w1
 ; ARM64-NEXT:    csetm x0, lt
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %c = icmp slt i32 %0, %1
   %r = sext i1 %c to i64
@@ -204,13 +180,10 @@ define i128 @icmp_fuse_sexti128(i32, i32) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_fuse_sexti128>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    cmp w0, w1
+; ARM64:         cmp w0, w1
 ; ARM64-NEXT:    cset w0, lt
 ; ARM64-NEXT:    sbfx x0, x0, #0, #1
 ; ARM64-NEXT:    asr x1, x0, #63
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %c = icmp slt i32 %0, %1
   %r = sext i1 %c to i128
@@ -233,14 +206,11 @@ define i64 @icmp_ext_nofuse(i32, i32) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_ext_nofuse>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    cmp w0, w1
+; ARM64:         cmp w0, w1
 ; ARM64-NEXT:    cset w0, lt
 ; ARM64-NEXT:    ubfx x1, x0, #0, #1
 ; ARM64-NEXT:    sbfx x0, x0, #0, #1
 ; ARM64-NEXT:    eor x0, x0, x1
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %c = icmp slt i32 %0, %1
   %z = zext i1 %c to i64

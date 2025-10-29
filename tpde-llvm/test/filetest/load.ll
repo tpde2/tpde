@@ -21,10 +21,7 @@ define i8 @load_i8(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i8>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldrb w0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         ldrb w0, [x0]
 ; ARM64-NEXT:    ret
 entry:
   %b = load i8, ptr %a, align 1
@@ -42,11 +39,8 @@ define i8 @load_i8_alt(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i8_alt>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldrb w1, [x0]
+; ARM64:         ldrb w1, [x0]
 ; ARM64-NEXT:    ldrb w0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %b = load i8, ptr %a, align 1
@@ -65,10 +59,7 @@ define i16 @load_i16(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i16>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldrh w0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         ldrh w0, [x0]
 ; ARM64-NEXT:    ret
 entry:
   %b = load i16, ptr %a, align 2
@@ -86,11 +77,8 @@ define i16 @load_i16_alt(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i16_alt>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldrh w1, [x0]
+; ARM64:         ldrh w1, [x0]
 ; ARM64-NEXT:    ldrh w0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %b = load i16, ptr %a, align 2
@@ -112,13 +100,10 @@ define i24 @load_i24(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i24>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldrb w1, [x0, #0x2]
+; ARM64:         ldrb w1, [x0, #0x2]
 ; ARM64-NEXT:    ldrh w0, [x0]
 ; ARM64-NEXT:    orr w2, w0, w1, lsl #16
 ; ARM64-NEXT:    mov w0, w2
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %b = load i24, ptr %a, align 2
@@ -169,16 +154,13 @@ define i24 @load_i24_alt(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i24_alt>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldrb w1, [x0, #0x2]
+; ARM64:         ldrb w1, [x0, #0x2]
 ; ARM64-NEXT:    ldrh w2, [x0]
 ; ARM64-NEXT:    orr w3, w2, w1, lsl #16
 ; ARM64-NEXT:    ldrb w1, [x0, #0x2]
 ; ARM64-NEXT:    ldrh w0, [x0]
 ; ARM64-NEXT:    orr w2, w0, w1, lsl #16
 ; ARM64-NEXT:    mov w0, w2
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %b = load i24, ptr %a, align 2
@@ -197,10 +179,7 @@ define i32 @load_i32(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i32>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldr w0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         ldr w0, [x0]
 ; ARM64-NEXT:    ret
 entry:
   %b = load i32, ptr %a, align 4
@@ -238,11 +217,8 @@ define i32 @load_i32_alt(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i32_alt>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldr w1, [x0]
+; ARM64:         ldr w1, [x0]
 ; ARM64-NEXT:    ldr w0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %b = load i32, ptr %a, align 4
@@ -261,13 +237,10 @@ define i32 @load_i32_grep(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i32_grep>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    add x0, x0, #0x10
+; ARM64:         add x0, x0, #0x10
 ; ARM64-NEXT:    ldr w1, [x0]
 ; ARM64-NEXT:    ldr w0, [x0]
 ; ARM64-NEXT:    mov w0, w1
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %gep = getelementptr i32, ptr %a, i64 4
@@ -290,13 +263,10 @@ define i40 @load_i40(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i40>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldrb w1, [x0, #0x4]
+; ARM64:         ldrb w1, [x0, #0x4]
 ; ARM64-NEXT:    ldr w0, [x0]
 ; ARM64-NEXT:    orr x2, x0, x1, lsl #32
 ; ARM64-NEXT:    mov x0, x2
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %b = load i40, ptr %a, align 2
@@ -320,16 +290,13 @@ define i40 @load_i40_alt(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i40_alt>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldrb w1, [x0, #0x4]
+; ARM64:         ldrb w1, [x0, #0x4]
 ; ARM64-NEXT:    ldr w2, [x0]
 ; ARM64-NEXT:    orr x3, x2, x1, lsl #32
 ; ARM64-NEXT:    ldrb w1, [x0, #0x4]
 ; ARM64-NEXT:    ldr w0, [x0]
 ; ARM64-NEXT:    orr x2, x0, x1, lsl #32
 ; ARM64-NEXT:    mov x0, x2
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %b = load i40, ptr %a, align 2
@@ -351,13 +318,10 @@ define i48 @load_i48(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i48>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldrh w1, [x0, #0x4]
+; ARM64:         ldrh w1, [x0, #0x4]
 ; ARM64-NEXT:    ldr w0, [x0]
 ; ARM64-NEXT:    orr x2, x0, x1, lsl #32
 ; ARM64-NEXT:    mov x0, x2
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %b = load i48, ptr %a, align 2
@@ -381,16 +345,13 @@ define i48 @load_i48_alt(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i48_alt>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldrh w1, [x0, #0x4]
+; ARM64:         ldrh w1, [x0, #0x4]
 ; ARM64-NEXT:    ldr w2, [x0]
 ; ARM64-NEXT:    orr x3, x2, x1, lsl #32
 ; ARM64-NEXT:    ldrh w1, [x0, #0x4]
 ; ARM64-NEXT:    ldr w0, [x0]
 ; ARM64-NEXT:    orr x2, x0, x1, lsl #32
 ; ARM64-NEXT:    mov x0, x2
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %b = load i48, ptr %a, align 2
@@ -414,14 +375,11 @@ define i56 @load_i56(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i56>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldrb w1, [x0, #0x6]
+; ARM64:         ldrb w1, [x0, #0x6]
 ; ARM64-NEXT:    ldrh w2, [x0, #0x4]
 ; ARM64-NEXT:    orr w1, w2, w1, lsl #16
 ; ARM64-NEXT:    ldr w2, [x0]
 ; ARM64-NEXT:    orr x0, x2, x1, lsl #32
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %b = load i56, ptr %a, align 2
@@ -481,9 +439,7 @@ define i56 @load_i56_alt(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i56_alt>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldrb w1, [x0, #0x6]
+; ARM64:         ldrb w1, [x0, #0x6]
 ; ARM64-NEXT:    ldrh w2, [x0, #0x4]
 ; ARM64-NEXT:    orr w1, w2, w1, lsl #16
 ; ARM64-NEXT:    ldr w2, [x0]
@@ -493,7 +449,6 @@ define i56 @load_i56_alt(ptr %a) {
 ; ARM64-NEXT:    orr w1, w2, w1, lsl #16
 ; ARM64-NEXT:    ldr w2, [x0]
 ; ARM64-NEXT:    orr x0, x2, x1, lsl #32
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %b = load i56, ptr %a, align 2
@@ -512,10 +467,7 @@ define i64 @load_i64(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i64>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldr x0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         ldr x0, [x0]
 ; ARM64-NEXT:    ret
 entry:
   %b = load i64, ptr %a, align 8
@@ -553,11 +505,8 @@ define i64 @load_i64_alt(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i64_alt>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldr x1, [x0]
+; ARM64:         ldr x1, [x0]
 ; ARM64-NEXT:    ldr x0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %b = load i64, ptr %a, align 8
@@ -577,10 +526,7 @@ define i128 @load_i128(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i128>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldp x0, x1, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         ldp x0, x1, [x0]
 ; ARM64-NEXT:    ret
 entry:
   %b = load i128, ptr %a, align 8
@@ -623,11 +569,8 @@ define i128 @load_i128_alt(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i128_alt>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldp x1, x2, [x0]
+; ARM64:         ldp x1, x2, [x0]
 ; ARM64-NEXT:    ldp x0, x1, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %b = load i128, ptr %a, align 8
@@ -645,10 +588,7 @@ define float @load_float(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_float>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldr s0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         ldr s0, [x0]
 ; ARM64-NEXT:    ret
 entry:
   %b = load float, ptr %a, align 4
@@ -685,11 +625,8 @@ define float @load_float_alt(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_float_alt>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
+; ARM64:         ldr s0, [x0]
 ; ARM64-NEXT:    ldr s0, [x0]
-; ARM64-NEXT:    ldr s0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %b = load float, ptr %a, align 4
@@ -707,10 +644,7 @@ define double @load_double(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_double>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldr d0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         ldr d0, [x0]
 ; ARM64-NEXT:    ret
 entry:
   %b = load double, ptr %a, align 8
@@ -727,11 +661,8 @@ define double @load_double_alt(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_double_alt>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
+; ARM64:         ldr d0, [x0]
 ; ARM64-NEXT:    ldr d0, [x0]
-; ARM64-NEXT:    ldr d0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %b = load double, ptr %a, align 8
@@ -749,10 +680,7 @@ define <4 x float> @load_4f(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_4f>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldr q0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         ldr q0, [x0]
 ; ARM64-NEXT:    ret
 entry:
   %b = load <4 x float>, ptr %a, align 8
@@ -769,11 +697,8 @@ define <4 x float> @load_4f_alt(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_4f_alt>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
+; ARM64:         ldr q0, [x0]
 ; ARM64-NEXT:    ldr q0, [x0]
-; ARM64-NEXT:    ldr q0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %b = load <4 x float>, ptr %a, align 8
@@ -811,11 +736,8 @@ define void @load_struct_i8_i1(ptr %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_struct_i8_i1>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldrb w1, [x0]
+; ARM64:         ldrb w1, [x0]
 ; ARM64-NEXT:    ldrb w2, [x0, #0x1]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
 ; Make sure we are after the prologue
@@ -840,11 +762,8 @@ define void @load_struct_i8_i8(ptr %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_struct_i8_i8>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldrb w1, [x0]
+; ARM64:         ldrb w1, [x0]
 ; ARM64-NEXT:    ldrb w2, [x0, #0x1]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
 ; Make sure we are after the prologue
@@ -869,11 +788,8 @@ define void @load_struct_i8_i16(ptr %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_struct_i8_i16>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldrb w1, [x0]
+; ARM64:         ldrb w1, [x0]
 ; ARM64-NEXT:    ldrh w2, [x0, #0x2]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
 ; Make sure we are after the prologue
@@ -898,11 +814,8 @@ define void @load_struct_i8_i32(ptr %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_struct_i8_i32>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldrb w1, [x0]
+; ARM64:         ldrb w1, [x0]
 ; ARM64-NEXT:    ldr w2, [x0, #0x4]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
 ; Make sure we are after the prologue
@@ -927,11 +840,8 @@ define void @load_struct_i8_i64(ptr %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_struct_i8_i64>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldrb w1, [x0]
+; ARM64:         ldrb w1, [x0]
 ; ARM64-NEXT:    ldr x2, [x0, #0x8]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
 ; Make sure we are after the prologue
@@ -956,11 +866,8 @@ define void @load_struct_i1_i32(ptr %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_struct_i1_i32>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldrb w1, [x0]
+; ARM64:         ldrb w1, [x0]
 ; ARM64-NEXT:    ldr w2, [x0, #0x4]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
 ; Make sure we are after the prologue
@@ -985,11 +892,8 @@ define void @load_struct_i16_i32(ptr %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_struct_i16_i32>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldrh w1, [x0]
+; ARM64:         ldrh w1, [x0]
 ; ARM64-NEXT:    ldr w2, [x0, #0x4]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
 ; Make sure we are after the prologue
@@ -1014,11 +918,8 @@ define void @load_struct_i32_i32(ptr %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_struct_i32_i32>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldr w1, [x0]
+; ARM64:         ldr w1, [x0]
 ; ARM64-NEXT:    ldr w2, [x0, #0x4]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
 ; Make sure we are after the prologue
@@ -1043,11 +944,8 @@ define void @load_struct_i64_i32(ptr %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_struct_i64_i32>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldr x1, [x0]
+; ARM64:         ldr x1, [x0]
 ; ARM64-NEXT:    ldr w2, [x0, #0x8]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
 ; Make sure we are after the prologue
@@ -1072,11 +970,8 @@ define void @load_struct_ptr_i32(ptr %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_struct_ptr_i32>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldr x1, [x0]
+; ARM64:         ldr x1, [x0]
 ; ARM64-NEXT:    ldr w2, [x0, #0x8]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
 ; Make sure we are after the prologue
@@ -1101,11 +996,8 @@ define void @load_struct_i32_ptr(ptr %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_struct_i32_ptr>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldr w1, [x0]
+; ARM64:         ldr w1, [x0]
 ; ARM64-NEXT:    ldr x2, [x0, #0x8]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
 ; Make sure we are after the prologue
@@ -1130,11 +1022,8 @@ define void @load_struct_f32_ptr(ptr %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_struct_f32_ptr>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldr s0, [x0]
+; ARM64:         ldr s0, [x0]
 ; ARM64-NEXT:    ldr x1, [x0, #0x8]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
 ; Make sure we are after the prologue
@@ -1160,12 +1049,9 @@ define void @load_struct_i128_i1(ptr %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_struct_i128_i1>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldr x1, [x0]
+; ARM64:         ldr x1, [x0]
 ; ARM64-NEXT:    ldr x2, [x0, #0x8]
 ; ARM64-NEXT:    ldrb w3, [x0, #0x10]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
 ; Make sure we are after the prologue
@@ -1196,15 +1082,12 @@ define void @load_struct_i32_i32_i32_i32_i32_i32(ptr %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_struct_i32_i32_i32_i32_i32_i32>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldr w1, [x0]
+; ARM64:         ldr w1, [x0]
 ; ARM64-NEXT:    ldr w2, [x0, #0x4]
 ; ARM64-NEXT:    ldr w3, [x0, #0x8]
 ; ARM64-NEXT:    ldr w4, [x0, #0xc]
 ; ARM64-NEXT:    ldr w5, [x0, #0x10]
 ; ARM64-NEXT:    ldr w6, [x0, #0x14]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
     %1 = load %struct.i32_i32_i32_i32_i32_i32, ptr %0

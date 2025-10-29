@@ -15,10 +15,7 @@ define <2 x float> @fnegv2f32(<2 x float> %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fnegv2f32>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    fneg v0.2s, v0.2s
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         fneg v0.2s, v0.2s
 ; ARM64-NEXT:    ret
   %r = fneg <2 x float> %0
   ret <2 x float> %r
@@ -34,10 +31,7 @@ define <4 x float> @fnegv4f32(<4 x float> %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fnegv4f32>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    fneg v0.4s, v0.4s
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         fneg v0.4s, v0.4s
 ; ARM64-NEXT:    ret
   %r = fneg <4 x float> %0
   ret <4 x float> %r
@@ -53,10 +47,7 @@ define <2 x double> @fnegv2f64(<2 x double> %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fnegv2f64>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    fneg v0.2d, v0.2d
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         fneg v0.2d, v0.2d
 ; ARM64-NEXT:    ret
   %r = fneg <2 x double> %0
   ret <2 x double> %r

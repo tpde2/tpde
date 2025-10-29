@@ -23,13 +23,10 @@ define void @insert_i8_i32_0(ptr %0, i8 %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <insert_i8_i32_0>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldrb w2, [x0]
+; ARM64:         ldrb w2, [x0]
 ; ARM64-NEXT:    ldr w3, [x0, #0x4]
 ; ARM64-NEXT:    strb w1, [x0]
 ; ARM64-NEXT:    str w3, [x0, #0x4]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %2 = load %struct.i8_i32, ptr %0
@@ -50,13 +47,10 @@ define void @insert_i8_i32_1(ptr %0, i32 %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <insert_i8_i32_1>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldrb w2, [x0]
+; ARM64:         ldrb w2, [x0]
 ; ARM64-NEXT:    ldr w3, [x0, #0x4]
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    str w1, [x0, #0x4]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %2 = load %struct.i8_i32, ptr %0
@@ -80,16 +74,13 @@ define void @insert_i8_i32_0_nosalvage(ptr %0, i8 %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <insert_i8_i32_0_nosalvage>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldrb w2, [x0]
+; ARM64:         ldrb w2, [x0]
 ; ARM64-NEXT:    ldr w3, [x0, #0x4]
 ; ARM64-NEXT:    mov w4, w3
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    str w3, [x0, #0x4]
 ; ARM64-NEXT:    strb w1, [x0]
 ; ARM64-NEXT:    str w4, [x0, #0x4]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %2 = load %struct.i8_i32, ptr %0
@@ -114,16 +105,13 @@ define void @insert_i8_i32_1_nosalvage(ptr %0, i32 %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <insert_i8_i32_1_nosalvage>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldrb w2, [x0]
+; ARM64:         ldrb w2, [x0]
 ; ARM64-NEXT:    ldr w3, [x0, #0x4]
 ; ARM64-NEXT:    mov w4, w2
 ; ARM64-NEXT:    strb w2, [x0]
 ; ARM64-NEXT:    str w3, [x0, #0x4]
 ; ARM64-NEXT:    strb w4, [x0]
 ; ARM64-NEXT:    str w1, [x0, #0x4]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %2 = load %struct.i8_i32, ptr %0
@@ -146,13 +134,10 @@ define void @insert_ptr_i32_0(ptr %0, ptr %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <insert_ptr_i32_0>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldr x2, [x0]
+; ARM64:         ldr x2, [x0]
 ; ARM64-NEXT:    ldr w3, [x0, #0x8]
 ; ARM64-NEXT:    str x1, [x0]
 ; ARM64-NEXT:    str w3, [x0, #0x8]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %2 = load %struct.ptr_i32, ptr %0
@@ -173,13 +158,10 @@ define void @insert_ptr_i32_1(ptr %0, i32 %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <insert_ptr_i32_1>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldr x2, [x0]
+; ARM64:         ldr x2, [x0]
 ; ARM64-NEXT:    ldr w3, [x0, #0x8]
 ; ARM64-NEXT:    str x2, [x0]
 ; ARM64-NEXT:    str w1, [x0, #0x8]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %2 = load %struct.ptr_i32, ptr %0
@@ -203,16 +185,13 @@ define void @insert_ptr_i32_0_nosalvage(ptr %0, ptr %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <insert_ptr_i32_0_nosalvage>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldr x2, [x0]
+; ARM64:         ldr x2, [x0]
 ; ARM64-NEXT:    ldr w3, [x0, #0x8]
 ; ARM64-NEXT:    mov w4, w3
 ; ARM64-NEXT:    str x2, [x0]
 ; ARM64-NEXT:    str w3, [x0, #0x8]
 ; ARM64-NEXT:    str x1, [x0]
 ; ARM64-NEXT:    str w4, [x0, #0x8]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %2 = load %struct.ptr_i32, ptr %0
@@ -233,12 +212,9 @@ define void @insert_ptr_i32_poison(ptr %0, ptr %1, i32 %2) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <insert_ptr_i32_poison>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    mov w3, #0x0 // =0
+; ARM64:         mov w3, #0x0 // =0
 ; ARM64-NEXT:    str x1, [x0]
 ; ARM64-NEXT:    str w2, [x0, #0x8]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %3 = insertvalue %struct.ptr_i32 poison, ptr %1, 0
@@ -260,14 +236,11 @@ define ptr @insert_ptr_i32_poison_nosalvage(ptr %0, ptr %1, i32 %2) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <insert_ptr_i32_poison_nosalvage>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    mov x3, x1
+; ARM64:         mov x3, x1
 ; ARM64-NEXT:    mov w4, #0x0 // =0
 ; ARM64-NEXT:    str x3, [x0]
 ; ARM64-NEXT:    str w2, [x0, #0x8]
 ; ARM64-NEXT:    mov x0, x1
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %3 = insertvalue %struct.ptr_i32 poison, ptr %1, 0
@@ -289,14 +262,11 @@ define i32 @insert_ptr_i32_poison_nosalvage1(ptr %0, ptr %1, i32 %2) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <insert_ptr_i32_poison_nosalvage1>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    mov w3, #0x0 // =0
+; ARM64:         mov w3, #0x0 // =0
 ; ARM64-NEXT:    mov w3, w2
 ; ARM64-NEXT:    str x1, [x0]
 ; ARM64-NEXT:    str w3, [x0, #0x8]
 ; ARM64-NEXT:    mov w0, w2
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %3 = insertvalue %struct.ptr_i32 poison, ptr %1, 0
@@ -320,16 +290,13 @@ define void @insert_ptr_i32_1_nosalvage(ptr %0, i32 %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <insert_ptr_i32_1_nosalvage>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldr x2, [x0]
+; ARM64:         ldr x2, [x0]
 ; ARM64-NEXT:    ldr w3, [x0, #0x8]
 ; ARM64-NEXT:    mov x4, x2
 ; ARM64-NEXT:    str x2, [x0]
 ; ARM64-NEXT:    str w3, [x0, #0x8]
 ; ARM64-NEXT:    str x4, [x0]
 ; ARM64-NEXT:    str w1, [x0, #0x8]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %2 = load %struct.ptr_i32, ptr %0
@@ -352,13 +319,10 @@ define void @insert_f32_ptr_0(ptr %0, float %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <insert_f32_ptr_0>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldr s1, [x0]
+; ARM64:         ldr s1, [x0]
 ; ARM64-NEXT:    ldr x1, [x0, #0x8]
 ; ARM64-NEXT:    str s0, [x0]
 ; ARM64-NEXT:    str x1, [x0, #0x8]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %2 = load %struct.f32_ptr, ptr %0
@@ -379,13 +343,10 @@ define void @insert_f32_ptr_1(ptr %0, ptr %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <insert_f32_ptr_1>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldr s0, [x0]
+; ARM64:         ldr s0, [x0]
 ; ARM64-NEXT:    ldr x2, [x0, #0x8]
 ; ARM64-NEXT:    str s0, [x0]
 ; ARM64-NEXT:    str x1, [x0, #0x8]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %2 = load %struct.f32_ptr, ptr %0
@@ -409,16 +370,13 @@ define void @insert_f32_ptr_0_nosalvage(ptr %0, float %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <insert_f32_ptr_0_nosalvage>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldr s1, [x0]
+; ARM64:         ldr s1, [x0]
 ; ARM64-NEXT:    ldr x1, [x0, #0x8]
 ; ARM64-NEXT:    mov x2, x1
 ; ARM64-NEXT:    str s1, [x0]
 ; ARM64-NEXT:    str x1, [x0, #0x8]
 ; ARM64-NEXT:    str s0, [x0]
 ; ARM64-NEXT:    str x2, [x0, #0x8]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %2 = load %struct.f32_ptr, ptr %0
@@ -443,16 +401,13 @@ define void @insert_f32_ptr_1_nosalvage(ptr %0, ptr %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <insert_f32_ptr_1_nosalvage>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldr s0, [x0]
+; ARM64:         ldr s0, [x0]
 ; ARM64-NEXT:    ldr x2, [x0, #0x8]
 ; ARM64-NEXT:    mov v1.16b, v0.16b
 ; ARM64-NEXT:    str s0, [x0]
 ; ARM64-NEXT:    str x2, [x0, #0x8]
 ; ARM64-NEXT:    str s1, [x0]
 ; ARM64-NEXT:    str x1, [x0, #0x8]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %2 = load %struct.f32_ptr, ptr %0
@@ -479,15 +434,12 @@ define void @insert_i128_i1_0(ptr %0, i128 %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <insert_i128_i1_0>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldr x1, [x0]
+; ARM64:         ldr x1, [x0]
 ; ARM64-NEXT:    ldr x4, [x0, #0x8]
 ; ARM64-NEXT:    ldrb w5, [x0, #0x10]
 ; ARM64-NEXT:    str x2, [x0]
 ; ARM64-NEXT:    str x3, [x0, #0x8]
 ; ARM64-NEXT:    strb w5, [x0, #0x10]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %2 = load %struct.i128_i1, ptr %0
@@ -510,15 +462,12 @@ define void @insert_i128_i1_1(ptr %0, i1 %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <insert_i128_i1_1>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldr x2, [x0]
+; ARM64:         ldr x2, [x0]
 ; ARM64-NEXT:    ldr x3, [x0, #0x8]
 ; ARM64-NEXT:    ldrb w4, [x0, #0x10]
 ; ARM64-NEXT:    str x2, [x0]
 ; ARM64-NEXT:    str x3, [x0, #0x8]
 ; ARM64-NEXT:    strb w1, [x0, #0x10]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %2 = load %struct.i128_i1, ptr %0
@@ -547,9 +496,7 @@ define void @insert_i128_i1_0_nosalvage(ptr %0, i128 %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <insert_i128_i1_0_nosalvage>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldr x1, [x0]
+; ARM64:         ldr x1, [x0]
 ; ARM64-NEXT:    ldr x4, [x0, #0x8]
 ; ARM64-NEXT:    ldrb w5, [x0, #0x10]
 ; ARM64-NEXT:    mov w6, w5
@@ -559,7 +506,6 @@ define void @insert_i128_i1_0_nosalvage(ptr %0, i128 %1) {
 ; ARM64-NEXT:    str x2, [x0]
 ; ARM64-NEXT:    str x3, [x0, #0x8]
 ; ARM64-NEXT:    strb w6, [x0, #0x10]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %2 = load %struct.i128_i1, ptr %0
@@ -590,9 +536,7 @@ define void @insert_i128_i1_1_nosalvage(ptr %0, i1 %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <insert_i128_i1_1_nosalvage>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldr x2, [x0]
+; ARM64:         ldr x2, [x0]
 ; ARM64-NEXT:    ldr x3, [x0, #0x8]
 ; ARM64-NEXT:    ldrb w4, [x0, #0x10]
 ; ARM64-NEXT:    mov x5, x2
@@ -603,7 +547,6 @@ define void @insert_i128_i1_1_nosalvage(ptr %0, i1 %1) {
 ; ARM64-NEXT:    str x5, [x0]
 ; ARM64-NEXT:    str x6, [x0, #0x8]
 ; ARM64-NEXT:    strb w1, [x0, #0x10]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %2 = load %struct.i128_i1, ptr %0
@@ -631,9 +574,7 @@ define void @insert_nested_1(ptr %p, i32 %v) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <insert_nested_1>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldr w2, [x0]
+; ARM64:         ldr w2, [x0]
 ; ARM64-NEXT:    ldr w3, [x0, #0x4]
 ; ARM64-NEXT:    ldr w4, [x0, #0x8]
 ; ARM64-NEXT:    ldr w5, [x0, #0xc]
@@ -641,7 +582,6 @@ define void @insert_nested_1(ptr %p, i32 %v) {
 ; ARM64-NEXT:    str w3, [x0, #0x4]
 ; ARM64-NEXT:    str w4, [x0, #0x8]
 ; ARM64-NEXT:    str w5, [x0, #0xc]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %l = load {{i32, i32}, {i32, i32}}, ptr %p
   %iv = insertvalue {{i32, i32}, {i32, i32}} %l, i32 %v, 0, 0
@@ -667,9 +607,7 @@ define void @insert_nested_2(ptr %p, i32 %v) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <insert_nested_2>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldr w2, [x0]
+; ARM64:         ldr w2, [x0]
 ; ARM64-NEXT:    ldr w3, [x0, #0x4]
 ; ARM64-NEXT:    ldr w4, [x0, #0x8]
 ; ARM64-NEXT:    ldr w5, [x0, #0xc]
@@ -677,7 +615,6 @@ define void @insert_nested_2(ptr %p, i32 %v) {
 ; ARM64-NEXT:    str w1, [x0, #0x4]
 ; ARM64-NEXT:    str w4, [x0, #0x8]
 ; ARM64-NEXT:    str w5, [x0, #0xc]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %l = load {{i32, i32}, {i32, i32}}, ptr %p
   %iv = insertvalue {{i32, i32}, {i32, i32}} %l, i32 %v, 0, 1
@@ -703,9 +640,7 @@ define void @insert_nested_3(ptr %p, i32 %v) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <insert_nested_3>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldr w2, [x0]
+; ARM64:         ldr w2, [x0]
 ; ARM64-NEXT:    ldr w3, [x0, #0x4]
 ; ARM64-NEXT:    ldr w4, [x0, #0x8]
 ; ARM64-NEXT:    ldr w5, [x0, #0xc]
@@ -713,7 +648,6 @@ define void @insert_nested_3(ptr %p, i32 %v) {
 ; ARM64-NEXT:    str w3, [x0, #0x4]
 ; ARM64-NEXT:    str w1, [x0, #0x8]
 ; ARM64-NEXT:    str w5, [x0, #0xc]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %l = load {{i32, i32}, {i32, i32}}, ptr %p
   %iv = insertvalue {{i32, i32}, {i32, i32}} %l, i32 %v, 1, 0
@@ -739,9 +673,7 @@ define void @insert_nested_4(ptr %p, i32 %v) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <insert_nested_4>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldr w2, [x0]
+; ARM64:         ldr w2, [x0]
 ; ARM64-NEXT:    ldr w3, [x0, #0x4]
 ; ARM64-NEXT:    ldr w4, [x0, #0x8]
 ; ARM64-NEXT:    ldr w5, [x0, #0xc]
@@ -749,7 +681,6 @@ define void @insert_nested_4(ptr %p, i32 %v) {
 ; ARM64-NEXT:    str w3, [x0, #0x4]
 ; ARM64-NEXT:    str w4, [x0, #0x8]
 ; ARM64-NEXT:    str w1, [x0, #0xc]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %l = load {{i32, i32}, {i32, i32}}, ptr %p
   %iv = insertvalue {{i32, i32}, {i32, i32}} %l, i32 %v, 1, 1
@@ -781,9 +712,7 @@ define void @insert_nested_5(ptr %p, {i32, i32} %v) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <insert_nested_5>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldr w3, [x0]
+; ARM64:         ldr w3, [x0]
 ; ARM64-NEXT:    ldr w4, [x0, #0x4]
 ; ARM64-NEXT:    ldr w5, [x0, #0x8]
 ; ARM64-NEXT:    ldr w6, [x0, #0xc]
@@ -797,7 +726,6 @@ define void @insert_nested_5(ptr %p, {i32, i32} %v) {
 ; ARM64-NEXT:    str w1, [x0, #0x10]
 ; ARM64-NEXT:    str w2, [x0, #0x14]
 ; ARM64-NEXT:    str w9, [x0, #0x18]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %l = load {{i32, i32}, {[2 x {i32, i32}], i32}}, ptr %p
   %iv = insertvalue {{i32, i32}, {[2 x {i32, i32}], i32}} %l, {i32, i32} %v, 1, 0, 1

@@ -17,11 +17,8 @@ define float @fmul_f32_1(float %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fmul_f32_1>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    fmov s1, #1.00000000
+; ARM64:         fmov s1, #1.00000000
 ; ARM64-NEXT:    fmul s0, s0, s1
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
     %1 = fmul float %0, 1.0
@@ -39,13 +36,10 @@ define float @fmul_f32_5_32(float %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fmul_f32_5_32>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    mov x16, #0x3d71 // =15729
+; ARM64:         mov x16, #0x3d71 // =15729
 ; ARM64-NEXT:    movk x16, #0x40aa, lsl #16
 ; ARM64-NEXT:    fmov s1, w16
 ; ARM64-NEXT:    fmul s0, s0, s1
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
     %1 = fmul float %0, 0x401547AE20000000
@@ -61,10 +55,7 @@ define float @fmul_f32_f32(float %0, float %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fmul_f32_f32>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    fmul s0, s0, s1
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         fmul s0, s0, s1
 ; ARM64-NEXT:    ret
   entry:
     %2 = fmul float %0, %1
@@ -82,11 +73,8 @@ define double @fmul_f64_1(double %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fmul_f64_1>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    fmov d1, #1.00000000
+; ARM64:         fmov d1, #1.00000000
 ; ARM64-NEXT:    fmul d0, d0, d1
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
     %1 = fmul double %0, 1.0
@@ -104,15 +92,12 @@ define double @fmul_f64_5_32(double %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fmul_f64_5_32>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    mov x16, #0xe148 // =57672
+; ARM64:         mov x16, #0xe148 // =57672
 ; ARM64-NEXT:    movk x16, #0x147a, lsl #16
 ; ARM64-NEXT:    movk x16, #0x47ae, lsl #32
 ; ARM64-NEXT:    movk x16, #0x4015, lsl #48
 ; ARM64-NEXT:    fmov d1, x16
 ; ARM64-NEXT:    fmul d0, d0, d1
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
     %1 = fmul double %0, 5.32
@@ -128,10 +113,7 @@ define double @fmul_f64_f64(double %0, double %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fmul_f64_f64>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    fmul d0, d0, d1
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         fmul d0, d0, d1
 ; ARM64-NEXT:    ret
   entry:
     %2 = fmul double %0, %1
@@ -151,12 +133,9 @@ define float @fmul_f32_no_salvage_imm(float %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fmul_f32_no_salvage_imm>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    fmov s1, #1.00000000
+; ARM64:         fmov s1, #1.00000000
 ; ARM64-NEXT:    fmul s1, s0, s1
 ; ARM64-NEXT:    fmul s0, s0, s1
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
     %1 = fmul float %0, 1.0
@@ -175,11 +154,8 @@ define float @fmul_f32_no_salvage_reg(float %0, float %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fmul_f32_no_salvage_reg>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    fmul s1, s0, s1
+; ARM64:         fmul s1, s0, s1
 ; ARM64-NEXT:    fmul s0, s0, s1
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
     %2 = fmul float %0, %1
@@ -200,12 +176,9 @@ define double @fmul_f64_no_salvage_imm(double %0) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fmul_f64_no_salvage_imm>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    fmov d1, #1.00000000
+; ARM64:         fmov d1, #1.00000000
 ; ARM64-NEXT:    fmul d1, d0, d1
 ; ARM64-NEXT:    fmul d0, d0, d1
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
     %1 = fmul double %0, 1.0
@@ -224,11 +197,8 @@ define double @fmul_f64_no_salvage_reg(double %0, double %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fmul_f64_no_salvage_reg>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    fmul d1, d0, d1
+; ARM64:         fmul d1, d0, d1
 ; ARM64-NEXT:    fmul d0, d0, d1
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   entry:
     %2 = fmul double %0, %1
@@ -251,7 +221,7 @@ define fp128 @fmul_f128(fp128 %a, fp128 %b) {
 ; ARM64-LABEL: <fmul_f128>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    bl 0x158 <fmul_f128+0x8>
+; ARM64-NEXT:    bl 0xc8 <fmul_f128+0x8>
 ; ARM64-NEXT:     R_AARCH64_CALL26 __multf3
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
@@ -276,7 +246,7 @@ define fp128 @fmul_f128_const(fp128 %a) {
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    movi v1.16b, #0x0
-; ARM64-NEXT:    bl 0x17c <fmul_f128_const+0xc>
+; ARM64-NEXT:    bl 0xec <fmul_f128_const+0xc>
 ; ARM64-NEXT:     R_AARCH64_CALL26 __multf3
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret

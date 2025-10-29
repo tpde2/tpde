@@ -21,10 +21,7 @@ define float @minnumf32(float %0, float %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <minnumf32>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    fminnm s0, s0, s1
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         fminnm s0, s0, s1
 ; ARM64-NEXT:    ret
   %res = call float @llvm.minnum(float %0, float %1)
   ret float %res
@@ -46,10 +43,7 @@ define double @minnumf64(double %0, double %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <minnumf64>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    fminnm d0, d0, d1
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         fminnm d0, d0, d1
 ; ARM64-NEXT:    ret
   %res = call double @llvm.minnum(double %0, double %1)
   ret double %res
@@ -71,11 +65,8 @@ define float @minnumf32_noreuse(float %0, float %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <minnumf32_noreuse>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    fminnm s1, s0, s1
+; ARM64:         fminnm s1, s0, s1
 ; ARM64-NEXT:    fadd s0, s0, s1
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %cs = call float @llvm.minnum(float %0, float %1)
   %res = fadd float %0, %cs
@@ -98,11 +89,8 @@ define double @minnumf64_noreuse(double %0, double %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <minnumf64_noreuse>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    fminnm d1, d0, d1
+; ARM64:         fminnm d1, d0, d1
 ; ARM64-NEXT:    fadd d0, d0, d1
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %cs = call double @llvm.minnum(double %0, double %1)
   %res = fadd double %0, %cs

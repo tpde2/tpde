@@ -14,10 +14,7 @@ define void @empty() {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <empty>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
-; ARM64-NEXT:    ret
+; ARM64:         ret
   entry:
     ret void
 }

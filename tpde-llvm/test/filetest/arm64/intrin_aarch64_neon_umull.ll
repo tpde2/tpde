@@ -6,10 +6,7 @@
 
 define <8 x i16> @v8i8(<8 x i8> %a, <8 x i8> %b) {
 ; ARM64-LABEL: <v8i8>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    umull v0.8h, v0.8b, v1.8b
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         umull v0.8h, v0.8b, v1.8b
 ; ARM64-NEXT:    ret
   %r = call <8 x i16> @llvm.aarch64.neon.umull(<8 x i8> %a, <8 x i8> %b)
   ret <8 x i16> %r
@@ -17,10 +14,7 @@ define <8 x i16> @v8i8(<8 x i8> %a, <8 x i8> %b) {
 
 define <4 x i32> @v4i16(<4 x i16> %a, <4 x i16> %b) {
 ; ARM64-LABEL: <v4i16>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    umull v0.4s, v0.4h, v1.4h
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         umull v0.4s, v0.4h, v1.4h
 ; ARM64-NEXT:    ret
   %r = call <4 x i32> @llvm.aarch64.neon.umull(<4 x i16> %a, <4 x i16> %b)
   ret <4 x i32> %r
@@ -28,10 +22,7 @@ define <4 x i32> @v4i16(<4 x i16> %a, <4 x i16> %b) {
 
 define <2 x i64> @v2i32(<2 x i32> %a, <2 x i32> %b) {
 ; ARM64-LABEL: <v2i32>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    umull v0.2d, v0.2s, v1.2s
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         umull v0.2d, v0.2s, v1.2s
 ; ARM64-NEXT:    ret
   %r = call <2 x i64> @llvm.aarch64.neon.umull(<2 x i32> %a, <2 x i32> %b)
   ret <2 x i64> %r

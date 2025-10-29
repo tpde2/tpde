@@ -16,11 +16,8 @@ define @eq(%a, %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <eq>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    cmp x0, x1
+; ARM64:         cmp x0, x1
 ; ARM64-NEXT:    csel x0, x0, x1, eq
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %res = condselect %a, %b, %a, %b, 0
@@ -38,11 +35,8 @@ define @neq(%a, %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <neq>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    cmp x0, x1
+; ARM64:         cmp x0, x1
 ; ARM64-NEXT:    csel x0, x0, x1, ne
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %res = condselect %a, %b, %a, %b, 1
@@ -60,11 +54,8 @@ define @uge(%a, %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <uge>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    cmp x0, x1
+; ARM64:         cmp x0, x1
 ; ARM64-NEXT:    csel x0, x0, x1, hs
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %res = condselect %a, %b, %a, %b, 2
@@ -82,11 +73,8 @@ define @ugt(%a, %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ugt>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    cmp x0, x1
+; ARM64:         cmp x0, x1
 ; ARM64-NEXT:    csel x0, x0, x1, hi
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %res = condselect %a, %b, %a, %b, 3
@@ -104,11 +92,8 @@ define @ule(%a, %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ule>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    cmp x0, x1
+; ARM64:         cmp x0, x1
 ; ARM64-NEXT:    csel x0, x0, x1, ls
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %res = condselect %a, %b, %a, %b, 4
@@ -126,11 +111,8 @@ define @ult(%a, %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ult>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    cmp x0, x1
+; ARM64:         cmp x0, x1
 ; ARM64-NEXT:    csel x0, x0, x1, lo
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %res = condselect %a, %b, %a, %b, 5
@@ -148,11 +130,8 @@ define @sge(%a, %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <sge>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    cmp x0, x1
+; ARM64:         cmp x0, x1
 ; ARM64-NEXT:    csel x0, x0, x1, ge
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %res = condselect %a, %b, %a, %b, 6
@@ -170,11 +149,8 @@ define @sgt(%a, %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <sgt>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    cmp x0, x1
+; ARM64:         cmp x0, x1
 ; ARM64-NEXT:    csel x0, x0, x1, gt
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %res = condselect %a, %b, %a, %b, 7
@@ -192,11 +168,8 @@ define @sle(%a, %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <sle>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    cmp x0, x1
+; ARM64:         cmp x0, x1
 ; ARM64-NEXT:    csel x0, x0, x1, le
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %res = condselect %a, %b, %a, %b, 8
@@ -214,11 +187,8 @@ define @slt(%a, %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <slt>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    cmp x0, x1
+; ARM64:         cmp x0, x1
 ; ARM64-NEXT:    csel x0, x0, x1, lt
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %res = condselect %a, %b, %a, %b, 9

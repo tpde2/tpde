@@ -15,11 +15,8 @@ define i32 @load_i32_gep1(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i32_gep1>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldr w1, [x0, #0x10]
+; ARM64:         ldr w1, [x0, #0x10]
 ; ARM64-NEXT:    mov w0, w1
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %gep = getelementptr i32, ptr %a, i64 4
   %load = load i32, ptr %gep, align 4
@@ -35,11 +32,8 @@ define i32 @load_i32_gep2(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i32_gep2>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    add x0, x0, #0xd
+; ARM64:         add x0, x0, #0xd
 ; ARM64-NEXT:    ldr w0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %gep = getelementptr i8, ptr %a, i64 13
   %load = load i32, ptr %gep, align 4
@@ -55,11 +49,8 @@ define i32 @load_i32_gep3(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i32_gep3>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    sub x0, x0, #0x4
+; ARM64:         sub x0, x0, #0x4
 ; ARM64-NEXT:    ldr w0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %gep = getelementptr i32, ptr %a, i64 -1
   %load = load i32, ptr %gep, align 4
@@ -75,11 +66,8 @@ define i32 @load_i32_gep4(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i32_gep4>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    sub x0, x0, #0x400
+; ARM64:         sub x0, x0, #0x400
 ; ARM64-NEXT:    ldr w0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %gep = getelementptr i32, ptr %a, i64 -256
   %load = load i32, ptr %gep, align 4
@@ -95,11 +83,8 @@ define i32 @load_i32_gep5(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i32_gep5>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldr w1, [x0, #0x2000]
+; ARM64:         ldr w1, [x0, #0x2000]
 ; ARM64-NEXT:    mov w0, w1
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %gep = getelementptr i32, ptr %a, i64 2048
   %load = load i32, ptr %gep, align 4
@@ -115,11 +100,8 @@ define i32 @load_i32_gep6(ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i32_gep6>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    add x0, x0, #0x40, lsl #12 // =0x40000
+; ARM64:         add x0, x0, #0x40, lsl #12 // =0x40000
 ; ARM64-NEXT:    ldr w0, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %gep = getelementptr i32, ptr %a, i64 65536
   %load = load i32, ptr %gep, align 4
@@ -135,10 +117,7 @@ define void @store_i32_gep1(i32 %v, ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_i32_gep1>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    str w0, [x1, #0x10]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         str w0, [x1, #0x10]
 ; ARM64-NEXT:    ret
   %gep = getelementptr i32, ptr %a, i64 4
   store i32 %v, ptr %gep, align 4
@@ -154,11 +133,8 @@ define void @store_i32_gep2(i32 %v, ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_i32_gep2>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    add x1, x1, #0xd
+; ARM64:         add x1, x1, #0xd
 ; ARM64-NEXT:    str w0, [x1]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %gep = getelementptr i8, ptr %a, i64 13
   store i32 %v, ptr %gep, align 4
@@ -174,11 +150,8 @@ define void @store_i32_gep3(i32 %v, ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_i32_gep3>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    sub x1, x1, #0x4
+; ARM64:         sub x1, x1, #0x4
 ; ARM64-NEXT:    str w0, [x1]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %gep = getelementptr i32, ptr %a, i64 -1
   store i32 %v, ptr %gep, align 4
@@ -194,11 +167,8 @@ define void @store_i32_gep4(i32 %v, ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_i32_gep4>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    sub x1, x1, #0x400
+; ARM64:         sub x1, x1, #0x400
 ; ARM64-NEXT:    str w0, [x1]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %gep = getelementptr i32, ptr %a, i64 -256
   store i32 %v, ptr %gep, align 4
@@ -214,10 +184,7 @@ define void @store_i32_gep5(i32 %v, ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_i32_gep5>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    str w0, [x1, #0x2000]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         str w0, [x1, #0x2000]
 ; ARM64-NEXT:    ret
   %gep = getelementptr i32, ptr %a, i64 2048
   store i32 %v, ptr %gep, align 4
@@ -233,11 +200,8 @@ define void @store_i32_gep6(i32 %v, ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_i32_gep6>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    add x1, x1, #0x40, lsl #12 // =0x40000
+; ARM64:         add x1, x1, #0x40, lsl #12 // =0x40000
 ; ARM64-NEXT:    str w0, [x1]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %gep = getelementptr i32, ptr %a, i64 65536
   store i32 %v, ptr %gep, align 4

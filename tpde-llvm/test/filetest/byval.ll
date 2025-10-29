@@ -16,13 +16,10 @@ define i32 @fn_i32_byval_ptr_i32_i32(ptr byval(%struct.ptr_i32) align 8 %0, i32 
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fn_i32_byval_ptr_i32_i32>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    add x17, sp, #0xa0
+; ARM64:         mov x17, sp
 ; ARM64-NEXT:    add x9, x17, #0x0
 ; ARM64-NEXT:    ldr w1, [x9, #0x8]
 ; ARM64-NEXT:    add w0, w0, w1
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %addr = getelementptr %struct.ptr_i32, ptr %0, i64 0, i32 1
@@ -168,9 +165,7 @@ define void @fn_byval3(ptr byval(i8) align 1 %a, ptr byval(i32) align 2 %b, ptr 
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fn_byval3>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    add x17, sp, #0xa0
+; ARM64:         mov x17, sp
 ; ARM64-NEXT:    add x9, x17, #0x0
 ; ARM64-NEXT:    add x10, x17, #0x8
 ; ARM64-NEXT:    add x11, x17, #0x10
@@ -180,7 +175,6 @@ define void @fn_byval3(ptr byval(i8) align 1 %a, ptr byval(i32) align 2 %b, ptr 
 ; ARM64-NEXT:    str w10, [x0]
 ; ARM64-NEXT:    ldrb w11, [x11]
 ; ARM64-NEXT:    strb w11, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %la = load i8, ptr %a
   store volatile i8 %la, ptr %d
@@ -221,7 +215,7 @@ define void @call_byval3(ptr %a, ptr %b, ptr %c, ptr %d) {
 ; ARM64-NEXT:    ldrb w16, [x2]
 ; ARM64-NEXT:    strb w16, [sp, #0x10]
 ; ARM64-NEXT:    mov x0, x3
-; ARM64-NEXT:    bl 0x148 <call_byval3+0x28>
+; ARM64-NEXT:    bl 0x138 <call_byval3+0x28>
 ; ARM64-NEXT:     R_AARCH64_CALL26 fn_byval3
 ; ARM64-NEXT:    add sp, sp, #0x20
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -291,7 +285,7 @@ define void @call_byval4(ptr %a, ptr %b) {
 ; ARM64-LABEL: <call_byval4>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    bl 0x1a8 <call_byval4+0x8>
+; ARM64-NEXT:    bl 0x198 <call_byval4+0x8>
 ; ARM64-NEXT:     R_AARCH64_CALL26 fn_byval4
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret

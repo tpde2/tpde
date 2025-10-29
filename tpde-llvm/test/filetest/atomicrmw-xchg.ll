@@ -15,11 +15,8 @@ define i8 @atomicrmw_xchg_i8_seq_cst(ptr %p, i8 %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <atomicrmw_xchg_i8_seq_cst>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    swpalb w1, w1, [x0]
+; ARM64:         swpalb w1, w1, [x0]
 ; ARM64-NEXT:    mov w0, w1
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %r = atomicrmw xchg ptr %p, i8 %a seq_cst
   ret i8 %r
@@ -35,10 +32,7 @@ define void @atomicrmw_xchg_i8_seq_cst_nouse(ptr %p, i8 %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <atomicrmw_xchg_i8_seq_cst_nouse>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    swpalb w1, w1, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         swpalb w1, w1, [x0]
 ; ARM64-NEXT:    ret
   %r = atomicrmw xchg ptr %p, i8 %a seq_cst
   ret void
@@ -54,11 +48,8 @@ define i16 @atomicrmw_xchg_i16_seq_cst(ptr %p, i16 %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <atomicrmw_xchg_i16_seq_cst>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    swpalh w1, w1, [x0]
+; ARM64:         swpalh w1, w1, [x0]
 ; ARM64-NEXT:    mov w0, w1
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %r = atomicrmw xchg ptr %p, i16 %a seq_cst
   ret i16 %r
@@ -74,10 +65,7 @@ define void @atomicrmw_xchg_i16_seq_cst_nouse(ptr %p, i16 %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <atomicrmw_xchg_i16_seq_cst_nouse>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    swpalh w1, w1, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         swpalh w1, w1, [x0]
 ; ARM64-NEXT:    ret
   %r = atomicrmw xchg ptr %p, i16 %a seq_cst
   ret void
@@ -93,11 +81,8 @@ define i32 @atomicrmw_xchg_i32_seq_cst(ptr %p, i32 %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <atomicrmw_xchg_i32_seq_cst>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    swpal w1, w1, [x0]
+; ARM64:         swpal w1, w1, [x0]
 ; ARM64-NEXT:    mov w0, w1
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %r = atomicrmw xchg ptr %p, i32 %a seq_cst
   ret i32 %r
@@ -112,10 +97,7 @@ define void @atomicrmw_xchg_i32_seq_cst_nouse(ptr %p, i32 %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <atomicrmw_xchg_i32_seq_cst_nouse>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    swpal w1, w1, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         swpal w1, w1, [x0]
 ; ARM64-NEXT:    ret
   %r = atomicrmw xchg ptr %p, i32 %a seq_cst
   ret void
@@ -131,11 +113,8 @@ define i64 @atomicrmw_xchg_i64_seq_cst(ptr %p, i64 %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <atomicrmw_xchg_i64_seq_cst>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    swpal x1, x1, [x0]
+; ARM64:         swpal x1, x1, [x0]
 ; ARM64-NEXT:    mov x0, x1
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %r = atomicrmw xchg ptr %p, i64 %a seq_cst
   ret i64 %r
@@ -150,10 +129,7 @@ define void @atomicrmw_xchg_i64_seq_cst_nouse(ptr %p, i64 %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <atomicrmw_xchg_i64_seq_cst_nouse>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    swpal x1, x1, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         swpal x1, x1, [x0]
 ; ARM64-NEXT:    ret
   %r = atomicrmw xchg ptr %p, i64 %a seq_cst
   ret void
@@ -169,11 +145,8 @@ define ptr @atomicrmw_xchg_ptr_seq_cst(ptr %p, ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <atomicrmw_xchg_ptr_seq_cst>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    swpal x1, x1, [x0]
+; ARM64:         swpal x1, x1, [x0]
 ; ARM64-NEXT:    mov x0, x1
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %r = atomicrmw xchg ptr %p, ptr %a seq_cst
   ret ptr %r
@@ -188,10 +161,7 @@ define void @atomicrmw_xchg_ptr_seq_cst_nouse(ptr %p, ptr %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <atomicrmw_xchg_ptr_seq_cst_nouse>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    swpal x1, x1, [x0]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         swpal x1, x1, [x0]
 ; ARM64-NEXT:    ret
   %r = atomicrmw xchg ptr %p, ptr %a seq_cst
   ret void

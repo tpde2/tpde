@@ -14,10 +14,7 @@ define ptr @f0() {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <f0>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldr x0, [x29, #0x8]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         ldr x0, [x29, #0x8]
 ; ARM64-NEXT:    ret
   %p = call ptr @llvm.returnaddress(i32 0)
   ret ptr %p
@@ -32,10 +29,7 @@ define ptr @f1() {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <f1>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    mov x0, #0x0 // =0
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         mov x0, #0x0 // =0
 ; ARM64-NEXT:    ret
   %p = call ptr @llvm.returnaddress(i32 1)
   ret ptr %p
@@ -50,10 +44,7 @@ define ptr @f4() {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <f4>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    mov x0, #0x0 // =0
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         mov x0, #0x0 // =0
 ; ARM64-NEXT:    ret
   %p = call ptr @llvm.returnaddress(i32 4)
   ret ptr %p

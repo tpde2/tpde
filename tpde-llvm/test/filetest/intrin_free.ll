@@ -15,10 +15,7 @@ define void @free_intrinsics(ptr %p) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <free_intrinsics>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    mov w0, #0x0 // =0
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         mov w0, #0x0 // =0
 ; ARM64-NEXT:    ret
   call void @llvm.donothing()
 ; %a0 = call i32 @llvm.annotation.i32(i32 undef, ptr undef, ptr undef, i32 undef)

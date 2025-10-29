@@ -13,9 +13,7 @@ define void @test() {
 ; X64-NEXT:    ud2
 ;
 ; ARM64-LABEL: <test>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    brk #0x1
+; ARM64:         brk #0x1
 entry:
   unreachable
 }

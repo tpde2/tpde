@@ -23,9 +23,7 @@ define float @atomicrmw_fadd_float_seq_cst(ptr %p, float %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <atomicrmw_fadd_float_seq_cst>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldr s1, [x0]
+; ARM64:         ldr s1, [x0]
 ; ARM64-NEXT:    fadd s2, s1, s0
 ; ARM64-NEXT:    fmov w1, s1
 ; ARM64-NEXT:    mov w3, w1
@@ -33,9 +31,8 @@ define float @atomicrmw_fadd_float_seq_cst(ptr %p, float %a) {
 ; ARM64-NEXT:    casal w3, w2, [x0]
 ; ARM64-NEXT:    fmov s1, w3
 ; ARM64-NEXT:    cmp w3, w1
-; ARM64-NEXT:    b.ne 0xc <atomicrmw_fadd_float_seq_cst+0xc>
+; ARM64-NEXT:    b.ne 0x4 <atomicrmw_fadd_float_seq_cst+0x4>
 ; ARM64-NEXT:    fmov s0, s1
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %r = atomicrmw fadd ptr %p, float %a seq_cst
   ret float %r
@@ -59,9 +56,7 @@ define void @atomicrmw_fadd_float_seq_cst_nouse(ptr %p, float %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <atomicrmw_fadd_float_seq_cst_nouse>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldr s1, [x0]
+; ARM64:         ldr s1, [x0]
 ; ARM64-NEXT:    fadd s2, s1, s0
 ; ARM64-NEXT:    fmov w1, s1
 ; ARM64-NEXT:    mov w3, w1
@@ -69,9 +64,8 @@ define void @atomicrmw_fadd_float_seq_cst_nouse(ptr %p, float %a) {
 ; ARM64-NEXT:    casal w3, w2, [x0]
 ; ARM64-NEXT:    fmov s1, w3
 ; ARM64-NEXT:    cmp w3, w1
-; ARM64-NEXT:    b.ne 0x4c <atomicrmw_fadd_float_seq_cst_nouse+0xc>
+; ARM64-NEXT:    b.ne 0x34 <atomicrmw_fadd_float_seq_cst_nouse+0x4>
 ; ARM64-NEXT:    fmov s0, s1
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %r = atomicrmw fadd ptr %p, float %a seq_cst
   ret void
@@ -95,9 +89,7 @@ define double @atomicrmw_fadd_double_seq_cst(ptr %p, double %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <atomicrmw_fadd_double_seq_cst>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldr d1, [x0]
+; ARM64:         ldr d1, [x0]
 ; ARM64-NEXT:    fadd d2, d1, d0
 ; ARM64-NEXT:    fmov x1, d1
 ; ARM64-NEXT:    mov x3, x1
@@ -105,9 +97,8 @@ define double @atomicrmw_fadd_double_seq_cst(ptr %p, double %a) {
 ; ARM64-NEXT:    casal x3, x2, [x0]
 ; ARM64-NEXT:    fmov d1, x3
 ; ARM64-NEXT:    cmp x3, x1
-; ARM64-NEXT:    b.ne 0x8c <atomicrmw_fadd_double_seq_cst+0xc>
+; ARM64-NEXT:    b.ne 0x64 <atomicrmw_fadd_double_seq_cst+0x4>
 ; ARM64-NEXT:    fmov d0, d1
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %r = atomicrmw fadd ptr %p, double %a seq_cst
   ret double %r
@@ -131,9 +122,7 @@ define void @atomicrmw_fadd_double_seq_cst_nouse(ptr %p, double %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <atomicrmw_fadd_double_seq_cst_nouse>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    ldr d1, [x0]
+; ARM64:         ldr d1, [x0]
 ; ARM64-NEXT:    fadd d2, d1, d0
 ; ARM64-NEXT:    fmov x1, d1
 ; ARM64-NEXT:    mov x3, x1
@@ -141,9 +130,8 @@ define void @atomicrmw_fadd_double_seq_cst_nouse(ptr %p, double %a) {
 ; ARM64-NEXT:    casal x3, x2, [x0]
 ; ARM64-NEXT:    fmov d1, x3
 ; ARM64-NEXT:    cmp x3, x1
-; ARM64-NEXT:    b.ne 0xcc <atomicrmw_fadd_double_seq_cst_nouse+0xc>
+; ARM64-NEXT:    b.ne 0x94 <atomicrmw_fadd_double_seq_cst_nouse+0x4>
 ; ARM64-NEXT:    fmov d0, d1
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %r = atomicrmw fadd ptr %p, double %a seq_cst
   ret void

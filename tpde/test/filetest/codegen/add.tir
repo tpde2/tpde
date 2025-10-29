@@ -15,10 +15,7 @@ define @add1(%a, %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <add1>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    add x0, x0, x1
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64:         add x0, x0, x1
 ; ARM64-NEXT:    ret
 entry:
   %res = add %a, %b
@@ -36,11 +33,8 @@ define @add2(%a, %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <add2>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
-; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    add x2, x0, x1
+; ARM64:         add x2, x0, x1
 ; ARM64-NEXT:    add x0, x0, x2
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
 entry:
   %tmp = add %a, %b
