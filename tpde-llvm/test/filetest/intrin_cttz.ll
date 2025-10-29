@@ -14,11 +14,8 @@ declare i64   @llvm.cttz.i64  (i64, i1)
 
 define void @cttz_i8(i8 %0) {
 ; X64-LABEL: <cttz_i8>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    or edi, 0x100
+; X64:         or edi, 0x100
 ; X64-NEXT:    bsf eax, edi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <cttz_i8>:
@@ -33,10 +30,7 @@ define void @cttz_i8(i8 %0) {
 
 define void @cttz_i8_zero_poison(i8 %0) {
 ; X64-LABEL: <cttz_i8_zero_poison>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    bsf edi, edi
-; X64-NEXT:    pop rbp
+; X64:         bsf edi, edi
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <cttz_i8_zero_poison>:
@@ -50,11 +44,8 @@ define void @cttz_i8_zero_poison(i8 %0) {
 
 define void @cttz_i16(i16 %0) {
 ; X64-LABEL: <cttz_i16>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    or edi, 0x10000
+; X64:         or edi, 0x10000
 ; X64-NEXT:    bsf eax, edi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <cttz_i16>:
@@ -69,10 +60,7 @@ define void @cttz_i16(i16 %0) {
 
 define void @cttz_i16_zero_poison(i16 %0) {
 ; X64-LABEL: <cttz_i16_zero_poison>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    bsf edi, edi
-; X64-NEXT:    pop rbp
+; X64:         bsf edi, edi
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <cttz_i16_zero_poison>:
@@ -86,11 +74,8 @@ define void @cttz_i16_zero_poison(i16 %0) {
 
 define void @cttz_i32(i32 %0) {
 ; X64-LABEL: <cttz_i32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, 0x20
+; X64:         mov eax, 0x20
 ; X64-NEXT:    bsf eax, edi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <cttz_i32>:
@@ -104,10 +89,7 @@ define void @cttz_i32(i32 %0) {
 
 define void @cttz_i32_zero_poison(i32 %0) {
 ; X64-LABEL: <cttz_i32_zero_poison>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    bsf edi, edi
-; X64-NEXT:    pop rbp
+; X64:         bsf edi, edi
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <cttz_i32_zero_poison>:
@@ -121,11 +103,8 @@ define void @cttz_i32_zero_poison(i32 %0) {
 
 define void @cttz_i64(i64 %0) {
 ; X64-LABEL: <cttz_i64>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, 0x40
+; X64:         mov eax, 0x40
 ; X64-NEXT:    bsf rax, rdi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <cttz_i64>:
@@ -139,10 +118,7 @@ define void @cttz_i64(i64 %0) {
 
 define void @cttz_i64_zero_poison(i64 %0) {
 ; X64-LABEL: <cttz_i64_zero_poison>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    bsf rdi, rdi
-; X64-NEXT:    pop rbp
+; X64:         bsf rdi, rdi
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <cttz_i64_zero_poison>:
@@ -156,13 +132,10 @@ define void @cttz_i64_zero_poison(i64 %0) {
 
 define void @cttz_i32_no_salvage(i32 %0) {
 ; X64-LABEL: <cttz_i32_no_salvage>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, 0x20
+; X64:         mov eax, 0x20
 ; X64-NEXT:    bsf eax, edi
 ; X64-NEXT:    mov eax, 0x20
 ; X64-NEXT:    bsf eax, edi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <cttz_i32_no_salvage>:
@@ -179,13 +152,10 @@ define void @cttz_i32_no_salvage(i32 %0) {
 
 define void @cttz_i64_no_salvage(i64 %0) {
 ; X64-LABEL: <cttz_i64_no_salvage>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, 0x40
+; X64:         mov eax, 0x40
 ; X64-NEXT:    bsf rax, rdi
 ; X64-NEXT:    mov eax, 0x40
 ; X64-NEXT:    bsf rax, rdi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <cttz_i64_no_salvage>:
@@ -202,14 +172,11 @@ define void @cttz_i64_no_salvage(i64 %0) {
 
 define void @cttz_i16_no_salvage(i16 %0) {
 ; X64-LABEL: <cttz_i16_no_salvage>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, edi
+; X64:         mov eax, edi
 ; X64-NEXT:    or eax, 0x10000
 ; X64-NEXT:    bsf ecx, eax
 ; X64-NEXT:    or edi, 0x10000
 ; X64-NEXT:    bsf eax, edi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <cttz_i16_no_salvage>:

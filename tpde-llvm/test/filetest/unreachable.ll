@@ -8,9 +8,7 @@
 
 define void @test() {
 ; X64-LABEL: <test>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    ud2
+; X64:         ud2
 ;
 ; ARM64-LABEL: <test>:
 ; ARM64:         brk #0x1

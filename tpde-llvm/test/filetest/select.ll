@@ -8,12 +8,9 @@
 
 define i32 @select_i32_reg(i1 %0, i32 %1, i32 %2) {
 ; X64-LABEL: <select_i32_reg>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    test dil, 0x1
+; X64:         test dil, 0x1
 ; X64-NEXT:    cmove esi, edx
 ; X64-NEXT:    mov eax, esi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <select_i32_reg>:
@@ -28,12 +25,9 @@ define i32 @select_i32_reg(i1 %0, i32 %1, i32 %2) {
 
 define i64 @select_i64_reg(i1 %0, i64 %1, i64 %2) {
 ; X64-LABEL: <select_i64_reg>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    test dil, 0x1
+; X64:         test dil, 0x1
 ; X64-NEXT:    cmove rsi, rdx
 ; X64-NEXT:    mov rax, rsi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <select_i64_reg>:
@@ -49,12 +43,9 @@ define i64 @select_i64_reg(i1 %0, i64 %1, i64 %2) {
 
 define ptr @select_ptr_reg(i1 %0, ptr %1, ptr %2) {
 ; X64-LABEL: <select_ptr_reg>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    test dil, 0x1
+; X64:         test dil, 0x1
 ; X64-NEXT:    cmove rsi, rdx
 ; X64-NEXT:    mov rax, rsi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <select_ptr_reg>:
@@ -69,13 +60,10 @@ define ptr @select_ptr_reg(i1 %0, ptr %1, ptr %2) {
 
 define i128 @select_i128_reg(i1 %0, i128 %1, i128 %2) {
 ; X64-LABEL: <select_i128_reg>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    test dil, 0x1
+; X64:         test dil, 0x1
 ; X64-NEXT:    cmove rsi, rcx
 ; X64-NEXT:    cmove rdx, r8
 ; X64-NEXT:    mov rax, rsi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <select_i128_reg>:
@@ -92,14 +80,11 @@ define i128 @select_i128_reg(i1 %0, i128 %1, i128 %2) {
 
 define float @select_f32_reg(i1 %0, float %1, float %2) {
 ; X64-LABEL: <select_f32_reg>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    test dil, 0x1
+; X64:         test dil, 0x1
 ; X64-NEXT:    je <L0>
 ; X64-NEXT:    movaps xmm1, xmm0
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    movaps xmm0, xmm1
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <select_f32_reg>:
@@ -114,14 +99,11 @@ define float @select_f32_reg(i1 %0, float %1, float %2) {
 
 define double @select_f64_reg(i1 %0, double %1, double %2) {
 ; X64-LABEL: <select_f64_reg>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    test dil, 0x1
+; X64:         test dil, 0x1
 ; X64-NEXT:    je <L0>
 ; X64-NEXT:    movaps xmm1, xmm0
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    movaps xmm0, xmm1
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <select_f64_reg>:
@@ -139,13 +121,10 @@ define double @select_f64_reg(i1 %0, double %1, double %2) {
 
 define %struct.i8_i64 @select_i8_i64_0(i1 %0, %struct.i8_i64 %1, %struct.i8_i64 %2) {
 ; X64-LABEL: <select_i8_i64_0>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    test dil, 0x1
+; X64:         test dil, 0x1
 ; X64-NEXT:    cmove rsi, rcx
 ; X64-NEXT:    cmove rdx, r8
 ; X64-NEXT:    mov eax, esi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <select_i8_i64_0>:
@@ -162,14 +141,11 @@ entry:
 
 define %struct.i8_i64 @select_i8_i64_1(i1 %0, %struct.i8_i64 %1, %struct.i8_i64 %2) {
 ; X64-LABEL: <select_i8_i64_1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    test dil, 0x1
+; X64:         test dil, 0x1
 ; X64-NEXT:    cmove rcx, rsi
 ; X64-NEXT:    cmove r8, rdx
 ; X64-NEXT:    mov eax, ecx
 ; X64-NEXT:    mov rdx, r8
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <select_i8_i64_1>:
@@ -186,13 +162,10 @@ entry:
 
 define [2 x i64] @select_a2i64(i1 %0, [2 x i64] %1, [2 x i64] %2) {
 ; X64-LABEL: <select_a2i64>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    test dil, 0x1
+; X64:         test dil, 0x1
 ; X64-NEXT:    cmove rsi, rcx
 ; X64-NEXT:    cmove rdx, r8
 ; X64-NEXT:    mov rax, rsi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <select_a2i64>:
@@ -208,14 +181,11 @@ define [2 x i64] @select_a2i64(i1 %0, [2 x i64] %1, [2 x i64] %2) {
 
 define <2 x i64> @select_v2i64(i1 %0, <2 x i64> %1, <2 x i64> %2) {
 ; X64-LABEL: <select_v2i64>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    test dil, 0x1
+; X64:         test dil, 0x1
 ; X64-NEXT:    je <L0>
 ; X64-NEXT:    movaps xmm1, xmm0
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    movaps xmm0, xmm1
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <select_v2i64>:

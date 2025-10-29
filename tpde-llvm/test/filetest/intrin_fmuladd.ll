@@ -8,11 +8,8 @@
 
 define float @fmuladdf32(float %0, float %1, float %2) {
 ; X64-LABEL: <fmuladdf32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mulss xmm0, xmm1
+; X64:         mulss xmm0, xmm1
 ; X64-NEXT:    addss xmm0, xmm2
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fmuladdf32>:
@@ -24,11 +21,8 @@ define float @fmuladdf32(float %0, float %1, float %2) {
 
 define double @fmuladdf64(double %0, double %1, double %2) {
 ; X64-LABEL: <fmuladdf64>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mulsd xmm0, xmm1
+; X64:         mulsd xmm0, xmm1
 ; X64-NEXT:    addsd xmm0, xmm2
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fmuladdf64>:

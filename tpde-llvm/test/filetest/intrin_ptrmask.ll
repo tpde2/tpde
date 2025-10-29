@@ -8,11 +8,8 @@
 
 define ptr @ptrmask_dyn(ptr %0, i64 %1) {
 ; X64-LABEL: <ptrmask_dyn>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    and rdi, rsi
+; X64:         and rdi, rsi
 ; X64-NEXT:    mov rax, rdi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ptrmask_dyn>:
@@ -25,11 +22,8 @@ define ptr @ptrmask_dyn(ptr %0, i64 %1) {
 
 define ptr @ptrmask_c1(ptr %0) {
 ; X64-LABEL: <ptrmask_c1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    and rdi, -0x10
+; X64:         and rdi, -0x10
 ; X64-NEXT:    mov rax, rdi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ptrmask_c1>:
@@ -41,12 +35,9 @@ define ptr @ptrmask_c1(ptr %0) {
 
 define ptr @ptrmask_c2(ptr %0) {
 ; X64-LABEL: <ptrmask_c2>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movabs rax, 0xfffffffffffff8
+; X64:         movabs rax, 0xfffffffffffff8
 ; X64-NEXT:    and rdi, rax
 ; X64-NEXT:    mov rax, rdi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ptrmask_c2>:

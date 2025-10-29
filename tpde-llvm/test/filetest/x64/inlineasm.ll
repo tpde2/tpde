@@ -6,10 +6,7 @@
 
 define void @inlineasm() {
 ; X64-LABEL: <inlineasm>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    pop rbp
-; X64-NEXT:    ret
+; X64:         ret
   call void asm "", "~{dirflag},~{fpsr},~{flags}"()
   call void asm sideeffect "", "~{dirflag},~{fpsr},~{flags}"()
   call void asm unwind "", "~{dirflag},~{fpsr},~{flags}"()

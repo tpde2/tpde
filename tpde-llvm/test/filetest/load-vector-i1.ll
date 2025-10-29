@@ -7,10 +7,7 @@
 
 define void @load_v1i1(ptr %p) {
 ; X64-LABEL: <load_v1i1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx edi, byte ptr [rdi]
-; X64-NEXT:    pop rbp
+; X64:         movzx edi, byte ptr [rdi]
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_v1i1>:
@@ -22,10 +19,7 @@ define void @load_v1i1(ptr %p) {
 
 define void @load_v2i1(ptr %p) {
 ; X64-LABEL: <load_v2i1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx edi, byte ptr [rdi]
-; X64-NEXT:    pop rbp
+; X64:         movzx edi, byte ptr [rdi]
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_v2i1>:
@@ -37,10 +31,7 @@ define void @load_v2i1(ptr %p) {
 
 define void @load_v8i1(ptr %p) {
 ; X64-LABEL: <load_v8i1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx edi, byte ptr [rdi]
-; X64-NEXT:    pop rbp
+; X64:         movzx edi, byte ptr [rdi]
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_v8i1>:
@@ -52,10 +43,7 @@ define void @load_v8i1(ptr %p) {
 
 define void @load_v16i1(ptr %p) {
 ; X64-LABEL: <load_v16i1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx edi, word ptr [rdi]
-; X64-NEXT:    pop rbp
+; X64:         movzx edi, word ptr [rdi]
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_v16i1>:
@@ -67,10 +55,7 @@ define void @load_v16i1(ptr %p) {
 
 define void @load_v32i1(ptr %p) {
 ; X64-LABEL: <load_v32i1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov edi, dword ptr [rdi]
-; X64-NEXT:    pop rbp
+; X64:         mov edi, dword ptr [rdi]
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_v32i1>:
@@ -82,13 +67,10 @@ define void @load_v32i1(ptr %p) {
 
 define void @load_v37i1(ptr %p) {
 ; X64-LABEL: <load_v37i1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, dword ptr [rdi]
+; X64:         mov eax, dword ptr [rdi]
 ; X64-NEXT:    movzx edi, byte ptr [rdi + 0x4]
 ; X64-NEXT:    shl rdi, 0x20
 ; X64-NEXT:    or rdi, rax
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_v37i1>:
@@ -102,10 +84,7 @@ define void @load_v37i1(ptr %p) {
 
 define void @load_v64i1(ptr %p) {
 ; X64-LABEL: <load_v64i1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rdi, qword ptr [rdi]
-; X64-NEXT:    pop rbp
+; X64:         mov rdi, qword ptr [rdi]
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_v64i1>:
@@ -117,11 +96,8 @@ define void @load_v64i1(ptr %p) {
 
 define void @load_a2v4i1(ptr %p) {
 ; X64-LABEL: <load_a2v4i1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx eax, byte ptr [rdi]
+; X64:         movzx eax, byte ptr [rdi]
 ; X64-NEXT:    movzx ecx, byte ptr [rdi + 0x1]
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_a2v4i1>:
@@ -134,11 +110,8 @@ define void @load_a2v4i1(ptr %p) {
 
 define void @load_a2v37i1(ptr %p) {
 ; X64-LABEL: <load_a2v37i1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, qword ptr [rdi]
+; X64:         mov rax, qword ptr [rdi]
 ; X64-NEXT:    mov rcx, qword ptr [rdi + 0x8]
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_a2v37i1>:
@@ -151,11 +124,8 @@ define void @load_a2v37i1(ptr %p) {
 
 define void @load_a2v64i1(ptr %p) {
 ; X64-LABEL: <load_a2v64i1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, qword ptr [rdi]
+; X64:         mov rax, qword ptr [rdi]
 ; X64-NEXT:    mov rcx, qword ptr [rdi + 0x8]
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_a2v64i1>:

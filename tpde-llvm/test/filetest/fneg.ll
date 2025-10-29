@@ -8,11 +8,8 @@
 
 define float @fnegf32(float %0) {
 ; X64-LABEL: <fnegf32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xorps xmm0, xmmword ptr <fnegf32+0x4>
+; X64:         xorps xmm0, xmmword ptr <fnegf32>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fnegf32>:
@@ -25,11 +22,8 @@ entry:
 
 define double @fnegf64(double %0) {
 ; X64-LABEL: <fnegf64>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xorps xmm0, xmmword ptr <fnegf64+0x4>
+; X64:         xorps xmm0, xmmword ptr <fnegf64>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fnegf64>:
@@ -42,11 +36,8 @@ entry:
 
 define fp128 @fnegf128(fp128 %v) {
 ; X64-LABEL: <fnegf128>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xorps xmm0, xmmword ptr <fnegf128+0x4>
+; X64:         xorps xmm0, xmmword ptr <fnegf128>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fnegf128>:

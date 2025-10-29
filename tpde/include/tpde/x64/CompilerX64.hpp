@@ -715,82 +715,96 @@ template <IRAdaptor Adaptor,
           typename Config>
 void CompilerX64<Adaptor, Derived, BaseTy, Config>::finish_func(
     u32 func_idx) noexcept {
-  // NB: code alignment factor 1, data alignment factor -8.
-  this->text_writer.eh_begin_fde(this->get_personality_sym());
-  // push rbp
-  this->text_writer.eh_write_inst(dwarf::DW_CFA_advance_loc, 1);
-  this->text_writer.eh_write_inst(dwarf::DW_CFA_def_cfa_offset, 16);
-  this->text_writer.eh_write_inst(
-      dwarf::DW_CFA_offset, dwarf::x64::DW_reg_rbp, 2);
-  // mov rbp, rsp
-  this->text_writer.eh_write_inst(dwarf::DW_CFA_advance_loc, 3);
-  this->text_writer.eh_write_inst(dwarf::DW_CFA_def_cfa_register,
-                                  dwarf::x64::DW_reg_rbp);
-
-  // Patched below
-  auto fde_prologue_adv_off = this->text_writer.eh_writer.size();
-  this->text_writer.eh_write_inst(dwarf::DW_CFA_advance_loc, 0);
-
-  auto *write_ptr = this->text_writer.begin_ptr() + func_start_off;
-  write_ptr += fe64_PUSHr(write_ptr, 0, FE_BP);
-  write_ptr += fe64_MOV64rr(write_ptr, 0, FE_BP, FE_SP);
   const CCInfo &ccinfo = derived()->cur_cc_assigner()->get_ccinfo();
   auto csr = ccinfo.callee_saved_regs;
   u64 saved_regs = this->register_file.clobbered & csr;
-  u32 num_saved_regs = 0u;
-  for (auto reg : util::BitSetIterator{saved_regs}) {
-    assert(reg <= AsmReg::R15);
-    write_ptr +=
-        fe64_PUSHr(write_ptr, 0, AsmReg{static_cast<AsmReg::REG>(reg)});
-    ++num_saved_regs;
 
-    // DWARF register ordering is subtly different from the encoding:
-    // x86 is:   ax, cx, dx, bx, sp, bp, si, di, r8, ...
-    // DWARF is: ax, dx, cx, bx, si, di, bp, sp, r8, ...
-    static const u8 gpreg_to_dwarf[] = {
-        dwarf::x64::DW_reg_rax,
-        dwarf::x64::DW_reg_rcx,
-        dwarf::x64::DW_reg_rdx,
-        dwarf::x64::DW_reg_rbx,
-        dwarf::x64::DW_reg_rsp,
-        dwarf::x64::DW_reg_rbp,
-        dwarf::x64::DW_reg_rsi,
-        dwarf::x64::DW_reg_rdi,
-        dwarf::x64::DW_reg_r8,
-        dwarf::x64::DW_reg_r9,
-        dwarf::x64::DW_reg_r10,
-        dwarf::x64::DW_reg_r11,
-        dwarf::x64::DW_reg_r12,
-        dwarf::x64::DW_reg_r13,
-        dwarf::x64::DW_reg_r14,
-        dwarf::x64::DW_reg_r15,
-    };
-    u8 dwarf_reg = gpreg_to_dwarf[reg];
-    auto cfa_off = num_saved_regs + 2;
-    this->text_writer.eh_write_inst(dwarf::DW_CFA_offset, dwarf_reg, cfa_off);
+  bool needs_stack_frame = this->stack.frame_used ||
+                           this->stack.generated_call ||
+                           this->stack.has_dynamic_alloca || saved_regs != 0;
+
+  u32 prologue_size = 0;
+  u32 num_saved_regs = 0;
+  u32 rsp_adjustment = 0;
+
+  // NB: code alignment factor 1, data alignment factor -8.
+  this->text_writer.eh_begin_fde(this->get_personality_sym());
+
+  if (needs_stack_frame) {
+    // push rbp
+    this->text_writer.eh_write_inst(dwarf::DW_CFA_advance_loc, 1);
+    this->text_writer.eh_write_inst(dwarf::DW_CFA_def_cfa_offset, 16);
+    this->text_writer.eh_write_inst(
+        dwarf::DW_CFA_offset, dwarf::x64::DW_reg_rbp, 2);
+    // mov rbp, rsp
+    this->text_writer.eh_write_inst(dwarf::DW_CFA_advance_loc, 3);
+    this->text_writer.eh_write_inst(dwarf::DW_CFA_def_cfa_register,
+                                    dwarf::x64::DW_reg_rbp);
+
+    // Patched below
+    auto fde_prologue_adv_off = this->text_writer.eh_writer.size();
+    this->text_writer.eh_write_inst(dwarf::DW_CFA_advance_loc, 0);
+
+    auto *write_ptr = this->text_writer.begin_ptr() + func_start_off;
+    write_ptr += fe64_PUSHr(write_ptr, 0, FE_BP);
+    write_ptr += fe64_MOV64rr(write_ptr, 0, FE_BP, FE_SP);
+    for (auto reg : util::BitSetIterator{saved_regs}) {
+      assert(reg <= AsmReg::R15);
+      write_ptr +=
+          fe64_PUSHr(write_ptr, 0, AsmReg{static_cast<AsmReg::REG>(reg)});
+      ++num_saved_regs;
+
+      // DWARF register ordering is subtly different from the encoding:
+      // x86 is:   ax, cx, dx, bx, sp, bp, si, di, r8, ...
+      // DWARF is: ax, dx, cx, bx, si, di, bp, sp, r8, ...
+      static const u8 gpreg_to_dwarf[] = {
+          dwarf::x64::DW_reg_rax,
+          dwarf::x64::DW_reg_rcx,
+          dwarf::x64::DW_reg_rdx,
+          dwarf::x64::DW_reg_rbx,
+          dwarf::x64::DW_reg_rsp,
+          dwarf::x64::DW_reg_rbp,
+          dwarf::x64::DW_reg_rsi,
+          dwarf::x64::DW_reg_rdi,
+          dwarf::x64::DW_reg_r8,
+          dwarf::x64::DW_reg_r9,
+          dwarf::x64::DW_reg_r10,
+          dwarf::x64::DW_reg_r11,
+          dwarf::x64::DW_reg_r12,
+          dwarf::x64::DW_reg_r13,
+          dwarf::x64::DW_reg_r14,
+          dwarf::x64::DW_reg_r15,
+      };
+      u8 dwarf_reg = gpreg_to_dwarf[reg];
+      auto cfa_off = num_saved_regs + 2;
+      this->text_writer.eh_write_inst(dwarf::DW_CFA_offset, dwarf_reg, cfa_off);
+    }
+
+    assert(
+        (!this->stack.has_dynamic_alloca || max_callee_stack_arg_size == 0) &&
+        "stack with dynamic alloca must adjust stack pointer at call sites");
+    // The frame_size contains the reserved frame size so we need to subtract
+    // the stack space we used for the saved registers
+    u32 final_frame_size =
+        util::align_up(this->stack.frame_size + max_callee_stack_arg_size, 16);
+    rsp_adjustment = final_frame_size - num_saved_regs * 8;
+    bool needs_rsp_adjustment = this->stack.generated_call ||
+                                this->stack.has_dynamic_alloca ||
+                                rsp_adjustment > ccinfo.red_zone_size;
+
+    if (needs_rsp_adjustment) {
+      write_ptr += fe64_SUB64ri(write_ptr, 0, FE_SP, rsp_adjustment);
+    } else {
+      rsp_adjustment = 0;
+    }
+
+    prologue_size =
+        write_ptr - (this->text_writer.begin_ptr() + func_start_off);
+    assert(prologue_size <= func_prologue_alloc);
+    assert(prologue_size < 0x44 && "cannot encode too large prologue in DWARF");
+    this->text_writer.eh_writer.data()[fde_prologue_adv_off] =
+        dwarf::DW_CFA_advance_loc | (prologue_size - 4);
   }
-
-  assert((!this->stack.has_dynamic_alloca || max_callee_stack_arg_size == 0) &&
-         "stack with dynamic alloca must adjust stack pointer at call sites");
-  // The frame_size contains the reserved frame size so we need to subtract
-  // the stack space we used for the saved registers
-  u32 final_frame_size =
-      util::align_up(this->stack.frame_size + max_callee_stack_arg_size, 16);
-  u32 rsp_adjustment = final_frame_size - num_saved_regs * 8;
-  bool needs_rsp_adjustment = this->stack.generated_call ||
-                              this->stack.has_dynamic_alloca ||
-                              rsp_adjustment > ccinfo.red_zone_size;
-
-  if (needs_rsp_adjustment) {
-    write_ptr += fe64_SUB64ri(write_ptr, 0, FE_SP, rsp_adjustment);
-  }
-
-  u32 prologue_size =
-      write_ptr - (this->text_writer.begin_ptr() + func_start_off);
-  assert(prologue_size <= func_prologue_alloc);
-  assert(prologue_size < 0x44 && "cannot encode too large prologue in DWARF");
-  this->text_writer.eh_writer.data()[fde_prologue_adv_off] =
-      dwarf::DW_CFA_advance_loc | (prologue_size - 4);
 
   auto func_sym = this->func_syms[func_idx];
   auto func_sec = this->text_writer.get_sec_ref();
@@ -811,27 +825,29 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::finish_func(
   u32 epilogue_size = func_epilogue_alloc;
   u32 func_end_ret_off = this->text_writer.offset() - epilogue_size;
   {
-    write_ptr = text_data + first_ret_off;
+    u8 *write_ptr = text_data + first_ret_off;
     const auto ret_start = write_ptr;
-    if (this->stack.has_dynamic_alloca) {
-      if (num_saved_regs == 0) {
-        write_ptr += fe64_MOV64rr(write_ptr, 0, FE_SP, FE_BP);
-      } else {
-        write_ptr +=
-            fe64_LEA64rm(write_ptr,
-                         0,
-                         FE_SP,
-                         FE_MEM(FE_BP, 0, FE_NOREG, -(i32)num_saved_regs * 8));
+    if (needs_stack_frame) {
+      if (this->stack.has_dynamic_alloca) {
+        if (num_saved_regs == 0) {
+          write_ptr += fe64_MOV64rr(write_ptr, 0, FE_SP, FE_BP);
+        } else {
+          write_ptr += fe64_LEA64rm(
+              write_ptr,
+              0,
+              FE_SP,
+              FE_MEM(FE_BP, 0, FE_NOREG, -(i32)num_saved_regs * 8));
+        }
+      } else if (rsp_adjustment != 0) {
+        write_ptr += fe64_ADD64ri(write_ptr, 0, FE_SP, rsp_adjustment);
       }
-    } else if (needs_rsp_adjustment) {
-      write_ptr += fe64_ADD64ri(write_ptr, 0, FE_SP, rsp_adjustment);
+      for (auto reg : util::BitSetIterator<true>{saved_regs}) {
+        assert(reg <= AsmReg::R15);
+        write_ptr +=
+            fe64_POPr(write_ptr, 0, AsmReg{static_cast<AsmReg::REG>(reg)});
+      }
+      write_ptr += fe64_POPr(write_ptr, 0, FE_BP);
     }
-    for (auto reg : util::BitSetIterator<true>{saved_regs}) {
-      assert(reg <= AsmReg::R15);
-      write_ptr +=
-          fe64_POPr(write_ptr, 0, AsmReg{static_cast<AsmReg::REG>(reg)});
-    }
-    write_ptr += fe64_POPr(write_ptr, 0, FE_BP);
     write_ptr += fe64_RET(write_ptr, 0);
     ret_size = write_ptr - ret_start;
     assert(ret_size <= epilogue_size && "function epilogue too long");

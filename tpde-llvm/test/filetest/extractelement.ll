@@ -7,11 +7,8 @@
 
 define i1 @ext_v5i1_0(ptr %p) {
 ; X64-LABEL: <ext_v5i1_0>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx edi, byte ptr [rdi]
+; X64:         movzx edi, byte ptr [rdi]
 ; X64-NEXT:    mov eax, edi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ext_v5i1_0>:
@@ -24,12 +21,9 @@ define i1 @ext_v5i1_0(ptr %p) {
 
 define i1 @ext_v5i1_3(ptr %p) {
 ; X64-LABEL: <ext_v5i1_3>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx edi, byte ptr [rdi]
+; X64:         movzx edi, byte ptr [rdi]
 ; X64-NEXT:    shr rdi, 0x3
 ; X64-NEXT:    mov eax, edi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ext_v5i1_3>:
@@ -43,14 +37,11 @@ define i1 @ext_v5i1_3(ptr %p) {
 
 define i1 @ext_v5i1_3_twice(ptr %p) {
 ; X64-LABEL: <ext_v5i1_3_twice>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx edi, byte ptr [rdi]
+; X64:         movzx edi, byte ptr [rdi]
 ; X64-NEXT:    mov rax, rdi
 ; X64-NEXT:    shr rax, 0x3
 ; X64-NEXT:    shr rdi, 0x3
 ; X64-NEXT:    mov eax, edi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ext_v5i1_3_twice>:
@@ -66,13 +57,10 @@ define i1 @ext_v5i1_3_twice(ptr %p) {
 
 define i1 @ext_v5i1_dyn(ptr %p, i32 %i) {
 ; X64-LABEL: <ext_v5i1_dyn>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx edi, byte ptr [rdi]
+; X64:         movzx edi, byte ptr [rdi]
 ; X64-NEXT:    mov ecx, esi
 ; X64-NEXT:    shr rdi, cl
 ; X64-NEXT:    mov eax, edi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ext_v5i1_dyn>:
@@ -86,11 +74,8 @@ define i1 @ext_v5i1_dyn(ptr %p, i32 %i) {
 
 define i1 @ext_v16i1_0(ptr %p) {
 ; X64-LABEL: <ext_v16i1_0>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx edi, word ptr [rdi]
+; X64:         movzx edi, word ptr [rdi]
 ; X64-NEXT:    mov eax, edi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ext_v16i1_0>:
@@ -103,12 +88,9 @@ define i1 @ext_v16i1_0(ptr %p) {
 
 define i1 @ext_v16i1_3(ptr %p) {
 ; X64-LABEL: <ext_v16i1_3>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx edi, word ptr [rdi]
+; X64:         movzx edi, word ptr [rdi]
 ; X64-NEXT:    shr rdi, 0x3
 ; X64-NEXT:    mov eax, edi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ext_v16i1_3>:
@@ -122,14 +104,11 @@ define i1 @ext_v16i1_3(ptr %p) {
 
 define i1 @ext_v16i1_3_twice(ptr %p) {
 ; X64-LABEL: <ext_v16i1_3_twice>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx edi, word ptr [rdi]
+; X64:         movzx edi, word ptr [rdi]
 ; X64-NEXT:    mov rax, rdi
 ; X64-NEXT:    shr rax, 0x3
 ; X64-NEXT:    shr rdi, 0x3
 ; X64-NEXT:    mov eax, edi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ext_v16i1_3_twice>:
@@ -145,13 +124,10 @@ define i1 @ext_v16i1_3_twice(ptr %p) {
 
 define i1 @ext_v16i1_dyn(ptr %p, i32 %i) {
 ; X64-LABEL: <ext_v16i1_dyn>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx edi, word ptr [rdi]
+; X64:         movzx edi, word ptr [rdi]
 ; X64-NEXT:    mov ecx, esi
 ; X64-NEXT:    shr rdi, cl
 ; X64-NEXT:    mov eax, edi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ext_v16i1_dyn>:

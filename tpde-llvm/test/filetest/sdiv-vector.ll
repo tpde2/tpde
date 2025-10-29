@@ -1723,13 +1723,10 @@ define <2 x i64> @sdiv_v2i64(<2 x i64> %a, <2 x i64> %b) {
 
 define void @sdiv_v4i1(ptr %p, ptr %q) {
 ; X64-LABEL: <sdiv_v4i1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx eax, byte ptr [rdi]
+; X64:         movzx eax, byte ptr [rdi]
 ; X64-NEXT:    movzx esi, byte ptr [rsi]
 ; X64-NEXT:    and eax, esi
 ; X64-NEXT:    mov byte ptr [rdi], al
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <sdiv_v4i1>:
@@ -1747,12 +1744,9 @@ define void @sdiv_v4i1(ptr %p, ptr %q) {
 
 define void @sdiv_v4i1_const(ptr %p) {
 ; X64-LABEL: <sdiv_v4i1_const>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx eax, byte ptr [rdi]
+; X64:         movzx eax, byte ptr [rdi]
 ; X64-NEXT:    and eax, 0x5
 ; X64-NEXT:    mov byte ptr [rdi], al
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <sdiv_v4i1_const>:
@@ -1769,13 +1763,10 @@ define void @sdiv_v4i1_const(ptr %p) {
 
 define void @sdiv_v8i1(ptr %p, ptr %q) {
 ; X64-LABEL: <sdiv_v8i1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx eax, byte ptr [rdi]
+; X64:         movzx eax, byte ptr [rdi]
 ; X64-NEXT:    movzx esi, byte ptr [rsi]
 ; X64-NEXT:    and eax, esi
 ; X64-NEXT:    mov byte ptr [rdi], al
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <sdiv_v8i1>:
@@ -1793,12 +1784,9 @@ define void @sdiv_v8i1(ptr %p, ptr %q) {
 
 define void @sdiv_v8i1_const(ptr %p) {
 ; X64-LABEL: <sdiv_v8i1_const>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx eax, byte ptr [rdi]
+; X64:         movzx eax, byte ptr [rdi]
 ; X64-NEXT:    and eax, 0x55
 ; X64-NEXT:    mov byte ptr [rdi], al
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <sdiv_v8i1_const>:
@@ -1815,13 +1803,10 @@ define void @sdiv_v8i1_const(ptr %p) {
 
 define void @sdiv_v32i1(ptr %p, ptr %q) {
 ; X64-LABEL: <sdiv_v32i1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, dword ptr [rdi]
+; X64:         mov eax, dword ptr [rdi]
 ; X64-NEXT:    mov esi, dword ptr [rsi]
 ; X64-NEXT:    and eax, esi
 ; X64-NEXT:    mov dword ptr [rdi], eax
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <sdiv_v32i1>:
@@ -1839,12 +1824,9 @@ define void @sdiv_v32i1(ptr %p, ptr %q) {
 
 define void @sdiv_v32i1_const(ptr %p) {
 ; X64-LABEL: <sdiv_v32i1_const>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, dword ptr [rdi]
+; X64:         mov eax, dword ptr [rdi]
 ; X64-NEXT:    and eax, 0x55555555
 ; X64-NEXT:    mov dword ptr [rdi], eax
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <sdiv_v32i1_const>:
@@ -1860,13 +1842,10 @@ define void @sdiv_v32i1_const(ptr %p) {
 
 define void @sdiv_v64i1(ptr %p, ptr %q) {
 ; X64-LABEL: <sdiv_v64i1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, qword ptr [rdi]
+; X64:         mov rax, qword ptr [rdi]
 ; X64-NEXT:    mov rsi, qword ptr [rsi]
 ; X64-NEXT:    and rax, rsi
 ; X64-NEXT:    mov qword ptr [rdi], rax
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <sdiv_v64i1>:
@@ -1883,13 +1862,10 @@ define void @sdiv_v64i1(ptr %p, ptr %q) {
 }
 define void @sdiv_v64i1_const(ptr %p) {
 ; X64-LABEL: <sdiv_v64i1_const>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, qword ptr [rdi]
+; X64:         mov rax, qword ptr [rdi]
 ; X64-NEXT:    movabs rcx, 0x5555555555555555
 ; X64-NEXT:    and rax, rcx
 ; X64-NEXT:    mov qword ptr [rdi], rax
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <sdiv_v64i1_const>:

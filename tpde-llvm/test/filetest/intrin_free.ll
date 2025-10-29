@@ -8,10 +8,7 @@
 
 define void @free_intrinsics(ptr %p) {
 ; X64-LABEL: <free_intrinsics>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor eax, eax
-; X64-NEXT:    pop rbp
+; X64:         xor eax, eax
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <free_intrinsics>:

@@ -308,10 +308,7 @@ entry:
 
 define i32 @ret_i32_i128_i128_i128_i32(i32 %0, i128 %1, i128 %2, i128 %3, i32 %4) {
 ; X64-LABEL: <ret_i32_i128_i128_i128_i32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, r9d
-; X64-NEXT:    pop rbp
+; X64:         mov eax, r9d
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ret_i32_i128_i128_i128_i32>:
@@ -860,12 +857,9 @@ entry:
 
 define void @fn_v_a3f64(ptr %d, [3 x double] %a) {
 ; X64-LABEL: <fn_v_a3f64>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movsd qword ptr [rdi], xmm0
+; X64:         movsd qword ptr [rdi], xmm0
 ; X64-NEXT:    movsd qword ptr [rdi + 0x8], xmm1
 ; X64-NEXT:    movsd qword ptr [rdi + 0x10], xmm2
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fn_v_a3f64>:
@@ -910,15 +904,12 @@ define void @call_v_a3f64(ptr %p, ptr %d) {
 
 define void @fn_v_a3f64_a3f64(ptr %d, [3 x double] %a, [3 x double] %b) {
 ; X64-LABEL: <fn_v_a3f64_a3f64>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movsd qword ptr [rdi], xmm0
+; X64:         movsd qword ptr [rdi], xmm0
 ; X64-NEXT:    movsd qword ptr [rdi + 0x8], xmm1
 ; X64-NEXT:    movsd qword ptr [rdi + 0x10], xmm2
 ; X64-NEXT:    movsd qword ptr [rdi], xmm3
 ; X64-NEXT:    movsd qword ptr [rdi + 0x8], xmm4
 ; X64-NEXT:    movsd qword ptr [rdi + 0x10], xmm5
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fn_v_a3f64_a3f64>:
@@ -1201,12 +1192,9 @@ entry:
 
 define void @call_sret_tgt(ptr sret(%struct.3i64) align 8) {
 ; X64-LABEL: <call_sret_tgt>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov qword ptr [rdi], 0x1
+; X64:         mov qword ptr [rdi], 0x1
 ; X64-NEXT:    mov qword ptr [rdi + 0x8], 0x2
 ; X64-NEXT:    mov qword ptr [rdi + 0x10], 0x3
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <call_sret_tgt>:

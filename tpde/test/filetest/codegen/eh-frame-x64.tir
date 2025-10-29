@@ -23,14 +23,9 @@
 ; EH-EMPTY:
 
 define @add1(%a, %b) {
-; EH-LABEL: FDE cie=00000000 pc=00000000...0000000c
+; EH-LABEL: FDE cie=00000000 pc=00000000...00000007
 ; EH-NEXT: Format:       DWARF32
-; EH-NEXT: DW_CFA_advance_loc: 1 to 0x1
-; EH-NEXT: DW_CFA_def_cfa_offset: +16
-; EH-NEXT: DW_CFA_offset: RBP -16
-; EH-NEXT: DW_CFA_advance_loc: 3 to 0x4
-; EH-NEXT: DW_CFA_def_cfa_register: RBP
-; EH-NEXT: DW_CFA_advance_loc: 0 to 0x4
+; EH-NEXT: DW_CFA_nop:
 ; EH-NEXT: DW_CFA_nop:
 ; EH-NEXT: DW_CFA_nop:
 ; EH-NEXT: DW_CFA_nop:
@@ -39,13 +34,10 @@ define @add1(%a, %b) {
 ; EH-NEXT: DW_CFA_nop:
 ; EH-EMPTY:
 ; ASM-LABEL: <add1>:
-; ASM:         0: push rbp
-; ASM-NEXT:    1: mov rbp, rsp
-; ASM-NEXT:    4: add rdi, rsi
-; ASM-NEXT:    7: mov rax, rdi
-; ASM-NEXT:    a: pop rbp
-; ASM-NEXT:    b: ret
-; ASM-NEXT:    c: nop dword ptr [rax]
+; ASM:         0: add rdi, rsi
+; ASM-NEXT:    3: mov rax, rdi
+; ASM-NEXT:    6: ret
+; ASM-NEXT:    7: nop word ptr [rax + rax]
 entry:
   %res = add %a, %b
   ret %res

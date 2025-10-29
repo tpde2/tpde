@@ -11,9 +11,7 @@
 ; COM: Fixed assignments in functions without calls for arguments may not use the argument registers
 define @arg_special_case(%a!, %b!, %c!, %d!, %e!, %f!) {
 ; X64-LABEL: <arg_special_case>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov r10, rdi
+; X64:         mov r10, rdi
 ; X64-NEXT:    mov rdi, rsi
 ; X64-NEXT:    mov rsi, rdx
 ; X64-NEXT:    mov rsi, rcx
@@ -22,13 +20,11 @@ define @arg_special_case(%a!, %b!, %c!, %d!, %e!, %f!) {
 ; X64-NEXT:    test r10, r10
 ; X64-NEXT:    je <L0>
 ; X64-NEXT:    mov rax, r10
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
+; X64-NEXT:    nop dword ptr [rax + rax]
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    mov rax, rdi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <arg_special_case>:
@@ -168,20 +164,16 @@ ret2:
 
 define @salvage_from_fixed_to_fixed(%a!, %b) {
 ; X64-LABEL: <salvage_from_fixed_to_fixed>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov r10, rdi
+; X64:         mov r10, rdi
 ; X64-NEXT:    lea rdi, [r10 + rsi]
 ; X64-NEXT:    test rsi, rsi
 ; X64-NEXT:    je <L0>
 ; X64-NEXT:    mov rax, rdi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
+; X64-NEXT:    nop dword ptr [rax + rax]
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    mov rax, rdi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <salvage_from_fixed_to_fixed>:
@@ -207,19 +199,15 @@ ret2:
 
 define @salvage_from_nonfixed_to_fixed(%a, %b) {
 ; X64-LABEL: <salvage_from_nonfixed_to_fixed>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    lea r8, [rdi + rsi]
+; X64:         lea r8, [rdi + rsi]
 ; X64-NEXT:    test rsi, rsi
 ; X64-NEXT:    je <L0>
 ; X64-NEXT:    mov rax, r8
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop dword ptr [rax]
+; X64-NEXT:    nop dword ptr [rax + rax]
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    mov rax, r8
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <salvage_from_nonfixed_to_fixed>:

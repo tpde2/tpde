@@ -7,14 +7,11 @@
 
 define float @copysignf32(float %0, float %1) {
 ; X64-LABEL: <copysignf32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    andps xmm1, xmmword ptr <copysignf32+0x4>
+; X64:         andps xmm1, xmmword ptr <copysignf32>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    andps xmm0, xmmword ptr <copysignf32+0xb>
+; X64-NEXT:    andps xmm0, xmmword ptr <copysignf32+0x7>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    orps xmm0, xmm1
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <copysignf32>:
@@ -27,14 +24,11 @@ define float @copysignf32(float %0, float %1) {
 
 define double @copysignf64(double %0, double %1) {
 ; X64-LABEL: <copysignf64>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    andps xmm1, xmmword ptr <copysignf64+0x4>
+; X64:         andps xmm1, xmmword ptr <copysignf64>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    andps xmm0, xmmword ptr <copysignf64+0xb>
+; X64-NEXT:    andps xmm0, xmmword ptr <copysignf64+0x7>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    orps xmm0, xmm1
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <copysignf64>:
@@ -48,16 +42,13 @@ define double @copysignf64(double %0, double %1) {
 
 define float @copysignf32_noreuse(float %0, float %1) {
 ; X64-LABEL: <copysignf32_noreuse>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    andps xmm1, xmmword ptr <copysignf32_noreuse+0x4>
+; X64:         andps xmm1, xmmword ptr <copysignf32_noreuse>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    movapd xmm2, xmm0
-; X64-NEXT:    andps xmm2, xmmword ptr <copysignf32_noreuse+0xf>
+; X64-NEXT:    andps xmm2, xmmword ptr <copysignf32_noreuse+0xb>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    orps xmm2, xmm1
 ; X64-NEXT:    addss xmm0, xmm2
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <copysignf32_noreuse>:
@@ -73,16 +64,13 @@ define float @copysignf32_noreuse(float %0, float %1) {
 
 define double @copysignf64_noreuse(double %0, double %1) {
 ; X64-LABEL: <copysignf64_noreuse>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    andps xmm1, xmmword ptr <copysignf64_noreuse+0x4>
+; X64:         andps xmm1, xmmword ptr <copysignf64_noreuse>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    movapd xmm2, xmm0
-; X64-NEXT:    andps xmm2, xmmword ptr <copysignf64_noreuse+0xf>
+; X64-NEXT:    andps xmm2, xmmword ptr <copysignf64_noreuse+0xb>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    orps xmm2, xmm1
 ; X64-NEXT:    addsd xmm0, xmm2
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <copysignf64_noreuse>:

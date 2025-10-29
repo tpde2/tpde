@@ -8,10 +8,7 @@
 
 define void @empty() {
 ; X64-LABEL: <empty>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    pop rbp
-; X64-NEXT:    ret
+; X64:         ret
 ;
 ; ARM64-LABEL: <empty>:
 ; ARM64:         ret

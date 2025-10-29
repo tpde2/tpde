@@ -8,11 +8,8 @@
 
 define i16 @sext_i8_to_i16(i8 %0) {
 ; X64-LABEL: <sext_i8_to_i16>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movsx edi, dil
+; X64:         movsx edi, dil
 ; X64-NEXT:    mov eax, edi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <sext_i8_to_i16>:
@@ -25,11 +22,8 @@ entry:
 
 define i21 @sext_i8_to_i21(i8 %0) {
 ; X64-LABEL: <sext_i8_to_i21>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movsx edi, dil
+; X64:         movsx edi, dil
 ; X64-NEXT:    mov eax, edi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <sext_i8_to_i21>:
@@ -42,11 +36,8 @@ entry:
 
 define i32 @sext_i8_to_i32(i8 %0) {
 ; X64-LABEL: <sext_i8_to_i32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movsx edi, dil
+; X64:         movsx edi, dil
 ; X64-NEXT:    mov eax, edi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <sext_i8_to_i32>:
@@ -59,11 +50,8 @@ entry:
 
 define i37 @sext_i8_to_i37(i8 %0) {
 ; X64-LABEL: <sext_i8_to_i37>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movsx rdi, dil
+; X64:         movsx rdi, dil
 ; X64-NEXT:    mov rax, rdi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <sext_i8_to_i37>:
@@ -76,11 +64,8 @@ entry:
 
 define i64 @sext_i8_to_i64(i8 %0) {
 ; X64-LABEL: <sext_i8_to_i64>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movsx rdi, dil
+; X64:         movsx rdi, dil
 ; X64-NEXT:    mov rax, rdi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <sext_i8_to_i64>:
@@ -116,11 +101,8 @@ entry:
 
 define i21 @sext_i16_to_i21(i16 %0) {
 ; X64-LABEL: <sext_i16_to_i21>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movsx edi, di
+; X64:         movsx edi, di
 ; X64-NEXT:    mov eax, edi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <sext_i16_to_i21>:
@@ -133,11 +115,8 @@ entry:
 
 define i32 @sext_i16_to_i32(i16 %0) {
 ; X64-LABEL: <sext_i16_to_i32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movsx edi, di
+; X64:         movsx edi, di
 ; X64-NEXT:    mov eax, edi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <sext_i16_to_i32>:
@@ -150,11 +129,8 @@ entry:
 
 define i37 @sext_i16_to_i37(i16 %0) {
 ; X64-LABEL: <sext_i16_to_i37>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movsx rdi, di
+; X64:         movsx rdi, di
 ; X64-NEXT:    mov rax, rdi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <sext_i16_to_i37>:
@@ -167,11 +143,8 @@ entry:
 
 define i64 @sext_i16_to_i64(i16 %0) {
 ; X64-LABEL: <sext_i16_to_i64>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movsx rdi, di
+; X64:         movsx rdi, di
 ; X64-NEXT:    mov rax, rdi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <sext_i16_to_i64>:
@@ -207,12 +180,9 @@ entry:
 
 define i32 @sext_i21_to_i32(i21 %0) {
 ; X64-LABEL: <sext_i21_to_i32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    shl edi, 0xb
+; X64:         shl edi, 0xb
 ; X64-NEXT:    sar edi, 0xb
 ; X64-NEXT:    mov eax, edi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <sext_i21_to_i32>:
@@ -225,12 +195,9 @@ entry:
 
 define i37 @sext_i21_to_i37(i21 %0) {
 ; X64-LABEL: <sext_i21_to_i37>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    shl rdi, 0x2b
+; X64:         shl rdi, 0x2b
 ; X64-NEXT:    sar rdi, 0x2b
 ; X64-NEXT:    mov rax, rdi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <sext_i21_to_i37>:
@@ -243,12 +210,9 @@ entry:
 
 define i64 @sext_i21_to_i64(i21 %0) {
 ; X64-LABEL: <sext_i21_to_i64>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    shl rdi, 0x2b
+; X64:         shl rdi, 0x2b
 ; X64-NEXT:    sar rdi, 0x2b
 ; X64-NEXT:    mov rax, rdi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <sext_i21_to_i64>:
@@ -285,11 +249,8 @@ entry:
 
 define i37 @sext_i32_to_i37(i32 %0) {
 ; X64-LABEL: <sext_i32_to_i37>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movsxd rdi, edi
+; X64:         movsxd rdi, edi
 ; X64-NEXT:    mov rax, rdi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <sext_i32_to_i37>:
@@ -302,11 +263,8 @@ entry:
 
 define i64 @sext_i32_to_i64(i32 %0) {
 ; X64-LABEL: <sext_i32_to_i64>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movsxd rdi, edi
+; X64:         movsxd rdi, edi
 ; X64-NEXT:    mov rax, rdi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <sext_i32_to_i64>:
@@ -341,14 +299,11 @@ entry:
 
 define i128 @sext_i32_to_i128_noreuse(i32 %i, ptr %p) {
 ; X64-LABEL: <sext_i32_to_i128_noreuse>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movsxd rax, edi
+; X64:         movsxd rax, edi
 ; X64-NEXT:    mov rcx, rax
 ; X64-NEXT:    sar rcx, 0x3f
 ; X64-NEXT:    mov dword ptr [rsi], edi
 ; X64-NEXT:    mov rdx, rcx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <sext_i32_to_i128_noreuse>:
@@ -366,12 +321,9 @@ define i128 @sext_i32_to_i128_noreuse(i32 %i, ptr %p) {
 
 define i64 @sext_i37_to_i64(i37 %0) {
 ; X64-LABEL: <sext_i37_to_i64>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    shl rdi, 0x1b
+; X64:         shl rdi, 0x1b
 ; X64-NEXT:    sar rdi, 0x1b
 ; X64-NEXT:    mov rax, rdi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <sext_i37_to_i64>:

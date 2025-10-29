@@ -8,11 +8,8 @@
 
 define void @ashr_i8_3(i8 %0) {
 ; X64-LABEL: <ashr_i8_3>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movsx edi, dil
+; X64:         movsx edi, dil
 ; X64-NEXT:    sar edi, 0x3
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ashr_i8_3>:
@@ -26,12 +23,9 @@ entry:
 
 define void @ashr_i8_i8(i8 %0, i8 %1) {
 ; X64-LABEL: <ashr_i8_i8>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movsx edi, dil
+; X64:         movsx edi, dil
 ; X64-NEXT:    mov ecx, esi
 ; X64-NEXT:    sar edi, cl
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ashr_i8_i8>:
@@ -45,11 +39,8 @@ entry:
 
 define void @ashr_i16_3(i16 %0) {
 ; X64-LABEL: <ashr_i16_3>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movsx edi, di
+; X64:         movsx edi, di
 ; X64-NEXT:    sar edi, 0x3
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ashr_i16_3>:
@@ -63,12 +54,9 @@ entry:
 
 define void @ashr_i16_i16(i16 %0, i16 %1) {
 ; X64-LABEL: <ashr_i16_i16>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movsx edi, di
+; X64:         movsx edi, di
 ; X64-NEXT:    mov ecx, esi
 ; X64-NEXT:    sar edi, cl
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ashr_i16_i16>:
@@ -82,10 +70,7 @@ entry:
 
 define void @ashr_i32_3(i32 %0) {
 ; X64-LABEL: <ashr_i32_3>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    sar edi, 0x3
-; X64-NEXT:    pop rbp
+; X64:         sar edi, 0x3
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ashr_i32_3>:
@@ -98,11 +83,8 @@ entry:
 
 define void @ashr_i32_i32(i32 %0, i32 %1) {
 ; X64-LABEL: <ashr_i32_i32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov ecx, esi
+; X64:         mov ecx, esi
 ; X64-NEXT:    sar edi, cl
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ashr_i32_i32>:
@@ -115,10 +97,7 @@ entry:
 
 define void @ashr_i64_3(i64 %0) {
 ; X64-LABEL: <ashr_i64_3>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    sar rdi, 0x3
-; X64-NEXT:    pop rbp
+; X64:         sar rdi, 0x3
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ashr_i64_3>:
@@ -131,11 +110,8 @@ entry:
 
 define void @ashr_i64_i64(i64 %0, i64 %1) {
 ; X64-LABEL: <ashr_i64_i64>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov ecx, esi
+; X64:         mov ecx, esi
 ; X64-NEXT:    sar rdi, cl
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ashr_i64_i64>:
@@ -149,12 +125,9 @@ entry:
 
 define void @ashr_i21_3(i21 %0) {
 ; X64-LABEL: <ashr_i21_3>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    shl edi, 0xb
+; X64:         shl edi, 0xb
 ; X64-NEXT:    sar edi, 0xb
 ; X64-NEXT:    sar edi, 0x3
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ashr_i21_3>:
@@ -168,13 +141,10 @@ entry:
 
 define void @ashr_i21_i21(i21 %0, i21 %1) {
 ; X64-LABEL: <ashr_i21_i21>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    shl edi, 0xb
+; X64:         shl edi, 0xb
 ; X64-NEXT:    sar edi, 0xb
 ; X64-NEXT:    mov ecx, esi
 ; X64-NEXT:    sar edi, cl
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ashr_i21_i21>:
@@ -188,12 +158,9 @@ entry:
 
 define void @ashr_i37_3(i37 %0) {
 ; X64-LABEL: <ashr_i37_3>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    shl rdi, 0x1b
+; X64:         shl rdi, 0x1b
 ; X64-NEXT:    sar rdi, 0x1b
 ; X64-NEXT:    sar rdi, 0x3
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ashr_i37_3>:
@@ -207,13 +174,10 @@ entry:
 
 define void @ashr_i37_i37(i37 %0, i37 %1) {
 ; X64-LABEL: <ashr_i37_i37>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    shl rdi, 0x1b
+; X64:         shl rdi, 0x1b
 ; X64-NEXT:    sar rdi, 0x1b
 ; X64-NEXT:    mov ecx, esi
 ; X64-NEXT:    sar rdi, cl
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ashr_i37_i37>:
@@ -227,15 +191,12 @@ entry:
 
 define i128 @ashr_i128_3(i128 %0) {
 ; X64-LABEL: <ashr_i128_3>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    shr rdi, 0x3
+; X64:         shr rdi, 0x3
 ; X64-NEXT:    mov rax, rsi
 ; X64-NEXT:    shl rax, 0x3d
 ; X64-NEXT:    or rax, rdi
 ; X64-NEXT:    sar rsi, 0x3
 ; X64-NEXT:    mov rdx, rsi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ashr_i128_3>:
@@ -252,13 +213,10 @@ entry:
 
 define i128 @ashr_i128_74(i128 %0) {
 ; X64-LABEL: <ashr_i128_74>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, rsi
+; X64:         mov rax, rsi
 ; X64-NEXT:    sar rax, 0xa
 ; X64-NEXT:    sar rsi, 0x3f
 ; X64-NEXT:    mov rdx, rsi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ashr_i128_74>:
@@ -273,15 +231,12 @@ entry:
 
 define i128 @ashr_i128_128(i128 %0) {
 ; X64-LABEL: <ashr_i128_128>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    shr rdi, 0x0
+; X64:         shr rdi, 0x0
 ; X64-NEXT:    mov rax, rsi
 ; X64-NEXT:    shl rax, 0x0
 ; X64-NEXT:    or rax, rdi
 ; X64-NEXT:    sar rsi, 0x0
 ; X64-NEXT:    mov rdx, rsi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ashr_i128_128>:
@@ -341,13 +296,10 @@ define i128 @ashr_i128_i128(i128 %v, i128 %s) {
 
 define void @ashr_i64_no_salvage_imm(i64 %0) {
 ; X64-LABEL: <ashr_i64_no_salvage_imm>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, rdi
+; X64:         mov rax, rdi
 ; X64-NEXT:    sar rax, 0x3
 ; X64-NEXT:    mov ecx, eax
 ; X64-NEXT:    sar rdi, cl
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ashr_i64_no_salvage_imm>:
@@ -362,14 +314,11 @@ entry:
 
 define void @ashr_i64_no_salvage_reg(i64 %0, i64 %1) {
 ; X64-LABEL: <ashr_i64_no_salvage_reg>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, rdi
+; X64:         mov rax, rdi
 ; X64-NEXT:    mov ecx, esi
 ; X64-NEXT:    sar rax, cl
 ; X64-NEXT:    mov ecx, eax
 ; X64-NEXT:    sar rdi, cl
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ashr_i64_no_salvage_reg>:
@@ -384,9 +333,7 @@ entry:
 
 define void @ashr_i37_no_salvage_imm(i37 %0) {
 ; X64-LABEL: <ashr_i37_no_salvage_imm>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, rdi
+; X64:         mov rax, rdi
 ; X64-NEXT:    shl rax, 0x1b
 ; X64-NEXT:    sar rax, 0x1b
 ; X64-NEXT:    sar rax, 0x3
@@ -394,7 +341,6 @@ define void @ashr_i37_no_salvage_imm(i37 %0) {
 ; X64-NEXT:    sar rdi, 0x1b
 ; X64-NEXT:    mov ecx, eax
 ; X64-NEXT:    sar rdi, cl
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ashr_i37_no_salvage_imm>:
@@ -411,9 +357,7 @@ entry:
 
 define void @ashr_i37_no_salvage_reg(i37 %0, i37 %1) {
 ; X64-LABEL: <ashr_i37_no_salvage_reg>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, rdi
+; X64:         mov rax, rdi
 ; X64-NEXT:    shl rax, 0x1b
 ; X64-NEXT:    sar rax, 0x1b
 ; X64-NEXT:    mov ecx, esi
@@ -422,7 +366,6 @@ define void @ashr_i37_no_salvage_reg(i37 %0, i37 %1) {
 ; X64-NEXT:    sar rdi, 0x1b
 ; X64-NEXT:    mov ecx, eax
 ; X64-NEXT:    sar rdi, cl
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ashr_i37_no_salvage_reg>:

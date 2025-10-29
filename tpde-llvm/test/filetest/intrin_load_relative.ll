@@ -7,12 +7,9 @@
 
 define ptr @loadrel_i64(ptr %p, i64 %o) {
 ; X64-LABEL: <loadrel_i64>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movsxd rsi, dword ptr [rdi + rsi]
+; X64:         movsxd rsi, dword ptr [rdi + rsi]
 ; X64-NEXT:    add rsi, rdi
 ; X64-NEXT:    mov rax, rsi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <loadrel_i64>:

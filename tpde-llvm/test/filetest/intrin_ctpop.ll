@@ -8,9 +8,7 @@
 
 define i8 @ctpop_i8(i8 %0) {
 ; X64-LABEL: <ctpop_i8>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx edi, dil
+; X64:         movzx edi, dil
 ; X64-NEXT:    mov eax, edi
 ; X64-NEXT:    shr eax
 ; X64-NEXT:    and eax, 0x55555555
@@ -26,7 +24,6 @@ define i8 @ctpop_i8(i8 %0) {
 ; X64-NEXT:    and eax, 0xf0f0f0f
 ; X64-NEXT:    imul eax, eax, 0x1010101
 ; X64-NEXT:    shr eax, 0x18
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ctpop_i8>:
@@ -42,9 +39,7 @@ define i8 @ctpop_i8(i8 %0) {
 
 define i16 @ctpop_i16(i16 %0) {
 ; X64-LABEL: <ctpop_i16>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx edi, di
+; X64:         movzx edi, di
 ; X64-NEXT:    mov eax, edi
 ; X64-NEXT:    shr eax
 ; X64-NEXT:    and eax, 0x55555555
@@ -60,7 +55,6 @@ define i16 @ctpop_i16(i16 %0) {
 ; X64-NEXT:    and eax, 0xf0f0f0f
 ; X64-NEXT:    imul eax, eax, 0x1010101
 ; X64-NEXT:    shr eax, 0x18
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ctpop_i16>:
@@ -76,9 +70,7 @@ define i16 @ctpop_i16(i16 %0) {
 
 define i23 @ctpop_i23(i23 %0) {
 ; X64-LABEL: <ctpop_i23>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    and edi, 0x7fffff
+; X64:         and edi, 0x7fffff
 ; X64-NEXT:    mov eax, edi
 ; X64-NEXT:    shr eax
 ; X64-NEXT:    and eax, 0x55555555
@@ -94,7 +86,6 @@ define i23 @ctpop_i23(i23 %0) {
 ; X64-NEXT:    and eax, 0xf0f0f0f
 ; X64-NEXT:    imul eax, eax, 0x1010101
 ; X64-NEXT:    shr eax, 0x18
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ctpop_i23>:
@@ -110,9 +101,7 @@ define i23 @ctpop_i23(i23 %0) {
 
 define i32 @ctpop_i32(i32 %0) {
 ; X64-LABEL: <ctpop_i32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, edi
+; X64:         mov eax, edi
 ; X64-NEXT:    shr eax
 ; X64-NEXT:    and eax, 0x55555555
 ; X64-NEXT:    sub edi, eax
@@ -127,7 +116,6 @@ define i32 @ctpop_i32(i32 %0) {
 ; X64-NEXT:    and eax, 0xf0f0f0f
 ; X64-NEXT:    imul eax, eax, 0x1010101
 ; X64-NEXT:    shr eax, 0x18
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ctpop_i32>:
@@ -142,9 +130,7 @@ define i32 @ctpop_i32(i32 %0) {
 
 define i37 @ctpop_i37(i37 %0) {
 ; X64-LABEL: <ctpop_i37>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movabs rax, 0x1fffffffff
+; X64:         movabs rax, 0x1fffffffff
 ; X64-NEXT:    and rdi, rax
 ; X64-NEXT:    mov rax, rdi
 ; X64-NEXT:    shr rax
@@ -165,7 +151,6 @@ define i37 @ctpop_i37(i37 %0) {
 ; X64-NEXT:    movabs rax, 0x101010101010101
 ; X64-NEXT:    imul rax, rdx
 ; X64-NEXT:    shr rax, 0x38
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ctpop_i37>:
@@ -181,9 +166,7 @@ define i37 @ctpop_i37(i37 %0) {
 
 define i64 @ctpop_i64(i64 %0) {
 ; X64-LABEL: <ctpop_i64>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, rdi
+; X64:         mov rax, rdi
 ; X64-NEXT:    shr rax
 ; X64-NEXT:    movabs rcx, 0x5555555555555555
 ; X64-NEXT:    and rcx, rax
@@ -202,7 +185,6 @@ define i64 @ctpop_i64(i64 %0) {
 ; X64-NEXT:    movabs rax, 0x101010101010101
 ; X64-NEXT:    imul rax, rdx
 ; X64-NEXT:    shr rax, 0x38
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ctpop_i64>:

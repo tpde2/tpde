@@ -7,15 +7,12 @@
 
 define void @ins_v5i1_0(ptr %p, i1 %e) {
 ; X64-LABEL: <ins_v5i1_0>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx eax, byte ptr [rdi]
+; X64:         movzx eax, byte ptr [rdi]
 ; X64-NEXT:    btr rax, 0x0
 ; X64-NEXT:    mov ecx, esi
 ; X64-NEXT:    and ecx, 0x1
 ; X64-NEXT:    or rax, rcx
 ; X64-NEXT:    mov byte ptr [rdi], al
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ins_v5i1_0>:
@@ -31,15 +28,12 @@ define void @ins_v5i1_0(ptr %p, i1 %e) {
 
 define void @ins_v5i1_3(ptr %p, i1 %e) {
 ; X64-LABEL: <ins_v5i1_3>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx eax, byte ptr [rdi]
+; X64:         movzx eax, byte ptr [rdi]
 ; X64-NEXT:    btr rax, 0x3
 ; X64-NEXT:    mov ecx, esi
 ; X64-NEXT:    and ecx, 0x1
 ; X64-NEXT:    lea rax, [rax + 8*rcx]
 ; X64-NEXT:    mov byte ptr [rdi], al
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ins_v5i1_3>:
@@ -105,16 +99,13 @@ define void @ins_v5i1_chain(ptr %p, i1 %e0, i1 %e1, i1 %e2, i1 %e3, i1 %e4) {
 
 define void @ins_v5i1_dyn(ptr %p, i1 %e, i32 %i) {
 ; X64-LABEL: <ins_v5i1_dyn>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx eax, byte ptr [rdi]
+; X64:         movzx eax, byte ptr [rdi]
 ; X64-NEXT:    mov ecx, edx
 ; X64-NEXT:    btr rax, rcx
 ; X64-NEXT:    and esi, 0x1
 ; X64-NEXT:    shl rsi, cl
 ; X64-NEXT:    or rsi, rax
 ; X64-NEXT:    mov byte ptr [rdi], sil
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ins_v5i1_dyn>:
@@ -135,15 +126,12 @@ define void @ins_v5i1_dyn(ptr %p, i1 %e, i32 %i) {
 
 define void @ins_v16i1_0(ptr %p, i1 %e) {
 ; X64-LABEL: <ins_v16i1_0>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx eax, word ptr [rdi]
+; X64:         movzx eax, word ptr [rdi]
 ; X64-NEXT:    btr rax, 0x0
 ; X64-NEXT:    mov ecx, esi
 ; X64-NEXT:    and ecx, 0x1
 ; X64-NEXT:    or rax, rcx
 ; X64-NEXT:    mov word ptr [rdi], ax
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ins_v16i1_0>:
@@ -159,15 +147,12 @@ define void @ins_v16i1_0(ptr %p, i1 %e) {
 
 define void @ins_v16i1_3(ptr %p, i1 %e) {
 ; X64-LABEL: <ins_v16i1_3>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx eax, word ptr [rdi]
+; X64:         movzx eax, word ptr [rdi]
 ; X64-NEXT:    btr rax, 0x3
 ; X64-NEXT:    mov ecx, esi
 ; X64-NEXT:    and ecx, 0x1
 ; X64-NEXT:    lea rax, [rax + 8*rcx]
 ; X64-NEXT:    mov word ptr [rdi], ax
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ins_v16i1_3>:
@@ -233,16 +218,13 @@ define void @ins_v16i1_chain(ptr %p, i1 %e0, i1 %e1, i1 %e2, i1 %e3, i1 %e4) {
 
 define void @ins_v16i1_dyn(ptr %p, i1 %e, i32 %i) {
 ; X64-LABEL: <ins_v16i1_dyn>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx eax, word ptr [rdi]
+; X64:         movzx eax, word ptr [rdi]
 ; X64-NEXT:    mov ecx, edx
 ; X64-NEXT:    btr rax, rcx
 ; X64-NEXT:    and esi, 0x1
 ; X64-NEXT:    shl rsi, cl
 ; X64-NEXT:    or rsi, rax
 ; X64-NEXT:    mov word ptr [rdi], si
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ins_v16i1_dyn>:

@@ -8,10 +8,7 @@
 
 define i1 @fcmp_f128_false(fp128 %0, fp128 %1) {
 ; X64-LABEL: <fcmp_f128_false>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor eax, eax
-; X64-NEXT:    pop rbp
+; X64:         xor eax, eax
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fcmp_f128_false>:
@@ -23,10 +20,7 @@ define i1 @fcmp_f128_false(fp128 %0, fp128 %1) {
 
 define i1 @fcmp_f128_true(fp128 %0, fp128 %1) {
 ; X64-LABEL: <fcmp_f128_true>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, 0x1
-; X64-NEXT:    pop rbp
+; X64:         mov eax, 0x1
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fcmp_f128_true>:

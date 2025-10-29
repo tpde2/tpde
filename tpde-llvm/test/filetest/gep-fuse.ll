@@ -8,10 +8,7 @@
 
 define i32 @load_i32_gep1(ptr %a) {
 ; X64-LABEL: <load_i32_gep1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, dword ptr [rdi + 0x10]
-; X64-NEXT:    pop rbp
+; X64:         mov eax, dword ptr [rdi + 0x10]
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i32_gep1>:
@@ -25,10 +22,7 @@ define i32 @load_i32_gep1(ptr %a) {
 
 define i32 @load_i32_gep2(ptr %a) {
 ; X64-LABEL: <load_i32_gep2>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, dword ptr [rdi + 0xd]
-; X64-NEXT:    pop rbp
+; X64:         mov eax, dword ptr [rdi + 0xd]
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i32_gep2>:
@@ -42,10 +36,7 @@ define i32 @load_i32_gep2(ptr %a) {
 
 define i32 @load_i32_gep3(ptr %a) {
 ; X64-LABEL: <load_i32_gep3>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, dword ptr [rdi - 0x4]
-; X64-NEXT:    pop rbp
+; X64:         mov eax, dword ptr [rdi - 0x4]
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i32_gep3>:
@@ -59,10 +50,7 @@ define i32 @load_i32_gep3(ptr %a) {
 
 define i32 @load_i32_gep4(ptr %a) {
 ; X64-LABEL: <load_i32_gep4>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, dword ptr [rdi - 0x400]
-; X64-NEXT:    pop rbp
+; X64:         mov eax, dword ptr [rdi - 0x400]
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i32_gep4>:
@@ -76,10 +64,7 @@ define i32 @load_i32_gep4(ptr %a) {
 
 define i32 @load_i32_gep5(ptr %a) {
 ; X64-LABEL: <load_i32_gep5>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, dword ptr [rdi + 0x2000]
-; X64-NEXT:    pop rbp
+; X64:         mov eax, dword ptr [rdi + 0x2000]
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i32_gep5>:
@@ -93,10 +78,7 @@ define i32 @load_i32_gep5(ptr %a) {
 
 define i32 @load_i32_gep6(ptr %a) {
 ; X64-LABEL: <load_i32_gep6>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, dword ptr [rdi + 0x40000]
-; X64-NEXT:    pop rbp
+; X64:         mov eax, dword ptr [rdi + 0x40000]
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i32_gep6>:
@@ -110,10 +92,7 @@ define i32 @load_i32_gep6(ptr %a) {
 
 define void @store_i32_gep1(i32 %v, ptr %a) {
 ; X64-LABEL: <store_i32_gep1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov dword ptr [rsi + 0x10], edi
-; X64-NEXT:    pop rbp
+; X64:         mov dword ptr [rsi + 0x10], edi
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_i32_gep1>:
@@ -126,10 +105,7 @@ define void @store_i32_gep1(i32 %v, ptr %a) {
 
 define void @store_i32_gep2(i32 %v, ptr %a) {
 ; X64-LABEL: <store_i32_gep2>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov dword ptr [rsi + 0xd], edi
-; X64-NEXT:    pop rbp
+; X64:         mov dword ptr [rsi + 0xd], edi
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_i32_gep2>:
@@ -143,10 +119,7 @@ define void @store_i32_gep2(i32 %v, ptr %a) {
 
 define void @store_i32_gep3(i32 %v, ptr %a) {
 ; X64-LABEL: <store_i32_gep3>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov dword ptr [rsi - 0x4], edi
-; X64-NEXT:    pop rbp
+; X64:         mov dword ptr [rsi - 0x4], edi
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_i32_gep3>:
@@ -160,10 +133,7 @@ define void @store_i32_gep3(i32 %v, ptr %a) {
 
 define void @store_i32_gep4(i32 %v, ptr %a) {
 ; X64-LABEL: <store_i32_gep4>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov dword ptr [rsi - 0x400], edi
-; X64-NEXT:    pop rbp
+; X64:         mov dword ptr [rsi - 0x400], edi
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_i32_gep4>:
@@ -177,10 +147,7 @@ define void @store_i32_gep4(i32 %v, ptr %a) {
 
 define void @store_i32_gep5(i32 %v, ptr %a) {
 ; X64-LABEL: <store_i32_gep5>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov dword ptr [rsi + 0x2000], edi
-; X64-NEXT:    pop rbp
+; X64:         mov dword ptr [rsi + 0x2000], edi
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_i32_gep5>:
@@ -193,10 +160,7 @@ define void @store_i32_gep5(i32 %v, ptr %a) {
 
 define void @store_i32_gep6(i32 %v, ptr %a) {
 ; X64-LABEL: <store_i32_gep6>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov dword ptr [rsi + 0x40000], edi
-; X64-NEXT:    pop rbp
+; X64:         mov dword ptr [rsi + 0x40000], edi
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_i32_gep6>:

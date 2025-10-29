@@ -6,10 +6,7 @@
 
 define void @pause() {
 ; X64-LABEL: <pause>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    pause
-; X64-NEXT:    pop rbp
+; X64:         pause
 ; X64-NEXT:    ret
   call void @llvm.x86.sse2.pause()
   ret void

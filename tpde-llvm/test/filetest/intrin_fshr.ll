@@ -8,16 +8,13 @@
 
 define i8 @fshr_i8_3(i8 %a, i8 %b) {
 ; X64-LABEL: <fshr_i8_3>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    shl edi, 0x8
+; X64:         shl edi, 0x8
 ; X64-NEXT:    lea esi, [rdi + rsi]
 ; X64-NEXT:    mov eax, 0x3
 ; X64-NEXT:    mov ecx, eax
 ; X64-NEXT:    and cl, 0x7
 ; X64-NEXT:    shr esi, cl
 ; X64-NEXT:    mov eax, esi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fshr_i8_3>:
@@ -39,16 +36,13 @@ define i8 @fshr_i8_3(i8 %a, i8 %b) {
 
 define i8 @fshr_i8_221(i8 %a, i8 %b) {
 ; X64-LABEL: <fshr_i8_221>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    shl edi, 0x8
+; X64:         shl edi, 0x8
 ; X64-NEXT:    lea esi, [rdi + rsi]
 ; X64-NEXT:    mov eax, 0xdd
 ; X64-NEXT:    mov ecx, eax
 ; X64-NEXT:    and cl, 0x7
 ; X64-NEXT:    shr esi, cl
 ; X64-NEXT:    mov eax, esi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fshr_i8_221>:
@@ -70,15 +64,12 @@ define i8 @fshr_i8_221(i8 %a, i8 %b) {
 
 define i8 @fshr_i8_dyn(i8 %a, i8 %b, i8 %c) {
 ; X64-LABEL: <fshr_i8_dyn>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    shl edi, 0x8
+; X64:         shl edi, 0x8
 ; X64-NEXT:    lea esi, [rdi + rsi]
 ; X64-NEXT:    mov ecx, edx
 ; X64-NEXT:    and cl, 0x7
 ; X64-NEXT:    shr esi, cl
 ; X64-NEXT:    mov eax, esi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fshr_i8_dyn>:
@@ -99,11 +90,8 @@ define i8 @fshr_i8_dyn(i8 %a, i8 %b, i8 %c) {
 
 define i8 @fshr_rotate_i8_3(i8 %a) {
 ; X64-LABEL: <fshr_rotate_i8_3>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    ror dil, 0x3
+; X64:         ror dil, 0x3
 ; X64-NEXT:    mov eax, edi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fshr_rotate_i8_3>:
@@ -122,11 +110,8 @@ define i8 @fshr_rotate_i8_3(i8 %a) {
 
 define i8 @fshr_rotate_i8_221(i8 %a) {
 ; X64-LABEL: <fshr_rotate_i8_221>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    ror dil, 0xdd
+; X64:         ror dil, 0xdd
 ; X64-NEXT:    mov eax, edi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fshr_rotate_i8_221>:
@@ -145,12 +130,9 @@ define i8 @fshr_rotate_i8_221(i8 %a) {
 
 define i8 @fshr_rotate_i8_dyn(i8 %a, i8 %c) {
 ; X64-LABEL: <fshr_rotate_i8_dyn>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov ecx, esi
+; X64:         mov ecx, esi
 ; X64-NEXT:    ror dil, cl
 ; X64-NEXT:    mov eax, edi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fshr_rotate_i8_dyn>:
@@ -169,16 +151,13 @@ define i8 @fshr_rotate_i8_dyn(i8 %a, i8 %c) {
 
 define i16 @fshr_i16_3(i16 %a, i16 %b) {
 ; X64-LABEL: <fshr_i16_3>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    shl edi, 0x10
+; X64:         shl edi, 0x10
 ; X64-NEXT:    lea esi, [rdi + rsi]
 ; X64-NEXT:    mov eax, 0x3
 ; X64-NEXT:    mov ecx, eax
 ; X64-NEXT:    and cl, 0xf
 ; X64-NEXT:    shr esi, cl
 ; X64-NEXT:    mov eax, esi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fshr_i16_3>:
@@ -200,16 +179,13 @@ define i16 @fshr_i16_3(i16 %a, i16 %b) {
 
 define i16 @fshr_i16_221(i16 %a, i16 %b) {
 ; X64-LABEL: <fshr_i16_221>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    shl edi, 0x10
+; X64:         shl edi, 0x10
 ; X64-NEXT:    lea esi, [rdi + rsi]
 ; X64-NEXT:    mov eax, 0xdd
 ; X64-NEXT:    mov ecx, eax
 ; X64-NEXT:    and cl, 0xf
 ; X64-NEXT:    shr esi, cl
 ; X64-NEXT:    mov eax, esi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fshr_i16_221>:
@@ -231,15 +207,12 @@ define i16 @fshr_i16_221(i16 %a, i16 %b) {
 
 define i16 @fshr_i16_dyn(i16 %a, i16 %b, i16 %c) {
 ; X64-LABEL: <fshr_i16_dyn>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    shl edi, 0x10
+; X64:         shl edi, 0x10
 ; X64-NEXT:    lea esi, [rdi + rsi]
 ; X64-NEXT:    mov ecx, edx
 ; X64-NEXT:    and cl, 0xf
 ; X64-NEXT:    shr esi, cl
 ; X64-NEXT:    mov eax, esi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fshr_i16_dyn>:
@@ -260,11 +233,8 @@ define i16 @fshr_i16_dyn(i16 %a, i16 %b, i16 %c) {
 
 define i16 @fshr_rotate_i16_3(i16 %a) {
 ; X64-LABEL: <fshr_rotate_i16_3>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    ror di, 0x3
+; X64:         ror di, 0x3
 ; X64-NEXT:    mov eax, edi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fshr_rotate_i16_3>:
@@ -283,11 +253,8 @@ define i16 @fshr_rotate_i16_3(i16 %a) {
 
 define i16 @fshr_rotate_i16_221(i16 %a) {
 ; X64-LABEL: <fshr_rotate_i16_221>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    ror di, 0xdd
+; X64:         ror di, 0xdd
 ; X64-NEXT:    mov eax, edi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fshr_rotate_i16_221>:
@@ -306,12 +273,9 @@ define i16 @fshr_rotate_i16_221(i16 %a) {
 
 define i16 @fshr_rotate_i16_dyn(i16 %a, i16 %c) {
 ; X64-LABEL: <fshr_rotate_i16_dyn>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov ecx, esi
+; X64:         mov ecx, esi
 ; X64-NEXT:    ror di, cl
 ; X64-NEXT:    mov eax, edi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fshr_rotate_i16_dyn>:
@@ -330,9 +294,7 @@ define i16 @fshr_rotate_i16_dyn(i16 %a, i16 %c) {
 
 define i32 @fshr_i32_3(i32 %a, i32 %b) {
 ; X64-LABEL: <fshr_i32_3>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    shr esi, 0x3
+; X64:         shr esi, 0x3
 ; X64-NEXT:    lea edi, [rdi + rdi]
 ; X64-NEXT:    mov eax, 0x3
 ; X64-NEXT:    mov ecx, eax
@@ -340,7 +302,6 @@ define i32 @fshr_i32_3(i32 %a, i32 %b) {
 ; X64-NEXT:    shl edi, cl
 ; X64-NEXT:    or edi, esi
 ; X64-NEXT:    mov eax, edi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fshr_i32_3>:
@@ -357,9 +318,7 @@ define i32 @fshr_i32_3(i32 %a, i32 %b) {
 
 define i32 @fshr_i32_221(i32 %a, i32 %b) {
 ; X64-LABEL: <fshr_i32_221>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    shr esi, 0xdd
+; X64:         shr esi, 0xdd
 ; X64-NEXT:    lea edi, [rdi + rdi]
 ; X64-NEXT:    mov eax, 0xdd
 ; X64-NEXT:    mov ecx, eax
@@ -367,7 +326,6 @@ define i32 @fshr_i32_221(i32 %a, i32 %b) {
 ; X64-NEXT:    shl edi, cl
 ; X64-NEXT:    or edi, esi
 ; X64-NEXT:    mov eax, edi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fshr_i32_221>:
@@ -385,9 +343,7 @@ define i32 @fshr_i32_221(i32 %a, i32 %b) {
 
 define i32 @fshr_i32_dyn(i32 %a, i32 %b, i32 %c) {
 ; X64-LABEL: <fshr_i32_dyn>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov ecx, edx
+; X64:         mov ecx, edx
 ; X64-NEXT:    shr esi, cl
 ; X64-NEXT:    lea edi, [rdi + rdi]
 ; X64-NEXT:    mov ecx, edx
@@ -395,7 +351,6 @@ define i32 @fshr_i32_dyn(i32 %a, i32 %b, i32 %c) {
 ; X64-NEXT:    shl edi, cl
 ; X64-NEXT:    or edi, esi
 ; X64-NEXT:    mov eax, edi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fshr_i32_dyn>:
@@ -412,11 +367,8 @@ define i32 @fshr_i32_dyn(i32 %a, i32 %b, i32 %c) {
 
 define i32 @fshr_rotate_i32_3(i32 %a) {
 ; X64-LABEL: <fshr_rotate_i32_3>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    ror edi, 0x3
+; X64:         ror edi, 0x3
 ; X64-NEXT:    mov eax, edi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fshr_rotate_i32_3>:
@@ -428,11 +380,8 @@ define i32 @fshr_rotate_i32_3(i32 %a) {
 
 define i32 @fshr_rotate_i32_221(i32 %a) {
 ; X64-LABEL: <fshr_rotate_i32_221>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    ror edi, 0xdd
+; X64:         ror edi, 0xdd
 ; X64-NEXT:    mov eax, edi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fshr_rotate_i32_221>:
@@ -444,12 +393,9 @@ define i32 @fshr_rotate_i32_221(i32 %a) {
 
 define i32 @fshr_rotate_i32_dyn(i32 %a, i32 %c) {
 ; X64-LABEL: <fshr_rotate_i32_dyn>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov ecx, esi
+; X64:         mov ecx, esi
 ; X64-NEXT:    ror edi, cl
 ; X64-NEXT:    mov eax, edi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fshr_rotate_i32_dyn>:
@@ -462,9 +408,7 @@ define i32 @fshr_rotate_i32_dyn(i32 %a, i32 %c) {
 
 define i64 @fshr_i64_3(i64 %a, i64 %b) {
 ; X64-LABEL: <fshr_i64_3>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    shr rsi, 0x3
+; X64:         shr rsi, 0x3
 ; X64-NEXT:    lea rdi, [rdi + rdi]
 ; X64-NEXT:    mov eax, 0x3
 ; X64-NEXT:    mov ecx, eax
@@ -472,7 +416,6 @@ define i64 @fshr_i64_3(i64 %a, i64 %b) {
 ; X64-NEXT:    shl rdi, cl
 ; X64-NEXT:    or rdi, rsi
 ; X64-NEXT:    mov rax, rdi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fshr_i64_3>:
@@ -489,9 +432,7 @@ define i64 @fshr_i64_3(i64 %a, i64 %b) {
 
 define i64 @fshr_i64_221(i64 %a, i64 %b) {
 ; X64-LABEL: <fshr_i64_221>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    shr rsi, 0xdd
+; X64:         shr rsi, 0xdd
 ; X64-NEXT:    lea rdi, [rdi + rdi]
 ; X64-NEXT:    mov eax, 0xdd
 ; X64-NEXT:    mov ecx, eax
@@ -499,7 +440,6 @@ define i64 @fshr_i64_221(i64 %a, i64 %b) {
 ; X64-NEXT:    shl rdi, cl
 ; X64-NEXT:    or rdi, rsi
 ; X64-NEXT:    mov rax, rdi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fshr_i64_221>:
@@ -517,9 +457,7 @@ define i64 @fshr_i64_221(i64 %a, i64 %b) {
 
 define i64 @fshr_i64_dyn(i64 %a, i64 %b, i64 %c) {
 ; X64-LABEL: <fshr_i64_dyn>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov ecx, edx
+; X64:         mov ecx, edx
 ; X64-NEXT:    shr rsi, cl
 ; X64-NEXT:    lea rdi, [rdi + rdi]
 ; X64-NEXT:    mov ecx, edx
@@ -527,7 +465,6 @@ define i64 @fshr_i64_dyn(i64 %a, i64 %b, i64 %c) {
 ; X64-NEXT:    shl rdi, cl
 ; X64-NEXT:    or rdi, rsi
 ; X64-NEXT:    mov rax, rdi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fshr_i64_dyn>:
@@ -544,11 +481,8 @@ define i64 @fshr_i64_dyn(i64 %a, i64 %b, i64 %c) {
 
 define i64 @fshr_rotate_i64_3(i64 %a) {
 ; X64-LABEL: <fshr_rotate_i64_3>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    ror rdi, 0x3
+; X64:         ror rdi, 0x3
 ; X64-NEXT:    mov rax, rdi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fshr_rotate_i64_3>:
@@ -560,11 +494,8 @@ define i64 @fshr_rotate_i64_3(i64 %a) {
 
 define i64 @fshr_rotate_i64_221(i64 %a) {
 ; X64-LABEL: <fshr_rotate_i64_221>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    ror rdi, 0xdd
+; X64:         ror rdi, 0xdd
 ; X64-NEXT:    mov rax, rdi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fshr_rotate_i64_221>:
@@ -576,12 +507,9 @@ define i64 @fshr_rotate_i64_221(i64 %a) {
 
 define i64 @fshr_rotate_i64_dyn(i64 %a, i64 %c) {
 ; X64-LABEL: <fshr_rotate_i64_dyn>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov ecx, esi
+; X64:         mov ecx, esi
 ; X64-NEXT:    ror rdi, cl
 ; X64-NEXT:    mov rax, rdi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fshr_rotate_i64_dyn>:

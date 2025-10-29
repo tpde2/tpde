@@ -10,10 +10,7 @@ declare void @llvm.prefetch.p0(ptr nocapture readonly, i32 immarg, i32 immarg, i
 
 define void @prefetch_read_local0_inst(ptr %0) {
 ; X64-LABEL: <prefetch_read_local0_inst>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    prefetchnta byte ptr [rdi]
-; X64-NEXT:    pop rbp
+; X64:         prefetchnta byte ptr [rdi]
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <prefetch_read_local0_inst>:
@@ -26,10 +23,7 @@ define void @prefetch_read_local0_inst(ptr %0) {
 
 define void @prefetch_read_local1_inst(ptr %0) {
 ; X64-LABEL: <prefetch_read_local1_inst>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    prefetcht2 byte ptr [rdi]
-; X64-NEXT:    pop rbp
+; X64:         prefetcht2 byte ptr [rdi]
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <prefetch_read_local1_inst>:
@@ -42,10 +36,7 @@ define void @prefetch_read_local1_inst(ptr %0) {
 
 define void @prefetch_read_local2_inst(ptr %0) {
 ; X64-LABEL: <prefetch_read_local2_inst>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    prefetcht1 byte ptr [rdi]
-; X64-NEXT:    pop rbp
+; X64:         prefetcht1 byte ptr [rdi]
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <prefetch_read_local2_inst>:
@@ -58,10 +49,7 @@ define void @prefetch_read_local2_inst(ptr %0) {
 
 define void @prefetch_read_local3_inst(ptr %0) {
 ; X64-LABEL: <prefetch_read_local3_inst>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    prefetcht0 byte ptr [rdi]
-; X64-NEXT:    pop rbp
+; X64:         prefetcht0 byte ptr [rdi]
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <prefetch_read_local3_inst>:
@@ -74,10 +62,7 @@ define void @prefetch_read_local3_inst(ptr %0) {
 
 define void @prefetch_write_local0_inst(ptr %0) {
 ; X64-LABEL: <prefetch_write_local0_inst>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    prefetchnta byte ptr [rdi]
-; X64-NEXT:    pop rbp
+; X64:         prefetchnta byte ptr [rdi]
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <prefetch_write_local0_inst>:
@@ -90,10 +75,7 @@ define void @prefetch_write_local0_inst(ptr %0) {
 
 define void @prefetch_write_local1_inst(ptr %0) {
 ; X64-LABEL: <prefetch_write_local1_inst>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    prefetcht2 byte ptr [rdi]
-; X64-NEXT:    pop rbp
+; X64:         prefetcht2 byte ptr [rdi]
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <prefetch_write_local1_inst>:
@@ -106,10 +88,7 @@ define void @prefetch_write_local1_inst(ptr %0) {
 
 define void @prefetch_write_local2_inst(ptr %0) {
 ; X64-LABEL: <prefetch_write_local2_inst>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    prefetcht1 byte ptr [rdi]
-; X64-NEXT:    pop rbp
+; X64:         prefetcht1 byte ptr [rdi]
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <prefetch_write_local2_inst>:
@@ -122,10 +101,7 @@ define void @prefetch_write_local2_inst(ptr %0) {
 
 define void @prefetch_write_local3_inst(ptr %0) {
 ; X64-LABEL: <prefetch_write_local3_inst>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    prefetcht0 byte ptr [rdi]
-; X64-NEXT:    pop rbp
+; X64:         prefetcht0 byte ptr [rdi]
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <prefetch_write_local3_inst>:
@@ -140,10 +116,7 @@ define void @prefetch_write_local3_inst(ptr %0) {
 
 define void @prefetch_read_local0_data(ptr %0) {
 ; X64-LABEL: <prefetch_read_local0_data>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    prefetchnta byte ptr [rdi]
-; X64-NEXT:    pop rbp
+; X64:         prefetchnta byte ptr [rdi]
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <prefetch_read_local0_data>:
@@ -156,10 +129,7 @@ define void @prefetch_read_local0_data(ptr %0) {
 
 define void @prefetch_read_local1_data(ptr %0) {
 ; X64-LABEL: <prefetch_read_local1_data>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    prefetcht2 byte ptr [rdi]
-; X64-NEXT:    pop rbp
+; X64:         prefetcht2 byte ptr [rdi]
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <prefetch_read_local1_data>:
@@ -172,10 +142,7 @@ define void @prefetch_read_local1_data(ptr %0) {
 
 define void @prefetch_read_local2_data(ptr %0) {
 ; X64-LABEL: <prefetch_read_local2_data>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    prefetcht1 byte ptr [rdi]
-; X64-NEXT:    pop rbp
+; X64:         prefetcht1 byte ptr [rdi]
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <prefetch_read_local2_data>:
@@ -188,10 +155,7 @@ define void @prefetch_read_local2_data(ptr %0) {
 
 define void @prefetch_read_local3_data(ptr %0) {
 ; X64-LABEL: <prefetch_read_local3_data>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    prefetcht0 byte ptr [rdi]
-; X64-NEXT:    pop rbp
+; X64:         prefetcht0 byte ptr [rdi]
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <prefetch_read_local3_data>:
@@ -205,10 +169,7 @@ define void @prefetch_read_local3_data(ptr %0) {
 
 define void @prefetch_write_local0_data(ptr %0) {
 ; X64-LABEL: <prefetch_write_local0_data>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    prefetchnta byte ptr [rdi]
-; X64-NEXT:    pop rbp
+; X64:         prefetchnta byte ptr [rdi]
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <prefetch_write_local0_data>:
@@ -221,10 +182,7 @@ define void @prefetch_write_local0_data(ptr %0) {
 
 define void @prefetch_write_local1_data(ptr %0) {
 ; X64-LABEL: <prefetch_write_local1_data>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    prefetcht2 byte ptr [rdi]
-; X64-NEXT:    pop rbp
+; X64:         prefetcht2 byte ptr [rdi]
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <prefetch_write_local1_data>:
@@ -237,10 +195,7 @@ define void @prefetch_write_local1_data(ptr %0) {
 
 define void @prefetch_write_local2_data(ptr %0) {
 ; X64-LABEL: <prefetch_write_local2_data>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    prefetcht1 byte ptr [rdi]
-; X64-NEXT:    pop rbp
+; X64:         prefetcht1 byte ptr [rdi]
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <prefetch_write_local2_data>:
@@ -253,10 +208,7 @@ define void @prefetch_write_local2_data(ptr %0) {
 
 define void @prefetch_write_local3_data(ptr %0) {
 ; X64-LABEL: <prefetch_write_local3_data>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    prefetcht0 byte ptr [rdi]
-; X64-NEXT:    pop rbp
+; X64:         prefetcht0 byte ptr [rdi]
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <prefetch_write_local3_data>:

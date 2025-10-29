@@ -9,10 +9,7 @@
 
 define <4 x i32> @retv4i32_zero() {
 ; X64-LABEL: <retv4i32_zero>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    pxor xmm0, xmm0
-; X64-NEXT:    pop rbp
+; X64:         pxor xmm0, xmm0
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <retv4i32_zero>:
@@ -23,10 +20,7 @@ define <4 x i32> @retv4i32_zero() {
 
 define <4 x i32> @retv4i32_poison() {
 ; X64-LABEL: <retv4i32_poison>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    pxor xmm0, xmm0
-; X64-NEXT:    pop rbp
+; X64:         pxor xmm0, xmm0
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <retv4i32_poison>:
@@ -37,10 +31,7 @@ define <4 x i32> @retv4i32_poison() {
 
 define <4 x i32> @retv4i32_allones() {
 ; X64-LABEL: <retv4i32_allones>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    pcmpeqb xmm0, xmm0
-; X64-NEXT:    pop rbp
+; X64:         pcmpeqb xmm0, xmm0
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <retv4i32_allones>:
@@ -51,11 +42,8 @@ define <4 x i32> @retv4i32_allones() {
 
 define <4 x i32> @retv4i32_values() {
 ; X64-LABEL: <retv4i32_values>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movaps xmm0, xmmword ptr <retv4i32_values+0x3>
+; X64:         movaps xmm0, xmmword ptr <retv4i32_allones+0xf>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <retv4i32_values>:
@@ -69,10 +57,7 @@ define <4 x i32> @retv4i32_values() {
 
 define <4 x i32> @retv4i32_multiplepoison() {
 ; X64-LABEL: <retv4i32_multiplepoison>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    pxor xmm0, xmm0
-; X64-NEXT:    pop rbp
+; X64:         pxor xmm0, xmm0
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <retv4i32_multiplepoison>:
@@ -83,11 +68,8 @@ define <4 x i32> @retv4i32_multiplepoison() {
 
 define <4 x i32> @retv4i32_mixedpoison() {
 ; X64-LABEL: <retv4i32_mixedpoison>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movaps xmm0, xmmword ptr <retv4i32_mixedpoison+0x3>
+; X64:         movaps xmm0, xmmword ptr <retv4i32_multiplepoison+0xf>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <retv4i32_mixedpoison>:
@@ -101,10 +83,7 @@ define <4 x i32> @retv4i32_mixedpoison() {
 
 define <4 x i32> @retv4i32_mixedpoisonzero() {
 ; X64-LABEL: <retv4i32_mixedpoisonzero>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    pxor xmm0, xmm0
-; X64-NEXT:    pop rbp
+; X64:         pxor xmm0, xmm0
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <retv4i32_mixedpoisonzero>:

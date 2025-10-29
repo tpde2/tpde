@@ -18,13 +18,10 @@ declare void @some_func(i32 noundef) #0
 
 define i32 @load_basic_int() {
 ; X64-LABEL: <load_basic_int>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    lea rax, <load_basic_int+0x3>
+; X64:         lea rax, <get_struct2+0xffffffffffffff4f>
 ; X64-NEXT:     R_X86_64_PC32 basic_int-0x4
 ; X64-NEXT:    mov ecx, dword ptr [rax]
 ; X64-NEXT:    mov eax, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_basic_int>:
@@ -42,15 +39,12 @@ entry:
 
 define i32 @load_basic_int_twice() {
 ; X64-LABEL: <load_basic_int_twice>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    lea rax, <load_basic_int_twice+0x3>
+; X64:         lea rax, <load_basic_int+0xf>
 ; X64-NEXT:     R_X86_64_PC32 basic_int-0x4
 ; X64-NEXT:    mov ecx, dword ptr [rax]
 ; X64-NEXT:    mov edx, dword ptr [rax]
 ; X64-NEXT:    lea ecx, [rcx + rdx]
 ; X64-NEXT:    mov eax, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_basic_int_twice>:
@@ -71,13 +65,10 @@ define i32 @load_basic_int_twice() {
 
 define i32 @load_global_int() {
 ; X64-LABEL: <load_global_int>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, qword ptr <load_global_int+0x3>
+; X64:         mov rax, qword ptr <load_basic_int_twice+0x1f>
 ; X64-NEXT:     R_X86_64_GOTPCREL global_int-0x4
 ; X64-NEXT:    mov ecx, dword ptr [rax]
 ; X64-NEXT:    mov eax, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_global_int>:
@@ -94,13 +85,10 @@ define i32 @load_global_int() {
 
 define i32 @load_global_dso_local_int() {
 ; X64-LABEL: <load_global_dso_local_int>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, qword ptr <load_global_dso_local_int+0x3>
+; X64:         mov rax, qword ptr <load_global_int+0xf>
 ; X64-NEXT:     R_X86_64_GOTPCREL global_dso_local_int-0x4
 ; X64-NEXT:    mov ecx, dword ptr [rax]
 ; X64-NEXT:    mov eax, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_global_dso_local_int>:
@@ -117,13 +105,10 @@ define i32 @load_global_dso_local_int() {
 
 define ptr @load_func_ptr() {
 ; X64-LABEL: <load_func_ptr>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, qword ptr <load_func_ptr+0x3>
+; X64:         mov rax, qword ptr <load_global_dso_local_int+0xf>
 ; X64-NEXT:     R_X86_64_GOTPCREL func_ptr-0x4
 ; X64-NEXT:    mov rcx, qword ptr [rax]
 ; X64-NEXT:    mov rax, rcx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_func_ptr>:
@@ -141,12 +126,9 @@ entry:
 
 define void @store_global_ptr(ptr %0) {
 ; X64-LABEL: <store_global_ptr>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, qword ptr <store_global_ptr+0x3>
+; X64:         mov rax, qword ptr <load_func_ptr+0xf>
 ; X64-NEXT:     R_X86_64_GOTPCREL global_ptr-0x4
 ; X64-NEXT:    mov qword ptr [rax], rdi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_global_ptr>:
@@ -163,11 +145,8 @@ entry:
 
 define ptr @get_global() {
 ; X64-LABEL: <get_global>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    lea rax, <get_global+0x3>
+; X64:         lea rax, <store_global_ptr+0xf>
 ; X64-NEXT:     R_X86_64_PC32 basic_int-0x4
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <get_global>:
@@ -182,11 +161,8 @@ entry:
 
 define ptr @get_func1() {
 ; X64-LABEL: <get_func1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, qword ptr <get_func1+0x3>
+; X64:         mov rax, qword ptr <get_global+0xf>
 ; X64-NEXT:     R_X86_64_GOTPCREL func_ptr-0x4
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <get_func1>:
@@ -201,11 +177,8 @@ entry:
 
 define ptr @get_func2() {
 ; X64-LABEL: <get_func2>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, qword ptr <get_func2+0x3>
+; X64:         mov rax, qword ptr <get_func1+0xf>
 ; X64-NEXT:     R_X86_64_GOTPCREL some_func-0x4
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <get_func2>:
@@ -220,13 +193,10 @@ entry:
 
 define {ptr, ptr} @get_struct1() {
 ; X64-LABEL: <get_struct1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, qword ptr <get_struct1+0x3>
+; X64:         mov rax, qword ptr <get_func2+0xf>
 ; X64-NEXT:     R_X86_64_GOTPCREL func_ptr-0x4
-; X64-NEXT:    lea rdx, <get_struct1+0xa>
+; X64-NEXT:    lea rdx, <get_struct1+0x6>
 ; X64-NEXT:     R_X86_64_PC32 basic_int-0x4
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <get_struct1>:
@@ -244,13 +214,10 @@ define {ptr, ptr} @get_struct1() {
 
 define {ptr, ptr} @get_struct2() {
 ; X64-LABEL: <get_struct2>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, qword ptr <get_struct2+0x3>
+; X64:         mov rax, qword ptr <get_struct1+0xf>
 ; X64-NEXT:     R_X86_64_GOTPCREL some_func-0x4
-; X64-NEXT:    mov rdx, qword ptr <get_struct2+0xa>
+; X64-NEXT:    mov rdx, qword ptr <get_struct2+0x6>
 ; X64-NEXT:     R_X86_64_GOTPCREL get_struct2-0x4
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <get_struct2>:

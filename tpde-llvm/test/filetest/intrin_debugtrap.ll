@@ -7,10 +7,7 @@
 
 define void @test() {
 ; X64-LABEL: <test>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    int3
-; X64-NEXT:    pop rbp
+; X64:         int3
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <test>:

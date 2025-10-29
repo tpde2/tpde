@@ -13,11 +13,8 @@
 
 define i8 @extract_i8_i32_0(ptr %0) {
 ; X64-LABEL: <extract_i8_i32_0>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx eax, byte ptr [rdi]
+; X64:         movzx eax, byte ptr [rdi]
 ; X64-NEXT:    mov ecx, dword ptr [rdi + 0x4]
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <extract_i8_i32_0>:
@@ -33,12 +30,9 @@ entry:
 
 define i32 @extract_i8_i32_1(ptr %0) {
 ; X64-LABEL: <extract_i8_i32_1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx eax, byte ptr [rdi]
+; X64:         movzx eax, byte ptr [rdi]
 ; X64-NEXT:    mov ecx, dword ptr [rdi + 0x4]
 ; X64-NEXT:    mov eax, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <extract_i8_i32_1>:
@@ -54,15 +48,12 @@ entry:
 
 define i8 @extract_i8_i32_0_no_salvage(ptr %0) {
 ; X64-LABEL: <extract_i8_i32_0_no_salvage>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx eax, byte ptr [rdi]
+; X64:         movzx eax, byte ptr [rdi]
 ; X64-NEXT:    mov ecx, dword ptr [rdi + 0x4]
 ; X64-NEXT:    mov edx, eax
 ; X64-NEXT:    mov byte ptr [rdi], al
 ; X64-NEXT:    mov dword ptr [rdi + 0x4], ecx
 ; X64-NEXT:    mov eax, edx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <extract_i8_i32_0_no_salvage>:
@@ -82,15 +73,12 @@ entry:
 
 define i32 @extract_i8_i32_1_no_salvage(ptr %0) {
 ; X64-LABEL: <extract_i8_i32_1_no_salvage>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx eax, byte ptr [rdi]
+; X64:         movzx eax, byte ptr [rdi]
 ; X64-NEXT:    mov ecx, dword ptr [rdi + 0x4]
 ; X64-NEXT:    mov edx, ecx
 ; X64-NEXT:    mov byte ptr [rdi], al
 ; X64-NEXT:    mov dword ptr [rdi + 0x4], ecx
 ; X64-NEXT:    mov eax, edx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <extract_i8_i32_1_no_salvage>:
@@ -111,11 +99,8 @@ entry:
 
 define ptr @extract_ptr_i32_0(ptr %0) {
 ; X64-LABEL: <extract_ptr_i32_0>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, qword ptr [rdi]
+; X64:         mov rax, qword ptr [rdi]
 ; X64-NEXT:    mov ecx, dword ptr [rdi + 0x8]
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <extract_ptr_i32_0>:
@@ -131,12 +116,9 @@ entry:
 
 define i32 @extract_ptr_i32_1(ptr %0) {
 ; X64-LABEL: <extract_ptr_i32_1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, qword ptr [rdi]
+; X64:         mov rax, qword ptr [rdi]
 ; X64-NEXT:    mov ecx, dword ptr [rdi + 0x8]
 ; X64-NEXT:    mov eax, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <extract_ptr_i32_1>:
@@ -152,15 +134,12 @@ entry:
 
 define ptr @extract_ptr_i32_0_no_salvage(ptr %0) {
 ; X64-LABEL: <extract_ptr_i32_0_no_salvage>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, qword ptr [rdi]
+; X64:         mov rax, qword ptr [rdi]
 ; X64-NEXT:    mov ecx, dword ptr [rdi + 0x8]
 ; X64-NEXT:    mov rdx, rax
 ; X64-NEXT:    mov qword ptr [rdi], rax
 ; X64-NEXT:    mov dword ptr [rdi + 0x8], ecx
 ; X64-NEXT:    mov rax, rdx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <extract_ptr_i32_0_no_salvage>:
@@ -180,15 +159,12 @@ entry:
 
 define i32 @extract_ptr_i32_1_no_salvage(ptr %0) {
 ; X64-LABEL: <extract_ptr_i32_1_no_salvage>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, qword ptr [rdi]
+; X64:         mov rax, qword ptr [rdi]
 ; X64-NEXT:    mov ecx, dword ptr [rdi + 0x8]
 ; X64-NEXT:    mov edx, ecx
 ; X64-NEXT:    mov qword ptr [rdi], rax
 ; X64-NEXT:    mov dword ptr [rdi + 0x8], ecx
 ; X64-NEXT:    mov eax, edx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <extract_ptr_i32_1_no_salvage>:
@@ -209,11 +185,8 @@ entry:
 
 define float @extract_f32_ptr_0(ptr %0) {
 ; X64-LABEL: <extract_f32_ptr_0>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movss xmm0, dword ptr [rdi]
+; X64:         movss xmm0, dword ptr [rdi]
 ; X64-NEXT:    mov rax, qword ptr [rdi + 0x8]
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <extract_f32_ptr_0>:
@@ -228,11 +201,8 @@ entry:
 
 define ptr @extract_f32_ptr_1(ptr %0) {
 ; X64-LABEL: <extract_f32_ptr_1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movss xmm0, dword ptr [rdi]
+; X64:         movss xmm0, dword ptr [rdi]
 ; X64-NEXT:    mov rax, qword ptr [rdi + 0x8]
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <extract_f32_ptr_1>:
@@ -248,15 +218,12 @@ entry:
 
 define float @extract_f32_ptr_0_no_salvage(ptr %0) {
 ; X64-LABEL: <extract_f32_ptr_0_no_salvage>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movss xmm0, dword ptr [rdi]
+; X64:         movss xmm0, dword ptr [rdi]
 ; X64-NEXT:    mov rax, qword ptr [rdi + 0x8]
 ; X64-NEXT:    movapd xmm1, xmm0
 ; X64-NEXT:    movss dword ptr [rdi], xmm0
 ; X64-NEXT:    mov qword ptr [rdi + 0x8], rax
 ; X64-NEXT:    movapd xmm0, xmm1
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <extract_f32_ptr_0_no_salvage>:
@@ -276,15 +243,12 @@ entry:
 
 define ptr @extract_f32_ptr_1_no_salvage(ptr %0) {
 ; X64-LABEL: <extract_f32_ptr_1_no_salvage>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movss xmm0, dword ptr [rdi]
+; X64:         movss xmm0, dword ptr [rdi]
 ; X64-NEXT:    mov rax, qword ptr [rdi + 0x8]
 ; X64-NEXT:    mov rcx, rax
 ; X64-NEXT:    movss dword ptr [rdi], xmm0
 ; X64-NEXT:    mov qword ptr [rdi + 0x8], rax
 ; X64-NEXT:    mov rax, rcx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <extract_f32_ptr_1_no_salvage>:
@@ -305,13 +269,10 @@ entry:
 
 define i128 @extract_i128_i1_0(ptr %0) {
 ; X64-LABEL: <extract_i128_i1_0>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, qword ptr [rdi]
+; X64:         mov rax, qword ptr [rdi]
 ; X64-NEXT:    mov rcx, qword ptr [rdi + 0x8]
 ; X64-NEXT:    movzx edx, byte ptr [rdi + 0x10]
 ; X64-NEXT:    mov rdx, rcx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <extract_i128_i1_0>:
@@ -329,13 +290,10 @@ entry:
 
 define i1 @extract_i128_i1_1(ptr %0) {
 ; X64-LABEL: <extract_i128_i1_1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, qword ptr [rdi]
+; X64:         mov rax, qword ptr [rdi]
 ; X64-NEXT:    mov rcx, qword ptr [rdi + 0x8]
 ; X64-NEXT:    movzx edx, byte ptr [rdi + 0x10]
 ; X64-NEXT:    mov eax, edx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <extract_i128_i1_1>:

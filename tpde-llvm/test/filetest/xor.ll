@@ -8,10 +8,7 @@
 
 define void @xor_i8_3(i8 %0) {
 ; X64-LABEL: <xor_i8_3>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor edi, 0x3
-; X64-NEXT:    pop rbp
+; X64:         xor edi, 0x3
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <xor_i8_3>:
@@ -24,10 +21,7 @@ entry:
 
 define void @xor_i8_9(i8 %0) {
 ; X64-LABEL: <xor_i8_9>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor edi, 0x9
-; X64-NEXT:    pop rbp
+; X64:         xor edi, 0x9
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <xor_i8_9>:
@@ -41,10 +35,7 @@ entry:
 
 define void @xor_i8_i8(i8 %0, i8 %1) {
 ; X64-LABEL: <xor_i8_i8>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor edi, esi
-; X64-NEXT:    pop rbp
+; X64:         xor edi, esi
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <xor_i8_i8>:
@@ -57,10 +48,7 @@ entry:
 
 define void @xor_i16_1ff0(i16 %0) {
 ; X64-LABEL: <xor_i16_1ff0>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor edi, 0x1ff0
-; X64-NEXT:    pop rbp
+; X64:         xor edi, 0x1ff0
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <xor_i16_1ff0>:
@@ -73,10 +61,7 @@ entry:
 
 define void @xor_i16_1ff1(i16 %0) {
 ; X64-LABEL: <xor_i16_1ff1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor edi, 0x1ff1
-; X64-NEXT:    pop rbp
+; X64:         xor edi, 0x1ff1
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <xor_i16_1ff1>:
@@ -90,10 +75,7 @@ entry:
 
 define void @xor_i16_i16(i16 %0, i16 %1) {
 ; X64-LABEL: <xor_i16_i16>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor edi, esi
-; X64-NEXT:    pop rbp
+; X64:         xor edi, esi
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <xor_i16_i16>:
@@ -106,10 +88,7 @@ entry:
 
 define void @xor_i32_1fffff0(i32 %0) {
 ; X64-LABEL: <xor_i32_1fffff0>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor edi, 0x1fffff0
-; X64-NEXT:    pop rbp
+; X64:         xor edi, 0x1fffff0
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <xor_i32_1fffff0>:
@@ -122,10 +101,7 @@ entry:
 
 define void @xor_i32_1fffff1(i32 %0) {
 ; X64-LABEL: <xor_i32_1fffff1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor edi, 0x1fffff1
-; X64-NEXT:    pop rbp
+; X64:         xor edi, 0x1fffff1
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <xor_i32_1fffff1>:
@@ -140,10 +116,7 @@ entry:
 
 define void @xor_i32_i32(i32 %0, i32 %1) {
 ; X64-LABEL: <xor_i32_i32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor edi, esi
-; X64-NEXT:    pop rbp
+; X64:         xor edi, esi
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <xor_i32_i32>:
@@ -156,10 +129,7 @@ entry:
 
 define void @xor_i64_fffffffffff1ffff(i64 %0) {
 ; X64-LABEL: <xor_i64_fffffffffff1ffff>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor rdi, -0xe0001
-; X64-NEXT:    pop rbp
+; X64:         xor rdi, -0xe0001
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <xor_i64_fffffffffff1ffff>:
@@ -172,10 +142,7 @@ entry:
 
 define void @xor_i64_fffffffffff2ffff(i64 %0) {
 ; X64-LABEL: <xor_i64_fffffffffff2ffff>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor rdi, -0xd0001
-; X64-NEXT:    pop rbp
+; X64:         xor rdi, -0xd0001
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <xor_i64_fffffffffff2ffff>:
@@ -189,10 +156,7 @@ entry:
 
 define void @xor_i64_i64(i64 %0, i64 %1) {
 ; X64-LABEL: <xor_i64_i64>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor rdi, rsi
-; X64-NEXT:    pop rbp
+; X64:         xor rdi, rsi
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <xor_i64_i64>:
@@ -205,10 +169,7 @@ entry:
 
 define void @xor_i37_3(i37 %0) {
 ; X64-LABEL: <xor_i37_3>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor rdi, 0x3
-; X64-NEXT:    pop rbp
+; X64:         xor rdi, 0x3
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <xor_i37_3>:
@@ -221,10 +182,7 @@ entry:
 
 define void @xor_i37_i37(i37 %0, i37 %1) {
 ; X64-LABEL: <xor_i37_i37>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor rdi, rsi
-; X64-NEXT:    pop rbp
+; X64:         xor rdi, rsi
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <xor_i37_i37>:
@@ -237,11 +195,8 @@ entry:
 
 define void @xor_i128_3(i128 %0) {
 ; X64-LABEL: <xor_i128_3>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor rdi, 0x3
+; X64:         xor rdi, 0x3
 ; X64-NEXT:    xor rsi, 0x0
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <xor_i128_3>:
@@ -256,11 +211,8 @@ entry:
 
 define void @xor_i128_30000000000000003(i128 %0) {
 ; X64-LABEL: <xor_i128_30000000000000003>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor rdi, 0x3
+; X64:         xor rdi, 0x3
 ; X64-NEXT:    xor rsi, 0x3
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <xor_i128_30000000000000003>:
@@ -274,11 +226,8 @@ entry:
 
 define void @xor_i128_90000000000000003(i128 %0) {
 ; X64-LABEL: <xor_i128_90000000000000003>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor rdi, 0x3
+; X64:         xor rdi, 0x3
 ; X64-NEXT:    xor rsi, 0x9
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <xor_i128_90000000000000003>:
@@ -293,11 +242,8 @@ entry:
 
 define void @xor_i128_90000000000000009(i128 %0) {
 ; X64-LABEL: <xor_i128_90000000000000009>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor rdi, 0x9
+; X64:         xor rdi, 0x9
 ; X64-NEXT:    xor rsi, 0x9
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <xor_i128_90000000000000009>:
@@ -313,11 +259,8 @@ entry:
 
 define void @xor_i128_i128(i128 %0, i128 %1) {
 ; X64-LABEL: <xor_i128_i128>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor rdi, rdx
+; X64:         xor rdi, rdx
 ; X64-NEXT:    xor rsi, rcx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <xor_i128_i128>:
@@ -331,12 +274,9 @@ entry:
 
 define void @xor_i64_no_salvage_imm(i64 %0) {
 ; X64-LABEL: <xor_i64_no_salvage_imm>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, rdi
+; X64:         mov rax, rdi
 ; X64-NEXT:    xor rax, 0x3
 ; X64-NEXT:    xor rdi, rax
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <xor_i64_no_salvage_imm>:
@@ -351,12 +291,9 @@ entry:
 
 define void @xor_i64_no_salvage_reg(i64 %0, i64 %1) {
 ; X64-LABEL: <xor_i64_no_salvage_reg>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, rdi
+; X64:         mov rax, rdi
 ; X64-NEXT:    xor rax, rsi
 ; X64-NEXT:    xor rdi, rax
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <xor_i64_no_salvage_reg>:
@@ -371,12 +308,9 @@ entry:
 
 define void @xor_i37_no_salvage_imm(i37 %0) {
 ; X64-LABEL: <xor_i37_no_salvage_imm>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, rdi
+; X64:         mov rax, rdi
 ; X64-NEXT:    xor rax, 0x3
 ; X64-NEXT:    xor rdi, rax
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <xor_i37_no_salvage_imm>:
@@ -391,12 +325,9 @@ entry:
 
 define void @xor_i37_no_salvage_reg(i37 %0, i37 %1) {
 ; X64-LABEL: <xor_i37_no_salvage_reg>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, rdi
+; X64:         mov rax, rdi
 ; X64-NEXT:    xor rax, rsi
 ; X64-NEXT:    xor rdi, rax
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <xor_i37_no_salvage_reg>:
@@ -411,15 +342,12 @@ entry:
 
 define void @xor_i128_no_salvage_imm(i128 %0) {
 ; X64-LABEL: <xor_i128_no_salvage_imm>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, rdi
+; X64:         mov rax, rdi
 ; X64-NEXT:    xor rax, 0x3
 ; X64-NEXT:    mov rcx, rsi
 ; X64-NEXT:    xor rcx, 0x0
 ; X64-NEXT:    xor rdi, rax
 ; X64-NEXT:    xor rsi, rcx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <xor_i128_no_salvage_imm>:

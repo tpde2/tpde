@@ -7,10 +7,7 @@
 
 define i1 @i1(i1 %p) {
 ; X64-LABEL: <i1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, edi
-; X64-NEXT:    pop rbp
+; X64:         mov eax, edi
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <i1>:
@@ -21,10 +18,7 @@ define i1 @i1(i1 %p) {
 
 define i8 @i8(i8 %p) {
 ; X64-LABEL: <i8>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, edi
-; X64-NEXT:    pop rbp
+; X64:         mov eax, edi
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <i8>:
@@ -35,10 +29,7 @@ define i8 @i8(i8 %p) {
 
 define i37 @i37(i37 %p) {
 ; X64-LABEL: <i37>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, rdi
-; X64-NEXT:    pop rbp
+; X64:         mov rax, rdi
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <i37>:
@@ -49,10 +40,7 @@ define i37 @i37(i37 %p) {
 
 define i64 @i64(i64 %p) {
 ; X64-LABEL: <i64>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, rdi
-; X64-NEXT:    pop rbp
+; X64:         mov rax, rdi
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <i64>:
@@ -63,11 +51,8 @@ define i64 @i64(i64 %p) {
 
 define i128 @i128(i128 %p) {
 ; X64-LABEL: <i128>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, rdi
+; X64:         mov rax, rdi
 ; X64-NEXT:    mov rdx, rsi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <i128>:

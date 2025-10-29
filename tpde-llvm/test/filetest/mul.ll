@@ -8,11 +8,8 @@
 
 define void @mul_i8_1(i8 %0) {
 ; X64-LABEL: <mul_i8_1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, 0x1
+; X64:         mov eax, 0x1
 ; X64-NEXT:    imul edi, eax
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <mul_i8_1>:
@@ -26,11 +23,8 @@ define void @mul_i8_1(i8 %0) {
 
 define void @mul_i8_-1(i8 %0) {
 ; X64-LABEL: <mul_i8_-1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, 0xff
+; X64:         mov eax, 0xff
 ; X64-NEXT:    imul edi, eax
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <mul_i8_-1>:
@@ -44,10 +38,7 @@ define void @mul_i8_-1(i8 %0) {
 
 define void @mul_i8_i8(i8 %0, i8 %1) {
 ; X64-LABEL: <mul_i8_i8>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    imul edi, esi
-; X64-NEXT:    pop rbp
+; X64:         imul edi, esi
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <mul_i8_i8>:
@@ -60,11 +51,8 @@ define void @mul_i8_i8(i8 %0, i8 %1) {
 
 define void @mul_i16_1(i16 %0) {
 ; X64-LABEL: <mul_i16_1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, 0x1
+; X64:         mov eax, 0x1
 ; X64-NEXT:    imul edi, eax
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <mul_i16_1>:
@@ -78,11 +66,8 @@ define void @mul_i16_1(i16 %0) {
 
 define void @mul_i16_-1(i16 %0) {
 ; X64-LABEL: <mul_i16_-1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, 0xffff
+; X64:         mov eax, 0xffff
 ; X64-NEXT:    imul edi, eax
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <mul_i16_-1>:
@@ -96,10 +81,7 @@ define void @mul_i16_-1(i16 %0) {
 
 define void @mul_i16_i16(i16 %0, i16 %1) {
 ; X64-LABEL: <mul_i16_i16>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    imul edi, esi
-; X64-NEXT:    pop rbp
+; X64:         imul edi, esi
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <mul_i16_i16>:
@@ -112,11 +94,8 @@ define void @mul_i16_i16(i16 %0, i16 %1) {
 
 define void @mul_i32_1(i32 %0) {
 ; X64-LABEL: <mul_i32_1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, 0x1
+; X64:         mov eax, 0x1
 ; X64-NEXT:    imul edi, eax
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <mul_i32_1>:
@@ -130,11 +109,8 @@ define void @mul_i32_1(i32 %0) {
 
 define void @mul_i32_-1(i32 %0) {
 ; X64-LABEL: <mul_i32_-1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, 0xffffffff
+; X64:         mov eax, 0xffffffff
 ; X64-NEXT:    imul edi, eax
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <mul_i32_-1>:
@@ -148,10 +124,7 @@ define void @mul_i32_-1(i32 %0) {
 
 define void @mul_i32_i32(i32 %0, i32 %1) {
 ; X64-LABEL: <mul_i32_i32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    imul edi, esi
-; X64-NEXT:    pop rbp
+; X64:         imul edi, esi
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <mul_i32_i32>:
@@ -164,11 +137,8 @@ define void @mul_i32_i32(i32 %0, i32 %1) {
 
 define void @mul_i37_1(i37 %0) {
 ; X64-LABEL: <mul_i37_1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, 0x1
+; X64:         mov eax, 0x1
 ; X64-NEXT:    imul rdi, rax
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <mul_i37_1>:
@@ -182,11 +152,8 @@ define void @mul_i37_1(i37 %0) {
 
 define void @mul_i37_-1(i37 %0) {
 ; X64-LABEL: <mul_i37_-1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movabs rax, 0x1fffffffff
+; X64:         movabs rax, 0x1fffffffff
 ; X64-NEXT:    imul rdi, rax
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <mul_i37_-1>:
@@ -200,10 +167,7 @@ define void @mul_i37_-1(i37 %0) {
 
 define void @mul_i37_i37(i37 %0, i37 %1) {
 ; X64-LABEL: <mul_i37_i37>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    imul rdi, rsi
-; X64-NEXT:    pop rbp
+; X64:         imul rdi, rsi
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <mul_i37_i37>:
@@ -216,11 +180,8 @@ define void @mul_i37_i37(i37 %0, i37 %1) {
 
 define void @mul_i64_1(i64 %0) {
 ; X64-LABEL: <mul_i64_1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, 0x1
+; X64:         mov eax, 0x1
 ; X64-NEXT:    imul rdi, rax
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <mul_i64_1>:
@@ -234,11 +195,8 @@ define void @mul_i64_1(i64 %0) {
 
 define void @mul_i64_-1(i64 %0) {
 ; X64-LABEL: <mul_i64_-1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, -0x1
+; X64:         mov rax, -0x1
 ; X64-NEXT:    imul rdi, rax
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <mul_i64_-1>:
@@ -252,10 +210,7 @@ define void @mul_i64_-1(i64 %0) {
 
 define void @mul_i64_i64(i64 %0, i64 %1) {
 ; X64-LABEL: <mul_i64_i64>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    imul rdi, rsi
-; X64-NEXT:    pop rbp
+; X64:         imul rdi, rsi
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <mul_i64_i64>:
@@ -268,9 +223,7 @@ define void @mul_i64_i64(i64 %0, i64 %1) {
 
 define void @mul_i128_1(i128 %0) {
 ; X64-LABEL: <mul_i128_1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov ecx, 0x1
+; X64:         mov ecx, 0x1
 ; X64-NEXT:    imul rsi, rcx
 ; X64-NEXT:    mov rax, rcx
 ; X64-NEXT:    mul rdi
@@ -278,7 +231,6 @@ define void @mul_i128_1(i128 %0) {
 ; X64-NEXT:    xor ecx, ecx
 ; X64-NEXT:    imul rcx, rdi
 ; X64-NEXT:    add rdx, rcx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <mul_i128_1>:
@@ -296,9 +248,7 @@ define void @mul_i128_1(i128 %0) {
 
 define void @mul_i128_1_reorder(i128 %0) {
 ; X64-LABEL: <mul_i128_1_reorder>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov ecx, 0x1
+; X64:         mov ecx, 0x1
 ; X64-NEXT:    imul rsi, rcx
 ; X64-NEXT:    mov rax, rcx
 ; X64-NEXT:    mul rdi
@@ -306,7 +256,6 @@ define void @mul_i128_1_reorder(i128 %0) {
 ; X64-NEXT:    xor ecx, ecx
 ; X64-NEXT:    imul rcx, rdi
 ; X64-NEXT:    add rdx, rcx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <mul_i128_1_reorder>:
@@ -324,9 +273,7 @@ define void @mul_i128_1_reorder(i128 %0) {
 
 define void @mul_i128_1001_1002(i128 %0) {
 ; X64-LABEL: <mul_i128_1001_1002>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov ecx, 0x1002
+; X64:         mov ecx, 0x1002
 ; X64-NEXT:    imul rsi, rcx
 ; X64-NEXT:    mov rax, rcx
 ; X64-NEXT:    mul rdi
@@ -334,7 +281,6 @@ define void @mul_i128_1001_1002(i128 %0) {
 ; X64-NEXT:    mov ecx, 0x1001
 ; X64-NEXT:    imul rcx, rdi
 ; X64-NEXT:    add rdx, rcx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <mul_i128_1001_1002>:
@@ -382,9 +328,7 @@ define void @mul_i128_i128(i128 %0, i128 %1) {
 
 define void @mul_i128_salvage_imm(i128 %0) {
 ; X64-LABEL: <mul_i128_salvage_imm>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov ecx, 0x1
+; X64:         mov ecx, 0x1
 ; X64-NEXT:    imul rsi, rcx
 ; X64-NEXT:    mov rax, rcx
 ; X64-NEXT:    mul rdi
@@ -392,7 +336,6 @@ define void @mul_i128_salvage_imm(i128 %0) {
 ; X64-NEXT:    xor ecx, ecx
 ; X64-NEXT:    imul rcx, rdi
 ; X64-NEXT:    add rdx, rcx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <mul_i128_salvage_imm>:
@@ -438,13 +381,10 @@ define void @mul_i128_salvage_reg(i128 %0, i128 %1) {
 
 define void @mul_i64_no_salvage_imm(i64 %0) {
 ; X64-LABEL: <mul_i64_no_salvage_imm>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, rdi
+; X64:         mov rax, rdi
 ; X64-NEXT:    mov ecx, 0x1
 ; X64-NEXT:    imul rax, rcx
 ; X64-NEXT:    imul rdi, rax
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <mul_i64_no_salvage_imm>:
@@ -460,12 +400,9 @@ define void @mul_i64_no_salvage_imm(i64 %0) {
 
 define void @mul_i64_no_salvage_reg(i64 %0, i64 %1) {
 ; X64-LABEL: <mul_i64_no_salvage_reg>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, rdi
+; X64:         mov rax, rdi
 ; X64-NEXT:    imul rax, rsi
 ; X64-NEXT:    imul rdi, rax
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <mul_i64_no_salvage_reg>:
@@ -480,13 +417,10 @@ define void @mul_i64_no_salvage_reg(i64 %0, i64 %1) {
 
 define void @mul_i37_no_salvage_imm(i37 %0) {
 ; X64-LABEL: <mul_i37_no_salvage_imm>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, rdi
+; X64:         mov rax, rdi
 ; X64-NEXT:    mov ecx, 0x3
 ; X64-NEXT:    imul rax, rcx
 ; X64-NEXT:    imul rdi, rax
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <mul_i37_no_salvage_imm>:
@@ -502,12 +436,9 @@ entry:
 
 define void @mul_i37_no_salvage_reg(i37 %0, i37 %1) {
 ; X64-LABEL: <mul_i37_no_salvage_reg>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, rdi
+; X64:         mov rax, rdi
 ; X64-NEXT:    imul rax, rsi
 ; X64-NEXT:    imul rdi, rax
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <mul_i37_no_salvage_reg>:

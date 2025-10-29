@@ -9,10 +9,7 @@
 ; COM: these are all no-ops
 define i64 @ptrtoint_i64(ptr %0) {
 ; X64-LABEL: <ptrtoint_i64>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, rdi
-; X64-NEXT:    pop rbp
+; X64:         mov rax, rdi
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ptrtoint_i64>:
@@ -24,11 +21,8 @@ define i64 @ptrtoint_i64(ptr %0) {
 
 define i64 @ptrtoint_i64_no_salvage(ptr %0) {
 ; X64-LABEL: <ptrtoint_i64_no_salvage>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
+; X64:         mov rax, rdi
 ; X64-NEXT:    mov rax, rdi
-; X64-NEXT:    mov rax, rdi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ptrtoint_i64_no_salvage>:
@@ -42,10 +36,7 @@ define i64 @ptrtoint_i64_no_salvage(ptr %0) {
 
 define i32 @ptrtoint_i32(ptr %0) {
 ; X64-LABEL: <ptrtoint_i32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, edi
-; X64-NEXT:    pop rbp
+; X64:         mov eax, edi
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ptrtoint_i32>:
@@ -57,11 +48,8 @@ define i32 @ptrtoint_i32(ptr %0) {
 
 define i32 @ptrtoint_i32_no_salvage(ptr %0) {
 ; X64-LABEL: <ptrtoint_i32_no_salvage>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, rdi
+; X64:         mov rax, rdi
 ; X64-NEXT:    mov eax, edi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ptrtoint_i32_no_salvage>:
@@ -75,10 +63,7 @@ define i32 @ptrtoint_i32_no_salvage(ptr %0) {
 
 define <2 x i64> @ptrtoint_v2i64(<2 x ptr> %p) {
 ; X64-LABEL: <ptrtoint_v2i64>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    pop rbp
-; X64-NEXT:    ret
+; X64:         ret
 ;
 ; ARM64-LABEL: <ptrtoint_v2i64>:
 ; ARM64:         ret
@@ -88,15 +73,12 @@ define <2 x i64> @ptrtoint_v2i64(<2 x ptr> %p) {
 
 define void @ptrtoint_v6i64(ptr %p, ptr %q) {
 ; X64-LABEL: <ptrtoint_v6i64>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movups xmm0, xmmword ptr [rdi]
+; X64:         movups xmm0, xmmword ptr [rdi]
 ; X64-NEXT:    movups xmm1, xmmword ptr [rdi + 0x10]
 ; X64-NEXT:    movups xmm2, xmmword ptr [rdi + 0x20]
 ; X64-NEXT:    movups xmmword ptr [rsi], xmm0
 ; X64-NEXT:    movups xmmword ptr [rsi + 0x10], xmm1
 ; X64-NEXT:    movups xmmword ptr [rsi + 0x20], xmm2
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ptrtoint_v6i64>:

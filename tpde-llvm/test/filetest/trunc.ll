@@ -9,10 +9,7 @@
 ; COM: these are all no-ops
 define i1 @trunc_i64_i1(i64 %0) {
 ; X64-LABEL: <trunc_i64_i1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, edi
-; X64-NEXT:    pop rbp
+; X64:         mov eax, edi
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <trunc_i64_i1>:
@@ -24,10 +21,7 @@ define i1 @trunc_i64_i1(i64 %0) {
 
 define i8 @trunc_i64_i8(i64 %0) {
 ; X64-LABEL: <trunc_i64_i8>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, edi
-; X64-NEXT:    pop rbp
+; X64:         mov eax, edi
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <trunc_i64_i8>:
@@ -39,10 +33,7 @@ define i8 @trunc_i64_i8(i64 %0) {
 
 define i16 @trunc_i64_i16(i64 %0) {
 ; X64-LABEL: <trunc_i64_i16>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, edi
-; X64-NEXT:    pop rbp
+; X64:         mov eax, edi
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <trunc_i64_i16>:
@@ -54,10 +45,7 @@ define i16 @trunc_i64_i16(i64 %0) {
 
 define i32 @trunc_i64_i32(i64 %0) {
 ; X64-LABEL: <trunc_i64_i32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, edi
-; X64-NEXT:    pop rbp
+; X64:         mov eax, edi
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <trunc_i64_i32>:
@@ -69,10 +57,7 @@ define i32 @trunc_i64_i32(i64 %0) {
 
 define i37 @trunc_i64_i37(i64 %0) {
 ; X64-LABEL: <trunc_i64_i37>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, rdi
-; X64-NEXT:    pop rbp
+; X64:         mov rax, rdi
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <trunc_i64_i37>:
@@ -84,10 +69,7 @@ define i37 @trunc_i64_i37(i64 %0) {
 
 define i64 @trunc_i128_i64(i128 %0) {
 ; X64-LABEL: <trunc_i128_i64>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, rdi
-; X64-NEXT:    pop rbp
+; X64:         mov rax, rdi
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <trunc_i128_i64>:
@@ -99,11 +81,8 @@ define i64 @trunc_i128_i64(i128 %0) {
 
 define i1 @trunc_i64_i37_no_salvage(i64 %0) {
 ; X64-LABEL: <trunc_i64_i37_no_salvage>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, rdi
+; X64:         mov rax, rdi
 ; X64-NEXT:    mov eax, edi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <trunc_i64_i37_no_salvage>:

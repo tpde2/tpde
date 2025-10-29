@@ -8,10 +8,7 @@
 
 define i32 @bitcast_f32_to_i32(float %0) {
 ; X64-LABEL: <bitcast_f32_to_i32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movd eax, xmm0
-; X64-NEXT:    pop rbp
+; X64:         movd eax, xmm0
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <bitcast_f32_to_i32>:
@@ -24,10 +21,7 @@ entry:
 
 define float @bitcast_i32_to_f32(i32 %0) {
 ; X64-LABEL: <bitcast_i32_to_f32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movd xmm0, edi
-; X64-NEXT:    pop rbp
+; X64:         movd xmm0, edi
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <bitcast_i32_to_f32>:
@@ -41,10 +35,7 @@ entry:
 
 define i64 @bitcast_f64_to_i64(double %0) {
 ; X64-LABEL: <bitcast_f64_to_i64>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movq rax, xmm0
-; X64-NEXT:    pop rbp
+; X64:         movq rax, xmm0
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <bitcast_f64_to_i64>:
@@ -57,10 +48,7 @@ entry:
 
 define double @bitcast_i64_to_f64(i64 %0) {
 ; X64-LABEL: <bitcast_i64_to_f64>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movq xmm0, rdi
-; X64-NEXT:    pop rbp
+; X64:         movq xmm0, rdi
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <bitcast_i64_to_f64>:
@@ -74,10 +62,7 @@ entry:
 
 define <4 x float> @bitcast_i8vec_to_f32vec(<16 x i8> %0) {
 ; X64-LABEL: <bitcast_i8vec_to_f32vec>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    pop rbp
-; X64-NEXT:    ret
+; X64:         ret
 ;
 ; ARM64-LABEL: <bitcast_i8vec_to_f32vec>:
 ; ARM64:         ret
@@ -88,9 +73,7 @@ entry:
 
 define void @bitcast_v16i32_v16f32(ptr %src, ptr %dst) {
 ; X64-LABEL: <bitcast_v16i32_v16f32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movups xmm0, xmmword ptr [rdi]
+; X64:         movups xmm0, xmmword ptr [rdi]
 ; X64-NEXT:    movups xmm1, xmmword ptr [rdi + 0x10]
 ; X64-NEXT:    movups xmm2, xmmword ptr [rdi + 0x20]
 ; X64-NEXT:    movups xmm3, xmmword ptr [rdi + 0x30]
@@ -98,7 +81,6 @@ define void @bitcast_v16i32_v16f32(ptr %src, ptr %dst) {
 ; X64-NEXT:    movups xmmword ptr [rsi + 0x10], xmm1
 ; X64-NEXT:    movups xmmword ptr [rsi + 0x20], xmm2
 ; X64-NEXT:    movups xmmword ptr [rsi + 0x30], xmm3
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <bitcast_v16i32_v16f32>:
@@ -119,15 +101,12 @@ define void @bitcast_v16i32_v16f32(ptr %src, ptr %dst) {
 
 define void @bitcast_v24i8_v6f32(ptr %src, ptr %dst) {
 ; X64-LABEL: <bitcast_v24i8_v6f32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movsd xmm0, qword ptr [rdi]
+; X64:         movsd xmm0, qword ptr [rdi]
 ; X64-NEXT:    movsd xmm1, qword ptr [rdi + 0x8]
 ; X64-NEXT:    movsd xmm2, qword ptr [rdi + 0x10]
 ; X64-NEXT:    movsd qword ptr [rsi], xmm0
 ; X64-NEXT:    movsd qword ptr [rsi + 0x8], xmm1
 ; X64-NEXT:    movsd qword ptr [rsi + 0x10], xmm2
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <bitcast_v24i8_v6f32>:
@@ -232,11 +211,8 @@ define void @bitcast_v16i1_v2i8(ptr %src, ptr %dst) {
 
 define void @bitcast_v8i1_i8(ptr %src, ptr %dst) {
 ; X64-LABEL: <bitcast_v8i1_i8>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx edi, byte ptr [rdi]
+; X64:         movzx edi, byte ptr [rdi]
 ; X64-NEXT:    mov byte ptr [rsi], dil
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <bitcast_v8i1_i8>:
@@ -251,11 +227,8 @@ define void @bitcast_v8i1_i8(ptr %src, ptr %dst) {
 
 define void @bitcast_v16i1_i16(ptr %src, ptr %dst) {
 ; X64-LABEL: <bitcast_v16i1_i16>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx edi, word ptr [rdi]
+; X64:         movzx edi, word ptr [rdi]
 ; X64-NEXT:    mov word ptr [rsi], di
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <bitcast_v16i1_i16>:

@@ -7,11 +7,8 @@
 
 define <2 x float> @fnegv2f32(<2 x float> %0) {
 ; X64-LABEL: <fnegv2f32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xorps xmm0, xmmword ptr <fnegv2f32+0x4>
+; X64:         xorps xmm0, xmmword ptr <fnegv2f32>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fnegv2f32>:
@@ -23,11 +20,8 @@ define <2 x float> @fnegv2f32(<2 x float> %0) {
 
 define <4 x float> @fnegv4f32(<4 x float> %0) {
 ; X64-LABEL: <fnegv4f32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xorps xmm0, xmmword ptr <fnegv4f32+0x4>
+; X64:         xorps xmm0, xmmword ptr <fnegv4f32>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fnegv4f32>:
@@ -39,11 +33,8 @@ define <4 x float> @fnegv4f32(<4 x float> %0) {
 
 define <2 x double> @fnegv2f64(<2 x double> %0) {
 ; X64-LABEL: <fnegv2f64>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xorps xmm0, xmmword ptr <fnegv2f64+0x4>
+; X64:         xorps xmm0, xmmword ptr <fnegv2f64>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fnegv2f64>:

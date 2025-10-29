@@ -8,10 +8,7 @@
 
 define i8 @freeze_i8(i8 %0) {
 ; X64-LABEL: <freeze_i8>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, edi
-; X64-NEXT:    pop rbp
+; X64:         mov eax, edi
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <freeze_i8>:
@@ -23,11 +20,8 @@ entry:
 
 define i8 @freeze_i8_no_salvage(i8 %0) {
 ; X64-LABEL: <freeze_i8_no_salvage>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
+; X64:         mov eax, edi
 ; X64-NEXT:    mov eax, edi
-; X64-NEXT:    mov eax, edi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <freeze_i8_no_salvage>:
@@ -42,10 +36,7 @@ entry:
 
 define i64 @freeze_i64(i64 %0) {
 ; X64-LABEL: <freeze_i64>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, rdi
-; X64-NEXT:    pop rbp
+; X64:         mov rax, rdi
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <freeze_i64>:
@@ -57,11 +48,8 @@ entry:
 
 define i64 @freeze_i64_no_salvage(i64 %0) {
 ; X64-LABEL: <freeze_i64_no_salvage>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
+; X64:         mov rax, rdi
 ; X64-NEXT:    mov rax, rdi
-; X64-NEXT:    mov rax, rdi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <freeze_i64_no_salvage>:
@@ -76,10 +64,7 @@ entry:
 
 define float @freeze_float(float %0) {
 ; X64-LABEL: <freeze_float>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    pop rbp
-; X64-NEXT:    ret
+; X64:         ret
 ;
 ; ARM64-LABEL: <freeze_float>:
 ; ARM64:         ret
@@ -90,10 +75,7 @@ entry:
 
 define float @freeze_float_no_salvage(float %0) {
 ; X64-LABEL: <freeze_float_no_salvage>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movapd xmm1, xmm0
-; X64-NEXT:    pop rbp
+; X64:         movapd xmm1, xmm0
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <freeze_float_no_salvage>:
@@ -110,15 +92,12 @@ entry:
 
 define void @freeze_i128_i1(ptr %0) {
 ; X64-LABEL: <freeze_i128_i1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, qword ptr [rdi]
+; X64:         mov rax, qword ptr [rdi]
 ; X64-NEXT:    mov rcx, qword ptr [rdi + 0x8]
 ; X64-NEXT:    movzx edx, byte ptr [rdi + 0x10]
 ; X64-NEXT:    mov qword ptr [rdi], rax
 ; X64-NEXT:    mov qword ptr [rdi + 0x8], rcx
 ; X64-NEXT:    mov byte ptr [rdi + 0x10], dl
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <freeze_i128_i1>:

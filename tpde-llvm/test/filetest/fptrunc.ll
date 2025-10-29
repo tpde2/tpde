@@ -8,10 +8,7 @@
 
 define float @fptrunc_f64tof32(double %0) {
 ; X64-LABEL: <fptrunc_f64tof32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    cvtsd2ss xmm0, xmm0
-; X64-NEXT:    pop rbp
+; X64:         cvtsd2ss xmm0, xmm0
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fptrunc_f64tof32>:

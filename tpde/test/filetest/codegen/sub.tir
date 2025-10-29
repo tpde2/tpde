@@ -7,11 +7,8 @@
 
 define @sub1(%a, %b) {
 ; X64-LABEL: <sub1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    sub rdi, rsi
+; X64:         sub rdi, rsi
 ; X64-NEXT:    mov rax, rdi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <sub1>:
@@ -24,13 +21,10 @@ entry:
 
 define @sub2(%a, %b) {
 ; X64-LABEL: <sub2>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, rdi
+; X64:         mov rax, rdi
 ; X64-NEXT:    sub rax, rsi
 ; X64-NEXT:    sub rdi, rax
 ; X64-NEXT:    mov rax, rdi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <sub2>:

@@ -9,12 +9,9 @@
 
 define void @store_glob(ptr %ptr) {
 ; X64-LABEL: <store_glob>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    lea rax, <store_glob+0x3>
+; X64:         lea rax, <phi_gep_insert_after_earlier_phi+0xfffffffffffff9ef>
 ; X64-NEXT:     R_X86_64_PC32 glob-0x4
 ; X64-NEXT:    mov qword ptr [rdi], rax
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_glob>:
@@ -30,12 +27,9 @@ define void @store_glob(ptr %ptr) {
 
 define void @store_glob_ptrtoint(ptr %ptr) {
 ; X64-LABEL: <store_glob_ptrtoint>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    lea rax, <store_glob_ptrtoint+0x3>
+; X64:         lea rax, <store_glob+0xf>
 ; X64-NEXT:     R_X86_64_PC32 glob-0x4
 ; X64-NEXT:    mov qword ptr [rdi], rax
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_glob_ptrtoint>:
@@ -51,13 +45,10 @@ define void @store_glob_ptrtoint(ptr %ptr) {
 
 define void @store_glob_ptrtoint_trunc_add(ptr %ptr) {
 ; X64-LABEL: <store_glob_ptrtoint_trunc_add>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    lea rax, <store_glob_ptrtoint_trunc_add+0x3>
+; X64:         lea rax, <store_glob_ptrtoint+0xf>
 ; X64-NEXT:     R_X86_64_PC32 glob-0x4
 ; X64-NEXT:    lea eax, [rax + 0x20]
 ; X64-NEXT:    mov dword ptr [rdi], eax
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_glob_ptrtoint_trunc_add>:
@@ -74,11 +65,8 @@ define void @store_glob_ptrtoint_trunc_add(ptr %ptr) {
 
 define void @store_struct1(ptr %ptr) {
 ; X64-LABEL: <store_struct1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov dword ptr [rdi], 0x0
+; X64:         mov dword ptr [rdi], 0x0
 ; X64-NEXT:    mov dword ptr [rdi + 0x4], 0x1
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_struct1>:
@@ -93,13 +81,10 @@ define void @store_struct1(ptr %ptr) {
 
 define void @store_struct2(ptr %ptr) {
 ; X64-LABEL: <store_struct2>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov dword ptr [rdi], 0x0
-; X64-NEXT:    lea rax, <store_struct2+0x9>
+; X64:         mov dword ptr [rdi], 0x0
+; X64-NEXT:    lea rax, <store_struct2+0x5>
 ; X64-NEXT:     R_X86_64_PC32 glob-0x4
 ; X64-NEXT:    mov qword ptr [rdi + 0x8], rax
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_struct2>:
@@ -117,15 +102,12 @@ define void @store_struct2(ptr %ptr) {
 
 define void @store_struct3(ptr %ptr) {
 ; X64-LABEL: <store_struct3>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    lea rax, <store_struct3+0x3>
+; X64:         lea rax, <store_struct2+0x1f>
 ; X64-NEXT:     R_X86_64_PC32 glob-0x4
 ; X64-NEXT:    lea eax, [rax + 0x20]
 ; X64-NEXT:    xor ecx, ecx
 ; X64-NEXT:    mov dword ptr [rdi], ecx
 ; X64-NEXT:    mov dword ptr [rdi + 0x4], eax
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_struct3>:
@@ -232,13 +214,10 @@ define void @vector_ptrs(ptr %ptr) {
 
 define void @store_array1(ptr %ptr) {
 ; X64-LABEL: <store_array1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    lea rax, <store_array1+0x3>
+; X64:         lea rax, <vector_ptrs+0x6f>
 ; X64-NEXT:     R_X86_64_PC32 glob-0x4
 ; X64-NEXT:    mov qword ptr [rdi], rax
 ; X64-NEXT:    mov qword ptr [rdi + 0x8], 0x0
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_array1>:
@@ -256,12 +235,9 @@ define void @store_array1(ptr %ptr) {
 
 define void @store_array2(ptr %ptr) {
 ; X64-LABEL: <store_array2>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov qword ptr [rdi], 0xbc614e
+; X64:         mov qword ptr [rdi], 0xbc614e
 ; X64-NEXT:    movabs rax, 0x44e6af645f07c
 ; X64-NEXT:    mov qword ptr [rdi + 0x8], rax
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_array2>:

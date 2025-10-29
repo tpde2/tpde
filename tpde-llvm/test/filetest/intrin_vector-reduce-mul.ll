@@ -7,12 +7,9 @@
 
 define i8 @vr_mul_v1i8(ptr %p) {
 ; X64-LABEL: <vr_mul_v1i8>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx eax, byte ptr [rdi]
+; X64:         movzx eax, byte ptr [rdi]
 ; X64-NEXT:    mov ecx, eax
 ; X64-NEXT:    mov eax, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <vr_mul_v1i8>:
@@ -346,12 +343,9 @@ define i8 @vr_mul_v32i8(ptr %p) {
 
 define i16 @vr_mul_v1i16(ptr %p) {
 ; X64-LABEL: <vr_mul_v1i16>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx eax, word ptr [rdi]
+; X64:         movzx eax, word ptr [rdi]
 ; X64-NEXT:    mov ecx, eax
 ; X64-NEXT:    mov eax, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <vr_mul_v1i16>:
@@ -541,12 +535,9 @@ define i16 @vr_mul_v16i16(ptr %p) {
 
 define i32 @vr_mul_v1i32(ptr %p) {
 ; X64-LABEL: <vr_mul_v1i32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, dword ptr [rdi]
+; X64:         mov eax, dword ptr [rdi]
 ; X64-NEXT:    mov ecx, eax
 ; X64-NEXT:    mov eax, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <vr_mul_v1i32>:
@@ -688,12 +679,9 @@ define i32 @vr_mul_v8i32(ptr %p) {
 
 define i64 @vr_mul_v1i64(ptr %p) {
 ; X64-LABEL: <vr_mul_v1i64>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, qword ptr [rdi]
+; X64:         mov rax, qword ptr [rdi]
 ; X64-NEXT:    mov rcx, rax
 ; X64-NEXT:    mov rax, rcx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <vr_mul_v1i64>:

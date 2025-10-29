@@ -7,10 +7,7 @@
 
 define float @sqrtf32(float %0) {
 ; X64-LABEL: <sqrtf32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    sqrtss xmm0, xmm0
-; X64-NEXT:    pop rbp
+; X64:         sqrtss xmm0, xmm0
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <sqrtf32>:
@@ -22,10 +19,7 @@ define float @sqrtf32(float %0) {
 
 define double @sqrtf64(double %0) {
 ; X64-LABEL: <sqrtf64>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    sqrtsd xmm0, xmm0
-; X64-NEXT:    pop rbp
+; X64:         sqrtsd xmm0, xmm0
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <sqrtf64>:

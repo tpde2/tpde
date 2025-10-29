@@ -7,16 +7,13 @@
 
 define i17 @smaxi17(i17 %0, i17 %1) {
 ; X64-LABEL: <smaxi17>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    shl edi, 0xf
+; X64:         shl edi, 0xf
 ; X64-NEXT:    sar edi, 0xf
 ; X64-NEXT:    shl esi, 0xf
 ; X64-NEXT:    sar esi, 0xf
 ; X64-NEXT:    cmp edi, esi
 ; X64-NEXT:    cmovg esi, edi
 ; X64-NEXT:    mov eax, esi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <smaxi17>:
@@ -31,12 +28,9 @@ define i17 @smaxi17(i17 %0, i17 %1) {
 
 define i32 @smaxi32(i32 %0, i32 %1) {
 ; X64-LABEL: <smaxi32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    cmp edi, esi
+; X64:         cmp edi, esi
 ; X64-NEXT:    cmovg esi, edi
 ; X64-NEXT:    mov eax, esi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <smaxi32>:
@@ -49,16 +43,13 @@ define i32 @smaxi32(i32 %0, i32 %1) {
 
 define i37 @smaxi37(i37 %0, i37 %1) {
 ; X64-LABEL: <smaxi37>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    shl rdi, 0x1b
+; X64:         shl rdi, 0x1b
 ; X64-NEXT:    sar rdi, 0x1b
 ; X64-NEXT:    shl rsi, 0x1b
 ; X64-NEXT:    sar rsi, 0x1b
 ; X64-NEXT:    cmp rdi, rsi
 ; X64-NEXT:    cmovg rsi, rdi
 ; X64-NEXT:    mov rax, rsi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <smaxi37>:
@@ -73,12 +64,9 @@ define i37 @smaxi37(i37 %0, i37 %1) {
 
 define i64 @smaxi64(i64 %0, i64 %1) {
 ; X64-LABEL: <smaxi64>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    cmp rdi, rsi
+; X64:         cmp rdi, rsi
 ; X64-NEXT:    cmovg rsi, rdi
 ; X64-NEXT:    mov rax, rsi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <smaxi64>:

@@ -8,9 +8,7 @@
 
 define i1 @is_snan_float(float %p) {
 ; X64-LABEL: <is_snan_float>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor eax, eax
+; X64:         xor eax, eax
 ; X64-NEXT:    movd ecx, xmm0
 ; X64-NEXT:    and ecx, 0x7fffffff
 ; X64-NEXT:    cmp ecx, 0x7fc00000
@@ -20,7 +18,6 @@ define i1 @is_snan_float(float %p) {
 ; X64-NEXT:    and cl, dl
 ; X64-NEXT:    or cl, al
 ; X64-NEXT:    mov eax, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <is_snan_float>:
@@ -77,16 +74,13 @@ define i1 @is_snan_double(double %p) {
 
 define i1 @is_qnan_float(float %p) {
 ; X64-LABEL: <is_qnan_float>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor eax, eax
+; X64:         xor eax, eax
 ; X64-NEXT:    movd ecx, xmm0
 ; X64-NEXT:    and ecx, 0x7fffffff
 ; X64-NEXT:    cmp ecx, 0x7fc00000
 ; X64-NEXT:    setge cl
 ; X64-NEXT:    or cl, al
 ; X64-NEXT:    mov eax, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <is_qnan_float>:
@@ -104,9 +98,7 @@ define i1 @is_qnan_float(float %p) {
 
 define i1 @is_qnan_double(double %p) {
 ; X64-LABEL: <is_qnan_double>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor eax, eax
+; X64:         xor eax, eax
 ; X64-NEXT:    movq rcx, xmm0
 ; X64-NEXT:    movabs rdx, 0x7fffffffffffffff
 ; X64-NEXT:    and rdx, rcx
@@ -115,7 +107,6 @@ define i1 @is_qnan_double(double %p) {
 ; X64-NEXT:    setg cl
 ; X64-NEXT:    or cl, al
 ; X64-NEXT:    mov eax, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <is_qnan_double>:
@@ -133,16 +124,13 @@ define i1 @is_qnan_double(double %p) {
 
 define i1 @is_ninf_float(float %p) {
 ; X64-LABEL: <is_ninf_float>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor eax, eax
-; X64-NEXT:    movss xmm1, dword ptr <is_ninf_float+0x6>
+; X64:         xor eax, eax
+; X64-NEXT:    movss xmm1, dword ptr <is_ninf_float+0x2>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    ucomiss xmm1, xmm0
 ; X64-NEXT:    setae cl
 ; X64-NEXT:    or cl, al
 ; X64-NEXT:    mov eax, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <is_ninf_float>:
@@ -159,16 +147,13 @@ define i1 @is_ninf_float(float %p) {
 
 define i1 @is_ninf_double(double %p) {
 ; X64-LABEL: <is_ninf_double>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor eax, eax
-; X64-NEXT:    movsd xmm1, qword ptr <is_ninf_double+0x6>
+; X64:         xor eax, eax
+; X64-NEXT:    movsd xmm1, qword ptr <is_ninf_double+0x2>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    ucomisd xmm1, xmm0
 ; X64-NEXT:    setae cl
 ; X64-NEXT:    or cl, al
 ; X64-NEXT:    mov eax, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <is_ninf_double>:
@@ -185,9 +170,7 @@ define i1 @is_ninf_double(double %p) {
 
 define i1 @is_nnorm_float(float %p) {
 ; X64-LABEL: <is_nnorm_float>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor eax, eax
+; X64:         xor eax, eax
 ; X64-NEXT:    movd ecx, xmm0
 ; X64-NEXT:    test ecx, ecx
 ; X64-NEXT:    sets dl
@@ -198,7 +181,6 @@ define i1 @is_nnorm_float(float %p) {
 ; X64-NEXT:    and cl, dl
 ; X64-NEXT:    or cl, al
 ; X64-NEXT:    mov eax, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <is_nnorm_float>:
@@ -257,9 +239,7 @@ define i1 @is_nnorm_double(double %p) {
 
 define i1 @is_nsnorm_float(float %p) {
 ; X64-LABEL: <is_nsnorm_float>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor eax, eax
+; X64:         xor eax, eax
 ; X64-NEXT:    movd ecx, xmm0
 ; X64-NEXT:    test ecx, ecx
 ; X64-NEXT:    sets dl
@@ -270,7 +250,6 @@ define i1 @is_nsnorm_float(float %p) {
 ; X64-NEXT:    and cl, dl
 ; X64-NEXT:    or cl, al
 ; X64-NEXT:    mov eax, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <is_nsnorm_float>:
@@ -327,15 +306,12 @@ define i1 @is_nsnorm_double(double %p) {
 
 define i1 @is_nzero_float(float %p) {
 ; X64-LABEL: <is_nzero_float>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor eax, eax
+; X64:         xor eax, eax
 ; X64-NEXT:    movd ecx, xmm0
 ; X64-NEXT:    neg ecx
 ; X64-NEXT:    seto cl
 ; X64-NEXT:    or cl, al
 ; X64-NEXT:    mov eax, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <is_nzero_float>:
@@ -352,15 +328,12 @@ define i1 @is_nzero_float(float %p) {
 
 define i1 @is_nzero_double(double %p) {
 ; X64-LABEL: <is_nzero_double>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor eax, eax
+; X64:         xor eax, eax
 ; X64-NEXT:    movq rcx, xmm0
 ; X64-NEXT:    neg rcx
 ; X64-NEXT:    seto cl
 ; X64-NEXT:    or cl, al
 ; X64-NEXT:    mov eax, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <is_nzero_double>:
@@ -377,15 +350,12 @@ define i1 @is_nzero_double(double %p) {
 
 define i1 @is_pzero_float(float %p) {
 ; X64-LABEL: <is_pzero_float>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor eax, eax
+; X64:         xor eax, eax
 ; X64-NEXT:    movd ecx, xmm0
 ; X64-NEXT:    test ecx, ecx
 ; X64-NEXT:    sete cl
 ; X64-NEXT:    or cl, al
 ; X64-NEXT:    mov eax, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <is_pzero_float>:
@@ -401,15 +371,12 @@ define i1 @is_pzero_float(float %p) {
 
 define i1 @is_pzero_double(double %p) {
 ; X64-LABEL: <is_pzero_double>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor eax, eax
+; X64:         xor eax, eax
 ; X64-NEXT:    movq rcx, xmm0
 ; X64-NEXT:    test rcx, rcx
 ; X64-NEXT:    sete cl
 ; X64-NEXT:    or cl, al
 ; X64-NEXT:    mov eax, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <is_pzero_double>:
@@ -425,16 +392,13 @@ define i1 @is_pzero_double(double %p) {
 
 define i1 @is_psnorm_float(float %p) {
 ; X64-LABEL: <is_psnorm_float>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor eax, eax
+; X64:         xor eax, eax
 ; X64-NEXT:    movd ecx, xmm0
 ; X64-NEXT:    dec ecx
 ; X64-NEXT:    cmp ecx, 0x7fffff
 ; X64-NEXT:    setb cl
 ; X64-NEXT:    or cl, al
 ; X64-NEXT:    mov eax, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <is_psnorm_float>:
@@ -452,9 +416,7 @@ define i1 @is_psnorm_float(float %p) {
 
 define i1 @is_psnorm_double(double %p) {
 ; X64-LABEL: <is_psnorm_double>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor eax, eax
+; X64:         xor eax, eax
 ; X64-NEXT:    movq rcx, xmm0
 ; X64-NEXT:    dec rcx
 ; X64-NEXT:    movabs rdx, 0xfffffffffffff
@@ -462,7 +424,6 @@ define i1 @is_psnorm_double(double %p) {
 ; X64-NEXT:    setb cl
 ; X64-NEXT:    or cl, al
 ; X64-NEXT:    mov eax, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <is_psnorm_double>:
@@ -480,9 +441,7 @@ define i1 @is_psnorm_double(double %p) {
 
 define i1 @is_pnorm_float(float %p) {
 ; X64-LABEL: <is_pnorm_float>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor eax, eax
+; X64:         xor eax, eax
 ; X64-NEXT:    movd ecx, xmm0
 ; X64-NEXT:    test ecx, ecx
 ; X64-NEXT:    setns dl
@@ -493,7 +452,6 @@ define i1 @is_pnorm_float(float %p) {
 ; X64-NEXT:    and cl, dl
 ; X64-NEXT:    or cl, al
 ; X64-NEXT:    mov eax, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <is_pnorm_float>:
@@ -552,15 +510,12 @@ define i1 @is_pnorm_double(double %p) {
 
 define i1 @is_pinf_float(float %p) {
 ; X64-LABEL: <is_pinf_float>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor eax, eax
-; X64-NEXT:    ucomiss xmm0, dword ptr <is_pinf_float+0x6>
+; X64:         xor eax, eax
+; X64-NEXT:    ucomiss xmm0, dword ptr <is_pinf_float+0x2>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    setae cl
 ; X64-NEXT:    or cl, al
 ; X64-NEXT:    mov eax, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <is_pinf_float>:
@@ -576,15 +531,12 @@ define i1 @is_pinf_float(float %p) {
 }
 define i1 @is_pinf_double(double %p) {
 ; X64-LABEL: <is_pinf_double>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor eax, eax
-; X64-NEXT:    ucomisd xmm0, qword ptr <is_pinf_double+0x6>
+; X64:         xor eax, eax
+; X64-NEXT:    ucomisd xmm0, qword ptr <is_pinf_double+0x2>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    setae cl
 ; X64-NEXT:    or cl, al
 ; X64-NEXT:    mov eax, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <is_pinf_double>:
@@ -603,14 +555,11 @@ define i1 @is_pinf_double(double %p) {
 
 define i1 @is_ninf_pinf_float(float %p) {
 ; X64-LABEL: <is_ninf_pinf_float>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movd eax, xmm0
+; X64:         movd eax, xmm0
 ; X64-NEXT:    and eax, 0x7fffffff
 ; X64-NEXT:    cmp eax, 0x7f800000
 ; X64-NEXT:    sete al
 ; X64-NEXT:    or al, 0x0
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <is_ninf_pinf_float>:
@@ -628,16 +577,13 @@ define i1 @is_ninf_pinf_float(float %p) {
 }
 define i1 @is_ninf_pinf_double(double %p) {
 ; X64-LABEL: <is_ninf_pinf_double>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movq rax, xmm0
+; X64:         movq rax, xmm0
 ; X64-NEXT:    movabs rcx, 0x7fffffffffffffff
 ; X64-NEXT:    and rcx, rax
 ; X64-NEXT:    movabs rax, 0x7ff0000000000000
 ; X64-NEXT:    cmp rcx, rax
 ; X64-NEXT:    sete al
 ; X64-NEXT:    or al, 0x0
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <is_ninf_pinf_double>:
@@ -656,12 +602,9 @@ define i1 @is_ninf_pinf_double(double %p) {
 
 define i1 @is_snan_qnan_float(float %p) {
 ; X64-LABEL: <is_snan_qnan_float>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    ucomiss xmm0, xmm0
+; X64:         ucomiss xmm0, xmm0
 ; X64-NEXT:    setp al
 ; X64-NEXT:    or al, 0x0
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <is_snan_qnan_float>:
@@ -676,12 +619,9 @@ define i1 @is_snan_qnan_float(float %p) {
 }
 define i1 @is_snan_qnan_double(double %p) {
 ; X64-LABEL: <is_snan_qnan_double>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    ucomisd xmm0, xmm0
+; X64:         ucomisd xmm0, xmm0
 ; X64-NEXT:    setp al
 ; X64-NEXT:    or al, 0x0
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <is_snan_qnan_double>:
@@ -697,15 +637,12 @@ define i1 @is_snan_qnan_double(double %p) {
 
 define i1 @is_nnorm_pnorm_float(float %p) {
 ; X64-LABEL: <is_nnorm_pnorm_float>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movd eax, xmm0
+; X64:         movd eax, xmm0
 ; X64-NEXT:    and eax, 0x7fffffff
 ; X64-NEXT:    add eax, 0xff800000
 ; X64-NEXT:    cmp eax, 0x7f000000
 ; X64-NEXT:    setb al
 ; X64-NEXT:    or al, 0x0
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <is_nnorm_pnorm_float>:
@@ -724,9 +661,7 @@ define i1 @is_nnorm_pnorm_float(float %p) {
 }
 define i1 @is_nnorm_pnorm_double(double %p) {
 ; X64-LABEL: <is_nnorm_pnorm_double>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movq rax, xmm0
+; X64:         movq rax, xmm0
 ; X64-NEXT:    movabs rcx, 0x7fffffffffffffff
 ; X64-NEXT:    and rcx, rax
 ; X64-NEXT:    movabs rax, -0x10000000000000
@@ -735,7 +670,6 @@ define i1 @is_nnorm_pnorm_double(double %p) {
 ; X64-NEXT:    cmp eax, 0x3ff
 ; X64-NEXT:    setb al
 ; X64-NEXT:    or al, 0x0
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <is_nnorm_pnorm_double>:
@@ -756,9 +690,7 @@ define i1 @is_nnorm_pnorm_double(double %p) {
 
 define i1 @is_snan_psnorm_float(float %p) {
 ; X64-LABEL: <is_snan_psnorm_float>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor eax, eax
+; X64:         xor eax, eax
 ; X64-NEXT:    movd ecx, xmm0
 ; X64-NEXT:    and ecx, 0x7fffffff
 ; X64-NEXT:    cmp ecx, 0x7fc00000
@@ -772,7 +704,6 @@ define i1 @is_snan_psnorm_float(float %p) {
 ; X64-NEXT:    cmp eax, 0x7fffff
 ; X64-NEXT:    setb al
 ; X64-NEXT:    or al, cl
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <is_snan_psnorm_float>:

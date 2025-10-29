@@ -20,13 +20,10 @@ declare {i128, i1} @llvm.umul.with.overflow.i128(i128, i128)
 
 define i8 @umul_i8_0(i8 %0, i8 %1) {
 ; X64-LABEL: <umul_i8_0>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor ecx, ecx
+; X64:         xor ecx, ecx
 ; X64-NEXT:    mov eax, edi
 ; X64-NEXT:    mul sil
 ; X64-NEXT:    seto cl
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <umul_i8_0>:
@@ -46,14 +43,11 @@ entry:
 
 define i1 @umul_i8_1(i8 %0, i8 %1) {
 ; X64-LABEL: <umul_i8_1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor ecx, ecx
+; X64:         xor ecx, ecx
 ; X64-NEXT:    mov eax, edi
 ; X64-NEXT:    mul sil
 ; X64-NEXT:    seto cl
 ; X64-NEXT:    mov eax, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <umul_i8_1>:
@@ -73,13 +67,10 @@ entry:
 
 define i16 @umul_i16_0(i16 %0, i16 %1) {
 ; X64-LABEL: <umul_i16_0>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor ecx, ecx
+; X64:         xor ecx, ecx
 ; X64-NEXT:    mov eax, edi
 ; X64-NEXT:    mul si
 ; X64-NEXT:    seto cl
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <umul_i16_0>:
@@ -99,14 +90,11 @@ entry:
 
 define i1 @umul_i16_1(i16 %0, i16 %1) {
 ; X64-LABEL: <umul_i16_1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor ecx, ecx
+; X64:         xor ecx, ecx
 ; X64-NEXT:    mov eax, edi
 ; X64-NEXT:    mul si
 ; X64-NEXT:    seto cl
 ; X64-NEXT:    mov eax, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <umul_i16_1>:
@@ -126,13 +114,10 @@ entry:
 
 define i32 @umul_i32_0(i32 %0, i32 %1) {
 ; X64-LABEL: <umul_i32_0>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor ecx, ecx
+; X64:         xor ecx, ecx
 ; X64-NEXT:    mov eax, edi
 ; X64-NEXT:    mul esi
 ; X64-NEXT:    seto cl
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <umul_i32_0>:
@@ -150,14 +135,11 @@ entry:
 
 define i1 @umul_i32_1(i32 %0, i32 %1) {
 ; X64-LABEL: <umul_i32_1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor ecx, ecx
+; X64:         xor ecx, ecx
 ; X64-NEXT:    mov eax, edi
 ; X64-NEXT:    mul esi
 ; X64-NEXT:    seto cl
 ; X64-NEXT:    mov eax, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <umul_i32_1>:
@@ -175,13 +157,10 @@ entry:
 
 define i64 @umul_i64_0(i64 %0, i64 %1) {
 ; X64-LABEL: <umul_i64_0>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor ecx, ecx
+; X64:         xor ecx, ecx
 ; X64-NEXT:    mov rax, rdi
 ; X64-NEXT:    mul rsi
 ; X64-NEXT:    seto cl
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <umul_i64_0>:
@@ -198,14 +177,11 @@ entry:
 
 define i1 @umul_i64_1(i64 %0, i64 %1) {
 ; X64-LABEL: <umul_i64_1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor ecx, ecx
+; X64:         xor ecx, ecx
 ; X64-NEXT:    mov rax, rdi
 ; X64-NEXT:    mul rsi
 ; X64-NEXT:    seto cl
 ; X64-NEXT:    mov eax, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <umul_i64_1>:
@@ -225,13 +201,10 @@ entry:
 
 define i8 @smul_i8_0(i8 %0, i8 %1) {
 ; X64-LABEL: <smul_i8_0>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor ecx, ecx
+; X64:         xor ecx, ecx
 ; X64-NEXT:    mov eax, edi
 ; X64-NEXT:    imul sil
 ; X64-NEXT:    seto cl
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <smul_i8_0>:
@@ -251,14 +224,11 @@ entry:
 
 define i1 @smul_i8_1(i8 %0, i8 %1) {
 ; X64-LABEL: <smul_i8_1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor ecx, ecx
+; X64:         xor ecx, ecx
 ; X64-NEXT:    mov eax, edi
 ; X64-NEXT:    imul sil
 ; X64-NEXT:    seto cl
 ; X64-NEXT:    mov eax, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <smul_i8_1>:
@@ -278,13 +248,10 @@ entry:
 
 define i16 @smul_i16_0(i16 %0, i16 %1) {
 ; X64-LABEL: <smul_i16_0>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor eax, eax
+; X64:         xor eax, eax
 ; X64-NEXT:    imul di, si
 ; X64-NEXT:    seto al
 ; X64-NEXT:    mov eax, edi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <smul_i16_0>:
@@ -304,12 +271,9 @@ entry:
 
 define i1 @smul_i16_1(i16 %0, i16 %1) {
 ; X64-LABEL: <smul_i16_1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor eax, eax
+; X64:         xor eax, eax
 ; X64-NEXT:    imul di, si
 ; X64-NEXT:    seto al
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <smul_i16_1>:
@@ -329,13 +293,10 @@ entry:
 
 define i32 @smul_i32_0(i32 %0, i32 %1) {
 ; X64-LABEL: <smul_i32_0>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor eax, eax
+; X64:         xor eax, eax
 ; X64-NEXT:    imul edi, esi
 ; X64-NEXT:    seto al
 ; X64-NEXT:    mov eax, edi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <smul_i32_0>:
@@ -353,12 +314,9 @@ entry:
 
 define i1 @smul_i32_1(i32 %0, i32 %1) {
 ; X64-LABEL: <smul_i32_1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor eax, eax
+; X64:         xor eax, eax
 ; X64-NEXT:    imul edi, esi
 ; X64-NEXT:    seto al
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <smul_i32_1>:
@@ -376,13 +334,10 @@ entry:
 
 define i64 @smul_i64_0(i64 %0, i64 %1) {
 ; X64-LABEL: <smul_i64_0>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor eax, eax
+; X64:         xor eax, eax
 ; X64-NEXT:    imul rdi, rsi
 ; X64-NEXT:    seto al
 ; X64-NEXT:    mov rax, rdi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <smul_i64_0>:
@@ -401,12 +356,9 @@ entry:
 
 define i1 @smul_i64_1(i64 %0, i64 %1) {
 ; X64-LABEL: <smul_i64_1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor eax, eax
+; X64:         xor eax, eax
 ; X64-NEXT:    imul rdi, rsi
 ; X64-NEXT:    seto al
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <smul_i64_1>:

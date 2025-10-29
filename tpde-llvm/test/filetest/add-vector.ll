@@ -7,13 +7,10 @@
 
 define void @add_v1i8(ptr %p, ptr %q) {
 ; X64-LABEL: <add_v1i8>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx eax, byte ptr [rdi]
+; X64:         movzx eax, byte ptr [rdi]
 ; X64-NEXT:    movzx ecx, byte ptr [rsi]
 ; X64-NEXT:    lea eax, [rax + rcx]
 ; X64-NEXT:    mov byte ptr [rdi], al
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <add_v1i8>:
@@ -93,10 +90,7 @@ define void @add_v5i8(ptr %p, ptr %q) {
 
 define <8 x i8> @add_v8i8(<8 x i8> %a, <8 x i8> %b) {
 ; X64-LABEL: <add_v8i8>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    paddb xmm0, xmm1
-; X64-NEXT:    pop rbp
+; X64:         paddb xmm0, xmm1
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <add_v8i8>:
@@ -109,10 +103,7 @@ define <8 x i8> @add_v8i8(<8 x i8> %a, <8 x i8> %b) {
 
 define <16 x i8> @add_v16i8(<16 x i8> %a, <16 x i8> %b) {
 ; X64-LABEL: <add_v16i8>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    paddb xmm0, xmm1
-; X64-NEXT:    pop rbp
+; X64:         paddb xmm0, xmm1
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <add_v16i8>:
@@ -125,9 +116,7 @@ define <16 x i8> @add_v16i8(<16 x i8> %a, <16 x i8> %b) {
 
 define void @add_v32i8(ptr %p, ptr %q) {
 ; X64-LABEL: <add_v32i8>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movups xmm0, xmmword ptr [rdi]
+; X64:         movups xmm0, xmmword ptr [rdi]
 ; X64-NEXT:    movups xmm1, xmmword ptr [rdi + 0x10]
 ; X64-NEXT:    movups xmm2, xmmword ptr [rsi]
 ; X64-NEXT:    movups xmm3, xmmword ptr [rsi + 0x10]
@@ -135,7 +124,6 @@ define void @add_v32i8(ptr %p, ptr %q) {
 ; X64-NEXT:    paddb xmm1, xmm3
 ; X64-NEXT:    movups xmmword ptr [rdi], xmm0
 ; X64-NEXT:    movups xmmword ptr [rdi + 0x10], xmm1
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <add_v32i8>:
@@ -157,10 +145,7 @@ define void @add_v32i8(ptr %p, ptr %q) {
 
 define <4 x i16> @add_v4i16(<4 x i16> %a, <4 x i16> %b) {
 ; X64-LABEL: <add_v4i16>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    paddw xmm0, xmm1
-; X64-NEXT:    pop rbp
+; X64:         paddw xmm0, xmm1
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <add_v4i16>:
@@ -173,10 +158,7 @@ define <4 x i16> @add_v4i16(<4 x i16> %a, <4 x i16> %b) {
 
 define <8 x i16> @add_v8i16(<8 x i16> %a, <8 x i16> %b) {
 ; X64-LABEL: <add_v8i16>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    paddw xmm0, xmm1
-; X64-NEXT:    pop rbp
+; X64:         paddw xmm0, xmm1
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <add_v8i16>:
@@ -189,10 +171,7 @@ define <8 x i16> @add_v8i16(<8 x i16> %a, <8 x i16> %b) {
 
 define <2 x i32> @add_v2i32(<2 x i32> %a, <2 x i32> %b) {
 ; X64-LABEL: <add_v2i32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    paddd xmm0, xmm1
-; X64-NEXT:    pop rbp
+; X64:         paddd xmm0, xmm1
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <add_v2i32>:
@@ -205,10 +184,7 @@ define <2 x i32> @add_v2i32(<2 x i32> %a, <2 x i32> %b) {
 
 define <4 x i32> @add_v4i32(<4 x i32> %a, <4 x i32> %b) {
 ; X64-LABEL: <add_v4i32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    paddd xmm0, xmm1
-; X64-NEXT:    pop rbp
+; X64:         paddd xmm0, xmm1
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <add_v4i32>:
@@ -221,10 +197,7 @@ define <4 x i32> @add_v4i32(<4 x i32> %a, <4 x i32> %b) {
 
 define <2 x i64> @add_v2i64(<2 x i64> %a, <2 x i64> %b) {
 ; X64-LABEL: <add_v2i64>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    paddq xmm0, xmm1
-; X64-NEXT:    pop rbp
+; X64:         paddq xmm0, xmm1
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <add_v2i64>:
@@ -237,13 +210,10 @@ define <2 x i64> @add_v2i64(<2 x i64> %a, <2 x i64> %b) {
 
 define void @add_v4i1(ptr %p, ptr %q) {
 ; X64-LABEL: <add_v4i1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx eax, byte ptr [rdi]
+; X64:         movzx eax, byte ptr [rdi]
 ; X64-NEXT:    movzx esi, byte ptr [rsi]
 ; X64-NEXT:    xor eax, esi
 ; X64-NEXT:    mov byte ptr [rdi], al
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <add_v4i1>:
@@ -261,12 +231,9 @@ define void @add_v4i1(ptr %p, ptr %q) {
 
 define void @add_v4i1_const(ptr %p) {
 ; X64-LABEL: <add_v4i1_const>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx eax, byte ptr [rdi]
+; X64:         movzx eax, byte ptr [rdi]
 ; X64-NEXT:    xor eax, 0x5
 ; X64-NEXT:    mov byte ptr [rdi], al
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <add_v4i1_const>:
@@ -283,13 +250,10 @@ define void @add_v4i1_const(ptr %p) {
 
 define void @add_v8i1(ptr %p, ptr %q) {
 ; X64-LABEL: <add_v8i1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx eax, byte ptr [rdi]
+; X64:         movzx eax, byte ptr [rdi]
 ; X64-NEXT:    movzx esi, byte ptr [rsi]
 ; X64-NEXT:    xor eax, esi
 ; X64-NEXT:    mov byte ptr [rdi], al
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <add_v8i1>:
@@ -307,12 +271,9 @@ define void @add_v8i1(ptr %p, ptr %q) {
 
 define void @add_v8i1_const(ptr %p) {
 ; X64-LABEL: <add_v8i1_const>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx eax, byte ptr [rdi]
+; X64:         movzx eax, byte ptr [rdi]
 ; X64-NEXT:    xor eax, 0x55
 ; X64-NEXT:    mov byte ptr [rdi], al
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <add_v8i1_const>:
@@ -329,13 +290,10 @@ define void @add_v8i1_const(ptr %p) {
 
 define void @add_v32i1(ptr %p, ptr %q) {
 ; X64-LABEL: <add_v32i1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, dword ptr [rdi]
+; X64:         mov eax, dword ptr [rdi]
 ; X64-NEXT:    mov esi, dword ptr [rsi]
 ; X64-NEXT:    xor eax, esi
 ; X64-NEXT:    mov dword ptr [rdi], eax
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <add_v32i1>:
@@ -353,12 +311,9 @@ define void @add_v32i1(ptr %p, ptr %q) {
 
 define void @add_v32i1_const(ptr %p) {
 ; X64-LABEL: <add_v32i1_const>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, dword ptr [rdi]
+; X64:         mov eax, dword ptr [rdi]
 ; X64-NEXT:    xor eax, 0x55555555
 ; X64-NEXT:    mov dword ptr [rdi], eax
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <add_v32i1_const>:
@@ -374,13 +329,10 @@ define void @add_v32i1_const(ptr %p) {
 
 define void @add_v64i1(ptr %p, ptr %q) {
 ; X64-LABEL: <add_v64i1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, qword ptr [rdi]
+; X64:         mov rax, qword ptr [rdi]
 ; X64-NEXT:    mov rsi, qword ptr [rsi]
 ; X64-NEXT:    xor rax, rsi
 ; X64-NEXT:    mov qword ptr [rdi], rax
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <add_v64i1>:
@@ -398,13 +350,10 @@ define void @add_v64i1(ptr %p, ptr %q) {
 
 define void @add_v64i1_const(ptr %p) {
 ; X64-LABEL: <add_v64i1_const>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, qword ptr [rdi]
+; X64:         mov rax, qword ptr [rdi]
 ; X64-NEXT:    movabs rcx, 0x5555555555555555
 ; X64-NEXT:    xor rax, rcx
 ; X64-NEXT:    mov qword ptr [rdi], rax
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <add_v64i1_const>:

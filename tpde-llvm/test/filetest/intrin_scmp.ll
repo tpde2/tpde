@@ -8,9 +8,7 @@
 
 define i17 @scmpi17(i17 %0, i17 %1) {
 ; X64-LABEL: <scmpi17>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    shl edi, 0xf
+; X64:         shl edi, 0xf
 ; X64-NEXT:    sar edi, 0xf
 ; X64-NEXT:    shl esi, 0xf
 ; X64-NEXT:    sar esi, 0xf
@@ -19,7 +17,6 @@ define i17 @scmpi17(i17 %0, i17 %1) {
 ; X64-NEXT:    setg cl
 ; X64-NEXT:    sub cl, al
 ; X64-NEXT:    movsx rax, cl
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <scmpi17>:
@@ -37,14 +34,11 @@ define i17 @scmpi17(i17 %0, i17 %1) {
 
 define i32 @scmpi32(i32 %0, i32 %1) {
 ; X64-LABEL: <scmpi32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    cmp edi, esi
+; X64:         cmp edi, esi
 ; X64-NEXT:    setl al
 ; X64-NEXT:    setg cl
 ; X64-NEXT:    sub cl, al
 ; X64-NEXT:    movsx rax, cl
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <scmpi32>:
@@ -60,9 +54,7 @@ define i32 @scmpi32(i32 %0, i32 %1) {
 
 define i37 @scmpi37(i37 %0, i37 %1) {
 ; X64-LABEL: <scmpi37>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    shl rdi, 0x1b
+; X64:         shl rdi, 0x1b
 ; X64-NEXT:    sar rdi, 0x1b
 ; X64-NEXT:    shl rsi, 0x1b
 ; X64-NEXT:    sar rsi, 0x1b
@@ -71,7 +63,6 @@ define i37 @scmpi37(i37 %0, i37 %1) {
 ; X64-NEXT:    setg cl
 ; X64-NEXT:    sub cl, al
 ; X64-NEXT:    movsx rax, cl
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <scmpi37>:
@@ -89,14 +80,11 @@ define i37 @scmpi37(i37 %0, i37 %1) {
 
 define i64 @scmpi64(i64 %0, i64 %1) {
 ; X64-LABEL: <scmpi64>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    cmp rdi, rsi
+; X64:         cmp rdi, rsi
 ; X64-NEXT:    setl al
 ; X64-NEXT:    setg cl
 ; X64-NEXT:    sub cl, al
 ; X64-NEXT:    movsx rax, cl
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <scmpi64>:
@@ -112,14 +100,11 @@ define i64 @scmpi64(i64 %0, i64 %1) {
 
 define i32 @scmpi64_32(i64 %0, i64 %1) {
 ; X64-LABEL: <scmpi64_32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    cmp rdi, rsi
+; X64:         cmp rdi, rsi
 ; X64-NEXT:    setl al
 ; X64-NEXT:    setg cl
 ; X64-NEXT:    sub cl, al
 ; X64-NEXT:    movsx rax, cl
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <scmpi64_32>:

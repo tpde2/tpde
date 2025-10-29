@@ -9,14 +9,11 @@
 
 define {i64, i1} @cmpxchg_mono_mono(ptr %0, i64 %1, i64 %2) {
 ; X64-LABEL: <cmpxchg_mono_mono>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, rsi
+; X64:         mov rax, rsi
 ; X64-NEXT:    lock
 ; X64-NEXT:    cmpxchg qword ptr [rdi], rdx
 ; X64-NEXT:    sete cl
 ; X64-NEXT:    mov edx, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <cmpxchg_mono_mono>:
@@ -38,14 +35,11 @@ define {i64, i1} @cmpxchg_mono_mono(ptr %0, i64 %1, i64 %2) {
 
 define {i64, i1} @cmpxchg_acq_mono(ptr %0, i64 %1, i64 %2) {
 ; X64-LABEL: <cmpxchg_acq_mono>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, rsi
+; X64:         mov rax, rsi
 ; X64-NEXT:    lock
 ; X64-NEXT:    cmpxchg qword ptr [rdi], rdx
 ; X64-NEXT:    sete cl
 ; X64-NEXT:    mov edx, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <cmpxchg_acq_mono>:
@@ -66,14 +60,11 @@ define {i64, i1} @cmpxchg_acq_mono(ptr %0, i64 %1, i64 %2) {
 
 define {i64, i1} @cmpxchg_acq_acq(ptr %0, i64 %1, i64 %2) {
 ; X64-LABEL: <cmpxchg_acq_acq>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, rsi
+; X64:         mov rax, rsi
 ; X64-NEXT:    lock
 ; X64-NEXT:    cmpxchg qword ptr [rdi], rdx
 ; X64-NEXT:    sete cl
 ; X64-NEXT:    mov edx, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <cmpxchg_acq_acq>:
@@ -95,14 +86,11 @@ define {i64, i1} @cmpxchg_acq_acq(ptr %0, i64 %1, i64 %2) {
 
 define {i64, i1} @cmpxchg_rel_mono(ptr %0, i64 %1, i64 %2) {
 ; X64-LABEL: <cmpxchg_rel_mono>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, rsi
+; X64:         mov rax, rsi
 ; X64-NEXT:    lock
 ; X64-NEXT:    cmpxchg qword ptr [rdi], rdx
 ; X64-NEXT:    sete cl
 ; X64-NEXT:    mov edx, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <cmpxchg_rel_mono>:
@@ -123,14 +111,11 @@ define {i64, i1} @cmpxchg_rel_mono(ptr %0, i64 %1, i64 %2) {
 
 define {i64, i1} @cmpxchg_rel_acq(ptr %0, i64 %1, i64 %2) {
 ; X64-LABEL: <cmpxchg_rel_acq>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, rsi
+; X64:         mov rax, rsi
 ; X64-NEXT:    lock
 ; X64-NEXT:    cmpxchg qword ptr [rdi], rdx
 ; X64-NEXT:    sete cl
 ; X64-NEXT:    mov edx, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <cmpxchg_rel_acq>:
@@ -152,14 +137,11 @@ define {i64, i1} @cmpxchg_rel_acq(ptr %0, i64 %1, i64 %2) {
 
 define {i64, i1} @cmpxchg_acqrel_mono(ptr %0, i64 %1, i64 %2) {
 ; X64-LABEL: <cmpxchg_acqrel_mono>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, rsi
+; X64:         mov rax, rsi
 ; X64-NEXT:    lock
 ; X64-NEXT:    cmpxchg qword ptr [rdi], rdx
 ; X64-NEXT:    sete cl
 ; X64-NEXT:    mov edx, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <cmpxchg_acqrel_mono>:
@@ -180,14 +162,11 @@ define {i64, i1} @cmpxchg_acqrel_mono(ptr %0, i64 %1, i64 %2) {
 
 define {i64, i1} @cmpxchg_acqrel_acq(ptr %0, i64 %1, i64 %2) {
 ; X64-LABEL: <cmpxchg_acqrel_acq>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, rsi
+; X64:         mov rax, rsi
 ; X64-NEXT:    lock
 ; X64-NEXT:    cmpxchg qword ptr [rdi], rdx
 ; X64-NEXT:    sete cl
 ; X64-NEXT:    mov edx, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <cmpxchg_acqrel_acq>:
@@ -209,14 +188,11 @@ define {i64, i1} @cmpxchg_acqrel_acq(ptr %0, i64 %1, i64 %2) {
 
 define {i64, i1} @cmpxchg_seqcst_mono(ptr %0, i64 %1, i64 %2) {
 ; X64-LABEL: <cmpxchg_seqcst_mono>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, rsi
+; X64:         mov rax, rsi
 ; X64-NEXT:    lock
 ; X64-NEXT:    cmpxchg qword ptr [rdi], rdx
 ; X64-NEXT:    sete cl
 ; X64-NEXT:    mov edx, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <cmpxchg_seqcst_mono>:
@@ -237,14 +213,11 @@ define {i64, i1} @cmpxchg_seqcst_mono(ptr %0, i64 %1, i64 %2) {
 
 define {i64, i1} @cmpxchg_seqcst_acq(ptr %0, i64 %1, i64 %2) {
 ; X64-LABEL: <cmpxchg_seqcst_acq>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, rsi
+; X64:         mov rax, rsi
 ; X64-NEXT:    lock
 ; X64-NEXT:    cmpxchg qword ptr [rdi], rdx
 ; X64-NEXT:    sete cl
 ; X64-NEXT:    mov edx, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <cmpxchg_seqcst_acq>:
@@ -265,14 +238,11 @@ define {i64, i1} @cmpxchg_seqcst_acq(ptr %0, i64 %1, i64 %2) {
 
 define {i64, i1} @cmpxchg_seqcst_seqcst(ptr %0, i64 %1, i64 %2) {
 ; X64-LABEL: <cmpxchg_seqcst_seqcst>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, rsi
+; X64:         mov rax, rsi
 ; X64-NEXT:    lock
 ; X64-NEXT:    cmpxchg qword ptr [rdi], rdx
 ; X64-NEXT:    sete cl
 ; X64-NEXT:    mov edx, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <cmpxchg_seqcst_seqcst>:
@@ -294,15 +264,12 @@ define {i64, i1} @cmpxchg_seqcst_seqcst(ptr %0, i64 %1, i64 %2) {
 
 define {i32, i1} @cmpxchg_mono_mono32(ptr %0, i32 %1, i32 %2) {
 ; X64-LABEL: <cmpxchg_mono_mono32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, esi
+; X64:         mov eax, esi
 ; X64-NEXT:    lock
 ; X64-NEXT:    cmpxchg dword ptr [rdi], edx
 ; X64-NEXT:    sete cl
 ; X64-NEXT:    mov eax, eax
 ; X64-NEXT:    mov edx, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <cmpxchg_mono_mono32>:
@@ -324,15 +291,12 @@ define {i32, i1} @cmpxchg_mono_mono32(ptr %0, i32 %1, i32 %2) {
 
 define {i32, i1} @cmpxchg_acq_mono32(ptr %0, i32 %1, i32 %2) {
 ; X64-LABEL: <cmpxchg_acq_mono32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, esi
+; X64:         mov eax, esi
 ; X64-NEXT:    lock
 ; X64-NEXT:    cmpxchg dword ptr [rdi], edx
 ; X64-NEXT:    sete cl
 ; X64-NEXT:    mov eax, eax
 ; X64-NEXT:    mov edx, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <cmpxchg_acq_mono32>:
@@ -353,15 +317,12 @@ define {i32, i1} @cmpxchg_acq_mono32(ptr %0, i32 %1, i32 %2) {
 
 define {i32, i1} @cmpxchg_acq_acq32(ptr %0, i32 %1, i32 %2) {
 ; X64-LABEL: <cmpxchg_acq_acq32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, esi
+; X64:         mov eax, esi
 ; X64-NEXT:    lock
 ; X64-NEXT:    cmpxchg dword ptr [rdi], edx
 ; X64-NEXT:    sete cl
 ; X64-NEXT:    mov eax, eax
 ; X64-NEXT:    mov edx, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <cmpxchg_acq_acq32>:
@@ -383,15 +344,12 @@ define {i32, i1} @cmpxchg_acq_acq32(ptr %0, i32 %1, i32 %2) {
 
 define {i32, i1} @cmpxchg_rel_mono32(ptr %0, i32 %1, i32 %2) {
 ; X64-LABEL: <cmpxchg_rel_mono32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, esi
+; X64:         mov eax, esi
 ; X64-NEXT:    lock
 ; X64-NEXT:    cmpxchg dword ptr [rdi], edx
 ; X64-NEXT:    sete cl
 ; X64-NEXT:    mov eax, eax
 ; X64-NEXT:    mov edx, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <cmpxchg_rel_mono32>:
@@ -412,15 +370,12 @@ define {i32, i1} @cmpxchg_rel_mono32(ptr %0, i32 %1, i32 %2) {
 
 define {i32, i1} @cmpxchg_rel_acq32(ptr %0, i32 %1, i32 %2) {
 ; X64-LABEL: <cmpxchg_rel_acq32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, esi
+; X64:         mov eax, esi
 ; X64-NEXT:    lock
 ; X64-NEXT:    cmpxchg dword ptr [rdi], edx
 ; X64-NEXT:    sete cl
 ; X64-NEXT:    mov eax, eax
 ; X64-NEXT:    mov edx, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <cmpxchg_rel_acq32>:
@@ -442,15 +397,12 @@ define {i32, i1} @cmpxchg_rel_acq32(ptr %0, i32 %1, i32 %2) {
 
 define {i32, i1} @cmpxchg_acqrel_mono32(ptr %0, i32 %1, i32 %2) {
 ; X64-LABEL: <cmpxchg_acqrel_mono32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, esi
+; X64:         mov eax, esi
 ; X64-NEXT:    lock
 ; X64-NEXT:    cmpxchg dword ptr [rdi], edx
 ; X64-NEXT:    sete cl
 ; X64-NEXT:    mov eax, eax
 ; X64-NEXT:    mov edx, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <cmpxchg_acqrel_mono32>:
@@ -471,15 +423,12 @@ define {i32, i1} @cmpxchg_acqrel_mono32(ptr %0, i32 %1, i32 %2) {
 
 define {i32, i1} @cmpxchg_acqrel_acq32(ptr %0, i32 %1, i32 %2) {
 ; X64-LABEL: <cmpxchg_acqrel_acq32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, esi
+; X64:         mov eax, esi
 ; X64-NEXT:    lock
 ; X64-NEXT:    cmpxchg dword ptr [rdi], edx
 ; X64-NEXT:    sete cl
 ; X64-NEXT:    mov eax, eax
 ; X64-NEXT:    mov edx, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <cmpxchg_acqrel_acq32>:
@@ -501,15 +450,12 @@ define {i32, i1} @cmpxchg_acqrel_acq32(ptr %0, i32 %1, i32 %2) {
 
 define {i32, i1} @cmpxchg_seqcst_mono32(ptr %0, i32 %1, i32 %2) {
 ; X64-LABEL: <cmpxchg_seqcst_mono32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, esi
+; X64:         mov eax, esi
 ; X64-NEXT:    lock
 ; X64-NEXT:    cmpxchg dword ptr [rdi], edx
 ; X64-NEXT:    sete cl
 ; X64-NEXT:    mov eax, eax
 ; X64-NEXT:    mov edx, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <cmpxchg_seqcst_mono32>:
@@ -530,15 +476,12 @@ define {i32, i1} @cmpxchg_seqcst_mono32(ptr %0, i32 %1, i32 %2) {
 
 define {i32, i1} @cmpxchg_seqcst_acq32(ptr %0, i32 %1, i32 %2) {
 ; X64-LABEL: <cmpxchg_seqcst_acq32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, esi
+; X64:         mov eax, esi
 ; X64-NEXT:    lock
 ; X64-NEXT:    cmpxchg dword ptr [rdi], edx
 ; X64-NEXT:    sete cl
 ; X64-NEXT:    mov eax, eax
 ; X64-NEXT:    mov edx, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <cmpxchg_seqcst_acq32>:
@@ -559,15 +502,12 @@ define {i32, i1} @cmpxchg_seqcst_acq32(ptr %0, i32 %1, i32 %2) {
 
 define {i32, i1} @cmpxchg_seqcst_seqcst32(ptr %0, i32 %1, i32 %2) {
 ; X64-LABEL: <cmpxchg_seqcst_seqcst32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, esi
+; X64:         mov eax, esi
 ; X64-NEXT:    lock
 ; X64-NEXT:    cmpxchg dword ptr [rdi], edx
 ; X64-NEXT:    sete cl
 ; X64-NEXT:    mov eax, eax
 ; X64-NEXT:    mov edx, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <cmpxchg_seqcst_seqcst32>:
@@ -589,15 +529,12 @@ define {i32, i1} @cmpxchg_seqcst_seqcst32(ptr %0, i32 %1, i32 %2) {
 
 define {i16, i1} @cmpxchg_mono_mono16(ptr %0, i16 %1, i16 %2) {
 ; X64-LABEL: <cmpxchg_mono_mono16>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, esi
+; X64:         mov eax, esi
 ; X64-NEXT:    lock
 ; X64-NEXT:    cmpxchg word ptr [rdi], dx
 ; X64-NEXT:    sete cl
 ; X64-NEXT:    movzx eax, ax
 ; X64-NEXT:    mov edx, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <cmpxchg_mono_mono16>:
@@ -619,15 +556,12 @@ define {i16, i1} @cmpxchg_mono_mono16(ptr %0, i16 %1, i16 %2) {
 
 define {i16, i1} @cmpxchg_acq_mono16(ptr %0, i16 %1, i16 %2) {
 ; X64-LABEL: <cmpxchg_acq_mono16>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, esi
+; X64:         mov eax, esi
 ; X64-NEXT:    lock
 ; X64-NEXT:    cmpxchg word ptr [rdi], dx
 ; X64-NEXT:    sete cl
 ; X64-NEXT:    movzx eax, ax
 ; X64-NEXT:    mov edx, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <cmpxchg_acq_mono16>:
@@ -648,15 +582,12 @@ define {i16, i1} @cmpxchg_acq_mono16(ptr %0, i16 %1, i16 %2) {
 
 define {i16, i1} @cmpxchg_acq_acq16(ptr %0, i16 %1, i16 %2) {
 ; X64-LABEL: <cmpxchg_acq_acq16>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, esi
+; X64:         mov eax, esi
 ; X64-NEXT:    lock
 ; X64-NEXT:    cmpxchg word ptr [rdi], dx
 ; X64-NEXT:    sete cl
 ; X64-NEXT:    movzx eax, ax
 ; X64-NEXT:    mov edx, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <cmpxchg_acq_acq16>:
@@ -678,15 +609,12 @@ define {i16, i1} @cmpxchg_acq_acq16(ptr %0, i16 %1, i16 %2) {
 
 define {i16, i1} @cmpxchg_rel_mono16(ptr %0, i16 %1, i16 %2) {
 ; X64-LABEL: <cmpxchg_rel_mono16>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, esi
+; X64:         mov eax, esi
 ; X64-NEXT:    lock
 ; X64-NEXT:    cmpxchg word ptr [rdi], dx
 ; X64-NEXT:    sete cl
 ; X64-NEXT:    movzx eax, ax
 ; X64-NEXT:    mov edx, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <cmpxchg_rel_mono16>:
@@ -707,15 +635,12 @@ define {i16, i1} @cmpxchg_rel_mono16(ptr %0, i16 %1, i16 %2) {
 
 define {i16, i1} @cmpxchg_rel_acq16(ptr %0, i16 %1, i16 %2) {
 ; X64-LABEL: <cmpxchg_rel_acq16>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, esi
+; X64:         mov eax, esi
 ; X64-NEXT:    lock
 ; X64-NEXT:    cmpxchg word ptr [rdi], dx
 ; X64-NEXT:    sete cl
 ; X64-NEXT:    movzx eax, ax
 ; X64-NEXT:    mov edx, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <cmpxchg_rel_acq16>:
@@ -737,15 +662,12 @@ define {i16, i1} @cmpxchg_rel_acq16(ptr %0, i16 %1, i16 %2) {
 
 define {i16, i1} @cmpxchg_acqrel_mono16(ptr %0, i16 %1, i16 %2) {
 ; X64-LABEL: <cmpxchg_acqrel_mono16>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, esi
+; X64:         mov eax, esi
 ; X64-NEXT:    lock
 ; X64-NEXT:    cmpxchg word ptr [rdi], dx
 ; X64-NEXT:    sete cl
 ; X64-NEXT:    movzx eax, ax
 ; X64-NEXT:    mov edx, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <cmpxchg_acqrel_mono16>:
@@ -766,15 +688,12 @@ define {i16, i1} @cmpxchg_acqrel_mono16(ptr %0, i16 %1, i16 %2) {
 
 define {i16, i1} @cmpxchg_acqrel_acq16(ptr %0, i16 %1, i16 %2) {
 ; X64-LABEL: <cmpxchg_acqrel_acq16>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, esi
+; X64:         mov eax, esi
 ; X64-NEXT:    lock
 ; X64-NEXT:    cmpxchg word ptr [rdi], dx
 ; X64-NEXT:    sete cl
 ; X64-NEXT:    movzx eax, ax
 ; X64-NEXT:    mov edx, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <cmpxchg_acqrel_acq16>:
@@ -796,15 +715,12 @@ define {i16, i1} @cmpxchg_acqrel_acq16(ptr %0, i16 %1, i16 %2) {
 
 define {i16, i1} @cmpxchg_seqcst_mono16(ptr %0, i16 %1, i16 %2) {
 ; X64-LABEL: <cmpxchg_seqcst_mono16>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, esi
+; X64:         mov eax, esi
 ; X64-NEXT:    lock
 ; X64-NEXT:    cmpxchg word ptr [rdi], dx
 ; X64-NEXT:    sete cl
 ; X64-NEXT:    movzx eax, ax
 ; X64-NEXT:    mov edx, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <cmpxchg_seqcst_mono16>:
@@ -825,15 +741,12 @@ define {i16, i1} @cmpxchg_seqcst_mono16(ptr %0, i16 %1, i16 %2) {
 
 define {i16, i1} @cmpxchg_seqcst_acq16(ptr %0, i16 %1, i16 %2) {
 ; X64-LABEL: <cmpxchg_seqcst_acq16>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, esi
+; X64:         mov eax, esi
 ; X64-NEXT:    lock
 ; X64-NEXT:    cmpxchg word ptr [rdi], dx
 ; X64-NEXT:    sete cl
 ; X64-NEXT:    movzx eax, ax
 ; X64-NEXT:    mov edx, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <cmpxchg_seqcst_acq16>:
@@ -854,15 +767,12 @@ define {i16, i1} @cmpxchg_seqcst_acq16(ptr %0, i16 %1, i16 %2) {
 
 define {i16, i1} @cmpxchg_seqcst_seqcst16(ptr %0, i16 %1, i16 %2) {
 ; X64-LABEL: <cmpxchg_seqcst_seqcst16>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, esi
+; X64:         mov eax, esi
 ; X64-NEXT:    lock
 ; X64-NEXT:    cmpxchg word ptr [rdi], dx
 ; X64-NEXT:    sete cl
 ; X64-NEXT:    movzx eax, ax
 ; X64-NEXT:    mov edx, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <cmpxchg_seqcst_seqcst16>:
@@ -884,15 +794,12 @@ define {i16, i1} @cmpxchg_seqcst_seqcst16(ptr %0, i16 %1, i16 %2) {
 
 define {i8, i1} @cmpxchg_mono_mono8(ptr %0, i8 %1, i8 %2) {
 ; X64-LABEL: <cmpxchg_mono_mono8>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, esi
+; X64:         mov eax, esi
 ; X64-NEXT:    lock
 ; X64-NEXT:    cmpxchg byte ptr [rdi], dl
 ; X64-NEXT:    sete cl
 ; X64-NEXT:    movzx eax, al
 ; X64-NEXT:    mov edx, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <cmpxchg_mono_mono8>:
@@ -914,15 +821,12 @@ define {i8, i1} @cmpxchg_mono_mono8(ptr %0, i8 %1, i8 %2) {
 
 define {i8, i1} @cmpxchg_acq_mono8(ptr %0, i8 %1, i8 %2) {
 ; X64-LABEL: <cmpxchg_acq_mono8>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, esi
+; X64:         mov eax, esi
 ; X64-NEXT:    lock
 ; X64-NEXT:    cmpxchg byte ptr [rdi], dl
 ; X64-NEXT:    sete cl
 ; X64-NEXT:    movzx eax, al
 ; X64-NEXT:    mov edx, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <cmpxchg_acq_mono8>:
@@ -943,15 +847,12 @@ define {i8, i1} @cmpxchg_acq_mono8(ptr %0, i8 %1, i8 %2) {
 
 define {i8, i1} @cmpxchg_acq_acq8(ptr %0, i8 %1, i8 %2) {
 ; X64-LABEL: <cmpxchg_acq_acq8>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, esi
+; X64:         mov eax, esi
 ; X64-NEXT:    lock
 ; X64-NEXT:    cmpxchg byte ptr [rdi], dl
 ; X64-NEXT:    sete cl
 ; X64-NEXT:    movzx eax, al
 ; X64-NEXT:    mov edx, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <cmpxchg_acq_acq8>:
@@ -973,15 +874,12 @@ define {i8, i1} @cmpxchg_acq_acq8(ptr %0, i8 %1, i8 %2) {
 
 define {i8, i1} @cmpxchg_rel_mono8(ptr %0, i8 %1, i8 %2) {
 ; X64-LABEL: <cmpxchg_rel_mono8>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, esi
+; X64:         mov eax, esi
 ; X64-NEXT:    lock
 ; X64-NEXT:    cmpxchg byte ptr [rdi], dl
 ; X64-NEXT:    sete cl
 ; X64-NEXT:    movzx eax, al
 ; X64-NEXT:    mov edx, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <cmpxchg_rel_mono8>:
@@ -1002,15 +900,12 @@ define {i8, i1} @cmpxchg_rel_mono8(ptr %0, i8 %1, i8 %2) {
 
 define {i8, i1} @cmpxchg_rel_acq8(ptr %0, i8 %1, i8 %2) {
 ; X64-LABEL: <cmpxchg_rel_acq8>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, esi
+; X64:         mov eax, esi
 ; X64-NEXT:    lock
 ; X64-NEXT:    cmpxchg byte ptr [rdi], dl
 ; X64-NEXT:    sete cl
 ; X64-NEXT:    movzx eax, al
 ; X64-NEXT:    mov edx, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <cmpxchg_rel_acq8>:
@@ -1032,15 +927,12 @@ define {i8, i1} @cmpxchg_rel_acq8(ptr %0, i8 %1, i8 %2) {
 
 define {i8, i1} @cmpxchg_acqrel_mono8(ptr %0, i8 %1, i8 %2) {
 ; X64-LABEL: <cmpxchg_acqrel_mono8>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, esi
+; X64:         mov eax, esi
 ; X64-NEXT:    lock
 ; X64-NEXT:    cmpxchg byte ptr [rdi], dl
 ; X64-NEXT:    sete cl
 ; X64-NEXT:    movzx eax, al
 ; X64-NEXT:    mov edx, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <cmpxchg_acqrel_mono8>:
@@ -1061,15 +953,12 @@ define {i8, i1} @cmpxchg_acqrel_mono8(ptr %0, i8 %1, i8 %2) {
 
 define {i8, i1} @cmpxchg_acqrel_acq8(ptr %0, i8 %1, i8 %2) {
 ; X64-LABEL: <cmpxchg_acqrel_acq8>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, esi
+; X64:         mov eax, esi
 ; X64-NEXT:    lock
 ; X64-NEXT:    cmpxchg byte ptr [rdi], dl
 ; X64-NEXT:    sete cl
 ; X64-NEXT:    movzx eax, al
 ; X64-NEXT:    mov edx, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <cmpxchg_acqrel_acq8>:
@@ -1091,15 +980,12 @@ define {i8, i1} @cmpxchg_acqrel_acq8(ptr %0, i8 %1, i8 %2) {
 
 define {i8, i1} @cmpxchg_seqcst_mono8(ptr %0, i8 %1, i8 %2) {
 ; X64-LABEL: <cmpxchg_seqcst_mono8>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, esi
+; X64:         mov eax, esi
 ; X64-NEXT:    lock
 ; X64-NEXT:    cmpxchg byte ptr [rdi], dl
 ; X64-NEXT:    sete cl
 ; X64-NEXT:    movzx eax, al
 ; X64-NEXT:    mov edx, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <cmpxchg_seqcst_mono8>:
@@ -1120,15 +1006,12 @@ define {i8, i1} @cmpxchg_seqcst_mono8(ptr %0, i8 %1, i8 %2) {
 
 define {i8, i1} @cmpxchg_seqcst_acq8(ptr %0, i8 %1, i8 %2) {
 ; X64-LABEL: <cmpxchg_seqcst_acq8>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, esi
+; X64:         mov eax, esi
 ; X64-NEXT:    lock
 ; X64-NEXT:    cmpxchg byte ptr [rdi], dl
 ; X64-NEXT:    sete cl
 ; X64-NEXT:    movzx eax, al
 ; X64-NEXT:    mov edx, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <cmpxchg_seqcst_acq8>:
@@ -1149,15 +1032,12 @@ define {i8, i1} @cmpxchg_seqcst_acq8(ptr %0, i8 %1, i8 %2) {
 
 define {i8, i1} @cmpxchg_seqcst_seqcst8(ptr %0, i8 %1, i8 %2) {
 ; X64-LABEL: <cmpxchg_seqcst_seqcst8>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, esi
+; X64:         mov eax, esi
 ; X64-NEXT:    lock
 ; X64-NEXT:    cmpxchg byte ptr [rdi], dl
 ; X64-NEXT:    sete cl
 ; X64-NEXT:    movzx eax, al
 ; X64-NEXT:    mov edx, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <cmpxchg_seqcst_seqcst8>:

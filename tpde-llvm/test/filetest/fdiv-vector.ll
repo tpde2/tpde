@@ -7,12 +7,9 @@
 
 define <2 x float> @fdiv_v2f32_1(<2 x float> %0) {
 ; X64-LABEL: <fdiv_v2f32_1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movabs rax, 0x3f8000003f800000
+; X64:         movabs rax, 0x3f8000003f800000
 ; X64-NEXT:    movq xmm1, rax
 ; X64-NEXT:    divps xmm0, xmm1
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fdiv_v2f32_1>:
@@ -26,10 +23,7 @@ define <2 x float> @fdiv_v2f32_1(<2 x float> %0) {
 
 define <2 x float> @fdiv_v2f32_f32(<2 x float> %0, <2 x float> %1) {
 ; X64-LABEL: <fdiv_v2f32_f32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    divps xmm0, xmm1
-; X64-NEXT:    pop rbp
+; X64:         divps xmm0, xmm1
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fdiv_v2f32_f32>:
@@ -41,12 +35,9 @@ define <2 x float> @fdiv_v2f32_f32(<2 x float> %0, <2 x float> %1) {
 
 define <4 x float> @fdiv_v4f32_1(<4 x float> %0) {
 ; X64-LABEL: <fdiv_v4f32_1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movaps xmm1, xmmword ptr <fdiv_v4f32_1+0x3>
+; X64:         movaps xmm1, xmmword ptr <fdiv_v2f32_f32+0xf>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    divps xmm0, xmm1
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fdiv_v4f32_1>:
@@ -62,10 +53,7 @@ define <4 x float> @fdiv_v4f32_1(<4 x float> %0) {
 
 define <4 x float> @fdiv_v4f32_f32(<4 x float> %0, <4 x float> %1) {
 ; X64-LABEL: <fdiv_v4f32_f32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    divps xmm0, xmm1
-; X64-NEXT:    pop rbp
+; X64:         divps xmm0, xmm1
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fdiv_v4f32_f32>:
@@ -77,12 +65,9 @@ define <4 x float> @fdiv_v4f32_f32(<4 x float> %0, <4 x float> %1) {
 
 define <2 x double> @fdiv_v2f64_1(<2 x double> %0) {
 ; X64-LABEL: <fdiv_v2f64_1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movaps xmm1, xmmword ptr <fdiv_v2f64_1+0x3>
+; X64:         movaps xmm1, xmmword ptr <fdiv_v4f32_f32+0xf>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    divpd xmm0, xmm1
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fdiv_v2f64_1>:
@@ -98,10 +83,7 @@ define <2 x double> @fdiv_v2f64_1(<2 x double> %0) {
 
 define <2 x double> @fdiv_v2f64_f64(<2 x double> %0, <2 x double> %1) {
 ; X64-LABEL: <fdiv_v2f64_f64>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    divpd xmm0, xmm1
-; X64-NEXT:    pop rbp
+; X64:         divpd xmm0, xmm1
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fdiv_v2f64_f64>:

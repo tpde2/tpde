@@ -10,10 +10,7 @@ declare void @llvm.trap()
 
 define void @test() {
 ; X64-LABEL: <test>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    ud2
-; X64-NEXT:    pop rbp
+; X64:         ud2
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <test>:

@@ -11,11 +11,8 @@ declare void @llvm.stackrestore.p0(ptr)
 
 define void @test() {
 ; X64-LABEL: <test>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, rsp
+; X64:         mov rax, rsp
 ; X64-NEXT:    mov rsp, rax
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <test>:

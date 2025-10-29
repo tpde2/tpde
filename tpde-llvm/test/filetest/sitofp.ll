@@ -8,11 +8,8 @@
 
 define float @i8tof32(i8 %0) {
 ; X64-LABEL: <i8tof32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movsx edi, dil
+; X64:         movsx edi, dil
 ; X64-NEXT:    cvtsi2ss xmm0, edi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <i8tof32>:
@@ -26,11 +23,8 @@ entry:
 
 define float @i16tof32(i16 %0) {
 ; X64-LABEL: <i16tof32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movsx edi, di
+; X64:         movsx edi, di
 ; X64-NEXT:    cvtsi2ss xmm0, edi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <i16tof32>:
@@ -44,12 +38,9 @@ entry:
 
 define float @i21tof32(i21 %0) {
 ; X64-LABEL: <i21tof32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    shl edi, 0xb
+; X64:         shl edi, 0xb
 ; X64-NEXT:    sar edi, 0xb
 ; X64-NEXT:    cvtsi2ss xmm0, edi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <i21tof32>:
@@ -63,10 +54,7 @@ entry:
 
 define float @i32tof32(i32 %0) {
 ; X64-LABEL: <i32tof32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    cvtsi2ss xmm0, edi
-; X64-NEXT:    pop rbp
+; X64:         cvtsi2ss xmm0, edi
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <i32tof32>:
@@ -79,12 +67,9 @@ entry:
 
 define float @i37tof32(i37 %0) {
 ; X64-LABEL: <i37tof32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    shl rdi, 0x1b
+; X64:         shl rdi, 0x1b
 ; X64-NEXT:    sar rdi, 0x1b
 ; X64-NEXT:    cvtsi2ss xmm0, rdi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <i37tof32>:
@@ -98,10 +83,7 @@ entry:
 
 define float @i64tof32(i64 %0) {
 ; X64-LABEL: <i64tof32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    cvtsi2ss xmm0, rdi
-; X64-NEXT:    pop rbp
+; X64:         cvtsi2ss xmm0, rdi
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <i64tof32>:
@@ -115,11 +97,8 @@ entry:
 
 define double @i8tof64(i8 %0) {
 ; X64-LABEL: <i8tof64>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movsx edi, dil
+; X64:         movsx edi, dil
 ; X64-NEXT:    cvtsi2sd xmm0, edi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <i8tof64>:
@@ -133,11 +112,8 @@ entry:
 
 define double @i16tof64(i16 %0) {
 ; X64-LABEL: <i16tof64>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movsx edi, di
+; X64:         movsx edi, di
 ; X64-NEXT:    cvtsi2sd xmm0, edi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <i16tof64>:
@@ -151,12 +127,9 @@ entry:
 
 define double @i21tof64(i21 %0) {
 ; X64-LABEL: <i21tof64>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    shl edi, 0xb
+; X64:         shl edi, 0xb
 ; X64-NEXT:    sar edi, 0xb
 ; X64-NEXT:    cvtsi2sd xmm0, edi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <i21tof64>:
@@ -170,10 +143,7 @@ entry:
 
 define double @i32tof64(i32 %0) {
 ; X64-LABEL: <i32tof64>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    cvtsi2sd xmm0, edi
-; X64-NEXT:    pop rbp
+; X64:         cvtsi2sd xmm0, edi
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <i32tof64>:
@@ -186,12 +156,9 @@ entry:
 
 define double @i37tof64(i37 %0) {
 ; X64-LABEL: <i37tof64>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    shl rdi, 0x1b
+; X64:         shl rdi, 0x1b
 ; X64-NEXT:    sar rdi, 0x1b
 ; X64-NEXT:    cvtsi2sd xmm0, rdi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <i37tof64>:
@@ -205,10 +172,7 @@ entry:
 
 define double @i64tof64(i64 %0) {
 ; X64-LABEL: <i64tof64>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    cvtsi2sd xmm0, rdi
-; X64-NEXT:    pop rbp
+; X64:         cvtsi2sd xmm0, rdi
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <i64tof64>:

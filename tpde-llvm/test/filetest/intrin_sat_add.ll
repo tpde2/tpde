@@ -7,16 +7,13 @@
 
 define i8 @sadd_sat_i8(i8, i8) {
 ; X64-LABEL: <sadd_sat_i8>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    lea eax, [rdi + rsi]
+; X64:         lea eax, [rdi + rsi]
 ; X64-NEXT:    sar al, 0x7
 ; X64-NEXT:    add al, -0x80
 ; X64-NEXT:    add dil, sil
 ; X64-NEXT:    movzx ecx, dil
 ; X64-NEXT:    movzx eax, al
 ; X64-NEXT:    cmovno eax, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <sadd_sat_i8>:
@@ -36,15 +33,12 @@ define i8 @sadd_sat_i8(i8, i8) {
 
 define i16 @sadd_sat_i16(i16, i16) {
 ; X64-LABEL: <sadd_sat_i16>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    lea eax, [rdi + rsi]
+; X64:         lea eax, [rdi + rsi]
 ; X64-NEXT:    movsx eax, ax
 ; X64-NEXT:    sar eax, 0xf
 ; X64-NEXT:    xor eax, 0xffff8000
 ; X64-NEXT:    add di, si
 ; X64-NEXT:    cmovno eax, edi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <sadd_sat_i16>:
@@ -64,14 +58,11 @@ define i16 @sadd_sat_i16(i16, i16) {
 
 define i32 @sadd_sat_i32(i32, i32) {
 ; X64-LABEL: <sadd_sat_i32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    lea eax, [rdi + rsi]
+; X64:         lea eax, [rdi + rsi]
 ; X64-NEXT:    sar eax, 0x1f
 ; X64-NEXT:    add eax, 0x80000000
 ; X64-NEXT:    add edi, esi
 ; X64-NEXT:    cmovno eax, edi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <sadd_sat_i32>:
@@ -87,16 +78,13 @@ define i32 @sadd_sat_i32(i32, i32) {
 
 define i64 @sadd_sat_i64(i64, i64) {
 ; X64-LABEL: <sadd_sat_i64>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    lea rax, [rdi + rsi]
+; X64:         lea rax, [rdi + rsi]
 ; X64-NEXT:    sar rax, 0x3f
 ; X64-NEXT:    movabs rcx, -0x8000000000000000
 ; X64-NEXT:    xor rcx, rax
 ; X64-NEXT:    add rdi, rsi
 ; X64-NEXT:    cmovno rcx, rdi
 ; X64-NEXT:    mov rax, rcx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <sadd_sat_i64>:
@@ -112,14 +100,11 @@ define i64 @sadd_sat_i64(i64, i64) {
 
 define i8 @uadd_sat_i8(i8, i8) {
 ; X64-LABEL: <uadd_sat_i8>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    add dil, sil
+; X64:         add dil, sil
 ; X64-NEXT:    movzx eax, dil
 ; X64-NEXT:    mov ecx, 0xff
 ; X64-NEXT:    cmovae ecx, eax
 ; X64-NEXT:    mov eax, ecx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <uadd_sat_i8>:
@@ -136,12 +121,9 @@ define i8 @uadd_sat_i8(i8, i8) {
 
 define i16 @uadd_sat_i16(i16, i16) {
 ; X64-LABEL: <uadd_sat_i16>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    add di, si
+; X64:         add di, si
 ; X64-NEXT:    mov eax, 0xffff
 ; X64-NEXT:    cmovae eax, edi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <uadd_sat_i16>:
@@ -158,12 +140,9 @@ define i16 @uadd_sat_i16(i16, i16) {
 
 define i32 @uadd_sat_i32(i32, i32) {
 ; X64-LABEL: <uadd_sat_i32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    add edi, esi
+; X64:         add edi, esi
 ; X64-NEXT:    mov eax, 0xffffffff
 ; X64-NEXT:    cmovae eax, edi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <uadd_sat_i32>:
@@ -177,12 +156,9 @@ define i32 @uadd_sat_i32(i32, i32) {
 
 define i64 @uadd_sat_i64(i64, i64) {
 ; X64-LABEL: <uadd_sat_i64>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    add rdi, rsi
+; X64:         add rdi, rsi
 ; X64-NEXT:    mov rax, -0x1
 ; X64-NEXT:    cmovae rax, rdi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <uadd_sat_i64>:

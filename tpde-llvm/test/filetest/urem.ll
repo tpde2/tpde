@@ -8,15 +8,12 @@
 
 define i8 @urem_i8_1(i8 %0) {
 ; X64-LABEL: <urem_i8_1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx edi, dil
+; X64:         movzx edi, dil
 ; X64-NEXT:    xor edx, edx
 ; X64-NEXT:    mov ecx, 0x1
 ; X64-NEXT:    mov eax, edi
 ; X64-NEXT:    div ecx
 ; X64-NEXT:    mov eax, edx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <urem_i8_1>:
@@ -33,15 +30,12 @@ entry:
 
 define i8 @urem_i8_-1(i8 %0) {
 ; X64-LABEL: <urem_i8_-1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx edi, dil
+; X64:         movzx edi, dil
 ; X64-NEXT:    xor edx, edx
 ; X64-NEXT:    mov ecx, 0xff
 ; X64-NEXT:    mov eax, edi
 ; X64-NEXT:    div ecx
 ; X64-NEXT:    mov eax, edx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <urem_i8_-1>:
@@ -58,15 +52,12 @@ entry:
 
 define i8 @urem_i8_28(i8 %0) {
 ; X64-LABEL: <urem_i8_28>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx edi, dil
+; X64:         movzx edi, dil
 ; X64-NEXT:    xor edx, edx
 ; X64-NEXT:    mov ecx, 0x1c
 ; X64-NEXT:    mov eax, edi
 ; X64-NEXT:    div ecx
 ; X64-NEXT:    mov eax, edx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <urem_i8_28>:
@@ -83,15 +74,12 @@ entry:
 
 define i8 @urem_i8_i8(i8 %0, i8 %1) {
 ; X64-LABEL: <urem_i8_i8>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx edi, dil
+; X64:         movzx edi, dil
 ; X64-NEXT:    movzx esi, sil
 ; X64-NEXT:    xor edx, edx
 ; X64-NEXT:    mov eax, edi
 ; X64-NEXT:    div esi
 ; X64-NEXT:    mov eax, edx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <urem_i8_i8>:
@@ -108,15 +96,12 @@ entry:
 
 define i8 @urem_i8_32(i8 %0) {
 ; X64-LABEL: <urem_i8_32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx edi, dil
+; X64:         movzx edi, dil
 ; X64-NEXT:    xor edx, edx
 ; X64-NEXT:    mov ecx, 0x20
 ; X64-NEXT:    mov eax, edi
 ; X64-NEXT:    div ecx
 ; X64-NEXT:    mov eax, edx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <urem_i8_32>:
@@ -133,15 +118,12 @@ entry:
 
 define i16 @urem_i16_1(i16 %0) {
 ; X64-LABEL: <urem_i16_1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx edi, di
+; X64:         movzx edi, di
 ; X64-NEXT:    xor edx, edx
 ; X64-NEXT:    mov ecx, 0x1
 ; X64-NEXT:    mov eax, edi
 ; X64-NEXT:    div ecx
 ; X64-NEXT:    mov eax, edx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <urem_i16_1>:
@@ -158,15 +140,12 @@ entry:
 
 define i16 @urem_i16_-1(i16 %0) {
 ; X64-LABEL: <urem_i16_-1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx edi, di
+; X64:         movzx edi, di
 ; X64-NEXT:    xor edx, edx
 ; X64-NEXT:    mov ecx, 0xffff
 ; X64-NEXT:    mov eax, edi
 ; X64-NEXT:    div ecx
 ; X64-NEXT:    mov eax, edx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <urem_i16_-1>:
@@ -183,15 +162,12 @@ entry:
 
 define i16 @urem_i16_28(i16 %0) {
 ; X64-LABEL: <urem_i16_28>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx edi, di
+; X64:         movzx edi, di
 ; X64-NEXT:    xor edx, edx
 ; X64-NEXT:    mov ecx, 0x1c
 ; X64-NEXT:    mov eax, edi
 ; X64-NEXT:    div ecx
 ; X64-NEXT:    mov eax, edx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <urem_i16_28>:
@@ -208,15 +184,12 @@ entry:
 
 define i16 @urem_i16_32(i16 %0) {
 ; X64-LABEL: <urem_i16_32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx edi, di
+; X64:         movzx edi, di
 ; X64-NEXT:    xor edx, edx
 ; X64-NEXT:    mov ecx, 0x20
 ; X64-NEXT:    mov eax, edi
 ; X64-NEXT:    div ecx
 ; X64-NEXT:    mov eax, edx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <urem_i16_32>:
@@ -233,15 +206,12 @@ entry:
 
 define i16 @urem_i16_i16(i16 %0, i16 %1) {
 ; X64-LABEL: <urem_i16_i16>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx edi, di
+; X64:         movzx edi, di
 ; X64-NEXT:    movzx esi, si
 ; X64-NEXT:    xor edx, edx
 ; X64-NEXT:    mov eax, edi
 ; X64-NEXT:    div esi
 ; X64-NEXT:    mov eax, edx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <urem_i16_i16>:
@@ -258,14 +228,11 @@ entry:
 
 define i32 @urem_i32_1(i32 %0) {
 ; X64-LABEL: <urem_i32_1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor edx, edx
+; X64:         xor edx, edx
 ; X64-NEXT:    mov ecx, 0x1
 ; X64-NEXT:    mov eax, edi
 ; X64-NEXT:    div ecx
 ; X64-NEXT:    mov eax, edx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <urem_i32_1>:
@@ -281,14 +248,11 @@ entry:
 
 define i32 @urem_i32_-1(i32 %0) {
 ; X64-LABEL: <urem_i32_-1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor edx, edx
+; X64:         xor edx, edx
 ; X64-NEXT:    mov ecx, 0xffffffff
 ; X64-NEXT:    mov eax, edi
 ; X64-NEXT:    div ecx
 ; X64-NEXT:    mov eax, edx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <urem_i32_-1>:
@@ -304,14 +268,11 @@ entry:
 
 define i32 @urem_i32_28(i32 %0) {
 ; X64-LABEL: <urem_i32_28>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor edx, edx
+; X64:         xor edx, edx
 ; X64-NEXT:    mov ecx, 0x1c
 ; X64-NEXT:    mov eax, edi
 ; X64-NEXT:    div ecx
 ; X64-NEXT:    mov eax, edx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <urem_i32_28>:
@@ -327,14 +288,11 @@ entry:
 
 define i32 @urem_i32_32(i32 %0) {
 ; X64-LABEL: <urem_i32_32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor edx, edx
+; X64:         xor edx, edx
 ; X64-NEXT:    mov ecx, 0x20
 ; X64-NEXT:    mov eax, edi
 ; X64-NEXT:    div ecx
 ; X64-NEXT:    mov eax, edx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <urem_i32_32>:
@@ -350,13 +308,10 @@ entry:
 
 define i32 @urem_i32_i32(i32 %0, i32 %1) {
 ; X64-LABEL: <urem_i32_i32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor edx, edx
+; X64:         xor edx, edx
 ; X64-NEXT:    mov eax, edi
 ; X64-NEXT:    div esi
 ; X64-NEXT:    mov eax, edx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <urem_i32_i32>:
@@ -371,14 +326,11 @@ entry:
 
 define i64 @urem_i64_1(i64 %0) {
 ; X64-LABEL: <urem_i64_1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor edx, edx
+; X64:         xor edx, edx
 ; X64-NEXT:    mov ecx, 0x1
 ; X64-NEXT:    mov rax, rdi
 ; X64-NEXT:    div rcx
 ; X64-NEXT:    mov rax, rdx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <urem_i64_1>:
@@ -394,14 +346,11 @@ entry:
 
 define i64 @urem_i64_-1(i64 %0) {
 ; X64-LABEL: <urem_i64_-1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor edx, edx
+; X64:         xor edx, edx
 ; X64-NEXT:    mov rcx, -0x1
 ; X64-NEXT:    mov rax, rdi
 ; X64-NEXT:    div rcx
 ; X64-NEXT:    mov rax, rdx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <urem_i64_-1>:
@@ -417,14 +366,11 @@ entry:
 
 define i64 @urem_i64_28(i64 %0) {
 ; X64-LABEL: <urem_i64_28>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor edx, edx
+; X64:         xor edx, edx
 ; X64-NEXT:    mov ecx, 0x1c
 ; X64-NEXT:    mov rax, rdi
 ; X64-NEXT:    div rcx
 ; X64-NEXT:    mov rax, rdx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <urem_i64_28>:
@@ -440,14 +386,11 @@ entry:
 
 define i64 @urem_i64_32(i64 %0) {
 ; X64-LABEL: <urem_i64_32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor edx, edx
+; X64:         xor edx, edx
 ; X64-NEXT:    mov ecx, 0x20
 ; X64-NEXT:    mov rax, rdi
 ; X64-NEXT:    div rcx
 ; X64-NEXT:    mov rax, rdx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <urem_i64_32>:
@@ -463,13 +406,10 @@ entry:
 
 define i64 @urem_i64_i64(i64 %0, i64 %1) {
 ; X64-LABEL: <urem_i64_i64>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor edx, edx
+; X64:         xor edx, edx
 ; X64-NEXT:    mov rax, rdi
 ; X64-NEXT:    div rsi
 ; X64-NEXT:    mov rax, rdx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <urem_i64_i64>:
@@ -484,15 +424,12 @@ entry:
 
 define i8 @urem_i8_salvage(i8 %0, i8 %1) {
 ; X64-LABEL: <urem_i8_salvage>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx edi, dil
+; X64:         movzx edi, dil
 ; X64-NEXT:    movzx esi, sil
 ; X64-NEXT:    xor edx, edx
 ; X64-NEXT:    mov eax, edi
 ; X64-NEXT:    div esi
 ; X64-NEXT:    mov eax, edx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <urem_i8_salvage>:
@@ -509,15 +446,12 @@ entry:
 
 define i16 @urem_i16_salvage(i16 %0, i16 %1) {
 ; X64-LABEL: <urem_i16_salvage>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx edi, di
+; X64:         movzx edi, di
 ; X64-NEXT:    movzx esi, si
 ; X64-NEXT:    xor edx, edx
 ; X64-NEXT:    mov eax, edi
 ; X64-NEXT:    div esi
 ; X64-NEXT:    mov eax, edx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <urem_i16_salvage>:
@@ -534,13 +468,10 @@ entry:
 
 define i32 @urem_i32_salvage(i32 %0, i32 %1) {
 ; X64-LABEL: <urem_i32_salvage>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor edx, edx
+; X64:         xor edx, edx
 ; X64-NEXT:    mov eax, edi
 ; X64-NEXT:    div esi
 ; X64-NEXT:    mov eax, edx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <urem_i32_salvage>:
@@ -555,13 +486,10 @@ entry:
 
 define i64 @urem_i64_salvage(i64 %0, i64 %1) {
 ; X64-LABEL: <urem_i64_salvage>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor edx, edx
+; X64:         xor edx, edx
 ; X64-NEXT:    mov rax, rdi
 ; X64-NEXT:    div rsi
 ; X64-NEXT:    mov rax, rdx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <urem_i64_salvage>:
@@ -576,9 +504,7 @@ entry:
 
 define i8 @urem_i8_no_salvage(i8 %0, i8 %1) {
 ; X64-LABEL: <urem_i8_no_salvage>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx eax, dil
+; X64:         movzx eax, dil
 ; X64-NEXT:    movzx esi, sil
 ; X64-NEXT:    mov rcx, rax
 ; X64-NEXT:    xor edx, edx
@@ -591,7 +517,6 @@ define i8 @urem_i8_no_salvage(i8 %0, i8 %1) {
 ; X64-NEXT:    mov eax, edi
 ; X64-NEXT:    div ecx
 ; X64-NEXT:    mov eax, edx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <urem_i8_no_salvage>:
@@ -613,9 +538,7 @@ entry:
 
 define i16 @urem_i16_no_salvage(i16 %0, i16 %1) {
 ; X64-LABEL: <urem_i16_no_salvage>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx eax, di
+; X64:         movzx eax, di
 ; X64-NEXT:    movzx esi, si
 ; X64-NEXT:    mov rcx, rax
 ; X64-NEXT:    xor edx, edx
@@ -628,7 +551,6 @@ define i16 @urem_i16_no_salvage(i16 %0, i16 %1) {
 ; X64-NEXT:    mov eax, edi
 ; X64-NEXT:    div ecx
 ; X64-NEXT:    mov eax, edx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <urem_i16_no_salvage>:

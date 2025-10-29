@@ -7,10 +7,7 @@
 
 define void @store_atomic_i8_monotonic(ptr %p, i8 %v) {
 ; X64-LABEL: <store_atomic_i8_monotonic>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov byte ptr [rdi], sil
-; X64-NEXT:    pop rbp
+; X64:         mov byte ptr [rdi], sil
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_atomic_i8_monotonic>:
@@ -22,10 +19,7 @@ define void @store_atomic_i8_monotonic(ptr %p, i8 %v) {
 
 define void @store_atomic_i16_monotonic(ptr %p, i16 %v) {
 ; X64-LABEL: <store_atomic_i16_monotonic>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov word ptr [rdi], si
-; X64-NEXT:    pop rbp
+; X64:         mov word ptr [rdi], si
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_atomic_i16_monotonic>:
@@ -37,10 +31,7 @@ define void @store_atomic_i16_monotonic(ptr %p, i16 %v) {
 
 define void @store_atomic_i32_monotonic(ptr %p, i32 %v) {
 ; X64-LABEL: <store_atomic_i32_monotonic>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov dword ptr [rdi], esi
-; X64-NEXT:    pop rbp
+; X64:         mov dword ptr [rdi], esi
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_atomic_i32_monotonic>:
@@ -52,10 +43,7 @@ define void @store_atomic_i32_monotonic(ptr %p, i32 %v) {
 
 define void @store_atomic_i64_monotonic(ptr %p, i64 %v) {
 ; X64-LABEL: <store_atomic_i64_monotonic>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov qword ptr [rdi], rsi
-; X64-NEXT:    pop rbp
+; X64:         mov qword ptr [rdi], rsi
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_atomic_i64_monotonic>:
@@ -68,10 +56,7 @@ define void @store_atomic_i64_monotonic(ptr %p, i64 %v) {
 
 define void @store_atomic_i8_release(ptr %p, i8 %v) {
 ; X64-LABEL: <store_atomic_i8_release>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov byte ptr [rdi], sil
-; X64-NEXT:    pop rbp
+; X64:         mov byte ptr [rdi], sil
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_atomic_i8_release>:
@@ -83,10 +68,7 @@ define void @store_atomic_i8_release(ptr %p, i8 %v) {
 
 define void @store_atomic_i16_release(ptr %p, i16 %v) {
 ; X64-LABEL: <store_atomic_i16_release>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov word ptr [rdi], si
-; X64-NEXT:    pop rbp
+; X64:         mov word ptr [rdi], si
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_atomic_i16_release>:
@@ -98,10 +80,7 @@ define void @store_atomic_i16_release(ptr %p, i16 %v) {
 
 define void @store_atomic_i32_release(ptr %p, i32 %v) {
 ; X64-LABEL: <store_atomic_i32_release>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov dword ptr [rdi], esi
-; X64-NEXT:    pop rbp
+; X64:         mov dword ptr [rdi], esi
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_atomic_i32_release>:
@@ -113,10 +92,7 @@ define void @store_atomic_i32_release(ptr %p, i32 %v) {
 
 define void @store_atomic_i64_release(ptr %p, i64 %v) {
 ; X64-LABEL: <store_atomic_i64_release>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov qword ptr [rdi], rsi
-; X64-NEXT:    pop rbp
+; X64:         mov qword ptr [rdi], rsi
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_atomic_i64_release>:
@@ -129,10 +105,7 @@ define void @store_atomic_i64_release(ptr %p, i64 %v) {
 
 define void @store_atomic_i8_seq_cst(ptr %p, i8 %v) {
 ; X64-LABEL: <store_atomic_i8_seq_cst>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xchg byte ptr [rdi], sil
-; X64-NEXT:    pop rbp
+; X64:         xchg byte ptr [rdi], sil
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_atomic_i8_seq_cst>:
@@ -144,10 +117,7 @@ define void @store_atomic_i8_seq_cst(ptr %p, i8 %v) {
 
 define void @store_atomic_i16_seq_cst(ptr %p, i16 %v) {
 ; X64-LABEL: <store_atomic_i16_seq_cst>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xchg word ptr [rdi], si
-; X64-NEXT:    pop rbp
+; X64:         xchg word ptr [rdi], si
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_atomic_i16_seq_cst>:
@@ -159,10 +129,7 @@ define void @store_atomic_i16_seq_cst(ptr %p, i16 %v) {
 
 define void @store_atomic_i32_seq_cst(ptr %p, i32 %v) {
 ; X64-LABEL: <store_atomic_i32_seq_cst>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xchg dword ptr [rdi], esi
-; X64-NEXT:    pop rbp
+; X64:         xchg dword ptr [rdi], esi
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_atomic_i32_seq_cst>:
@@ -174,10 +141,7 @@ define void @store_atomic_i32_seq_cst(ptr %p, i32 %v) {
 
 define void @store_atomic_i64_seq_cst(ptr %p, i64 %v) {
 ; X64-LABEL: <store_atomic_i64_seq_cst>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xchg qword ptr [rdi], rsi
-; X64-NEXT:    pop rbp
+; X64:         xchg qword ptr [rdi], rsi
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <store_atomic_i64_seq_cst>:

@@ -13,11 +13,8 @@ target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16
 
 define i8 @load_i8(ptr %a) {
 ; X64-LABEL: <load_i8>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx edi, byte ptr [rdi]
+; X64:         movzx edi, byte ptr [rdi]
 ; X64-NEXT:    mov eax, edi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i8>:
@@ -30,12 +27,9 @@ entry:
 
 define i8 @load_i8_alt(ptr %a) {
 ; X64-LABEL: <load_i8_alt>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx eax, byte ptr [rdi]
+; X64:         movzx eax, byte ptr [rdi]
 ; X64-NEXT:    movzx edi, byte ptr [rdi]
 ; X64-NEXT:    mov eax, edi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i8_alt>:
@@ -51,11 +45,8 @@ entry:
 
 define i16 @load_i16(ptr %a) {
 ; X64-LABEL: <load_i16>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx edi, word ptr [rdi]
+; X64:         movzx edi, word ptr [rdi]
 ; X64-NEXT:    mov eax, edi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i16>:
@@ -68,12 +59,9 @@ entry:
 
 define i16 @load_i16_alt(ptr %a) {
 ; X64-LABEL: <load_i16_alt>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx eax, word ptr [rdi]
+; X64:         movzx eax, word ptr [rdi]
 ; X64-NEXT:    movzx edi, word ptr [rdi]
 ; X64-NEXT:    mov eax, edi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i16_alt>:
@@ -89,14 +77,11 @@ entry:
 
 define i24 @load_i24(ptr %a) {
 ; X64-LABEL: <load_i24>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx eax, word ptr [rdi]
+; X64:         movzx eax, word ptr [rdi]
 ; X64-NEXT:    movzx edi, byte ptr [rdi + 0x2]
 ; X64-NEXT:    shl edi, 0x10
 ; X64-NEXT:    or edi, eax
 ; X64-NEXT:    mov eax, edi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i24>:
@@ -139,9 +124,7 @@ entry:
 
 define i24 @load_i24_alt(ptr %a) {
 ; X64-LABEL: <load_i24_alt>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx eax, word ptr [rdi]
+; X64:         movzx eax, word ptr [rdi]
 ; X64-NEXT:    movzx ecx, byte ptr [rdi + 0x2]
 ; X64-NEXT:    shl ecx, 0x10
 ; X64-NEXT:    or ecx, eax
@@ -150,7 +133,6 @@ define i24 @load_i24_alt(ptr %a) {
 ; X64-NEXT:    shl edi, 0x10
 ; X64-NEXT:    or edi, eax
 ; X64-NEXT:    mov eax, edi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i24_alt>:
@@ -171,11 +153,8 @@ entry:
 
 define i32 @load_i32(ptr %a) {
 ; X64-LABEL: <load_i32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov edi, dword ptr [rdi]
+; X64:         mov edi, dword ptr [rdi]
 ; X64-NEXT:    mov eax, edi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i32>:
@@ -208,12 +187,9 @@ entry:
 
 define i32 @load_i32_alt(ptr %a) {
 ; X64-LABEL: <load_i32_alt>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, dword ptr [rdi]
+; X64:         mov eax, dword ptr [rdi]
 ; X64-NEXT:    mov edi, dword ptr [rdi]
 ; X64-NEXT:    mov eax, edi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i32_alt>:
@@ -228,12 +204,9 @@ entry:
 
 define i32 @load_i32_grep(ptr %a) {
 ; X64-LABEL: <load_i32_grep>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    lea rdi, [rdi + 0x10]
+; X64:         lea rdi, [rdi + 0x10]
 ; X64-NEXT:    mov eax, dword ptr [rdi]
 ; X64-NEXT:    mov edi, dword ptr [rdi]
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i32_grep>:
@@ -252,14 +225,11 @@ entry:
 
 define i40 @load_i40(ptr %a) {
 ; X64-LABEL: <load_i40>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, dword ptr [rdi]
+; X64:         mov eax, dword ptr [rdi]
 ; X64-NEXT:    movzx edi, byte ptr [rdi + 0x4]
 ; X64-NEXT:    shl rdi, 0x20
 ; X64-NEXT:    or rdi, rax
 ; X64-NEXT:    mov rax, rdi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i40>:
@@ -275,9 +245,7 @@ entry:
 
 define i40 @load_i40_alt(ptr %a) {
 ; X64-LABEL: <load_i40_alt>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, dword ptr [rdi]
+; X64:         mov eax, dword ptr [rdi]
 ; X64-NEXT:    movzx ecx, byte ptr [rdi + 0x4]
 ; X64-NEXT:    shl rcx, 0x20
 ; X64-NEXT:    or rcx, rax
@@ -286,7 +254,6 @@ define i40 @load_i40_alt(ptr %a) {
 ; X64-NEXT:    shl rdi, 0x20
 ; X64-NEXT:    or rdi, rax
 ; X64-NEXT:    mov rax, rdi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i40_alt>:
@@ -307,14 +274,11 @@ entry:
 
 define i48 @load_i48(ptr %a) {
 ; X64-LABEL: <load_i48>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, dword ptr [rdi]
+; X64:         mov eax, dword ptr [rdi]
 ; X64-NEXT:    movzx edi, word ptr [rdi + 0x4]
 ; X64-NEXT:    shl rdi, 0x20
 ; X64-NEXT:    or rdi, rax
 ; X64-NEXT:    mov rax, rdi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i48>:
@@ -330,9 +294,7 @@ entry:
 
 define i48 @load_i48_alt(ptr %a) {
 ; X64-LABEL: <load_i48_alt>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, dword ptr [rdi]
+; X64:         mov eax, dword ptr [rdi]
 ; X64-NEXT:    movzx ecx, word ptr [rdi + 0x4]
 ; X64-NEXT:    shl rcx, 0x20
 ; X64-NEXT:    or rcx, rax
@@ -341,7 +303,6 @@ define i48 @load_i48_alt(ptr %a) {
 ; X64-NEXT:    shl rdi, 0x20
 ; X64-NEXT:    or rdi, rax
 ; X64-NEXT:    mov rax, rdi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i48_alt>:
@@ -362,16 +323,13 @@ entry:
 
 define i56 @load_i56(ptr %a) {
 ; X64-LABEL: <load_i56>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx eax, word ptr [rdi + 0x4]
+; X64:         movzx eax, word ptr [rdi + 0x4]
 ; X64-NEXT:    movzx ecx, byte ptr [rdi + 0x6]
 ; X64-NEXT:    shl ecx, 0x10
 ; X64-NEXT:    or ecx, eax
 ; X64-NEXT:    shl rcx, 0x20
 ; X64-NEXT:    mov eax, dword ptr [rdi]
 ; X64-NEXT:    or rax, rcx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i56>:
@@ -419,9 +377,7 @@ entry:
 
 define i56 @load_i56_alt(ptr %a) {
 ; X64-LABEL: <load_i56_alt>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx eax, word ptr [rdi + 0x4]
+; X64:         movzx eax, word ptr [rdi + 0x4]
 ; X64-NEXT:    movzx ecx, byte ptr [rdi + 0x6]
 ; X64-NEXT:    shl ecx, 0x10
 ; X64-NEXT:    or ecx, eax
@@ -435,7 +391,6 @@ define i56 @load_i56_alt(ptr %a) {
 ; X64-NEXT:    shl rcx, 0x20
 ; X64-NEXT:    mov eax, dword ptr [rdi]
 ; X64-NEXT:    or rax, rcx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i56_alt>:
@@ -459,11 +414,8 @@ entry:
 
 define i64 @load_i64(ptr %a) {
 ; X64-LABEL: <load_i64>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rdi, qword ptr [rdi]
+; X64:         mov rdi, qword ptr [rdi]
 ; X64-NEXT:    mov rax, rdi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i64>:
@@ -496,12 +448,9 @@ entry:
 
 define i64 @load_i64_alt(ptr %a) {
 ; X64-LABEL: <load_i64_alt>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, qword ptr [rdi]
+; X64:         mov rax, qword ptr [rdi]
 ; X64-NEXT:    mov rdi, qword ptr [rdi]
 ; X64-NEXT:    mov rax, rdi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i64_alt>:
@@ -517,12 +466,9 @@ entry:
 
 define i128 @load_i128(ptr %a) {
 ; X64-LABEL: <load_i128>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, qword ptr [rdi]
+; X64:         mov rax, qword ptr [rdi]
 ; X64-NEXT:    mov rdi, qword ptr [rdi + 0x8]
 ; X64-NEXT:    mov rdx, rdi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i128>:
@@ -558,14 +504,11 @@ entry:
 
 define i128 @load_i128_alt(ptr %a) {
 ; X64-LABEL: <load_i128_alt>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, qword ptr [rdi]
+; X64:         mov rax, qword ptr [rdi]
 ; X64-NEXT:    mov rcx, qword ptr [rdi + 0x8]
 ; X64-NEXT:    mov rax, qword ptr [rdi]
 ; X64-NEXT:    mov rdi, qword ptr [rdi + 0x8]
 ; X64-NEXT:    mov rdx, rdi
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_i128_alt>:
@@ -581,10 +524,7 @@ entry:
 
 define float @load_float(ptr %a) {
 ; X64-LABEL: <load_float>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movss xmm0, dword ptr [rdi]
-; X64-NEXT:    pop rbp
+; X64:         movss xmm0, dword ptr [rdi]
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_float>:
@@ -617,11 +557,8 @@ entry:
 
 define float @load_float_alt(ptr %a) {
 ; X64-LABEL: <load_float_alt>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
+; X64:         movss xmm0, dword ptr [rdi]
 ; X64-NEXT:    movss xmm0, dword ptr [rdi]
-; X64-NEXT:    movss xmm0, dword ptr [rdi]
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_float_alt>:
@@ -637,10 +574,7 @@ entry:
 
 define double @load_double(ptr %a) {
 ; X64-LABEL: <load_double>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movsd xmm0, qword ptr [rdi]
-; X64-NEXT:    pop rbp
+; X64:         movsd xmm0, qword ptr [rdi]
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_double>:
@@ -653,11 +587,8 @@ entry:
 
 define double @load_double_alt(ptr %a) {
 ; X64-LABEL: <load_double_alt>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
+; X64:         movsd xmm0, qword ptr [rdi]
 ; X64-NEXT:    movsd xmm0, qword ptr [rdi]
-; X64-NEXT:    movsd xmm0, qword ptr [rdi]
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_double_alt>:
@@ -673,10 +604,7 @@ entry:
 
 define <4 x float> @load_4f(ptr %a) {
 ; X64-LABEL: <load_4f>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movups xmm0, xmmword ptr [rdi]
-; X64-NEXT:    pop rbp
+; X64:         movups xmm0, xmmword ptr [rdi]
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_4f>:
@@ -689,11 +617,8 @@ entry:
 
 define <4 x float> @load_4f_alt(ptr %a) {
 ; X64-LABEL: <load_4f_alt>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
+; X64:         movups xmm0, xmmword ptr [rdi]
 ; X64-NEXT:    movups xmm0, xmmword ptr [rdi]
-; X64-NEXT:    movups xmm0, xmmword ptr [rdi]
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_4f_alt>:
@@ -728,11 +653,8 @@ entry:
 
 define void @load_struct_i8_i1(ptr %0) {
 ; X64-LABEL: <load_struct_i8_i1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx eax, byte ptr [rdi]
+; X64:         movzx eax, byte ptr [rdi]
 ; X64-NEXT:    movzx ecx, byte ptr [rdi + 0x1]
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_struct_i8_i1>:
@@ -754,11 +676,8 @@ define void @load_struct_i8_i1(ptr %0) {
 
 define void @load_struct_i8_i8(ptr %0) {
 ; X64-LABEL: <load_struct_i8_i8>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx eax, byte ptr [rdi]
+; X64:         movzx eax, byte ptr [rdi]
 ; X64-NEXT:    movzx ecx, byte ptr [rdi + 0x1]
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_struct_i8_i8>:
@@ -780,11 +699,8 @@ define void @load_struct_i8_i8(ptr %0) {
 
 define void @load_struct_i8_i16(ptr %0) {
 ; X64-LABEL: <load_struct_i8_i16>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx eax, byte ptr [rdi]
+; X64:         movzx eax, byte ptr [rdi]
 ; X64-NEXT:    movzx ecx, word ptr [rdi + 0x2]
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_struct_i8_i16>:
@@ -806,11 +722,8 @@ define void @load_struct_i8_i16(ptr %0) {
 
 define void @load_struct_i8_i32(ptr %0) {
 ; X64-LABEL: <load_struct_i8_i32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx eax, byte ptr [rdi]
+; X64:         movzx eax, byte ptr [rdi]
 ; X64-NEXT:    mov ecx, dword ptr [rdi + 0x4]
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_struct_i8_i32>:
@@ -832,11 +745,8 @@ define void @load_struct_i8_i32(ptr %0) {
 
 define void @load_struct_i8_i64(ptr %0) {
 ; X64-LABEL: <load_struct_i8_i64>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx eax, byte ptr [rdi]
+; X64:         movzx eax, byte ptr [rdi]
 ; X64-NEXT:    mov rcx, qword ptr [rdi + 0x8]
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_struct_i8_i64>:
@@ -858,11 +768,8 @@ define void @load_struct_i8_i64(ptr %0) {
 
 define void @load_struct_i1_i32(ptr %0) {
 ; X64-LABEL: <load_struct_i1_i32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx eax, byte ptr [rdi]
+; X64:         movzx eax, byte ptr [rdi]
 ; X64-NEXT:    mov ecx, dword ptr [rdi + 0x4]
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_struct_i1_i32>:
@@ -884,11 +791,8 @@ define void @load_struct_i1_i32(ptr %0) {
 
 define void @load_struct_i16_i32(ptr %0) {
 ; X64-LABEL: <load_struct_i16_i32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx eax, word ptr [rdi]
+; X64:         movzx eax, word ptr [rdi]
 ; X64-NEXT:    mov ecx, dword ptr [rdi + 0x4]
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_struct_i16_i32>:
@@ -910,11 +814,8 @@ define void @load_struct_i16_i32(ptr %0) {
 
 define void @load_struct_i32_i32(ptr %0) {
 ; X64-LABEL: <load_struct_i32_i32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, dword ptr [rdi]
+; X64:         mov eax, dword ptr [rdi]
 ; X64-NEXT:    mov ecx, dword ptr [rdi + 0x4]
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_struct_i32_i32>:
@@ -936,11 +837,8 @@ define void @load_struct_i32_i32(ptr %0) {
 
 define void @load_struct_i64_i32(ptr %0) {
 ; X64-LABEL: <load_struct_i64_i32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, qword ptr [rdi]
+; X64:         mov rax, qword ptr [rdi]
 ; X64-NEXT:    mov ecx, dword ptr [rdi + 0x8]
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_struct_i64_i32>:
@@ -962,11 +860,8 @@ define void @load_struct_i64_i32(ptr %0) {
 
 define void @load_struct_ptr_i32(ptr %0) {
 ; X64-LABEL: <load_struct_ptr_i32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, qword ptr [rdi]
+; X64:         mov rax, qword ptr [rdi]
 ; X64-NEXT:    mov ecx, dword ptr [rdi + 0x8]
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_struct_ptr_i32>:
@@ -988,11 +883,8 @@ define void @load_struct_ptr_i32(ptr %0) {
 
 define void @load_struct_i32_ptr(ptr %0) {
 ; X64-LABEL: <load_struct_i32_ptr>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, dword ptr [rdi]
+; X64:         mov eax, dword ptr [rdi]
 ; X64-NEXT:    mov rcx, qword ptr [rdi + 0x8]
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_struct_i32_ptr>:
@@ -1014,11 +906,8 @@ define void @load_struct_i32_ptr(ptr %0) {
 
 define void @load_struct_f32_ptr(ptr %0) {
 ; X64-LABEL: <load_struct_f32_ptr>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movss xmm0, dword ptr [rdi]
+; X64:         movss xmm0, dword ptr [rdi]
 ; X64-NEXT:    mov rax, qword ptr [rdi + 0x8]
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_struct_f32_ptr>:
@@ -1040,12 +929,9 @@ define void @load_struct_f32_ptr(ptr %0) {
 
 define void @load_struct_i128_i1(ptr %0) {
 ; X64-LABEL: <load_struct_i128_i1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, qword ptr [rdi]
+; X64:         mov rax, qword ptr [rdi]
 ; X64-NEXT:    mov rcx, qword ptr [rdi + 0x8]
 ; X64-NEXT:    movzx edx, byte ptr [rdi + 0x10]
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_struct_i128_i1>:

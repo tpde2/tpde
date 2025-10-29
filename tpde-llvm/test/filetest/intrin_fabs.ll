@@ -11,11 +11,8 @@ declare double @llvm.fabs.f64(double)
 
 define float @fabsf32(float %0) {
 ; X64-LABEL: <fabsf32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    andps xmm0, xmmword ptr <fabsf32+0x4>
+; X64:         andps xmm0, xmmword ptr <fabsf32>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fabsf32>:
@@ -28,11 +25,8 @@ entry:
 
 define double @fabsf64(double %0) {
 ; X64-LABEL: <fabsf64>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    andps xmm0, xmmword ptr <fabsf64+0x4>
+; X64:         andps xmm0, xmmword ptr <fabsf64>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fabsf64>:
@@ -45,11 +39,8 @@ entry:
 
 define fp128 @fabsf128(fp128 %v) {
 ; X64-LABEL: <fabsf128>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    andps xmm0, xmmword ptr <fabsf128+0x4>
+; X64:         andps xmm0, xmmword ptr <fabsf128>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fabsf128>:

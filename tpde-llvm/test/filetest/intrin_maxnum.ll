@@ -7,9 +7,7 @@
 
 define float @maxnumf32(float %0, float %1) {
 ; X64-LABEL: <maxnumf32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movapd xmm2, xmm0
+; X64:         movapd xmm2, xmm0
 ; X64-NEXT:    cmpunordss xmm2, xmm0
 ; X64-NEXT:    movaps xmm3, xmm2
 ; X64-NEXT:    andps xmm3, xmm1
@@ -17,7 +15,6 @@ define float @maxnumf32(float %0, float %1) {
 ; X64-NEXT:    andnps xmm2, xmm1
 ; X64-NEXT:    orps xmm2, xmm3
 ; X64-NEXT:    movapd xmm0, xmm2
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <maxnumf32>:
@@ -29,9 +26,7 @@ define float @maxnumf32(float %0, float %1) {
 
 define double @maxnumf64(double %0, double %1) {
 ; X64-LABEL: <maxnumf64>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movapd xmm2, xmm0
+; X64:         movapd xmm2, xmm0
 ; X64-NEXT:    cmpunordsd xmm2, xmm0
 ; X64-NEXT:    movapd xmm3, xmm2
 ; X64-NEXT:    andpd xmm3, xmm1
@@ -39,7 +34,6 @@ define double @maxnumf64(double %0, double %1) {
 ; X64-NEXT:    andnpd xmm2, xmm1
 ; X64-NEXT:    orpd xmm2, xmm3
 ; X64-NEXT:    movapd xmm0, xmm2
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <maxnumf64>:
@@ -51,9 +45,7 @@ define double @maxnumf64(double %0, double %1) {
 
 define float @maxnumf32_noreuse(float %0, float %1) {
 ; X64-LABEL: <maxnumf32_noreuse>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movapd xmm2, xmm0
+; X64:         movapd xmm2, xmm0
 ; X64-NEXT:    cmpunordss xmm2, xmm0
 ; X64-NEXT:    movaps xmm3, xmm2
 ; X64-NEXT:    andps xmm3, xmm1
@@ -61,7 +53,6 @@ define float @maxnumf32_noreuse(float %0, float %1) {
 ; X64-NEXT:    andnps xmm2, xmm1
 ; X64-NEXT:    orps xmm2, xmm3
 ; X64-NEXT:    addss xmm0, xmm2
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <maxnumf32_noreuse>:
@@ -75,9 +66,7 @@ define float @maxnumf32_noreuse(float %0, float %1) {
 
 define double @maxnumf64_noreuse(double %0, double %1) {
 ; X64-LABEL: <maxnumf64_noreuse>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movapd xmm2, xmm0
+; X64:         movapd xmm2, xmm0
 ; X64-NEXT:    cmpunordsd xmm2, xmm0
 ; X64-NEXT:    movapd xmm3, xmm2
 ; X64-NEXT:    andpd xmm3, xmm1
@@ -85,7 +74,6 @@ define double @maxnumf64_noreuse(double %0, double %1) {
 ; X64-NEXT:    andnpd xmm2, xmm1
 ; X64-NEXT:    orpd xmm2, xmm3
 ; X64-NEXT:    addsd xmm0, xmm2
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <maxnumf64_noreuse>:

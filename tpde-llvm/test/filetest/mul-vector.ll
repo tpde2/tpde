@@ -7,15 +7,12 @@
 
 define <8 x i8> @mul_v8i8(<8 x i8> %a, <8 x i8> %b) {
 ; X64-LABEL: <mul_v8i8>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    punpcklbw {{.*#+}} xmm0 = xmm0[0,0,1,1,2,2,3,3,4,4,5,5,6,6,7,7]
+; X64:         punpcklbw {{.*#+}} xmm0 = xmm0[0,0,1,1,2,2,3,3,4,4,5,5,6,6,7,7]
 ; X64-NEXT:    punpcklbw {{.*#+}} xmm1 = xmm1[0,0,1,1,2,2,3,3,4,4,5,5,6,6,7,7]
 ; X64-NEXT:    pmullw xmm0, xmm1
-; X64-NEXT:    pand xmm0, xmmword ptr <mul_v8i8+0x10>
+; X64-NEXT:    pand xmm0, xmmword ptr <mul_v8i8+0xc>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    packuswb xmm0, xmm0
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <mul_v8i8>:
@@ -28,14 +25,12 @@ define <8 x i8> @mul_v8i8(<8 x i8> %a, <8 x i8> %b) {
 
 define <16 x i8> @mul_v16i8(<16 x i8> %a, <16 x i8> %b) {
 ; X64-LABEL: <mul_v16i8>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movapd xmm2, xmm0
+; X64:         movapd xmm2, xmm0
 ; X64-NEXT:    punpckhbw {{.*#+}} xmm2 = xmm2[8,8,9,9,10,10,11,11,12,12,13,13,14,14,15,15]
 ; X64-NEXT:    movapd xmm3, xmm1
 ; X64-NEXT:    punpckhbw {{.*#+}} xmm3 = xmm3[8,8,9,9,10,10,11,11,12,12,13,13,14,14,15,15]
 ; X64-NEXT:    pmullw xmm3, xmm2
-; X64-NEXT:    movdqa xmm2, xmmword ptr <mul_v16i8+0x18>
+; X64-NEXT:    movdqa xmm2, xmmword ptr <mul_v16i8+0x14>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    pand xmm3, xmm2
 ; X64-NEXT:    punpcklbw {{.*#+}} xmm0 = xmm0[0,0,1,1,2,2,3,3,4,4,5,5,6,6,7,7]
@@ -43,7 +38,6 @@ define <16 x i8> @mul_v16i8(<16 x i8> %a, <16 x i8> %b) {
 ; X64-NEXT:    pmullw xmm0, xmm1
 ; X64-NEXT:    pand xmm0, xmm2
 ; X64-NEXT:    packuswb xmm0, xmm3
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <mul_v16i8>:
@@ -56,10 +50,7 @@ define <16 x i8> @mul_v16i8(<16 x i8> %a, <16 x i8> %b) {
 
 define <4 x i16> @mul_v4i16(<4 x i16> %a, <4 x i16> %b) {
 ; X64-LABEL: <mul_v4i16>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    pmullw xmm0, xmm1
-; X64-NEXT:    pop rbp
+; X64:         pmullw xmm0, xmm1
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <mul_v4i16>:
@@ -72,10 +63,7 @@ define <4 x i16> @mul_v4i16(<4 x i16> %a, <4 x i16> %b) {
 
 define <8 x i16> @mul_v8i16(<8 x i16> %a, <8 x i16> %b) {
 ; X64-LABEL: <mul_v8i16>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    pmullw xmm0, xmm1
-; X64-NEXT:    pop rbp
+; X64:         pmullw xmm0, xmm1
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <mul_v8i16>:
@@ -88,15 +76,12 @@ define <8 x i16> @mul_v8i16(<8 x i16> %a, <8 x i16> %b) {
 
 define <2 x i32> @mul_v2i32(<2 x i32> %a, <2 x i32> %b) {
 ; X64-LABEL: <mul_v2i32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movapd xmm2, xmm0
+; X64:         movapd xmm2, xmm0
 ; X64-NEXT:    shufps {{.*#+}} xmm2 = xmm2[1,1,1,1]
 ; X64-NEXT:    pmuludq xmm0, xmm1
 ; X64-NEXT:    shufps {{.*#+}} xmm1 = xmm1[1,1,1,1]
 ; X64-NEXT:    pmuludq xmm1, xmm2
 ; X64-NEXT:    punpckldq {{.*#+}} xmm0 = xmm0[0],xmm1[0],xmm0[1],xmm1[1]
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <mul_v2i32>:
@@ -109,9 +94,7 @@ define <2 x i32> @mul_v2i32(<2 x i32> %a, <2 x i32> %b) {
 
 define <4 x i32> @mul_v4i32(<4 x i32> %a, <4 x i32> %b) {
 ; X64-LABEL: <mul_v4i32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    pshufd {{.*#+}} xmm2 = xmm1[1,1,3,3]
+; X64:         pshufd {{.*#+}} xmm2 = xmm1[1,1,3,3]
 ; X64-NEXT:    pmuludq xmm1, xmm0
 ; X64-NEXT:    pshufd {{.*#+}} xmm1 = xmm1[0,2,2,3]
 ; X64-NEXT:    pshufd {{.*#+}} xmm0 = xmm0[1,1,3,3]
@@ -119,7 +102,6 @@ define <4 x i32> @mul_v4i32(<4 x i32> %a, <4 x i32> %b) {
 ; X64-NEXT:    pshufd {{.*#+}} xmm0 = xmm0[0,2,2,3]
 ; X64-NEXT:    punpckldq {{.*#+}} xmm1 = xmm1[0],xmm0[0],xmm1[1],xmm0[1]
 ; X64-NEXT:    movapd xmm0, xmm1
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <mul_v4i32>:
@@ -132,9 +114,7 @@ define <4 x i32> @mul_v4i32(<4 x i32> %a, <4 x i32> %b) {
 
 define <2 x i64> @mul_v2i64(<2 x i64> %a, <2 x i64> %b) {
 ; X64-LABEL: <mul_v2i64>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movapd xmm2, xmm1
+; X64:         movapd xmm2, xmm1
 ; X64-NEXT:    psrlq xmm2, 0x20
 ; X64-NEXT:    pmuludq xmm2, xmm0
 ; X64-NEXT:    movapd xmm3, xmm0
@@ -144,7 +124,6 @@ define <2 x i64> @mul_v2i64(<2 x i64> %a, <2 x i64> %b) {
 ; X64-NEXT:    psllq xmm3, 0x20
 ; X64-NEXT:    pmuludq xmm0, xmm1
 ; X64-NEXT:    paddq xmm0, xmm3
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <mul_v2i64>:
@@ -163,13 +142,10 @@ define <2 x i64> @mul_v2i64(<2 x i64> %a, <2 x i64> %b) {
 
 define void @mul_v4i1(ptr %p, ptr %q) {
 ; X64-LABEL: <mul_v4i1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx eax, byte ptr [rdi]
+; X64:         movzx eax, byte ptr [rdi]
 ; X64-NEXT:    movzx esi, byte ptr [rsi]
 ; X64-NEXT:    and eax, esi
 ; X64-NEXT:    mov byte ptr [rdi], al
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <mul_v4i1>:
@@ -187,12 +163,9 @@ define void @mul_v4i1(ptr %p, ptr %q) {
 
 define void @mul_v4i1_const(ptr %p) {
 ; X64-LABEL: <mul_v4i1_const>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx eax, byte ptr [rdi]
+; X64:         movzx eax, byte ptr [rdi]
 ; X64-NEXT:    and eax, 0x5
 ; X64-NEXT:    mov byte ptr [rdi], al
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <mul_v4i1_const>:
@@ -209,13 +182,10 @@ define void @mul_v4i1_const(ptr %p) {
 
 define void @mul_v8i1(ptr %p, ptr %q) {
 ; X64-LABEL: <mul_v8i1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx eax, byte ptr [rdi]
+; X64:         movzx eax, byte ptr [rdi]
 ; X64-NEXT:    movzx esi, byte ptr [rsi]
 ; X64-NEXT:    and eax, esi
 ; X64-NEXT:    mov byte ptr [rdi], al
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <mul_v8i1>:
@@ -233,12 +203,9 @@ define void @mul_v8i1(ptr %p, ptr %q) {
 
 define void @mul_v8i1_const(ptr %p) {
 ; X64-LABEL: <mul_v8i1_const>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movzx eax, byte ptr [rdi]
+; X64:         movzx eax, byte ptr [rdi]
 ; X64-NEXT:    and eax, 0x55
 ; X64-NEXT:    mov byte ptr [rdi], al
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <mul_v8i1_const>:
@@ -255,13 +222,10 @@ define void @mul_v8i1_const(ptr %p) {
 
 define void @mul_v32i1(ptr %p, ptr %q) {
 ; X64-LABEL: <mul_v32i1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, dword ptr [rdi]
+; X64:         mov eax, dword ptr [rdi]
 ; X64-NEXT:    mov esi, dword ptr [rsi]
 ; X64-NEXT:    and eax, esi
 ; X64-NEXT:    mov dword ptr [rdi], eax
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <mul_v32i1>:
@@ -279,12 +243,9 @@ define void @mul_v32i1(ptr %p, ptr %q) {
 
 define void @mul_v32i1_const(ptr %p) {
 ; X64-LABEL: <mul_v32i1_const>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov eax, dword ptr [rdi]
+; X64:         mov eax, dword ptr [rdi]
 ; X64-NEXT:    and eax, 0x55555555
 ; X64-NEXT:    mov dword ptr [rdi], eax
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <mul_v32i1_const>:
@@ -300,13 +261,10 @@ define void @mul_v32i1_const(ptr %p) {
 
 define void @mul_v64i1(ptr %p, ptr %q) {
 ; X64-LABEL: <mul_v64i1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, qword ptr [rdi]
+; X64:         mov rax, qword ptr [rdi]
 ; X64-NEXT:    mov rsi, qword ptr [rsi]
 ; X64-NEXT:    and rax, rsi
 ; X64-NEXT:    mov qword ptr [rdi], rax
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <mul_v64i1>:
@@ -323,13 +281,10 @@ define void @mul_v64i1(ptr %p, ptr %q) {
 }
 define void @mul_v64i1_const(ptr %p) {
 ; X64-LABEL: <mul_v64i1_const>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, qword ptr [rdi]
+; X64:         mov rax, qword ptr [rdi]
 ; X64-NEXT:    movabs rcx, 0x5555555555555555
 ; X64-NEXT:    and rax, rcx
 ; X64-NEXT:    mov qword ptr [rdi], rax
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <mul_v64i1_const>:

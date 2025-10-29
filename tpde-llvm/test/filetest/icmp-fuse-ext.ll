@@ -7,12 +7,9 @@
 
 define i8 @icmp_fuse_zext8(i32, i32) {
 ; X64-LABEL: <icmp_fuse_zext8>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    cmp edi, esi
+; X64:         cmp edi, esi
 ; X64-NEXT:    mov eax, 0x0
 ; X64-NEXT:    setl al
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_fuse_zext8>:
@@ -26,12 +23,9 @@ define i8 @icmp_fuse_zext8(i32, i32) {
 
 define i32 @icmp_fuse_zext32(i32, i32) {
 ; X64-LABEL: <icmp_fuse_zext32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    cmp edi, esi
+; X64:         cmp edi, esi
 ; X64-NEXT:    mov eax, 0x0
 ; X64-NEXT:    setl al
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_fuse_zext32>:
@@ -45,12 +39,9 @@ define i32 @icmp_fuse_zext32(i32, i32) {
 
 define i64 @icmp_fuse_zexti64(i32, i32) {
 ; X64-LABEL: <icmp_fuse_zexti64>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    cmp edi, esi
+; X64:         cmp edi, esi
 ; X64-NEXT:    mov eax, 0x0
 ; X64-NEXT:    setl al
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_fuse_zexti64>:
@@ -64,14 +55,11 @@ define i64 @icmp_fuse_zexti64(i32, i32) {
 
 define i128 @icmp_fuse_zexti128(i32, i32) {
 ; X64-LABEL: <icmp_fuse_zexti128>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    cmp edi, esi
+; X64:         cmp edi, esi
 ; X64-NEXT:    setl al
 ; X64-NEXT:    and eax, 0x1
 ; X64-NEXT:    xor ecx, ecx
 ; X64-NEXT:    mov rdx, rcx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_fuse_zexti128>:
@@ -87,13 +75,10 @@ define i128 @icmp_fuse_zexti128(i32, i32) {
 
 define i8 @icmp_fuse_sext8(i32, i32) {
 ; X64-LABEL: <icmp_fuse_sext8>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    cmp edi, esi
+; X64:         cmp edi, esi
 ; X64-NEXT:    mov eax, 0x0
 ; X64-NEXT:    setl al
 ; X64-NEXT:    neg rax
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_fuse_sext8>:
@@ -107,13 +92,10 @@ define i8 @icmp_fuse_sext8(i32, i32) {
 
 define i32 @icmp_fuse_sext32(i32, i32) {
 ; X64-LABEL: <icmp_fuse_sext32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    cmp edi, esi
+; X64:         cmp edi, esi
 ; X64-NEXT:    mov eax, 0x0
 ; X64-NEXT:    setl al
 ; X64-NEXT:    neg rax
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_fuse_sext32>:
@@ -127,13 +109,10 @@ define i32 @icmp_fuse_sext32(i32, i32) {
 
 define i37 @icmp_fuse_sext37(i32, i32) {
 ; X64-LABEL: <icmp_fuse_sext37>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    cmp edi, esi
+; X64:         cmp edi, esi
 ; X64-NEXT:    mov eax, 0x0
 ; X64-NEXT:    setl al
 ; X64-NEXT:    neg rax
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_fuse_sext37>:
@@ -147,13 +126,10 @@ define i37 @icmp_fuse_sext37(i32, i32) {
 
 define i64 @icmp_fuse_sexti64(i32, i32) {
 ; X64-LABEL: <icmp_fuse_sexti64>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    cmp edi, esi
+; X64:         cmp edi, esi
 ; X64-NEXT:    mov eax, 0x0
 ; X64-NEXT:    setl al
 ; X64-NEXT:    neg rax
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_fuse_sexti64>:
@@ -167,16 +143,13 @@ define i64 @icmp_fuse_sexti64(i32, i32) {
 
 define i128 @icmp_fuse_sexti128(i32, i32) {
 ; X64-LABEL: <icmp_fuse_sexti128>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    cmp edi, esi
+; X64:         cmp edi, esi
 ; X64-NEXT:    setl al
 ; X64-NEXT:    shl rax, 0x3f
 ; X64-NEXT:    sar rax, 0x3f
 ; X64-NEXT:    mov rcx, rax
 ; X64-NEXT:    sar rcx, 0x3f
 ; X64-NEXT:    mov rdx, rcx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_fuse_sexti128>:
@@ -192,9 +165,7 @@ define i128 @icmp_fuse_sexti128(i32, i32) {
 
 define i64 @icmp_ext_nofuse(i32, i32) {
 ; X64-LABEL: <icmp_ext_nofuse>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    cmp edi, esi
+; X64:         cmp edi, esi
 ; X64-NEXT:    setl al
 ; X64-NEXT:    mov ecx, eax
 ; X64-NEXT:    and ecx, 0x1
@@ -202,7 +173,6 @@ define i64 @icmp_ext_nofuse(i32, i32) {
 ; X64-NEXT:    sar rax, 0x3f
 ; X64-NEXT:    xor rcx, rax
 ; X64-NEXT:    mov rax, rcx
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_ext_nofuse>:

@@ -7,12 +7,9 @@
 
 define float @vr_fadd_v1f32(float %s, ptr %p) {
 ; X64-LABEL: <vr_fadd_v1f32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movss xmm1, dword ptr [rdi]
+; X64:         movss xmm1, dword ptr [rdi]
 ; X64-NEXT:    movapd xmm2, xmm1
 ; X64-NEXT:    addss xmm0, xmm2
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <vr_fadd_v1f32>:
@@ -60,9 +57,7 @@ define float @vr_fadd_v4f32(float %s, ptr %p) {
 
 define float @vr_fadd_v5f32(float %s, ptr %p) {
 ; X64-LABEL: <vr_fadd_v5f32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movss xmm1, dword ptr [rdi]
+; X64:         movss xmm1, dword ptr [rdi]
 ; X64-NEXT:    movss xmm2, dword ptr [rdi + 0x4]
 ; X64-NEXT:    movss xmm3, dword ptr [rdi + 0x8]
 ; X64-NEXT:    movss xmm4, dword ptr [rdi + 0xc]
@@ -77,7 +72,6 @@ define float @vr_fadd_v5f32(float %s, ptr %p) {
 ; X64-NEXT:    addss xmm0, xmm6
 ; X64-NEXT:    movapd xmm6, xmm5
 ; X64-NEXT:    addss xmm0, xmm6
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <vr_fadd_v5f32>:
@@ -156,12 +150,9 @@ define float @vr_fadd_v8f32(float %s, ptr %p) {
 
 define double @vr_fadd_v1f64(double %s, ptr %p) {
 ; X64-LABEL: <vr_fadd_v1f64>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movsd xmm1, qword ptr [rdi]
+; X64:         movsd xmm1, qword ptr [rdi]
 ; X64-NEXT:    movapd xmm2, xmm1
 ; X64-NEXT:    addsd xmm0, xmm2
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <vr_fadd_v1f64>:
@@ -201,9 +192,7 @@ define double @vr_fadd_v2f64(double %s, ptr %p) {
 
 define double @vr_fadd_v5f64(double %s, ptr %p) {
 ; X64-LABEL: <vr_fadd_v5f64>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movsd xmm1, qword ptr [rdi]
+; X64:         movsd xmm1, qword ptr [rdi]
 ; X64-NEXT:    movsd xmm2, qword ptr [rdi + 0x8]
 ; X64-NEXT:    movsd xmm3, qword ptr [rdi + 0x10]
 ; X64-NEXT:    movsd xmm4, qword ptr [rdi + 0x18]
@@ -218,7 +207,6 @@ define double @vr_fadd_v5f64(double %s, ptr %p) {
 ; X64-NEXT:    addsd xmm0, xmm6
 ; X64-NEXT:    movapd xmm6, xmm5
 ; X64-NEXT:    addsd xmm0, xmm6
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <vr_fadd_v5f64>:

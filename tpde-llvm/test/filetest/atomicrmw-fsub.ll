@@ -7,9 +7,7 @@
 
 define float @atomicrmw_fsub_float_seq_cst(ptr %p, float %a) {
 ; X64-LABEL: <atomicrmw_fsub_float_seq_cst>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movd xmm1, dword ptr [rdi]
+; X64:         movd xmm1, dword ptr [rdi]
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    movd eax, xmm1
 ; X64-NEXT:    subss xmm1, xmm0
@@ -19,7 +17,6 @@ define float @atomicrmw_fsub_float_seq_cst(ptr %p, float %a) {
 ; X64-NEXT:    movd xmm1, eax
 ; X64-NEXT:    jne <L0>
 ; X64-NEXT:    movdqa xmm0, xmm1
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <atomicrmw_fsub_float_seq_cst>:
@@ -40,9 +37,7 @@ define float @atomicrmw_fsub_float_seq_cst(ptr %p, float %a) {
 
 define void @atomicrmw_fsub_float_seq_cst_nouse(ptr %p, float %a) {
 ; X64-LABEL: <atomicrmw_fsub_float_seq_cst_nouse>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movd xmm1, dword ptr [rdi]
+; X64:         movd xmm1, dword ptr [rdi]
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    movd eax, xmm1
 ; X64-NEXT:    subss xmm1, xmm0
@@ -52,7 +47,6 @@ define void @atomicrmw_fsub_float_seq_cst_nouse(ptr %p, float %a) {
 ; X64-NEXT:    movd xmm1, eax
 ; X64-NEXT:    jne <L0>
 ; X64-NEXT:    movdqa xmm0, xmm1
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <atomicrmw_fsub_float_seq_cst_nouse>:
@@ -73,9 +67,7 @@ define void @atomicrmw_fsub_float_seq_cst_nouse(ptr %p, float %a) {
 
 define double @atomicrmw_fsub_double_seq_cst(ptr %p, double %a) {
 ; X64-LABEL: <atomicrmw_fsub_double_seq_cst>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movq xmm1, qword ptr [rdi]
+; X64:         movq xmm1, qword ptr [rdi]
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    movq rax, xmm1
 ; X64-NEXT:    subsd xmm1, xmm0
@@ -85,7 +77,6 @@ define double @atomicrmw_fsub_double_seq_cst(ptr %p, double %a) {
 ; X64-NEXT:    movq xmm1, rax
 ; X64-NEXT:    jne <L0>
 ; X64-NEXT:    movdqa xmm0, xmm1
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <atomicrmw_fsub_double_seq_cst>:
@@ -106,9 +97,7 @@ define double @atomicrmw_fsub_double_seq_cst(ptr %p, double %a) {
 
 define void @atomicrmw_fsub_double_seq_cst_nouse(ptr %p, double %a) {
 ; X64-LABEL: <atomicrmw_fsub_double_seq_cst_nouse>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movq xmm1, qword ptr [rdi]
+; X64:         movq xmm1, qword ptr [rdi]
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    movq rax, xmm1
 ; X64-NEXT:    subsd xmm1, xmm0
@@ -118,7 +107,6 @@ define void @atomicrmw_fsub_double_seq_cst_nouse(ptr %p, double %a) {
 ; X64-NEXT:    movq xmm1, rax
 ; X64-NEXT:    jne <L0>
 ; X64-NEXT:    movdqa xmm0, xmm1
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <atomicrmw_fsub_double_seq_cst_nouse>:

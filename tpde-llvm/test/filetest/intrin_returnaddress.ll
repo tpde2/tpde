@@ -7,10 +7,7 @@
 
 define ptr @f0() {
 ; X64-LABEL: <f0>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    mov rax, qword ptr [rbp + 0x8]
-; X64-NEXT:    pop rbp
+; X64:         mov rax, qword ptr [rbp + 0x8]
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <f0>:
@@ -22,10 +19,7 @@ define ptr @f0() {
 
 define ptr @f1() {
 ; X64-LABEL: <f1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor eax, eax
-; X64-NEXT:    pop rbp
+; X64:         xor eax, eax
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <f1>:
@@ -37,10 +31,7 @@ define ptr @f1() {
 
 define ptr @f4() {
 ; X64-LABEL: <f4>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor eax, eax
-; X64-NEXT:    pop rbp
+; X64:         xor eax, eax
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <f4>:

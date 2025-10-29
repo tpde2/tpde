@@ -8,12 +8,9 @@
 
 define <8 x i8> @trunc_v8i16_8(<8 x i16> %v) {
 ; X64-LABEL: <trunc_v8i16_8>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    pand xmm0, xmmword ptr <trunc_v8i16_8+0x4>
+; X64:         pand xmm0, xmmword ptr <trunc_v8i16_8>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    packuswb xmm0, xmm0
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <trunc_v8i16_8>:
@@ -24,12 +21,9 @@ define <8 x i8> @trunc_v8i16_8(<8 x i16> %v) {
 }
 define <4 x i16> @trunc_v4i32_16(<4 x i32> %v) {
 ; X64-LABEL: <trunc_v4i32_16>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    pshuflw {{.*#+}} xmm0 = xmm0[0,2,2,3,4,5,6,7]
+; X64:         pshuflw {{.*#+}} xmm0 = xmm0[0,2,2,3,4,5,6,7]
 ; X64-NEXT:    pshufhw {{.*#+}} xmm0 = xmm0[0,1,2,3,4,6,6,7]
 ; X64-NEXT:    pshufd {{.*#+}} xmm0 = xmm0[0,2,2,3]
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <trunc_v4i32_16>:
@@ -40,10 +34,7 @@ define <4 x i16> @trunc_v4i32_16(<4 x i32> %v) {
 }
 define <2 x i32> @trunc_v2i64_32(<2 x i64> %v) {
 ; X64-LABEL: <trunc_v2i64_32>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    pshufd {{.*#+}} xmm0 = xmm0[0,2,2,3]
-; X64-NEXT:    pop rbp
+; X64:         pshufd {{.*#+}} xmm0 = xmm0[0,2,2,3]
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <trunc_v2i64_32>:
@@ -55,14 +46,11 @@ define <2 x i32> @trunc_v2i64_32(<2 x i64> %v) {
 
 define void @trunc_v8i8_1(ptr %p, <8 x i8> %a) {
 ; X64-LABEL: <trunc_v8i8_1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    punpcklbw {{.*#+}} xmm0 = xmm0[0,0,1,1,2,2,3,3,4,4,5,5,6,6,7,7]
+; X64:         punpcklbw {{.*#+}} xmm0 = xmm0[0,0,1,1,2,2,3,3,4,4,5,5,6,6,7,7]
 ; X64-NEXT:    psllw xmm0, 0xf
 ; X64-NEXT:    packsswb xmm0, xmm0
 ; X64-NEXT:    pmovmskb eax, xmm0
 ; X64-NEXT:    mov byte ptr [rdi], al
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <trunc_v8i8_1>:
@@ -84,12 +72,9 @@ define void @trunc_v8i8_1(ptr %p, <8 x i8> %a) {
 
 define void @trunc_v16i8_1(ptr %p, <16 x i8> %a) {
 ; X64-LABEL: <trunc_v16i8_1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    psllw xmm0, 0x7
+; X64:         psllw xmm0, 0x7
 ; X64-NEXT:    pmovmskb eax, xmm0
 ; X64-NEXT:    mov word ptr [rdi], ax
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <trunc_v16i8_1>:
@@ -113,15 +98,12 @@ define void @trunc_v16i8_1(ptr %p, <16 x i8> %a) {
 
 define void @trunc_v4i16_1(ptr %p, <4 x i16> %a) {
 ; X64-LABEL: <trunc_v4i16_1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    psllw xmm0, 0xf
-; X64-NEXT:    pand xmm0, xmmword ptr <trunc_v4i16_1+0x9>
+; X64:         psllw xmm0, 0xf
+; X64-NEXT:    pand xmm0, xmmword ptr <trunc_v4i16_1+0x5>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    packsswb xmm0, xmm0
 ; X64-NEXT:    pmovmskb eax, xmm0
 ; X64-NEXT:    mov byte ptr [rdi], al
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <trunc_v4i16_1>:
@@ -143,13 +125,10 @@ define void @trunc_v4i16_1(ptr %p, <4 x i16> %a) {
 
 define void @trunc_v8i16_1(ptr %p, <8 x i16> %a) {
 ; X64-LABEL: <trunc_v8i16_1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    psllw xmm0, 0xf
+; X64:         psllw xmm0, 0xf
 ; X64-NEXT:    packsswb xmm0, xmm0
 ; X64-NEXT:    pmovmskb eax, xmm0
 ; X64-NEXT:    mov byte ptr [rdi], al
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <trunc_v8i16_1>:
@@ -171,10 +150,8 @@ define void @trunc_v8i16_1(ptr %p, <8 x i16> %a) {
 
 define void @trunc_v2i32_1(ptr %p, <2 x i32> %a) {
 ; X64-LABEL: <trunc_v2i32_1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    punpckldq {{.*#+}} xmm0 = xmm0[0,0,1,1]
-; X64-NEXT:    pand xmm0, xmmword ptr <trunc_v2i32_1+0x8>
+; X64:         punpckldq {{.*#+}} xmm0 = xmm0[0,0,1,1]
+; X64-NEXT:    pand xmm0, xmmword ptr <trunc_v2i32_1+0x4>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    packssdw xmm0, xmm0
 ; X64-NEXT:    packssdw xmm0, xmm0
@@ -182,7 +159,6 @@ define void @trunc_v2i32_1(ptr %p, <2 x i32> %a) {
 ; X64-NEXT:    packsswb xmm0, xmm0
 ; X64-NEXT:    pmovmskb eax, xmm0
 ; X64-NEXT:    mov byte ptr [rdi], al
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <trunc_v2i32_1>:
@@ -204,16 +180,13 @@ define void @trunc_v2i32_1(ptr %p, <2 x i32> %a) {
 
 define void @trunc_v4i32_1(ptr %p, <4 x i32> %a) {
 ; X64-LABEL: <trunc_v4i32_1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    pshuflw {{.*#+}} xmm0 = xmm0[0,2,2,3,4,5,6,7]
+; X64:         pshuflw {{.*#+}} xmm0 = xmm0[0,2,2,3,4,5,6,7]
 ; X64-NEXT:    pshufhw {{.*#+}} xmm0 = xmm0[0,1,2,3,4,6,6,7]
 ; X64-NEXT:    pshufd {{.*#+}} xmm0 = xmm0[0,2,2,3]
 ; X64-NEXT:    psllw xmm0, 0xf
 ; X64-NEXT:    packsswb xmm0, xmm0
 ; X64-NEXT:    pmovmskb eax, xmm0
 ; X64-NEXT:    mov byte ptr [rdi], al
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <trunc_v4i32_1>:
@@ -235,15 +208,12 @@ define void @trunc_v4i32_1(ptr %p, <4 x i32> %a) {
 
 define void @trunc_v2i64_1(ptr %p, <2 x i64> %a) {
 ; X64-LABEL: <trunc_v2i64_1>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    pshufd {{.*#+}} xmm0 = xmm0[0,2,2,3]
+; X64:         pshufd {{.*#+}} xmm0 = xmm0[0,2,2,3]
 ; X64-NEXT:    pshuflw {{.*#+}} xmm0 = xmm0[0,2,2,3,4,5,6,7]
 ; X64-NEXT:    psllw xmm0, 0xf
 ; X64-NEXT:    packsswb xmm0, xmm0
 ; X64-NEXT:    pmovmskb eax, xmm0
 ; X64-NEXT:    mov byte ptr [rdi], al
-; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <trunc_v2i64_1>:

@@ -8,10 +8,7 @@
 
 define double @fpext_f32tof64(float %0) {
 ; X64-LABEL: <fpext_f32tof64>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    cvtss2sd xmm0, xmm0
-; X64-NEXT:    pop rbp
+; X64:         cvtss2sd xmm0, xmm0
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <fpext_f32tof64>:
