@@ -358,7 +358,7 @@ struct CompilerA64 : BaseTy<Adaptor, Derived, Config> {
   // prevent issues with exception handling
   u64 fixed_assignment_nonallocatable_mask =
       create_bitmask({AsmReg::R0, AsmReg::R1});
-  u32 func_start_off = 0u, func_prologue_alloc = 0u, func_epilogue_alloc = 0u;
+  u32 func_start_off = 0u, func_prologue_alloc = 0u;
   /// Offset to the `add sp, sp, XXX` instruction that the argument handling
   /// uses to access stack arguments if needed
   u32 func_arg_stack_add_off = ~0u;
@@ -779,11 +779,6 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::gen_func_prolog_and_args(
     func_prologue_alloc = reg_save_size + 12;
     this->text_writer.ensure_space(func_prologue_alloc);
     this->text_writer.cur_ptr() += func_prologue_alloc;
-    // ldp needs the same number of instructions as stp
-    // additionally, there's an add sp, ldp x29/x30, ret (+12)
-    func_epilogue_alloc = reg_save_size + 12;
-    // extra mov sp, fp
-    func_epilogue_alloc += this->stack.has_dynamic_alloca ? 4 : 0;
   }
 
   // TODO(ts): support larger stack alignments?
@@ -929,9 +924,6 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::finish_func(
     assert(final_frame_size < 16 * 1024 * 1024);
   }
 
-  u32 prologue_pad_offset = func_start_off;
-  u32 prologue_pad_size = func_prologue_alloc;
-
   bool needs_stack_frame =
       this->stack.frame_used || this->stack.generated_call ||
       this->stack.has_dynamic_alloca || saved_regs != 0 ||
@@ -939,6 +931,7 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::finish_func(
 
   this->text_writer.eh_begin_fde(this->get_personality_sym());
 
+  u32 prologue_size = 0;
   if (needs_stack_frame) [[likely]] {
     // NB: code alignment factor 4, data alignment factor -8.
     util::SmallVector<u32, 16> prologue;
@@ -1022,8 +1015,7 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::finish_func(
                 prologue.data(),
                 prologue.size() * sizeof(u32));
 
-    prologue_pad_offset += prologue.size() * sizeof(u32);
-    prologue_pad_size -= prologue.size() * sizeof(u32);
+    prologue_size = prologue.size() * sizeof(u32);
   }
 
   if (func_arg_stack_add_off != ~0u) {
@@ -1036,28 +1028,22 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::finish_func(
     }
   }
 
-  // TODO(ts): honor cur_needs_unwind_info
-  auto func_sym = this->func_syms[func_idx];
-  auto func_sec = this->text_writer.get_sec_ref();
+  if (!func_ret_offs.empty()) {
+    u8 *text_data = this->text_writer.begin_ptr();
+    if (func_ret_offs.back() == this->text_writer.offset() - 4) {
+      this->text_writer.cur_ptr() -= 4;
+      func_ret_offs.pop_back();
+    }
+    for (auto ret_off : func_ret_offs) {
+      u32 *write_ptr = reinterpret_cast<u32 *>(text_data + ret_off);
+      *write_ptr = de64_B((this->text_writer.offset() - ret_off) / 4);
+    }
 
-  if (func_ret_offs.empty()) {
-    this->text_writer.remove_prologue_bytes(prologue_pad_offset,
-                                            prologue_pad_size);
-    auto func_size = this->text_writer.offset() - func_start_off;
-    this->assembler.sym_def(func_sym, func_sec, func_start_off, func_size);
-    this->text_writer.eh_end_fde();
-    this->text_writer.except_encode_func();
-    return;
-  }
+    // Epilogue mirrors prologue + RET
+    this->text_writer.ensure_space(prologue_size + 4);
 
-  auto *text_data = this->text_writer.begin_ptr();
-  u32 first_ret_off = func_ret_offs[0];
-  u32 ret_size = 0;
-  {
-    u32 *write_ptr = reinterpret_cast<u32 *>(text_data + first_ret_off);
-    const auto ret_start = write_ptr;
     if (this->stack.has_dynamic_alloca) {
-      *write_ptr++ = de64_MOV_SPx(DA_SP, DA_GP(29));
+      ASMNC(MOV_SPx, DA_SP, DA_GP(29));
     }
 
     AsmReg last_reg = AsmReg::make_invalid();
@@ -1068,17 +1054,15 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::finish_func(
         const auto last_bank = this->register_file.reg_bank(last_reg);
         if (reg_bank == last_bank) {
           if (reg_bank == Config::GP_BANK) {
-            *write_ptr++ =
-                de64_LDPx(last_reg, AsmReg{reg}, stack_reg, frame_off);
+            ASMNC(LDPx, last_reg, AsmReg{reg}, stack_reg, frame_off);
           } else {
-            *write_ptr++ =
-                de64_LDPd(last_reg, AsmReg{reg}, stack_reg, frame_off);
+            ASMNC(LDPd, last_reg, AsmReg{reg}, stack_reg, frame_off);
           }
           frame_off += 16;
           last_reg = AsmReg::make_invalid();
         } else {
           assert(last_bank == Config::GP_BANK && reg_bank == Config::FP_BANK);
-          *write_ptr++ = de64_LDRxu(last_reg, stack_reg, frame_off);
+          ASMNC(LDRxu, last_reg, stack_reg, frame_off);
           frame_off += 8;
           last_reg = AsmReg{reg};
         }
@@ -1090,43 +1074,30 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::finish_func(
 
     if (last_reg.valid()) {
       if (this->register_file.reg_bank(last_reg) == Config::GP_BANK) {
-        *write_ptr++ = de64_LDRxu(last_reg, stack_reg, frame_off);
+        ASMNC(LDRxu, last_reg, stack_reg, frame_off);
       } else {
-        *write_ptr++ = de64_LDRdu(last_reg, stack_reg, frame_off);
+        ASMNC(LDRdu, last_reg, stack_reg, frame_off);
       }
     }
 
     if (needs_stack_frame) {
       if (final_frame_size <= 0x1f8) {
-        *write_ptr++ =
-            de64_LDPx_post(DA_GP(29), DA_GP(30), DA_SP, final_frame_size);
+        ASMNC(LDPx_post, DA_GP(29), DA_GP(30), DA_SP, final_frame_size);
       } else {
-        *write_ptr++ = de64_LDPx(DA_GP(29), DA_GP(30), DA_SP, 0);
-        *write_ptr++ = de64_ADDxi(DA_SP, DA_SP, final_frame_size);
+        ASMNC(LDPx, DA_GP(29), DA_GP(30), DA_SP, 0);
+        ASMNC(ADDxi, DA_SP, DA_SP, final_frame_size);
       }
     }
 
-    *write_ptr++ = de64_RET(DA_GP(30));
-
-    ret_size = (write_ptr - ret_start) * 4;
-    assert(ret_size <= func_epilogue_alloc);
-    std::memset(write_ptr, 0, func_epilogue_alloc - ret_size);
+    ASMNC(RET, DA_GP(30));
   }
 
-  for (u32 i = 1; i < func_ret_offs.size(); ++i) {
-    std::memcpy(text_data + func_ret_offs[i],
-                text_data + first_ret_off,
-                func_epilogue_alloc);
-  }
-
-  u32 func_end_ret_off = this->text_writer.offset() - func_epilogue_alloc;
-  if (func_ret_offs.back() == func_end_ret_off) {
-    this->text_writer.cur_ptr() -= func_epilogue_alloc - ret_size;
-  }
-
-  this->text_writer.remove_prologue_bytes(prologue_pad_offset,
-                                          prologue_pad_size);
+  // TODO(ts): honor cur_needs_unwind_info
+  this->text_writer.remove_prologue_bytes(func_start_off + prologue_size,
+                                          func_prologue_alloc - prologue_size);
   auto func_size = this->text_writer.offset() - func_start_off;
+  auto func_sym = this->func_syms[func_idx];
+  auto func_sec = this->text_writer.get_sec_ref();
   this->assembler.sym_def(func_sym, func_sec, func_start_off, func_size);
   this->text_writer.eh_end_fde();
   this->text_writer.except_encode_func();
@@ -1148,8 +1119,8 @@ template <IRAdaptor Adaptor,
 void CompilerA64<Adaptor, Derived, BaseTy, Config>::gen_func_epilog() noexcept {
   // Patched at the end, just reserve the space here.
   func_ret_offs.push_back(this->text_writer.offset());
-  this->text_writer.ensure_space(func_epilogue_alloc);
-  this->text_writer.cur_ptr() += func_epilogue_alloc;
+  this->text_writer.ensure_space(4); // Single branch to actual epilogue.
+  this->text_writer.cur_ptr() += 4;
 }
 
 template <IRAdaptor Adaptor,

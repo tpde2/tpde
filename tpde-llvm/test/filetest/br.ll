@@ -41,14 +41,11 @@ define i64 @condbr0(i64 %0, i1 %1) {
 ; X64-NEXT:    test sil, 0x1
 ; X64-NEXT:    je <L0>
 ; X64-NEXT:    mov rax, rbx
-; X64-NEXT:    pop rbx
-; X64-NEXT:    pop rbp
-; X64-NEXT:    ret
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    jmp <L1>
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    lea rbx, [rbx + 0xa]
 ; X64-NEXT:    mov rax, rbx
+; X64-NEXT:  <L1>:
 ; X64-NEXT:    pop rbx
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -59,12 +56,9 @@ define i64 @condbr0(i64 %0, i1 %1) {
 ; ARM64-NEXT:    str x19, [sp, #0x10]
 ; ARM64-NEXT:    mov x19, x0
 ; ARM64-NEXT:    tst w1, #0x1
-; ARM64-NEXT:    b.eq 0x6c <condbr0+0x4c>
+; ARM64-NEXT:    b.eq 0x40 <condbr0+0x20>
 ; ARM64-NEXT:    mov x0, x19
-; ARM64-NEXT:    ldr x19, [sp, #0x10]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
-; ARM64-NEXT:    ret
-; ARM64-NEXT:     ...
+; ARM64-NEXT:    b 0x48 <condbr0+0x28>
 ; ARM64-NEXT:    add x19, x19, #0xa
 ; ARM64-NEXT:    mov x0, x19
 ; ARM64-NEXT:    ldr x19, [sp, #0x10]
@@ -88,13 +82,10 @@ define i64 @condbr1(i64 %0, i1 %1) {
 ; X64-NEXT:    test sil, 0x1
 ; X64-NEXT:    jne <L0>
 ; X64-NEXT:    lea rax, [rbx + 0xa]
-; X64-NEXT:    pop rbx
-; X64-NEXT:    pop rbp
-; X64-NEXT:    ret
-; X64-NEXT:    nop word ptr [rax + rax]
-; X64-NEXT:    nop word ptr [rax + rax]
+; X64-NEXT:    jmp <L1>
 ; X64-NEXT:  <L0>:
 ; X64-NEXT:    mov rax, rbx
+; X64-NEXT:  <L1>:
 ; X64-NEXT:    pop rbx
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -105,12 +96,9 @@ define i64 @condbr1(i64 %0, i1 %1) {
 ; ARM64-NEXT:    str x19, [sp, #0x10]
 ; ARM64-NEXT:    mov x19, x0
 ; ARM64-NEXT:    tst w1, #0x1
-; ARM64-NEXT:    b.ne 0xcc <condbr1+0x4c>
+; ARM64-NEXT:    b.ne 0x80 <condbr1+0x20>
 ; ARM64-NEXT:    add x0, x19, #0xa
-; ARM64-NEXT:    ldr x19, [sp, #0x10]
-; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
-; ARM64-NEXT:    ret
-; ARM64-NEXT:     ...
+; ARM64-NEXT:    b 0x84 <condbr1+0x24>
 ; ARM64-NEXT:    mov x0, x19
 ; ARM64-NEXT:    ldr x19, [sp, #0x10]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0

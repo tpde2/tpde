@@ -338,7 +338,7 @@ struct CompilerX64 : BaseTy<Adaptor, Derived, Config> {
   // since they are clobbered there
   u64 fixed_assignment_nonallocatable_mask =
       create_bitmask({AsmReg::AX, AsmReg::DX, AsmReg::CX});
-  u32 func_start_off = 0u, func_prologue_alloc = 0u, func_epilogue_alloc = 0u;
+  u32 func_start_off = 0u, func_prologue_alloc = 0u;
   /// For vararg functions only: number of scalar and xmm registers used.
   // TODO: this information should be obtained from the CCAssigner.
   u32 scalar_arg_count = 0xFFFF'FFFF, vec_arg_count = 0xFFFF'FFFF;
@@ -602,9 +602,6 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::gen_func_prolog_and_args(
   func_prologue_alloc = reg_save_size + 11;
   this->text_writer.ensure_space(func_prologue_alloc);
   this->text_writer.cur_ptr() += func_prologue_alloc;
-  // pop has the same size as push; add/sub reg,imm32 and lea rsp, [rbp-imm32]
-  // have 7 bytes; pop rbp has 1 byte; ret has 1 byte.
-  func_epilogue_alloc = reg_save_size + 9;
 
   // TODO(ts): support larger stack alignments?
 
@@ -806,67 +803,37 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::finish_func(
         dwarf::DW_CFA_advance_loc | (prologue_size - 4);
   }
 
-  auto func_sym = this->func_syms[func_idx];
-  auto func_sec = this->text_writer.get_sec_ref();
-  if (func_ret_offs.empty()) {
-    // TODO(ts): honor cur_needs_unwind_info
-    this->text_writer.remove_prologue_bytes(
-        func_start_off + prologue_size, func_prologue_alloc - prologue_size);
-    auto func_size = this->text_writer.offset() - func_start_off;
-    this->assembler.sym_def(func_sym, func_sec, func_start_off, func_size);
-    this->text_writer.eh_end_fde();
-    this->text_writer.except_encode_func();
-    return;
-  }
+  if (!func_ret_offs.empty()) {
+    u8 *text_data = this->text_writer.begin_ptr();
+    if (func_ret_offs.back() == this->text_writer.offset() - 5) {
+      this->text_writer.cur_ptr() -= 5;
+      func_ret_offs.pop_back();
+    }
+    for (auto ret_off : func_ret_offs) {
+      fe64_JMP(text_data + ret_off, FE_JMPL, this->text_writer.cur_ptr());
+    }
 
-  auto *text_data = this->text_writer.begin_ptr();
-  u32 first_ret_off = func_ret_offs[0];
-  u32 ret_size = 0;
-  u32 epilogue_size = func_epilogue_alloc;
-  u32 func_end_ret_off = this->text_writer.offset() - epilogue_size;
-  {
-    u8 *write_ptr = text_data + first_ret_off;
-    const auto ret_start = write_ptr;
+    // Epilogue mirrors prologue (POP has the same size, ADD/LEA/MOV is not
+    // larger than SUB), but RET is 2B shorter than MOV RSP,RBP. However,
+    // prologue_size might be zero; for simplicity, over-allocate a few bytes.
+    this->text_writer.ensure_space(prologue_size + 1);
     if (needs_stack_frame) {
       if (this->stack.has_dynamic_alloca) {
         if (num_saved_regs == 0) {
-          write_ptr += fe64_MOV64rr(write_ptr, 0, FE_SP, FE_BP);
+          ASMNC(MOV64rr, FE_SP, FE_BP);
         } else {
-          write_ptr += fe64_LEA64rm(
-              write_ptr,
-              0,
-              FE_SP,
-              FE_MEM(FE_BP, 0, FE_NOREG, -(i32)num_saved_regs * 8));
+          i32 reg_save_size = num_saved_regs * 8;
+          ASMNC(LEA64rm, FE_SP, FE_MEM(FE_BP, 0, FE_NOREG, -reg_save_size));
         }
       } else if (rsp_adjustment != 0) {
-        write_ptr += fe64_ADD64ri(write_ptr, 0, FE_SP, rsp_adjustment);
+        ASMNC(ADD64ri, FE_SP, rsp_adjustment);
       }
       for (auto reg : util::BitSetIterator<true>{saved_regs}) {
-        assert(reg <= AsmReg::R15);
-        write_ptr +=
-            fe64_POPr(write_ptr, 0, AsmReg{static_cast<AsmReg::REG>(reg)});
+        ASMNC(POPr, AsmReg(reg));
       }
-      write_ptr += fe64_POPr(write_ptr, 0, FE_BP);
+      ASMNC(POPr, FE_BP);
     }
-    write_ptr += fe64_RET(write_ptr, 0);
-    ret_size = write_ptr - ret_start;
-    assert(ret_size <= epilogue_size && "function epilogue too long");
-
-    // write NOP for better disassembly
-    if (epilogue_size > ret_size) {
-      fe64_NOP(write_ptr, epilogue_size - ret_size);
-      if (first_ret_off == func_end_ret_off) {
-        this->text_writer.cur_ptr() -= epilogue_size - ret_size;
-      }
-    }
-  }
-
-  for (u32 i = 1; i < func_ret_offs.size(); ++i) {
-    std::memcpy(
-        text_data + func_ret_offs[i], text_data + first_ret_off, epilogue_size);
-    if (func_ret_offs[i] == func_end_ret_off) {
-      this->text_writer.cur_ptr() -= epilogue_size - ret_size;
-    }
+    ASMNC(RET);
   }
 
   // Do sym_def at the very end; we shorten the function here again, so only at
@@ -875,6 +842,8 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::finish_func(
   this->text_writer.remove_prologue_bytes(func_start_off + prologue_size,
                                           func_prologue_alloc - prologue_size);
   auto func_size = this->text_writer.offset() - func_start_off;
+  auto func_sym = this->func_syms[func_idx];
+  auto func_sec = this->text_writer.get_sec_ref();
   this->assembler.sym_def(func_sym, func_sec, func_start_off, func_size);
   this->text_writer.eh_end_fde();
   this->text_writer.except_encode_func();
@@ -897,8 +866,8 @@ template <IRAdaptor Adaptor,
 void CompilerX64<Adaptor, Derived, BaseTy, Config>::gen_func_epilog() noexcept {
   // Patched at the end, just reserve the space here.
   func_ret_offs.push_back(this->text_writer.offset());
-  this->text_writer.ensure_space(func_epilogue_alloc);
-  this->text_writer.cur_ptr() += func_epilogue_alloc;
+  this->text_writer.ensure_space(5); // JMP is 5 bytes
+  this->text_writer.cur_ptr() += 5;
 }
 
 template <IRAdaptor Adaptor,
