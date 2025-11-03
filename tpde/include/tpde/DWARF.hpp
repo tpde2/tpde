@@ -13,13 +13,22 @@ constexpr u8 DW_EH_PE_indirect = 0x80;
 constexpr u8 DW_EH_PE_sdata4 = 0x0b;
 constexpr u8 DW_EH_PE_omit = 0xff;
 
+constexpr u8 DW_CFA_advance_loc1 = 0x02;
+constexpr u8 DW_CFA_advance_loc2 = 0x03;
+constexpr u8 DW_CFA_advance_loc4 = 0x04;
 constexpr u8 DW_CFA_offset_extended = 0x05;
+constexpr u8 DW_CFA_restore_extended = 0x06;
+constexpr u8 DW_CFA_undefined = 0x07;
+constexpr u8 DW_CFA_same_value = 0x08;
+constexpr u8 DW_CFA_register = 0x09;
+constexpr u8 DW_CFA_remember_state = 0x0a;
+constexpr u8 DW_CFA_restore_state = 0x0b;
 constexpr u8 DW_CFA_def_cfa = 0x0c;
 constexpr u8 DW_CFA_def_cfa_register = 0x0d;
 constexpr u8 DW_CFA_def_cfa_offset = 0x0e;
-constexpr u8 DW_CFA_offset = 0x80;
 constexpr u8 DW_CFA_advance_loc = 0x40;
-constexpr u8 DW_CFA_advance_loc4 = 0x04;
+constexpr u8 DW_CFA_offset = 0x80;
+constexpr u8 DW_CFA_restore = 0xc0;
 
 constexpr u8 DWARF_CFI_PRIMARY_OPCODE_MASK = 0xc0;
 

@@ -45,6 +45,7 @@ entry:
 define @add2(%a, %b) {
 ; EH-LABEL: FDE cie=00000000 pc=00000010...00000170
 ; EH-NEXT: Format:       DWARF32
+; EH-NEXT: DW_CFA_remember_state:
 ; EH-NEXT: DW_CFA_advance_loc: 4 to 0x14
 ; EH-NEXT: DW_CFA_def_cfa_offset: +208
 ; EH-NEXT: DW_CFA_advance_loc: 24 to 0x2c
@@ -61,6 +62,12 @@ define @add2(%a, %b) {
 ; EH-NEXT: DW_CFA_offset: W26 -136
 ; EH-NEXT: DW_CFA_offset: W27 -128
 ; EH-NEXT: DW_CFA_offset: W28 -120
+; EH-NEXT: DW_CFA_advance_loc1: 320 to 0x16c
+; EH-NEXT: DW_CFA_restore_state:
+; EH-NEXT: DW_CFA_nop:
+; EH-NEXT: DW_CFA_nop:
+; EH-NEXT: DW_CFA_nop:
+; EH-NEXT: DW_CFA_nop:
 ; EH-EMPTY:
 ; ASM-LABEL: <add2>:
 ; ASM:         10: stp x29, x30, [sp, #-0xd0]!
@@ -392,10 +399,17 @@ define @add4(%a, %b) {
 ; EH-NEXT: Format:       DWARF32
 ; EH-NEXT: DW_CFA_advance_loc: 4 to 0x2c4
 ; EH-NEXT: DW_CFA_def_cfa_offset: +1184
+; EH-NEXT: DW_CFA_remember_state:
 ; EH-NEXT: DW_CFA_advance_loc: 8 to 0x2cc
 ; EH-NEXT: DW_CFA_def_cfa_register: W29
 ; EH-NEXT: DW_CFA_offset: W29 -1184
 ; EH-NEXT: DW_CFA_offset: W30 -1176
+; EH-NEXT: DW_CFA_advance_loc: 12 to 0x2d8
+; EH-NEXT: DW_CFA_restore_state:
+; EH-NEXT: DW_CFA_advance_loc: 4 to 0x2dc
+; EH-NEXT: DW_CFA_def_cfa_offset: +0
+; EH-NEXT: DW_CFA_nop:
+; EH-NEXT: DW_CFA_nop:
 ; EH-NEXT: DW_CFA_nop:
 ; EH-NEXT: DW_CFA_nop:
 ; EH-EMPTY:
@@ -468,15 +482,15 @@ entry:
 define @add7(%a, %b) {
 ; EH-LABEL: FDE cie=00000000 pc=00000320...00000338
 ; EH-NEXT: Format:       DWARF32
+; EH-NEXT: DW_CFA_remember_state:
 ; EH-NEXT: DW_CFA_advance_loc: 4 to 0x324
 ; EH-NEXT: DW_CFA_def_cfa_offset: +176
 ; EH-NEXT: DW_CFA_advance_loc: 4 to 0x328
 ; EH-NEXT: DW_CFA_def_cfa_register: W29
 ; EH-NEXT: DW_CFA_offset: W29 -176
 ; EH-NEXT: DW_CFA_offset: W30 -168
-; EH-NEXT: DW_CFA_nop:
-; EH-NEXT: DW_CFA_nop:
-; EH-NEXT: DW_CFA_nop:
+; EH-NEXT: DW_CFA_advance_loc: 12 to 0x334
+; EH-NEXT: DW_CFA_restore_state:
 ; EH-NEXT: DW_CFA_nop:
 ; EH-EMPTY:
 ; ASM-LABEL: <add7>:

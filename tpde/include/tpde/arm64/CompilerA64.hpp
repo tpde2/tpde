@@ -6,6 +6,7 @@
 #include "tpde/AssemblerElf.hpp"
 #include "tpde/AssignmentPartRef.hpp"
 #include "tpde/CompilerBase.hpp"
+#include "tpde/DWARF.hpp"
 #include "tpde/arm64/FunctionWriterA64.hpp"
 #include "tpde/base.hpp"
 #include "tpde/util/SmallVector.hpp"
@@ -935,6 +936,14 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::finish_func(
   if (needs_stack_frame) [[likely]] {
     // NB: code alignment factor 4, data alignment factor -8.
     util::SmallVector<u32, 16> prologue;
+    // For small stack frames, remember the state at the very beginning, which
+    // is identical to the state after the post-increment LDP. For large stack
+    // frames, remember the state after the SP adjustment (encoding the
+    // corresponding DW_def_cfa SP, framesize would be >=3 bytes; this way we
+    // can get away with a DW_def_cfa_offset 0 after the ADD).
+    if (!func_ret_offs.empty() && final_frame_size <= 0x1f8) {
+      this->text_writer.eh_write_inst(dwarf::DW_CFA_remember_state);
+    }
     this->text_writer.eh_write_inst(dwarf::DW_CFA_advance_loc, 1);
     this->text_writer.eh_write_inst(dwarf::DW_CFA_def_cfa_offset,
                                     final_frame_size);
@@ -943,6 +952,9 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::finish_func(
           de64_STPx_pre(DA_GP(29), DA_GP(30), DA_SP, -int(final_frame_size)));
       prologue.push_back(de64_MOV_SPx(DA_GP(29), DA_SP));
     } else {
+      if (!func_ret_offs.empty()) {
+        this->text_writer.eh_write_inst(dwarf::DW_CFA_remember_state);
+      }
       prologue.push_back(de64_SUBxi(DA_SP, DA_SP, final_frame_size));
       prologue.push_back(de64_STPx(DA_GP(29), DA_GP(30), DA_SP, 0));
       prologue.push_back(de64_MOV_SPx(DA_GP(29), DA_SP));
@@ -1079,13 +1091,19 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::finish_func(
         ASMNC(LDRdu, last_reg, stack_reg, frame_off);
       }
     }
-
     if (needs_stack_frame) {
+      u32 body_start = func_start_off + func_prologue_alloc;
+      this->text_writer.eh_advance(this->text_writer.offset() - body_start + 4);
+      this->text_writer.eh_write_inst(dwarf::DW_CFA_restore_state);
       if (final_frame_size <= 0x1f8) {
         ASMNC(LDPx_post, DA_GP(29), DA_GP(30), DA_SP, final_frame_size);
+        // CFI is correct here.
       } else {
         ASMNC(LDPx, DA_GP(29), DA_GP(30), DA_SP, 0);
+        // CFI is correct here, but we need to update the CFA after the ADD.
         ASMNC(ADDxi, DA_SP, DA_SP, final_frame_size);
+        this->text_writer.eh_write_inst(dwarf::DW_CFA_advance_loc, 1);
+        this->text_writer.eh_write_inst(dwarf::DW_CFA_def_cfa_offset, 0);
       }
     }
 

@@ -49,7 +49,6 @@ Unsupported features currently include:
 - IFuncs.
 - Various forms of constant expressions in global initializers.
 - Non-empty inline assembly.
-- Full asynchronous unwind info (frame info only correct in prologue and at call sites).
 - Several corner cases that we didn't encounter so far.
 
 ## Vector Support

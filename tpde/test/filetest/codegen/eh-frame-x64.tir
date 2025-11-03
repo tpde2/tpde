@@ -46,6 +46,7 @@ entry:
 define @add2(%a, %b) {
 ; EH-LABEL: FDE cie=00000000 pc=00000010...000001dd
 ; EH-NEXT: Format:       DWARF32
+; EH-NEXT: DW_CFA_remember_state:
 ; EH-NEXT: DW_CFA_advance_loc: 1 to 0x11
 ; EH-NEXT: DW_CFA_def_cfa_offset: +16
 ; EH-NEXT: DW_CFA_offset: RBP -16
@@ -57,6 +58,11 @@ define @add2(%a, %b) {
 ; EH-NEXT: DW_CFA_offset: R13 -40
 ; EH-NEXT: DW_CFA_offset: R14 -48
 ; EH-NEXT: DW_CFA_offset: R15 -56
+; EH-NEXT: DW_CFA_advance_loc2: 440 to 0x1dc
+; EH-NEXT: DW_CFA_restore_state:
+; EH-NEXT: DW_CFA_nop:
+; EH-NEXT: DW_CFA_nop:
+; EH-NEXT: DW_CFA_nop:
 ; EH-NEXT: DW_CFA_nop:
 ; EH-NEXT: DW_CFA_nop:
 ; EH-NEXT: DW_CFA_nop:
@@ -450,14 +456,14 @@ entry:
 define @add4(%a, %b) {
 ; EH-LABEL: FDE cie=00000000 pc=000003a0...000003bf
 ; EH-NEXT: Format:       DWARF32
+; EH-NEXT: DW_CFA_remember_state:
 ; EH-NEXT: DW_CFA_advance_loc: 1 to 0x3a1
 ; EH-NEXT: DW_CFA_def_cfa_offset: +16
 ; EH-NEXT: DW_CFA_offset: RBP -16
 ; EH-NEXT: DW_CFA_advance_loc: 3 to 0x3a4
 ; EH-NEXT: DW_CFA_def_cfa_register: RBP
-; EH-NEXT: DW_CFA_advance_loc: 7 to 0x3ab
-; EH-NEXT: DW_CFA_nop:
-; EH-NEXT: DW_CFA_nop:
+; EH-NEXT: DW_CFA_advance_loc: 19 to 0x3b7
+; EH-NEXT: DW_CFA_restore_state:
 ; EH-NEXT: DW_CFA_nop:
 ; EH-NEXT: DW_CFA_nop:
 ; EH-NEXT: DW_CFA_nop:
@@ -487,7 +493,7 @@ define @add5(%a, %b) {
 ; EH-NEXT: DW_CFA_offset: RBP -16
 ; EH-NEXT: DW_CFA_advance_loc: 3 to 0x3c4
 ; EH-NEXT: DW_CFA_def_cfa_register: RBP
-; EH-NEXT: DW_CFA_advance_loc: 7 to 0x3cb
+; EH-NEXT: DW_CFA_nop:
 ; EH-NEXT: DW_CFA_nop:
 ; EH-NEXT: DW_CFA_nop:
 ; EH-NEXT: DW_CFA_nop:
@@ -517,7 +523,7 @@ define @add6(%a, %b) {
 ; EH-NEXT: DW_CFA_offset: RBP -16
 ; EH-NEXT: DW_CFA_advance_loc: 3 to 0x3e4
 ; EH-NEXT: DW_CFA_def_cfa_register: RBP
-; EH-NEXT: DW_CFA_advance_loc: 0 to 0x3e4
+; EH-NEXT: DW_CFA_nop:
 ; EH-NEXT: DW_CFA_nop:
 ; EH-NEXT: DW_CFA_nop:
 ; EH-NEXT: DW_CFA_nop:
@@ -541,14 +547,14 @@ entry:
 define @add7(%a, %b) {
 ; EH-LABEL: FDE cie=00000000 pc=000003f0...000003fe
 ; EH-NEXT: Format:       DWARF32
+; EH-NEXT: DW_CFA_remember_state:
 ; EH-NEXT: DW_CFA_advance_loc: 1 to 0x3f1
 ; EH-NEXT: DW_CFA_def_cfa_offset: +16
 ; EH-NEXT: DW_CFA_offset: RBP -16
 ; EH-NEXT: DW_CFA_advance_loc: 3 to 0x3f4
 ; EH-NEXT: DW_CFA_def_cfa_register: RBP
-; EH-NEXT: DW_CFA_advance_loc: 0 to 0x3f4
-; EH-NEXT: DW_CFA_nop:
-; EH-NEXT: DW_CFA_nop:
+; EH-NEXT: DW_CFA_advance_loc: 9 to 0x3fd
+; EH-NEXT: DW_CFA_restore_state:
 ; EH-NEXT: DW_CFA_nop:
 ; EH-NEXT: DW_CFA_nop:
 ; EH-NEXT: DW_CFA_nop:

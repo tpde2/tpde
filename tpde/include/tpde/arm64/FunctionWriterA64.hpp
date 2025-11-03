@@ -54,6 +54,8 @@ public:
     }
   }
 
+  void eh_advance(u64 size) noexcept { eh_advance_raw(size / 4); }
+
 private:
   void handle_fixups() noexcept;
 };

@@ -228,8 +228,13 @@ public:
   }
 
   void eh_align_frame() noexcept;
+  void eh_write_inst(u8 opcode) noexcept { this->eh_writer.write<u8>(opcode); }
   void eh_write_inst(u8 opcode, u64 arg) noexcept;
   void eh_write_inst(u8 opcode, u64 first_arg, u64 second_arg) noexcept;
+  /// Write CFA_advance_loc; size must be scaled by code alignment factor.
+  void eh_advance_raw(u64 size_units) noexcept;
+  /// Write CFA_advance_loc with code alignment factor 1.
+  void eh_advance(u64 size) noexcept { eh_advance_raw(size); }
 
 private:
   void eh_init_cie(SymRef personality_func_addr = SymRef()) noexcept;

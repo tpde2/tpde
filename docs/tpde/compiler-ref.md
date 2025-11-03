@@ -718,7 +718,7 @@ this->free_stack_slot(slot, /* size_bytes = */ 8);
 - handles generating an object file and unwind information
 - configured using the compiler config, instance stored in CompilerBase
 - currently only x86-64 and AArch64 Linux ELF supported
-- unwind info is synchronous
+- Unwind info is asynchronous.
 - supports generating C++ exception information
 
 ### Sections

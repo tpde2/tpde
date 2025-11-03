@@ -728,6 +728,9 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::finish_func(
   this->text_writer.eh_begin_fde(this->get_personality_sym());
 
   if (needs_stack_frame) {
+    if (!func_ret_offs.empty()) {
+      this->text_writer.eh_write_inst(dwarf::DW_CFA_remember_state);
+    }
     // push rbp
     this->text_writer.eh_write_inst(dwarf::DW_CFA_advance_loc, 1);
     this->text_writer.eh_write_inst(dwarf::DW_CFA_def_cfa_offset, 16);
@@ -740,7 +743,9 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::finish_func(
 
     // Patched below
     auto fde_prologue_adv_off = this->text_writer.eh_writer.size();
-    this->text_writer.eh_write_inst(dwarf::DW_CFA_advance_loc, 0);
+    if (saved_regs != 0) {
+      this->text_writer.eh_write_inst(dwarf::DW_CFA_advance_loc, 0);
+    }
 
     auto *write_ptr = this->text_writer.begin_ptr() + func_start_off;
     write_ptr += fe64_PUSHr(write_ptr, 0, FE_BP);
@@ -798,9 +803,11 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::finish_func(
     prologue_size =
         write_ptr - (this->text_writer.begin_ptr() + func_start_off);
     assert(prologue_size <= func_prologue_alloc);
-    assert(prologue_size < 0x44 && "cannot encode too large prologue in DWARF");
-    this->text_writer.eh_writer.data()[fde_prologue_adv_off] =
-        dwarf::DW_CFA_advance_loc | (prologue_size - 4);
+    if (saved_regs != 0) {
+      assert(prologue_size < 0x44 && "cannot encode too large prologue in CFI");
+      this->text_writer.eh_writer.data()[fde_prologue_adv_off] =
+          dwarf::DW_CFA_advance_loc | (prologue_size - 4);
+    }
   }
 
   if (!func_ret_offs.empty()) {
@@ -828,10 +835,18 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::finish_func(
       } else if (rsp_adjustment != 0) {
         ASMNC(ADD64ri, FE_SP, rsp_adjustment);
       }
+      // TODO: if the calling convention doesn't guarantee a red zone, we must
+      // emit a CFA_restore for every single pop instruction.
+      assert(ccinfo.red_zone_size >= num_saved_regs * 8 &&
+             "unwind info incorrect for calling conv without red zone");
       for (auto reg : util::BitSetIterator<true>{saved_regs}) {
         ASMNC(POPr, AsmReg(reg));
       }
       ASMNC(POPr, FE_BP);
+
+      u32 body_start = func_start_off + func_prologue_alloc;
+      this->text_writer.eh_advance(this->text_writer.offset() - body_start);
+      this->text_writer.eh_write_inst(dwarf::DW_CFA_restore_state);
     }
     ASMNC(RET);
   }

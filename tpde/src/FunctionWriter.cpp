@@ -85,6 +85,23 @@ void FunctionWriterBase::eh_write_inst(const u8 opcode,
   eh_writer.write_uleb(second_arg);
 }
 
+void FunctionWriterBase::eh_advance_raw(u64 size_units) noexcept {
+  if (size_units < 0x40) {
+    eh_writer.write<u8>(dwarf::DW_CFA_advance_loc | size_units);
+  } else if (size_units <= UINT8_MAX) {
+    eh_writer.write<u8>(dwarf::DW_CFA_advance_loc1);
+    eh_writer.write<u8>(size_units);
+  } else if (size_units <= UINT16_MAX) {
+    eh_writer.write<u8>(dwarf::DW_CFA_advance_loc2);
+    eh_writer.write<u16>(size_units);
+  } else if (size_units <= UINT32_MAX) {
+    eh_writer.write<u8>(dwarf::DW_CFA_advance_loc4);
+    eh_writer.write<u32>(size_units);
+  } else {
+    TPDE_UNREACHABLE("CFI advance beyond 32 bits");
+  }
+}
+
 void FunctionWriterBase::eh_init_cie(SymRef personality_func_addr) noexcept {
   // write out the initial CIE
 
