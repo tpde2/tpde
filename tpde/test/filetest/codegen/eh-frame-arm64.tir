@@ -7,7 +7,7 @@
 
 ; NOTE: EH checks must be updated manually.
 
-; EH: 00000000 00000014 00000000 CIE
+; EH: 00000000 00000010 00000000 CIE
 ; EH-NEXT:   Format:                DWARF32
 ; EH-NEXT:   Version:               1
 ; EH-NEXT:   Augmentation:          "zR"
@@ -17,19 +17,11 @@
 ; EH-NEXT:   Augmentation data:     1B
 ; EH-EMPTY:
 ; EH-NEXT:   DW_CFA_def_cfa: WSP +0
-; EH-NEXT:   DW_CFA_nop:
-; EH-NEXT:   DW_CFA_nop:
-; EH-NEXT:   DW_CFA_nop:
-; EH-NEXT:   DW_CFA_nop:
 ; EH-EMPTY:
 
 define @add1(%a, %b) {
 ; EH-LABEL: FDE cie=00000000 pc=00000000...00000008
 ; EH-NEXT:   Format:       DWARF32
-; EH-NEXT:   DW_CFA_nop:
-; EH-NEXT:   DW_CFA_nop:
-; EH-NEXT:   DW_CFA_nop:
-; EH-NEXT:   DW_CFA_nop:
 ; EH-NEXT:   DW_CFA_nop:
 ; EH-NEXT:   DW_CFA_nop:
 ; EH-NEXT:   DW_CFA_nop:
@@ -64,10 +56,6 @@ define @add2(%a, %b) {
 ; EH-NEXT: DW_CFA_offset: W28 -120
 ; EH-NEXT: DW_CFA_advance_loc1: 320 to 0x16c
 ; EH-NEXT: DW_CFA_restore_state:
-; EH-NEXT: DW_CFA_nop:
-; EH-NEXT: DW_CFA_nop:
-; EH-NEXT: DW_CFA_nop:
-; EH-NEXT: DW_CFA_nop:
 ; EH-EMPTY:
 ; ASM-LABEL: <add2>:
 ; ASM:         10: stp x29, x30, [sp, #-0xd0]!
@@ -408,10 +396,6 @@ define @add4(%a, %b) {
 ; EH-NEXT: DW_CFA_restore_state:
 ; EH-NEXT: DW_CFA_advance_loc: 4 to 0x2dc
 ; EH-NEXT: DW_CFA_def_cfa_offset: +0
-; EH-NEXT: DW_CFA_nop:
-; EH-NEXT: DW_CFA_nop:
-; EH-NEXT: DW_CFA_nop:
-; EH-NEXT: DW_CFA_nop:
 ; EH-EMPTY:
 ; ASM-LABEL: <add4>:
 ; ASM:         2c0: sub sp, sp, #0x4a0
@@ -462,10 +446,6 @@ define @add6(%a, %b) {
 ; EH-NEXT: DW_CFA_def_cfa_register: W29
 ; EH-NEXT: DW_CFA_offset: W29 -176
 ; EH-NEXT: DW_CFA_offset: W30 -168
-; EH-NEXT: DW_CFA_nop:
-; EH-NEXT: DW_CFA_nop:
-; EH-NEXT: DW_CFA_nop:
-; EH-NEXT: DW_CFA_nop:
 ; EH-EMPTY:
 ; ASM-LABEL: <add6>:
 ; ASM:         300: stp x29, x30, [sp, #-0xb0]!
@@ -491,6 +471,10 @@ define @add7(%a, %b) {
 ; EH-NEXT: DW_CFA_offset: W30 -168
 ; EH-NEXT: DW_CFA_advance_loc: 12 to 0x334
 ; EH-NEXT: DW_CFA_restore_state:
+; EH-NEXT: DW_CFA_nop:
+; EH-NEXT: DW_CFA_nop:
+; EH-NEXT: DW_CFA_nop:
+; EH-NEXT: DW_CFA_nop:
 ; EH-NEXT: DW_CFA_nop:
 ; EH-EMPTY:
 ; ASM-LABEL: <add7>:

@@ -28,10 +28,6 @@ define @add1(%a, %b) {
 ; EH-NEXT: DW_CFA_nop:
 ; EH-NEXT: DW_CFA_nop:
 ; EH-NEXT: DW_CFA_nop:
-; EH-NEXT: DW_CFA_nop:
-; EH-NEXT: DW_CFA_nop:
-; EH-NEXT: DW_CFA_nop:
-; EH-NEXT: DW_CFA_nop:
 ; EH-EMPTY:
 ; ASM-LABEL: <add1>:
 ; ASM:         0: add rdi, rsi
@@ -60,10 +56,6 @@ define @add2(%a, %b) {
 ; EH-NEXT: DW_CFA_offset: R15 -56
 ; EH-NEXT: DW_CFA_advance_loc2: 440 to 0x1dc
 ; EH-NEXT: DW_CFA_restore_state:
-; EH-NEXT: DW_CFA_nop:
-; EH-NEXT: DW_CFA_nop:
-; EH-NEXT: DW_CFA_nop:
-; EH-NEXT: DW_CFA_nop:
 ; EH-NEXT: DW_CFA_nop:
 ; EH-NEXT: DW_CFA_nop:
 ; EH-NEXT: DW_CFA_nop:
@@ -269,10 +261,6 @@ define @add3(%a, %b) {
 ; EH-NEXT: DW_CFA_offset: R13 -40
 ; EH-NEXT: DW_CFA_offset: R14 -48
 ; EH-NEXT: DW_CFA_offset: R15 -56
-; EH-NEXT: DW_CFA_nop:
-; EH-NEXT: DW_CFA_nop:
-; EH-NEXT: DW_CFA_nop:
-; EH-NEXT: DW_CFA_nop:
 ; EH-EMPTY:
 ; ASM-LABEL: <add3>:
 ; ASM:         1e0: push rbp
@@ -464,10 +452,6 @@ define @add4(%a, %b) {
 ; EH-NEXT: DW_CFA_def_cfa_register: RBP
 ; EH-NEXT: DW_CFA_advance_loc: 19 to 0x3b7
 ; EH-NEXT: DW_CFA_restore_state:
-; EH-NEXT: DW_CFA_nop:
-; EH-NEXT: DW_CFA_nop:
-; EH-NEXT: DW_CFA_nop:
-; EH-NEXT: DW_CFA_nop:
 ; EH-EMPTY:
 ; ASM-LABEL: <add4>:
 ; ASM:         3a0: push rbp
@@ -496,10 +480,6 @@ define @add5(%a, %b) {
 ; EH-NEXT: DW_CFA_nop:
 ; EH-NEXT: DW_CFA_nop:
 ; EH-NEXT: DW_CFA_nop:
-; EH-NEXT: DW_CFA_nop:
-; EH-NEXT: DW_CFA_nop:
-; EH-NEXT: DW_CFA_nop:
-; EH-NEXT: DW_CFA_nop:
 ; EH-EMPTY:
 ; ASM-LABEL: <add5>:
 ; ASM:         3c0: push rbp
@@ -523,10 +503,6 @@ define @add6(%a, %b) {
 ; EH-NEXT: DW_CFA_offset: RBP -16
 ; EH-NEXT: DW_CFA_advance_loc: 3 to 0x3e4
 ; EH-NEXT: DW_CFA_def_cfa_register: RBP
-; EH-NEXT: DW_CFA_nop:
-; EH-NEXT: DW_CFA_nop:
-; EH-NEXT: DW_CFA_nop:
-; EH-NEXT: DW_CFA_nop:
 ; EH-NEXT: DW_CFA_nop:
 ; EH-NEXT: DW_CFA_nop:
 ; EH-NEXT: DW_CFA_nop:

@@ -862,6 +862,7 @@ bool CompilerBase<Adaptor, Derived, Config>::compile() {
   }
 
   text_writer.flush();
+  text_writer.end_module();
   assembler.finalize();
 
   // TODO(ts): generate object/map?

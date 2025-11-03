@@ -135,6 +135,8 @@ public:
 
   void begin_module(Assembler &assembler) noexcept;
 
+  void end_module() noexcept;
+
   void begin_func() noexcept;
 
   /// Get the current offset into the section.
@@ -167,7 +169,6 @@ public:
       section->locked = false;
 #endif
     }
-    eh_writer.flush();
   }
 
   /// \name Labels
