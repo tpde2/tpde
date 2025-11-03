@@ -217,3 +217,277 @@ entry:
   %s31 = add %s30, %a31
   ret %s31
 }
+
+define @add3(%a, %b) {
+; EH-LABEL: FDE cie=00000000 pc=00000170...000002b4
+; EH-NEXT: Format:       DWARF32
+; EH-NEXT: DW_CFA_advance_loc: 4 to 0x174
+; EH-NEXT: DW_CFA_def_cfa_offset: +208
+; EH-NEXT: DW_CFA_advance_loc: 24 to 0x18c
+; EH-NEXT: DW_CFA_def_cfa_register: W29
+; EH-NEXT: DW_CFA_offset: W29 -208
+; EH-NEXT: DW_CFA_offset: W30 -200
+; EH-NEXT: DW_CFA_offset: W19 -192
+; EH-NEXT: DW_CFA_offset: W20 -184
+; EH-NEXT: DW_CFA_offset: W21 -176
+; EH-NEXT: DW_CFA_offset: W22 -168
+; EH-NEXT: DW_CFA_offset: W23 -160
+; EH-NEXT: DW_CFA_offset: W24 -152
+; EH-NEXT: DW_CFA_offset: W25 -144
+; EH-NEXT: DW_CFA_offset: W26 -136
+; EH-NEXT: DW_CFA_offset: W27 -128
+; EH-NEXT: DW_CFA_offset: W28 -120
+; EH-EMPTY:
+; ASM-LABEL: <add3>:
+; ASM:         170: stp x29, x30, [sp, #-0xd0]!
+; ASM-NEXT:    174: mov x29, sp
+; ASM-NEXT:    178: stp x19, x20, [sp, #0x10]
+; ASM-NEXT:    17c: stp x21, x22, [sp, #0x20]
+; ASM-NEXT:    180: stp x23, x24, [sp, #0x30]
+; ASM-NEXT:    184: stp x25, x26, [sp, #0x40]
+; ASM-NEXT:    188: stp x27, x28, [sp, #0x50]
+; ASM-NEXT:    18c: add x2, x0, x1
+; ASM-NEXT:    190: add x3, x0, x1
+; ASM-NEXT:    194: add x4, x0, x1
+; ASM-NEXT:    198: add x5, x0, x1
+; ASM-NEXT:    19c: add x6, x0, x1
+; ASM-NEXT:    1a0: add x7, x0, x1
+; ASM-NEXT:    1a4: add x8, x0, x1
+; ASM-NEXT:    1a8: add x9, x0, x1
+; ASM-NEXT:    1ac: add x10, x0, x1
+; ASM-NEXT:    1b0: add x11, x0, x1
+; ASM-NEXT:    1b4: add x12, x0, x1
+; ASM-NEXT:    1b8: add x13, x0, x1
+; ASM-NEXT:    1bc: add x14, x0, x1
+; ASM-NEXT:    1c0: add x15, x0, x1
+; ASM-NEXT:    1c4: add x18, x0, x1
+; ASM-NEXT:    1c8: add x19, x0, x1
+; ASM-NEXT:    1cc: add x20, x0, x1
+; ASM-NEXT:    1d0: add x21, x0, x1
+; ASM-NEXT:    1d4: add x22, x0, x1
+; ASM-NEXT:    1d8: add x23, x0, x1
+; ASM-NEXT:    1dc: add x24, x0, x1
+; ASM-NEXT:    1e0: add x25, x0, x1
+; ASM-NEXT:    1e4: add x26, x0, x1
+; ASM-NEXT:    1e8: add x27, x0, x1
+; ASM-NEXT:    1ec: add x28, x0, x1
+; ASM-NEXT:    1f0: add x30, x0, x1
+; ASM-NEXT:    1f4: str x2, [x29, #0xa0]
+; ASM-NEXT:    1f8: add x2, x0, x1
+; ASM-NEXT:    1fc: str x2, [x29, #0xa8]
+; ASM-NEXT:    200: add x2, x0, x1
+; ASM-NEXT:    204: str x2, [x29, #0xb0]
+; ASM-NEXT:    208: add x2, x0, x1
+; ASM-NEXT:    20c: str x2, [x29, #0xb8]
+; ASM-NEXT:    210: add x2, x0, x1
+; ASM-NEXT:    214: str x2, [x29, #0xc0]
+; ASM-NEXT:    218: add x2, x0, x1
+; ASM-NEXT:    21c: add x0, x0, x1
+; ASM-NEXT:    220: ldr x1, [x29, #0xa0]
+; ASM-NEXT:    224: add x1, x1, x3
+; ASM-NEXT:    228: add x1, x1, x4
+; ASM-NEXT:    22c: add x1, x1, x5
+; ASM-NEXT:    230: add x1, x1, x6
+; ASM-NEXT:    234: add x1, x1, x7
+; ASM-NEXT:    238: add x1, x1, x8
+; ASM-NEXT:    23c: add x1, x1, x9
+; ASM-NEXT:    240: add x1, x1, x10
+; ASM-NEXT:    244: add x1, x1, x11
+; ASM-NEXT:    248: add x1, x1, x12
+; ASM-NEXT:    24c: add x1, x1, x13
+; ASM-NEXT:    250: add x1, x1, x14
+; ASM-NEXT:    254: add x1, x1, x15
+; ASM-NEXT:    258: add x1, x1, x18
+; ASM-NEXT:    25c: add x1, x1, x19
+; ASM-NEXT:    260: add x1, x1, x20
+; ASM-NEXT:    264: add x1, x1, x21
+; ASM-NEXT:    268: add x1, x1, x22
+; ASM-NEXT:    26c: add x1, x1, x23
+; ASM-NEXT:    270: add x1, x1, x24
+; ASM-NEXT:    274: add x1, x1, x25
+; ASM-NEXT:    278: add x1, x1, x26
+; ASM-NEXT:    27c: add x1, x1, x27
+; ASM-NEXT:    280: add x1, x1, x28
+; ASM-NEXT:    284: add x1, x1, x30
+; ASM-NEXT:    288: ldr x3, [x29, #0xa8]
+; ASM-NEXT:    28c: add x1, x1, x3
+; ASM-NEXT:    290: ldr x3, [x29, #0xb0]
+; ASM-NEXT:    294: add x1, x1, x3
+; ASM-NEXT:    298: ldr x3, [x29, #0xb8]
+; ASM-NEXT:    29c: add x1, x1, x3
+; ASM-NEXT:    2a0: ldr x3, [x29, #0xc0]
+; ASM-NEXT:    2a4: add x1, x1, x3
+; ASM-NEXT:    2a8: add x1, x1, x2
+; ASM-NEXT:    2ac: add x1, x1, x0
+; ASM-NEXT:    2b0: brk #0x1
+entry:
+  %a0 = add %a, %b
+  %a1 = add %a, %b
+  %a2 = add %a, %b
+  %a3 = add %a, %b
+  %a4 = add %a, %b
+  %a5 = add %a, %b
+  %a6 = add %a, %b
+  %a7 = add %a, %b
+  %a8 = add %a, %b
+  %a9 = add %a, %b
+  %a10 = add %a, %b
+  %a11 = add %a, %b
+  %a12 = add %a, %b
+  %a13 = add %a, %b
+  %a14 = add %a, %b
+  %a15 = add %a, %b
+  %a16 = add %a, %b
+  %a17 = add %a, %b
+  %a18 = add %a, %b
+  %a19 = add %a, %b
+  %a20 = add %a, %b
+  %a21 = add %a, %b
+  %a22 = add %a, %b
+  %a23 = add %a, %b
+  %a24 = add %a, %b
+  %a25 = add %a, %b
+  %a26 = add %a, %b
+  %a27 = add %a, %b
+  %a28 = add %a, %b
+  %a29 = add %a, %b
+  %a30 = add %a, %b
+  %a31 = add %a, %b
+  %s1 = add %a0, %a1
+  %s2 = add %s1, %a2
+  %s3 = add %s2, %a3
+  %s4 = add %s3, %a4
+  %s5 = add %s4, %a5
+  %s6 = add %s5, %a6
+  %s7 = add %s6, %a7
+  %s8 = add %s7, %a8
+  %s9 = add %s8, %a9
+  %s10 = add %s9, %a10
+  %s11 = add %s10, %a11
+  %s12 = add %s11, %a12
+  %s13 = add %s12, %a13
+  %s14 = add %s13, %a14
+  %s15 = add %s14, %a15
+  %s16 = add %s15, %a16
+  %s17 = add %s16, %a17
+  %s18 = add %s17, %a18
+  %s19 = add %s18, %a19
+  %s20 = add %s19, %a20
+  %s21 = add %s20, %a21
+  %s22 = add %s21, %a22
+  %s23 = add %s22, %a23
+  %s24 = add %s23, %a24
+  %s25 = add %s24, %a25
+  %s26 = add %s25, %a26
+  %s27 = add %s26, %a27
+  %s28 = add %s27, %a28
+  %s29 = add %s28, %a29
+  %s30 = add %s29, %a30
+  %s31 = add %s30, %a31
+  trap
+}
+
+define @add4(%a, %b) {
+; EH-LABEL: FDE cie=00000000 pc=000002c0...000002e0
+; EH-NEXT: Format:       DWARF32
+; EH-NEXT: DW_CFA_advance_loc: 4 to 0x2c4
+; EH-NEXT: DW_CFA_def_cfa_offset: +1184
+; EH-NEXT: DW_CFA_advance_loc: 8 to 0x2cc
+; EH-NEXT: DW_CFA_def_cfa_register: W29
+; EH-NEXT: DW_CFA_offset: W29 -1184
+; EH-NEXT: DW_CFA_offset: W30 -1176
+; EH-NEXT: DW_CFA_nop:
+; EH-NEXT: DW_CFA_nop:
+; EH-EMPTY:
+; ASM-LABEL: <add4>:
+; ASM:         2c0: sub sp, sp, #0x4a0
+; ASM-NEXT:    2c4: stp x29, x30, [sp]
+; ASM-NEXT:    2c8: mov x29, sp
+; ASM-NEXT:    2cc: add x0, x29, #0xa0
+; ASM-NEXT:    2d0: add x1, x0, x0
+; ASM-NEXT:    2d4: ldp x29, x30, [sp]
+; ASM-NEXT:    2d8: add sp, sp, #0x4a0
+; ASM-NEXT:    2dc: ret
+entry:
+  %a = alloca 1024, 8
+  %b = add %a, %a
+  ret %a
+}
+
+define @add5(%a, %b) {
+; EH-LABEL: FDE cie=00000000 pc=000002e0...000002f8
+; EH-NEXT: Format:       DWARF32
+; EH-NEXT: DW_CFA_advance_loc: 4 to 0x2e4
+; EH-NEXT: DW_CFA_def_cfa_offset: +1184
+; EH-NEXT: DW_CFA_advance_loc: 8 to 0x2ec
+; EH-NEXT: DW_CFA_def_cfa_register: W29
+; EH-NEXT: DW_CFA_offset: W29 -1184
+; EH-NEXT: DW_CFA_offset: W30 -1176
+; EH-NEXT: DW_CFA_nop:
+; EH-NEXT: DW_CFA_nop:
+; EH-EMPTY:
+; ASM-LABEL: <add5>:
+; ASM:         2e0: sub sp, sp, #0x4a0
+; ASM-NEXT:    2e4: stp x29, x30, [sp]
+; ASM-NEXT:    2e8: mov x29, sp
+; ASM-NEXT:    2ec: add x0, x29, #0xa0
+; ASM-NEXT:    2f0: add x1, x0, x0
+; ASM-NEXT:    2f4: brk #0x1
+entry:
+  %a = alloca 1024, 8
+  %b = add %a, %a
+  trap
+}
+
+define @add6(%a, %b) {
+; EH-LABEL: FDE cie=00000000 pc=00000300...00000314
+; EH-NEXT: Format:       DWARF32
+; EH-NEXT: DW_CFA_advance_loc: 4 to 0x304
+; EH-NEXT: DW_CFA_def_cfa_offset: +176
+; EH-NEXT: DW_CFA_advance_loc: 4 to 0x308
+; EH-NEXT: DW_CFA_def_cfa_register: W29
+; EH-NEXT: DW_CFA_offset: W29 -176
+; EH-NEXT: DW_CFA_offset: W30 -168
+; EH-NEXT: DW_CFA_nop:
+; EH-NEXT: DW_CFA_nop:
+; EH-NEXT: DW_CFA_nop:
+; EH-NEXT: DW_CFA_nop:
+; EH-EMPTY:
+; ASM-LABEL: <add6>:
+; ASM:         300: stp x29, x30, [sp, #-0xb0]!
+; ASM-NEXT:    304: mov x29, sp
+; ASM-NEXT:    308: add x0, x29, #0xa0
+; ASM-NEXT:    30c: add x1, x0, x0
+; ASM-NEXT:    310: brk #0x1
+entry:
+  %a = alloca 16, 8
+  %b = add %a, %a
+  trap
+}
+
+define @add7(%a, %b) {
+; EH-LABEL: FDE cie=00000000 pc=00000320...00000338
+; EH-NEXT: Format:       DWARF32
+; EH-NEXT: DW_CFA_advance_loc: 4 to 0x324
+; EH-NEXT: DW_CFA_def_cfa_offset: +176
+; EH-NEXT: DW_CFA_advance_loc: 4 to 0x328
+; EH-NEXT: DW_CFA_def_cfa_register: W29
+; EH-NEXT: DW_CFA_offset: W29 -176
+; EH-NEXT: DW_CFA_offset: W30 -168
+; EH-NEXT: DW_CFA_nop:
+; EH-NEXT: DW_CFA_nop:
+; EH-NEXT: DW_CFA_nop:
+; EH-NEXT: DW_CFA_nop:
+; EH-EMPTY:
+; ASM-LABEL: <add7>:
+; ASM:         320: stp x29, x30, [sp, #-0xb0]!
+; ASM-NEXT:    324: mov x29, sp
+; ASM-NEXT:    328: add x0, x29, #0xa0
+; ASM-NEXT:    32c: add x1, x0, x0
+; ASM-NEXT:    330: ldp x29, x30, [sp], #0xb0
+; ASM-NEXT:    334: ret
+entry:
+  %a = alloca 16, 8
+  %b = add %a, %a
+  ret %a
+}

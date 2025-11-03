@@ -181,6 +181,7 @@ define @add2(%a, %b) {
 ; ASM-NEXT:    1da: pop rbx
 ; ASM-NEXT:    1db: pop rbp
 ; ASM-NEXT:    1dc: ret
+; ASM-NEXT:    1dd: nop dword ptr [rax]
 entry:
   %a0 = add %a, %b
   %a1 = add %a, %b
@@ -246,4 +247,322 @@ entry:
   %s30 = add %s29, %a30
   %s31 = add %s30, %a31
   ret %s31
+}
+
+define @add3(%a, %b) {
+; EH-LABEL: FDE cie=00000000 pc=000001e0...0000039a
+; EH-NEXT: Format:       DWARF32
+; EH-NEXT: DW_CFA_advance_loc: 1 to 0x1e1
+; EH-NEXT: DW_CFA_def_cfa_offset: +16
+; EH-NEXT: DW_CFA_offset: RBP -16
+; EH-NEXT: DW_CFA_advance_loc: 3 to 0x1e4
+; EH-NEXT: DW_CFA_def_cfa_register: RBP
+; EH-NEXT: DW_CFA_advance_loc: 16 to 0x1f4
+; EH-NEXT: DW_CFA_offset: RBX -24
+; EH-NEXT: DW_CFA_offset: R12 -32
+; EH-NEXT: DW_CFA_offset: R13 -40
+; EH-NEXT: DW_CFA_offset: R14 -48
+; EH-NEXT: DW_CFA_offset: R15 -56
+; EH-NEXT: DW_CFA_nop:
+; EH-NEXT: DW_CFA_nop:
+; EH-NEXT: DW_CFA_nop:
+; EH-NEXT: DW_CFA_nop:
+; EH-EMPTY:
+; ASM-LABEL: <add3>:
+; ASM:         1e0: push rbp
+; ASM-NEXT:    1e1: mov rbp, rsp
+; ASM-NEXT:    1e4: push rbx
+; ASM-NEXT:    1e5: push r12
+; ASM-NEXT:    1e7: push r13
+; ASM-NEXT:    1e9: push r14
+; ASM-NEXT:    1eb: push r15
+; ASM-NEXT:    1ed: sub rsp, 0x98
+; ASM-NEXT:    1f4: lea rax, [rdi + rsi]
+; ASM-NEXT:    1f8: lea rcx, [rdi + rsi]
+; ASM-NEXT:    1fc: lea rdx, [rdi + rsi]
+; ASM-NEXT:    200: lea rbx, [rdi + rsi]
+; ASM-NEXT:    204: lea r8, [rdi + rsi]
+; ASM-NEXT:    208: lea r9, [rdi + rsi]
+; ASM-NEXT:    20c: lea r10, [rdi + rsi]
+; ASM-NEXT:    210: lea r11, [rdi + rsi]
+; ASM-NEXT:    214: lea r12, [rdi + rsi]
+; ASM-NEXT:    218: lea r13, [rdi + rsi]
+; ASM-NEXT:    21c: lea r14, [rdi + rsi]
+; ASM-NEXT:    220: lea r15, [rdi + rsi]
+; ASM-NEXT:    224: mov qword ptr [rbp - 0x30], rax
+; ASM-NEXT:    228: lea rax, [rdi + rsi]
+; ASM-NEXT:    22c: mov qword ptr [rbp - 0x38], rax
+; ASM-NEXT:    230: lea rax, [rdi + rsi]
+; ASM-NEXT:    234: mov qword ptr [rbp - 0x40], rax
+; ASM-NEXT:    238: lea rax, [rdi + rsi]
+; ASM-NEXT:    23c: mov qword ptr [rbp - 0x48], rax
+; ASM-NEXT:    240: lea rax, [rdi + rsi]
+; ASM-NEXT:    244: mov qword ptr [rbp - 0x50], rax
+; ASM-NEXT:    248: lea rax, [rdi + rsi]
+; ASM-NEXT:    24c: mov qword ptr [rbp - 0x58], rax
+; ASM-NEXT:    250: lea rax, [rdi + rsi]
+; ASM-NEXT:    254: mov qword ptr [rbp - 0x60], rax
+; ASM-NEXT:    258: lea rax, [rdi + rsi]
+; ASM-NEXT:    25c: mov qword ptr [rbp - 0x68], rax
+; ASM-NEXT:    260: lea rax, [rdi + rsi]
+; ASM-NEXT:    264: mov qword ptr [rbp - 0x70], rax
+; ASM-NEXT:    268: lea rax, [rdi + rsi]
+; ASM-NEXT:    26c: mov qword ptr [rbp - 0x78], rax
+; ASM-NEXT:    270: lea rax, [rdi + rsi]
+; ASM-NEXT:    274: mov qword ptr [rbp - 0x80], rax
+; ASM-NEXT:    278: lea rax, [rdi + rsi]
+; ASM-NEXT:    27c: mov qword ptr [rbp - 0x88], rax
+; ASM-NEXT:    283: lea rax, [rdi + rsi]
+; ASM-NEXT:    287: mov qword ptr [rbp - 0x90], rax
+; ASM-NEXT:    28e: lea rax, [rdi + rsi]
+; ASM-NEXT:    292: mov qword ptr [rbp - 0x98], rax
+; ASM-NEXT:    299: lea rax, [rdi + rsi]
+; ASM-NEXT:    29d: mov qword ptr [rbp - 0xa0], rax
+; ASM-NEXT:    2a4: lea rax, [rdi + rsi]
+; ASM-NEXT:    2a8: mov qword ptr [rbp - 0xa8], rax
+; ASM-NEXT:    2af: lea rax, [rdi + rsi]
+; ASM-NEXT:    2b3: mov qword ptr [rbp - 0xb0], rax
+; ASM-NEXT:    2ba: lea rax, [rdi + rsi]
+; ASM-NEXT:    2be: mov qword ptr [rbp - 0xb8], rax
+; ASM-NEXT:    2c5: lea rax, [rdi + rsi]
+; ASM-NEXT:    2c9: mov qword ptr [rbp - 0xc0], rax
+; ASM-NEXT:    2d0: lea rax, [rdi + rsi]
+; ASM-NEXT:    2d4: add rdi, rsi
+; ASM-NEXT:    2d7: mov rsi, qword ptr [rbp - 0x30]
+; ASM-NEXT:    2db: add rsi, rcx
+; ASM-NEXT:    2de: add rsi, rdx
+; ASM-NEXT:    2e1: add rsi, rbx
+; ASM-NEXT:    2e4: add rsi, r8
+; ASM-NEXT:    2e7: add rsi, r9
+; ASM-NEXT:    2ea: add rsi, r10
+; ASM-NEXT:    2ed: add rsi, r11
+; ASM-NEXT:    2f0: add rsi, r12
+; ASM-NEXT:    2f3: add rsi, r13
+; ASM-NEXT:    2f6: add rsi, r14
+; ASM-NEXT:    2f9: add rsi, r15
+; ASM-NEXT:    2fc: mov rcx, qword ptr [rbp - 0x38]
+; ASM-NEXT:    300: add rsi, rcx
+; ASM-NEXT:    303: mov rcx, qword ptr [rbp - 0x40]
+; ASM-NEXT:    307: add rsi, rcx
+; ASM-NEXT:    30a: mov rcx, qword ptr [rbp - 0x48]
+; ASM-NEXT:    30e: add rsi, rcx
+; ASM-NEXT:    311: mov rcx, qword ptr [rbp - 0x50]
+; ASM-NEXT:    315: add rsi, rcx
+; ASM-NEXT:    318: mov rcx, qword ptr [rbp - 0x58]
+; ASM-NEXT:    31c: add rsi, rcx
+; ASM-NEXT:    31f: mov rcx, qword ptr [rbp - 0x60]
+; ASM-NEXT:    323: add rsi, rcx
+; ASM-NEXT:    326: mov rcx, qword ptr [rbp - 0x68]
+; ASM-NEXT:    32a: add rsi, rcx
+; ASM-NEXT:    32d: mov rcx, qword ptr [rbp - 0x70]
+; ASM-NEXT:    331: add rsi, rcx
+; ASM-NEXT:    334: mov rcx, qword ptr [rbp - 0x78]
+; ASM-NEXT:    338: add rsi, rcx
+; ASM-NEXT:    33b: mov rcx, qword ptr [rbp - 0x80]
+; ASM-NEXT:    33f: add rsi, rcx
+; ASM-NEXT:    342: mov rcx, qword ptr [rbp - 0x88]
+; ASM-NEXT:    349: add rsi, rcx
+; ASM-NEXT:    34c: mov rcx, qword ptr [rbp - 0x90]
+; ASM-NEXT:    353: add rsi, rcx
+; ASM-NEXT:    356: mov rcx, qword ptr [rbp - 0x98]
+; ASM-NEXT:    35d: add rsi, rcx
+; ASM-NEXT:    360: mov rcx, qword ptr [rbp - 0xa0]
+; ASM-NEXT:    367: add rsi, rcx
+; ASM-NEXT:    36a: mov rcx, qword ptr [rbp - 0xa8]
+; ASM-NEXT:    371: add rsi, rcx
+; ASM-NEXT:    374: mov rcx, qword ptr [rbp - 0xb0]
+; ASM-NEXT:    37b: add rsi, rcx
+; ASM-NEXT:    37e: mov rcx, qword ptr [rbp - 0xb8]
+; ASM-NEXT:    385: add rsi, rcx
+; ASM-NEXT:    388: mov rcx, qword ptr [rbp - 0xc0]
+; ASM-NEXT:    38f: add rsi, rcx
+; ASM-NEXT:    392: add rsi, rax
+; ASM-NEXT:    395: add rsi, rdi
+; ASM-NEXT:    398: ud2
+; ASM-NEXT:    39a: nop word ptr [rax + rax]
+entry:
+  %a0 = add %a, %b
+  %a1 = add %a, %b
+  %a2 = add %a, %b
+  %a3 = add %a, %b
+  %a4 = add %a, %b
+  %a5 = add %a, %b
+  %a6 = add %a, %b
+  %a7 = add %a, %b
+  %a8 = add %a, %b
+  %a9 = add %a, %b
+  %a10 = add %a, %b
+  %a11 = add %a, %b
+  %a12 = add %a, %b
+  %a13 = add %a, %b
+  %a14 = add %a, %b
+  %a15 = add %a, %b
+  %a16 = add %a, %b
+  %a17 = add %a, %b
+  %a18 = add %a, %b
+  %a19 = add %a, %b
+  %a20 = add %a, %b
+  %a21 = add %a, %b
+  %a22 = add %a, %b
+  %a23 = add %a, %b
+  %a24 = add %a, %b
+  %a25 = add %a, %b
+  %a26 = add %a, %b
+  %a27 = add %a, %b
+  %a28 = add %a, %b
+  %a29 = add %a, %b
+  %a30 = add %a, %b
+  %a31 = add %a, %b
+  %s1 = add %a0, %a1
+  %s2 = add %s1, %a2
+  %s3 = add %s2, %a3
+  %s4 = add %s3, %a4
+  %s5 = add %s4, %a5
+  %s6 = add %s5, %a6
+  %s7 = add %s6, %a7
+  %s8 = add %s7, %a8
+  %s9 = add %s8, %a9
+  %s10 = add %s9, %a10
+  %s11 = add %s10, %a11
+  %s12 = add %s11, %a12
+  %s13 = add %s12, %a13
+  %s14 = add %s13, %a14
+  %s15 = add %s14, %a15
+  %s16 = add %s15, %a16
+  %s17 = add %s16, %a17
+  %s18 = add %s17, %a18
+  %s19 = add %s18, %a19
+  %s20 = add %s19, %a20
+  %s21 = add %s20, %a21
+  %s22 = add %s21, %a22
+  %s23 = add %s22, %a23
+  %s24 = add %s23, %a24
+  %s25 = add %s24, %a25
+  %s26 = add %s25, %a26
+  %s27 = add %s26, %a27
+  %s28 = add %s27, %a28
+  %s29 = add %s28, %a29
+  %s30 = add %s29, %a30
+  %s31 = add %s30, %a31
+  trap
+}
+
+define @add4(%a, %b) {
+; EH-LABEL: FDE cie=00000000 pc=000003a0...000003bf
+; EH-NEXT: Format:       DWARF32
+; EH-NEXT: DW_CFA_advance_loc: 1 to 0x3a1
+; EH-NEXT: DW_CFA_def_cfa_offset: +16
+; EH-NEXT: DW_CFA_offset: RBP -16
+; EH-NEXT: DW_CFA_advance_loc: 3 to 0x3a4
+; EH-NEXT: DW_CFA_def_cfa_register: RBP
+; EH-NEXT: DW_CFA_advance_loc: 7 to 0x3ab
+; EH-NEXT: DW_CFA_nop:
+; EH-NEXT: DW_CFA_nop:
+; EH-NEXT: DW_CFA_nop:
+; EH-NEXT: DW_CFA_nop:
+; EH-NEXT: DW_CFA_nop:
+; EH-NEXT: DW_CFA_nop:
+; EH-EMPTY:
+; ASM-LABEL: <add4>:
+; ASM:         3a0: push rbp
+; ASM-NEXT:    3a1: mov rbp, rsp
+; ASM-NEXT:    3a4: sub rsp, 0x430
+; ASM-NEXT:    3ab: lea rax, [rbp - 0x430]
+; ASM-NEXT:    3b2: lea rcx, [rax + rax]
+; ASM-NEXT:    3b6: add rsp, 0x430
+; ASM-NEXT:    3bd: pop rbp
+; ASM-NEXT:    3be: ret
+; ASM-NEXT:    3bf: nop
+entry:
+  %a = alloca 1024, 8
+  %b = add %a, %a
+  ret %a
+}
+
+define @add5(%a, %b) {
+; EH-LABEL: FDE cie=00000000 pc=000003c0...000003d8
+; EH-NEXT: Format:       DWARF32
+; EH-NEXT: DW_CFA_advance_loc: 1 to 0x3c1
+; EH-NEXT: DW_CFA_def_cfa_offset: +16
+; EH-NEXT: DW_CFA_offset: RBP -16
+; EH-NEXT: DW_CFA_advance_loc: 3 to 0x3c4
+; EH-NEXT: DW_CFA_def_cfa_register: RBP
+; EH-NEXT: DW_CFA_advance_loc: 7 to 0x3cb
+; EH-NEXT: DW_CFA_nop:
+; EH-NEXT: DW_CFA_nop:
+; EH-NEXT: DW_CFA_nop:
+; EH-NEXT: DW_CFA_nop:
+; EH-NEXT: DW_CFA_nop:
+; EH-NEXT: DW_CFA_nop:
+; EH-EMPTY:
+; ASM-LABEL: <add5>:
+; ASM:         3c0: push rbp
+; ASM-NEXT:    3c1: mov rbp, rsp
+; ASM-NEXT:    3c4: sub rsp, 0x430
+; ASM-NEXT:    3cb: lea rax, [rbp - 0x430]
+; ASM-NEXT:    3d2: lea rcx, [rax + rax]
+; ASM-NEXT:    3d6: ud2
+; ASM-NEXT:    3d8: nop dword ptr [rax + rax]
+entry:
+  %a = alloca 1024, 8
+  %b = add %a, %a
+  trap
+}
+
+define @add6(%a, %b) {
+; EH-LABEL: FDE cie=00000000 pc=000003e0...000003ee
+; EH-NEXT: Format:       DWARF32
+; EH-NEXT: DW_CFA_advance_loc: 1 to 0x3e1
+; EH-NEXT: DW_CFA_def_cfa_offset: +16
+; EH-NEXT: DW_CFA_offset: RBP -16
+; EH-NEXT: DW_CFA_advance_loc: 3 to 0x3e4
+; EH-NEXT: DW_CFA_def_cfa_register: RBP
+; EH-NEXT: DW_CFA_advance_loc: 0 to 0x3e4
+; EH-NEXT: DW_CFA_nop:
+; EH-NEXT: DW_CFA_nop:
+; EH-NEXT: DW_CFA_nop:
+; EH-NEXT: DW_CFA_nop:
+; EH-NEXT: DW_CFA_nop:
+; EH-NEXT: DW_CFA_nop:
+; EH-EMPTY:
+; ASM-LABEL: <add6>:
+; ASM:         3e0: push rbp
+; ASM-NEXT:    3e1: mov rbp, rsp
+; ASM-NEXT:    3e4: lea rax, [rbp - 0x40]
+; ASM-NEXT:    3e8: lea rcx, [rax + rax]
+; ASM-NEXT:    3ec: ud2
+; ASM-NEXT:    3ee: nop
+entry:
+  %a = alloca 16, 8
+  %b = add %a, %a
+  trap
+}
+
+define @add7(%a, %b) {
+; EH-LABEL: FDE cie=00000000 pc=000003f0...000003fe
+; EH-NEXT: Format:       DWARF32
+; EH-NEXT: DW_CFA_advance_loc: 1 to 0x3f1
+; EH-NEXT: DW_CFA_def_cfa_offset: +16
+; EH-NEXT: DW_CFA_offset: RBP -16
+; EH-NEXT: DW_CFA_advance_loc: 3 to 0x3f4
+; EH-NEXT: DW_CFA_def_cfa_register: RBP
+; EH-NEXT: DW_CFA_advance_loc: 0 to 0x3f4
+; EH-NEXT: DW_CFA_nop:
+; EH-NEXT: DW_CFA_nop:
+; EH-NEXT: DW_CFA_nop:
+; EH-NEXT: DW_CFA_nop:
+; EH-NEXT: DW_CFA_nop:
+; EH-NEXT: DW_CFA_nop:
+; EH-EMPTY:
+; ASM-LABEL: <add7>:
+; ASM:         3f0: push rbp
+; ASM-NEXT:    3f1: mov rbp, rsp
+; ASM-NEXT:    3f4: lea rax, [rbp - 0x40]
+; ASM-NEXT:    3f8: lea rcx, [rax + rax]
+; ASM-NEXT:    3fc: pop rbp
+; ASM-NEXT:    3fd: ret
+entry:
+  %a = alloca 16, 8
+  %b = add %a, %a
+  ret %a
 }
