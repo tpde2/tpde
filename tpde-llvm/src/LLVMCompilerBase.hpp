@@ -512,7 +512,7 @@ public:
                            const ValInfo &,
                            u64) noexcept;
   bool compile_resume(const llvm::Instruction *, const ValInfo &, u64) noexcept;
-  SymRef lookup_type_info_sym(IRValueRef value) noexcept;
+  SymRef lookup_type_info_sym(const llvm::GlobalValue *value) noexcept;
   bool compile_intrin(const llvm::IntrinsicInst *, const ValInfo &) noexcept;
   bool compile_is_fpclass(const llvm::IntrinsicInst *) noexcept;
   bool compile_overflow_intrin(const llvm::IntrinsicInst *,
@@ -709,8 +709,13 @@ typename LLVMCompilerBase<Adaptor, Derived, Config>::ValuePart
 
   std::string const_str;
   llvm::raw_string_ostream(const_str) << *const_val;
-  TPDE_LOG_ERR("encountered unhandled constant {}", const_str);
-  TPDE_FATAL("unhandled constant type");
+  TPDE_LOG_ERR("unhandled constant in operand: {}", const_str);
+  this->adaptor->func_unsupported = true;
+
+  // Try to keep going with a null constant.
+  static const std::array<u64, 8> zero{};
+  assert(size <= zero.size() * sizeof(u64));
+  return ValuePart(zero.data(), size, bank);
 }
 
 template <typename Adaptor, typename Derived, typename Config>
@@ -1198,8 +1203,9 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::global_init_to_data(
     return global_init_to_data(reloc_base, data, relocs, layout, fc, off);
   }
 
-  TPDE_LOG_ERR("Encountered unknown constant in global initializer");
-  llvm::errs() << *constant << "\n";
+  std::string const_str;
+  llvm::raw_string_ostream(const_str) << *constant;
+  TPDE_LOG_ERR("unhandled constant in global initializer: {}", const_str);
   return false;
 }
 
@@ -1298,8 +1304,8 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile(
     llvm::GlobalAlias *ga = &*it;
     auto *alias_target = llvm::dyn_cast<llvm::GlobalValue>(ga->getAliasee());
     if (alias_target == nullptr) {
-      assert(0);
-      continue;
+      TPDE_LOG_ERR("alias with non-GlobalValue aliasee is unsupported");
+      return false;
     }
     auto dst_sym = global_sym(ga);
     auto from_sym = global_sym(alias_target);
@@ -1662,7 +1668,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_load_generic(
       case f128:
         derived()->encode_loadv128(std::move(part_addr), res.part(i));
         break;
-      default: assert(0); return false;
+      default: return false;
       }
 
       off += part_descs[i].part.size + part_descs[i].part.pad_after;
@@ -1789,7 +1795,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_store_generic(
     case 64:
       derived()->encode_storei64(std::move(ptr_op), op_ref.part(0));
       break;
-    default: assert(0); return false;
+    default: return false;
     }
     break;
   }
@@ -1888,7 +1894,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_store_generic(
       case f128:
         derived()->encode_storev128(std::move(part_addr), std::move(part_ref));
         break;
-      default: assert(0); return false;
+      default: return false;
       }
 
       off += part_descs[i].part.size + part_descs[i].part.pad_after;
@@ -2980,7 +2986,9 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_insert_element(
 
   auto *vec_ty = llvm::cast<llvm::FixedVectorType>(inst->getType());
   unsigned nelem = vec_ty->getNumElements();
-  assert(index->getType()->getIntegerBitWidth() >= 8);
+  if (index->getType()->getIntegerBitWidth() < 8) {
+    return false;
+  }
 
   auto ins = inst->getOperand(1);
   auto [val_ref, val] = this->val_ref_single(ins);
@@ -4042,7 +4050,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_fcmp(
       // ONE __unordtf2 == 0 && __eqtf2 != 0
       // UEQ __unordtf2 != 0 || __eqtf2 == 0
       return false;
-    default: assert(0 && "unexpected fcmp predicate");
+    default: TPDE_UNREACHABLE("unexpected fcmp predicate");
     }
 
     IRValueRef lhs = cmp->getOperand(0);
@@ -4248,8 +4256,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_invoke(
       auto *C = landing_pad->getClause(i);
       SymRef sym;
       if (!C->isNullValue()) {
-        assert(llvm::dyn_cast<llvm::GlobalValue>(C));
-        sym = lookup_type_info_sym(C);
+        sym = lookup_type_info_sym(llvm::cast<llvm::GlobalValue>(C));
       }
       this->text_writer.except_add_action(i == 0, sym);
     } else {
@@ -4298,14 +4305,14 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_resume(
 template <typename Adaptor, typename Derived, typename Config>
 typename LLVMCompilerBase<Adaptor, Derived, Config>::SymRef
     LLVMCompilerBase<Adaptor, Derived, Config>::lookup_type_info_sym(
-        IRValueRef value) noexcept {
+        const llvm::GlobalValue *value) noexcept {
   for (const auto &[val, sym] : type_info_syms) {
     if (val == value) {
       return sym;
     }
   }
 
-  const auto sym = global_sym(llvm::cast<llvm::GlobalValue>(value));
+  const auto sym = global_sym(value);
 
   u32 off;
   u8 tmp[8] = {};
@@ -4837,7 +4844,9 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_intrin(
   case llvm::Intrinsic::ctlz:
   case llvm::Intrinsic::cttz: {
     auto *val = inst->getOperand(0);
-    assert(val->getType()->isIntegerTy());
+    if (!val->getType()->isIntegerTy()) {
+      return false;
+    }
     const auto width = val->getType()->getIntegerBitWidth();
     if (width != 8 && width != 16 && width != 32 && width != 64) {
       return false;
@@ -4983,8 +4992,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_intrin(
     return true;
   }
   case llvm::Intrinsic::eh_typeid_for: {
-    auto *type = inst->getOperand(0);
-    assert(llvm::isa<llvm::GlobalValue>(type));
+    auto *type = llvm::cast<llvm::GlobalValue>(inst->getOperand(0));
 
     // not the most efficient but it's OK
     const auto type_info_sym = lookup_type_info_sym(type);
@@ -5108,7 +5116,9 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_overflow_intrin(
   ValueRef res = this->result_ref(inst);
 
   auto *ty = inst->getOperand(0)->getType();
-  assert(ty->isIntegerTy());
+  if (!ty->isIntegerTy()) {
+    return false;
+  }
   const auto width = ty->getIntegerBitWidth();
 
   if (width == 128) {
