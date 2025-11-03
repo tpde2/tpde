@@ -111,6 +111,10 @@ bool TestIRCompilerA64::compile_inst(IRInstRef inst_idx, InstRange) noexcept {
     rb.ret();
     return true;
   }
+  case trap:
+    ASM(BRK, 1);
+    this->release_regs_after_return();
+    return true;
   case alloca: return true;
   case br: {
     auto block_idx = ir()->value_operands[value.op_begin_idx];
