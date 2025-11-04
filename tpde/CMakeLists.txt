@@ -116,16 +116,17 @@ target_link_libraries(tpde_test PUBLIC tpde)
 target_include_directories(tpde_test PRIVATE ../deps/)
 target_sources(tpde_test PRIVATE
     src/test/TestIR.cpp
-    src/test/TestIRCompiler.cpp
     src/test/TestIRCompilerA64.cpp
+    src/test/TestIRCompilerX64.cpp
     src/test/test_main.cpp
 
     PRIVATE
     FILE_SET HEADERS
     FILES
         src/test/TestIR.hpp
-        src/test/TestIRCompiler.hpp
+        src/test/TestIRAdaptor.hpp
         src/test/TestIRCompilerA64.hpp
+        src/test/TestIRCompilerX64.hpp
 )
 
 

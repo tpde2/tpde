@@ -10,10 +10,11 @@
 #include <args/args.hxx>
 
 #include "TestIR.hpp"
-#include "TestIRCompiler.hpp"
+#include "TestIRAdaptor.hpp"
 #include "TestIRCompilerA64.hpp"
+#include "TestIRCompilerX64.hpp"
 #include "tpde/Analyzer.hpp"
-#include "tpde/CompilerBase.hpp"
+#include "tpde/base.hpp"
 
 enum class Arch {
   x64,
@@ -217,36 +218,30 @@ int main(int argc, char *argv[]) {
     return 0;
   }
 
-  // TODO(ts): multiple arch select
-  if (arch.Get() == Arch::x64) {
-    test::TestIRAdaptor adaptor{&ir};
-    test::TestIRCompilerX64 compiler{&adaptor, no_fixed_assignments};
-
-    if (!compiler.compile()) {
-      TPDE_LOG_ERR("Failed to compile IR");
-      return 1;
-    }
-
-    const std::vector<u8> data = compiler.assembler.build_object_file();
-    if (obj_out_path && obj_out_path.Get() != "-") {
-      std::ofstream out_file{obj_out_path.Get(), std::ios::binary};
-      if (!out_file.is_open()) {
-        TPDE_LOG_ERR("Failed to open output file");
-        return 1;
-      }
-      out_file.write(reinterpret_cast<const char *>(data.data()), data.size());
-    } else {
-      std::cout.write(reinterpret_cast<const char *>(data.data()), data.size());
-    }
-  } else {
-    assert(arch.Get() == Arch::a64);
-    if (!test::compile_ir_arm64(
-            &ir, no_fixed_assignments.Get(), obj_out_path.Get())) {
-      TPDE_LOG_ERR("Failed to compiler IR");
-      return 1;
-    }
+  using CompileFn = std::vector<u8> (*)(test::TestIR *, bool);
+  CompileFn compile_fn;
+  switch (arch.Get()) {
+  case Arch::x64: compile_fn = &test::compile_ir_x64; break;
+  case Arch::a64: compile_fn = &test::compile_ir_arm64; break;
+  default: TPDE_UNREACHABLE("invalid architecture");
   }
 
+  std::vector<u8> data = compile_fn(&ir, no_fixed_assignments.Get());
+  if (data.empty()) {
+    TPDE_LOG_ERR("Failed to compile IR");
+    return 1;
+  }
+
+  if (obj_out_path && obj_out_path.Get() != "-") {
+    std::ofstream out_file{obj_out_path.Get(), std::ios::binary};
+    if (!out_file.is_open()) {
+      TPDE_LOG_ERR("Failed to open output file");
+      return 1;
+    }
+    out_file.write(reinterpret_cast<const char *>(data.data()), data.size());
+  } else {
+    std::cout.write(reinterpret_cast<const char *>(data.data()), data.size());
+  }
 
   return 0;
 }

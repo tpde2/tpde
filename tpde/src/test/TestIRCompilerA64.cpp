@@ -2,13 +2,11 @@
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#include <fstream>
-#include <iostream>
-
-#include "tpde/arm64/CompilerA64.hpp"
+#include "TestIRCompilerA64.hpp"
 
 #include "TestIR.hpp"
-#include "TestIRCompilerA64.hpp"
+#include "TestIRAdaptor.hpp"
+#include "tpde/arm64/CompilerA64.hpp"
 
 namespace {
 using namespace tpde;
@@ -16,13 +14,6 @@ using namespace tpde::test;
 
 struct TestIRCompilerA64 : a64::CompilerA64<TestIRAdaptor, TestIRCompilerA64> {
   using Base = a64::CompilerA64<TestIRAdaptor, TestIRCompilerA64>;
-
-  using IRValueRef = typename Base::IRValueRef;
-  using IRFuncRef = typename Base::IRFuncRef;
-  using ValuePartRef = typename Base::ValuePartRef;
-  using ScratchReg = typename Base::ScratchReg;
-  using AsmReg = typename Base::AsmReg;
-  using InstRange = typename Base::InstRange;
 
   bool no_fixed_assignments;
 
@@ -264,28 +255,11 @@ bool TestIRCompilerA64::compile_condselect(IRInstRef inst_idx) noexcept {
 }
 } // namespace
 
-bool test::compile_ir_arm64(TestIR *ir,
-                            bool no_fixed_assignments,
-                            const std::string &obj_out_path) {
+std::vector<u8> test::compile_ir_arm64(TestIR *ir, bool no_fixed_assignments) {
   test::TestIRAdaptor adaptor{ir};
   TestIRCompilerA64 compiler{&adaptor, no_fixed_assignments};
-
   if (!compiler.compile()) {
-    TPDE_LOG_ERR("Failed to compile IR");
-    return false;
+    return {};
   }
-
-  const std::vector<u8> data = compiler.assembler.build_object_file();
-  if (!obj_out_path.empty()) {
-    std::ofstream out_file{obj_out_path, std::ios::binary};
-    if (!out_file.is_open()) {
-      TPDE_LOG_ERR("Failed to open output file");
-      return false;
-    }
-    out_file.write(reinterpret_cast<const char *>(data.data()), data.size());
-  } else {
-    std::cout.write(reinterpret_cast<const char *>(data.data()), data.size());
-  }
-
-  return true;
+  return compiler.assembler.build_object_file();
 }

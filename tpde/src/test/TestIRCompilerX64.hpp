@@ -8,5 +8,5 @@
 #include <vector>
 
 namespace tpde::test {
-std::vector<u8> compile_ir_arm64(TestIR *ir, bool no_fixed_assignments);
-}
+std::vector<u8> compile_ir_x64(TestIR *ir, bool no_fixed_assignments);
+} // namespace tpde::test
