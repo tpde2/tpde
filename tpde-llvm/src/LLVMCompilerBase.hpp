@@ -4847,84 +4847,30 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_intrin(
     if (!val->getType()->isIntegerTy()) {
       return false;
     }
-    const auto width = val->getType()->getIntegerBitWidth();
-    if (width != 8 && width != 16 && width != 32 && width != 64) {
-      return false;
+    u32 width_idx = 0;
+    switch (val->getType()->getIntegerBitWidth()) {
+    case 8: width_idx = 0; break;
+    case 16: width_idx = 1; break;
+    case 32: width_idx = 2; break;
+    case 64: width_idx = 3; break;
+    default: return false;
     }
 
-    const auto zero_is_poison =
+    using EncodeFnTy = bool (Derived::*)(GenericValuePart &&, ValuePart &&);
+    static constexpr EncodeFnTy encode_fns[4][2][2] = {
+#define F(n, op, suffix) &Derived::encode_##op##i##n##suffix
+        {  {F(8, ctlz, ), F(8, ctlz, _zp)},  {F(8, cttz, ), F(32, cttz, _zp)}},
+        {{F(16, ctlz, ), F(16, ctlz, _zp)}, {F(16, cttz, ), F(32, cttz, _zp)}},
+        {{F(32, ctlz, ), F(32, ctlz, _zp)}, {F(32, cttz, ), F(32, cttz, _zp)}},
+        {{F(64, ctlz, ), F(64, ctlz, _zp)}, {F(64, cttz, ), F(64, cttz, _zp)}},
+#undef F
+    };
+    bool zero_is_poison =
         !llvm::cast<llvm::ConstantInt>(inst->getOperand(1))->isZero();
-
-    auto val_ref = this->val_ref(val);
-    auto [res_vr, res_ref] = this->result_ref_single(inst);
-
-    if (intrin_id == llvm::Intrinsic::ctlz) {
-      switch (width) {
-      case 8:
-        if (zero_is_poison) {
-          derived()->encode_ctlzi8_zero_poison(val_ref.part(0), res_ref);
-        } else {
-          derived()->encode_ctlzi8(val_ref.part(0), res_ref);
-        }
-        break;
-      case 16:
-        if (zero_is_poison) {
-          derived()->encode_ctlzi16_zero_poison(val_ref.part(0), res_ref);
-        } else {
-          derived()->encode_ctlzi16(val_ref.part(0), res_ref);
-        }
-        break;
-      case 32:
-        if (zero_is_poison) {
-          derived()->encode_ctlzi32_zero_poison(val_ref.part(0), res_ref);
-        } else {
-          derived()->encode_ctlzi32(val_ref.part(0), res_ref);
-        }
-        break;
-      case 64:
-        if (zero_is_poison) {
-          derived()->encode_ctlzi64_zero_poison(val_ref.part(0), res_ref);
-        } else {
-          derived()->encode_ctlzi64(val_ref.part(0), res_ref);
-        }
-        break;
-      default: TPDE_UNREACHABLE("invalid size");
-      }
-    } else {
-      assert(intrin_id == llvm::Intrinsic::cttz);
-      switch (width) {
-      case 8:
-        if (zero_is_poison) {
-          derived()->encode_cttzi32_zero_poison(val_ref.part(0), res_ref);
-        } else {
-          derived()->encode_cttzi8(val_ref.part(0), res_ref);
-        }
-        break;
-      case 16:
-        if (zero_is_poison) {
-          derived()->encode_cttzi32_zero_poison(val_ref.part(0), res_ref);
-        } else {
-          derived()->encode_cttzi16(val_ref.part(0), res_ref);
-        }
-        break;
-      case 32:
-        if (zero_is_poison) {
-          derived()->encode_cttzi32_zero_poison(val_ref.part(0), res_ref);
-        } else {
-          derived()->encode_cttzi32(val_ref.part(0), res_ref);
-        }
-        break;
-      case 64:
-        if (zero_is_poison) {
-          derived()->encode_cttzi64_zero_poison(val_ref.part(0), res_ref);
-        } else {
-          derived()->encode_cttzi64(val_ref.part(0), res_ref);
-        }
-        break;
-      default: TPDE_UNREACHABLE("invalid size");
-      }
-    }
-    return true;
+    bool is_cttz = intrin_id == llvm::Intrinsic::cttz;
+    EncodeFnTy fn = encode_fns[width_idx][is_cttz][zero_is_poison];
+    return (derived()->*fn)(this->val_ref(val).part(0),
+                            this->result_ref(inst).part(0));
   }
   case llvm::Intrinsic::bitreverse: {
     auto *val = inst->getOperand(0);

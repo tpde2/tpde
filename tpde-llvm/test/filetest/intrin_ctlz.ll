@@ -20,18 +20,15 @@ define void @ctlz_i8(i8 %0) {
 ; X64-NEXT:    bsr eax, edi
 ; X64-NEXT:    xor eax, 0x1f
 ; X64-NEXT:    add eax, -0x18
-; X64-NEXT:    test dil, dil
+; X64-NEXT:    test edi, edi
 ; X64-NEXT:    mov edi, 0x8
 ; X64-NEXT:    cmovne edi, eax
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ctlz_i8>:
-; ARM64:         ands w1, w0, #0xff
-; ARM64-NEXT:    mov w2, #0x8 // =8
-; ARM64-NEXT:    clz w1, w1
-; ARM64-NEXT:    tst w0, #0xff
-; ARM64-NEXT:    sub w1, w1, #0x18
-; ARM64-NEXT:    csel w0, w2, w1, eq
+; ARM64:         and w0, w0, #0xff
+; ARM64-NEXT:    clz w0, w0
+; ARM64-NEXT:    sub w1, w0, #0x18
 ; ARM64-NEXT:    ret
   entry:
     %1 = call i8 @llvm.ctlz.i8(i8 %0, i1 0)
@@ -62,18 +59,15 @@ define void @ctlz_i16(i16 %0) {
 ; X64-NEXT:    bsr eax, edi
 ; X64-NEXT:    xor eax, 0x1f
 ; X64-NEXT:    add eax, -0x10
-; X64-NEXT:    test di, di
+; X64-NEXT:    test edi, edi
 ; X64-NEXT:    mov edi, 0x10
 ; X64-NEXT:    cmovne edi, eax
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ctlz_i16>:
-; ARM64:         ands w1, w0, #0xffff
-; ARM64-NEXT:    mov w2, #0x10 // =16
-; ARM64-NEXT:    clz w1, w1
-; ARM64-NEXT:    tst w0, #0xffff
-; ARM64-NEXT:    sub w1, w1, #0x10
-; ARM64-NEXT:    csel w0, w2, w1, eq
+; ARM64:         and w0, w0, #0xffff
+; ARM64-NEXT:    clz w0, w0
+; ARM64-NEXT:    sub w1, w0, #0x10
 ; ARM64-NEXT:    ret
   entry:
     %1 = call i16 @llvm.ctlz.i16(i16 %0, i1 0)
@@ -202,31 +196,25 @@ define void @ctlz_i16_no_salvage(i16 %0) {
 ; X64-NEXT:    bsr ecx, eax
 ; X64-NEXT:    xor ecx, 0x1f
 ; X64-NEXT:    add ecx, -0x10
-; X64-NEXT:    test ax, ax
+; X64-NEXT:    test eax, eax
 ; X64-NEXT:    mov eax, 0x10
 ; X64-NEXT:    cmovne eax, ecx
 ; X64-NEXT:    movzx edi, di
 ; X64-NEXT:    bsr eax, edi
 ; X64-NEXT:    xor eax, 0x1f
 ; X64-NEXT:    add eax, -0x10
-; X64-NEXT:    test di, di
+; X64-NEXT:    test edi, edi
 ; X64-NEXT:    mov edi, 0x10
 ; X64-NEXT:    cmovne edi, eax
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ctlz_i16_no_salvage>:
-; ARM64:         ands w1, w0, #0xffff
-; ARM64-NEXT:    mov w2, #0x10 // =16
+; ARM64:         and w1, w0, #0xffff
 ; ARM64-NEXT:    clz w1, w1
-; ARM64-NEXT:    tst w0, #0xffff
-; ARM64-NEXT:    sub w1, w1, #0x10
-; ARM64-NEXT:    csel w3, w2, w1, eq
-; ARM64-NEXT:    ands w1, w0, #0xffff
-; ARM64-NEXT:    mov w2, #0x10 // =16
-; ARM64-NEXT:    clz w1, w1
-; ARM64-NEXT:    tst w0, #0xffff
-; ARM64-NEXT:    sub w1, w1, #0x10
-; ARM64-NEXT:    csel w0, w2, w1, eq
+; ARM64-NEXT:    sub w2, w1, #0x10
+; ARM64-NEXT:    and w0, w0, #0xffff
+; ARM64-NEXT:    clz w0, w0
+; ARM64-NEXT:    sub w1, w0, #0x10
 ; ARM64-NEXT:    ret
   entry:
     %1 = call i16 @llvm.ctlz.i16(i16 %0, i1 0)

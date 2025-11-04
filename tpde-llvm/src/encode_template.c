@@ -22,6 +22,9 @@
 #include <stddef.h>
 #include <stdint.h>
 
+// Note: using 8/16-bit integers as parameters is problematic, as some ABIs will
+// expect an implicit extension of the argument to 32 bit (which we don't do).
+
 typedef int8_t i8;
 typedef int16_t i16;
 typedef int32_t i32;
@@ -264,24 +267,23 @@ u128 TARGET_V1 bswapi128(u128 a) { return (u128)__builtin_bswap64(a) << 64 | __b
 u32 TARGET_V1 ctpopi32(u32 a) { return __builtin_popcount(a); }
 u64 TARGET_V1 ctpopi64(u64 a) { return __builtin_popcountll(a); }
 
-u32 TARGET_V1 cttzi32_zero_poison(u32 a) { return __builtin_ctz(a); }
-u64 TARGET_V1 cttzi64_zero_poison(u64 a) { return __builtin_ctzll(a); }
+u32 TARGET_V1 cttzi32_zp(u32 a) { return __builtin_ctz(a); }
+u64 TARGET_V1 cttzi64_zp(u64 a) { return __builtin_ctzll(a); }
 
-u32 TARGET_V1 cttzi8(i8 a) { if ((u8)a == 0) { return 8; } else { return __builtin_ctz(a); }}
-u32 TARGET_V1 cttzi16(i16 a) { if ((u16)a == 0) { return 16; } else { return __builtin_ctz(a); }}
-u32 TARGET_V1 cttzi32(u32 a) { if (a == 0) { return 32; } else { return __builtin_ctz(a); }}
-u64 TARGET_V1 cttzi64(u64 a) { if (a == 0) { return 64; } else { return __builtin_ctzll(a); }}
+u32 TARGET_V1 cttzi8(u32 a) { return __builtin_ctz(0x100|a); }
+u32 TARGET_V1 cttzi16(u32 a) { return __builtin_ctz(0x10000|a); }
+u32 TARGET_V1 cttzi32(u32 a) { return !a ? 32 : __builtin_ctz(a); }
+u64 TARGET_V1 cttzi64(u64 a) { return !a ? 64 : __builtin_ctzll(a); }
 
+u32 TARGET_V1 ctlzi8_zp(u32 a) { return __builtin_clz((u8)a) - 24; }
+u32 TARGET_V1 ctlzi16_zp(u32 a) { return __builtin_clz((u16)a) - 16; }
+u32 TARGET_V1 ctlzi32_zp(u32 a) { return __builtin_clz(a); }
+u64 TARGET_V1 ctlzi64_zp(u64 a) { return __builtin_clzll(a); }
 
-u32 TARGET_V1 ctlzi8_zero_poison(i8 a) { return __builtin_clz((u32)(u8)a) - 24; }
-u32 TARGET_V1 ctlzi16_zero_poison(i16 a) { return __builtin_clz((u32)(u16)a) - 16; }
-u32 TARGET_V1 ctlzi32_zero_poison(u32 a) { return __builtin_clz(a); }
-u64 TARGET_V1 ctlzi64_zero_poison(u64 a) { return __builtin_clzll(a); }
-
-u32 TARGET_V1 ctlzi8(i8 a) { if ((u8)a == 0) { return 8; } else { return __builtin_clz((u32)(u8)a) - 24; }}
-u32 TARGET_V1 ctlzi16(i16 a) { if ((u16)a == 0) { return 16; } else { return __builtin_clz((u32)(u16)a) - 16; }}
-u32 TARGET_V1 ctlzi32(u32 a) { if (a == 0) { return 32; } else { return __builtin_clz(a); }}
-u64 TARGET_V1 ctlzi64(u64 a) { if (a == 0) { return 64; } else { return __builtin_clzll(a); }}
+u32 TARGET_V1 ctlzi8(u32 a) { return !(u8)a ? 8 : __builtin_clz((u8)a) - 24; }
+u32 TARGET_V1 ctlzi16(u32 a) { return !(u16)a ? 16 : __builtin_clz((u16)a) - 16; }
+u32 TARGET_V1 ctlzi32(u32 a) { return !a ? 32 : __builtin_clz(a); }
+u64 TARGET_V1 ctlzi64(u64 a) { return !a ? 64 : __builtin_clzll(a); }
 
 u32 TARGET_V1 bitreversei32(u32 a) { return __builtin_bitreverse32(a); }
 u64 TARGET_V1 bitreversei64(u64 a) { return __builtin_bitreverse64(a); }
