@@ -9,7 +9,7 @@
 
 define void @store_glob(ptr %ptr) {
 ; X64-LABEL: <store_glob>:
-; X64:         lea rax, <phi_gep_insert_after_earlier_phi+0xfffffffffffff9ef>
+; X64:         lea rax, <phi_gep_insert_after_earlier_phi+0xfffffffffffffa0f>
 ; X64-NEXT:     R_X86_64_PC32 glob-0x4
 ; X64-NEXT:    mov qword ptr [rdi], rax
 ; X64-NEXT:    ret
@@ -136,8 +136,6 @@ define void @vector_constantexpr(ptr %ptr) {
 ; X64-NEXT:    pxor xmm0, xmm0
 ; X64-NEXT:    movq qword ptr [rbp - 0x30], xmm0
 ; X64-NEXT:    mov dword ptr [rbp - 0x30], eax
-; X64-NEXT:    movq xmm0, qword ptr [rbp - 0x30]
-; X64-NEXT:    movq qword ptr [rbp - 0x30], xmm0
 ; X64-NEXT:    mov dword ptr [rbp - 0x2c], ecx
 ; X64-NEXT:    movq xmm0, qword ptr [rbp - 0x30]
 ; X64-NEXT:    movsd qword ptr [rdi], xmm0
@@ -175,15 +173,11 @@ define void @vector_ptrs(ptr %ptr) {
 ; X64-NEXT:    lea rcx, <vector_ptrs+0x16>
 ; X64-NEXT:     R_X86_64_PC32 glob-0x4
 ; X64-NEXT:    mov qword ptr [rbp - 0x50], rcx
-; X64-NEXT:    movapd xmm0, xmmword ptr [rbp - 0x50]
-; X64-NEXT:    movapd xmmword ptr [rbp - 0x50], xmm0
 ; X64-NEXT:    mov qword ptr [rbp - 0x48], 0x0
-; X64-NEXT:    movapd xmm0, xmmword ptr [rbp - 0x50]
 ; X64-NEXT:    movapd xmmword ptr [rbp - 0x40], xmm1
 ; X64-NEXT:    mov qword ptr [rbp - 0x40], 0x0
-; X64-NEXT:    movapd xmm1, xmmword ptr [rbp - 0x40]
-; X64-NEXT:    movapd xmmword ptr [rbp - 0x40], xmm1
 ; X64-NEXT:    mov qword ptr [rbp - 0x38], rax
+; X64-NEXT:    movapd xmm0, xmmword ptr [rbp - 0x50]
 ; X64-NEXT:    movups xmmword ptr [rdi], xmm0
 ; X64-NEXT:    movapd xmm0, xmmword ptr [rbp - 0x40]
 ; X64-NEXT:    movups xmmword ptr [rdi + 0x10], xmm0
@@ -214,7 +208,7 @@ define void @vector_ptrs(ptr %ptr) {
 
 define void @store_array1(ptr %ptr) {
 ; X64-LABEL: <store_array1>:
-; X64:         lea rax, <vector_ptrs+0x6f>
+; X64:         lea rax, <vector_ptrs+0x4f>
 ; X64-NEXT:     R_X86_64_PC32 glob-0x4
 ; X64-NEXT:    mov qword ptr [rdi], rax
 ; X64-NEXT:    mov qword ptr [rdi + 0x8], 0x0

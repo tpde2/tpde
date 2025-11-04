@@ -348,22 +348,22 @@ define void @ins_v5i8_chain(ptr %p, i8 %e0, i8 %e1, i8 %e2, i8 %e3, i8 %e4) {
 ; X64-NEXT:    xor r12d, r12d
 ; X64-NEXT:    mov byte ptr [rbp - 0x30], al
 ; X64-NEXT:    mov byte ptr [rbp - 0x30], sil
-; X64-NEXT:    movzx eax, byte ptr [rbp - 0x30]
 ; X64-NEXT:    mov byte ptr [rbp - 0x2f], bl
 ; X64-NEXT:    mov byte ptr [rbp - 0x2f], dl
-; X64-NEXT:    movzx edx, byte ptr [rbp - 0x2f]
 ; X64-NEXT:    mov byte ptr [rbp - 0x2e], r10b
 ; X64-NEXT:    mov byte ptr [rbp - 0x2e], cl
-; X64-NEXT:    movzx ecx, byte ptr [rbp - 0x2e]
 ; X64-NEXT:    mov byte ptr [rbp - 0x2d], r11b
 ; X64-NEXT:    mov byte ptr [rbp - 0x2d], r8b
-; X64-NEXT:    movzx ebx, byte ptr [rbp - 0x2d]
 ; X64-NEXT:    mov byte ptr [rbp - 0x2c], r12b
 ; X64-NEXT:    mov byte ptr [rbp - 0x2c], r9b
+; X64-NEXT:    movzx eax, byte ptr [rbp - 0x30]
 ; X64-NEXT:    mov byte ptr [rdi], al
-; X64-NEXT:    mov byte ptr [rdi + 0x1], dl
-; X64-NEXT:    mov byte ptr [rdi + 0x2], cl
-; X64-NEXT:    mov byte ptr [rdi + 0x3], bl
+; X64-NEXT:    movzx eax, byte ptr [rbp - 0x2f]
+; X64-NEXT:    mov byte ptr [rdi + 0x1], al
+; X64-NEXT:    movzx eax, byte ptr [rbp - 0x2e]
+; X64-NEXT:    mov byte ptr [rdi + 0x2], al
+; X64-NEXT:    movzx eax, byte ptr [rbp - 0x2d]
+; X64-NEXT:    mov byte ptr [rdi + 0x3], al
 ; X64-NEXT:    movzx eax, byte ptr [rbp - 0x2c]
 ; X64-NEXT:    mov byte ptr [rdi + 0x4], al
 ; X64-NEXT:    pop r12
@@ -381,22 +381,22 @@ define void @ins_v5i8_chain(ptr %p, i8 %e0, i8 %e1, i8 %e2, i8 %e3, i8 %e4) {
 ; ARM64-NEXT:    mov w10, #0x0 // =0
 ; ARM64-NEXT:    strb w6, [x29, #0xa0]
 ; ARM64-NEXT:    strb w1, [x29, #0xa0]
-; ARM64-NEXT:    ldrb w1, [x29, #0xa0]
 ; ARM64-NEXT:    strb w7, [x29, #0xa1]
 ; ARM64-NEXT:    strb w2, [x29, #0xa1]
-; ARM64-NEXT:    ldrb w2, [x29, #0xa1]
 ; ARM64-NEXT:    strb w8, [x29, #0xa2]
 ; ARM64-NEXT:    strb w3, [x29, #0xa2]
-; ARM64-NEXT:    ldrb w3, [x29, #0xa2]
 ; ARM64-NEXT:    strb w9, [x29, #0xa3]
 ; ARM64-NEXT:    strb w4, [x29, #0xa3]
-; ARM64-NEXT:    ldrb w4, [x29, #0xa3]
 ; ARM64-NEXT:    strb w10, [x29, #0xa4]
 ; ARM64-NEXT:    strb w5, [x29, #0xa4]
+; ARM64-NEXT:    ldrb w1, [x29, #0xa0]
 ; ARM64-NEXT:    strb w1, [x0]
-; ARM64-NEXT:    strb w2, [x0, #0x1]
-; ARM64-NEXT:    strb w3, [x0, #0x2]
-; ARM64-NEXT:    strb w4, [x0, #0x3]
+; ARM64-NEXT:    ldrb w1, [x29, #0xa1]
+; ARM64-NEXT:    strb w1, [x0, #0x1]
+; ARM64-NEXT:    ldrb w1, [x29, #0xa2]
+; ARM64-NEXT:    strb w1, [x0, #0x2]
+; ARM64-NEXT:    ldrb w1, [x29, #0xa3]
+; ARM64-NEXT:    strb w1, [x0, #0x3]
 ; ARM64-NEXT:    ldrb w1, [x29, #0xa4]
 ; ARM64-NEXT:    strb w1, [x0, #0x4]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
@@ -603,17 +603,9 @@ define void @ins_v32i8_chain(ptr %p, i8 %e0, i8 %e1, i8 %e2, i8 %e3, i8 %e4) {
 ; X64-NEXT:    pxor xmm1, xmm1
 ; X64-NEXT:    movapd xmmword ptr [rbp - 0x50], xmm0
 ; X64-NEXT:    mov byte ptr [rbp - 0x50], sil
-; X64-NEXT:    movapd xmm0, xmmword ptr [rbp - 0x50]
-; X64-NEXT:    movapd xmmword ptr [rbp - 0x50], xmm0
 ; X64-NEXT:    mov byte ptr [rbp - 0x4f], dl
-; X64-NEXT:    movapd xmm0, xmmword ptr [rbp - 0x50]
-; X64-NEXT:    movapd xmmword ptr [rbp - 0x50], xmm0
 ; X64-NEXT:    mov byte ptr [rbp - 0x4e], cl
-; X64-NEXT:    movapd xmm0, xmmword ptr [rbp - 0x50]
-; X64-NEXT:    movapd xmmword ptr [rbp - 0x50], xmm0
 ; X64-NEXT:    mov byte ptr [rbp - 0x4d], r8b
-; X64-NEXT:    movapd xmm0, xmmword ptr [rbp - 0x50]
-; X64-NEXT:    movapd xmmword ptr [rbp - 0x50], xmm0
 ; X64-NEXT:    mov byte ptr [rbp - 0x4c], r9b
 ; X64-NEXT:    movapd xmm0, xmmword ptr [rbp - 0x50]
 ; X64-NEXT:    movups xmmword ptr [rdi], xmm0
@@ -721,14 +713,8 @@ define <4 x i32> @ins_v4i32_chain(i32 %a, i32 %b, i32 %c, i32 %d) {
 ; X64-NEXT:    pxor xmm0, xmm0
 ; X64-NEXT:    movapd xmmword ptr [rbp - 0x40], xmm0
 ; X64-NEXT:    mov dword ptr [rbp - 0x40], edi
-; X64-NEXT:    movapd xmm0, xmmword ptr [rbp - 0x40]
-; X64-NEXT:    movapd xmmword ptr [rbp - 0x40], xmm0
 ; X64-NEXT:    mov dword ptr [rbp - 0x3c], esi
-; X64-NEXT:    movapd xmm0, xmmword ptr [rbp - 0x40]
-; X64-NEXT:    movapd xmmword ptr [rbp - 0x40], xmm0
 ; X64-NEXT:    mov dword ptr [rbp - 0x38], edx
-; X64-NEXT:    movapd xmm0, xmmword ptr [rbp - 0x40]
-; X64-NEXT:    movapd xmmword ptr [rbp - 0x40], xmm0
 ; X64-NEXT:    mov dword ptr [rbp - 0x34], ecx
 ; X64-NEXT:    movapd xmm0, xmmword ptr [rbp - 0x40]
 ; X64-NEXT:    pop rbp

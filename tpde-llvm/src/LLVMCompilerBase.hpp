@@ -2992,9 +2992,10 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_insert_element(
 
   auto ins = inst->getOperand(1);
   auto [val_ref, val] = this->val_ref_single(ins);
-  ValueRef res_vr = this->result_ref(inst);
+  ValueRef res_vr{derived()};
 
   if (ins->getType()->isIntegerTy(1)) {
+    res_vr = this->result_ref(inst);
     assert(res_vr.assignment()->part_count == 1);
     ValueRef src_vr = this->val_ref(inst->getOperand(0));
     if (auto *ci = llvm::dyn_cast<llvm::ConstantInt>(index)) {
@@ -3022,9 +3023,14 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_insert_element(
   // indices, because the value reference must always be initialized.
   {
     ValueRef src_vr = this->val_ref(inst->getOperand(0));
-    for (u32 i = 0; i < res_vr.assignment()->part_count; ++i) {
-      // TODO: skip overwritten part in scalarized case.
-      res_vr.part(i).set_value(src_vr.part(i));
+    if (src_vr.is_owned()) {
+      res_vr = this->result_ref_alias(inst, std::move(src_vr));
+    } else {
+      res_vr = this->result_ref(inst);
+      for (u32 i = 0; i < res_vr.assignment()->part_count; ++i) {
+        // TODO: skip overwritten part in scalarized case.
+        res_vr.part(i).set_value(src_vr.part(i));
+      }
     }
   }
 
