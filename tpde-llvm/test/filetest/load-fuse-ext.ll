@@ -737,3 +737,18 @@ define i128 @load_i33_sext_i128(ptr %a) {
   %x = sext i33 %l to i128
   ret i128 %x
 }
+
+define i64 @load_gep_ext(ptr %p) {
+; X64-LABEL: <load_gep_ext>:
+; X64:         movsxd rax, dword ptr [rdi + 0xe]
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <load_gep_ext>:
+; ARM64:         add x0, x0, #0xe
+; ARM64-NEXT:    ldrsw x0, [x0]
+; ARM64-NEXT:    ret
+  %gep = getelementptr i8, ptr %p, i64 14
+  %load = load i32, ptr %gep, align 1
+  %ext = sext i32 %load to i64
+  ret i64 %ext
+}
