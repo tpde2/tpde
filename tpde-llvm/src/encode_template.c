@@ -528,8 +528,11 @@ float TARGET_V1 fabsf32(float a) { return __builtin_fabsf(a); }
 double TARGET_V1 fabsf64(double a) { return __builtin_fabs(a); }
 fp128 TARGET_V1 fabsf128(fp128 a) { return __builtin_fabsf128(a); }
 
-float TARGET_V1 fmaf32(float a, float b, float c) { return a * b + c; }
-double TARGET_V1 fmaf64(double a, double b, double c) { return a * b + c; }
+float TARGET_V1 fmuladdf32(float a, float b, float c) { return a * b + c; }
+double TARGET_V1 fmuladdf64(double a, double b, double c) { return a * b + c; }
+v2f32 TARGET_V1 fmuladdv2f32(v2f32 a, v2f32 b, v2f32 c) { return a * b + c; }
+v4f32 TARGET_V1 fmuladdv4f32(v4f32 a, v4f32 b, v4f32 c) { return a * b + c; }
+v2f64 TARGET_V1 fmuladdv2f64(v2f64 a, v2f64 b, v2f64 c) { return a * b + c; }
 
 float TARGET_V1 copysignf32(float a, float b) { return __builtin_copysignf(a, b); }
 double TARGET_V1 copysignf64(double a, double b) { return __builtin_copysign(a, b); }

@@ -4533,42 +4533,42 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_intrin(
     return true;
   }
   case llvm::Intrinsic::fmuladd: {
-    auto op1_ref = this->val_ref(inst->getOperand(0));
-    auto op2_ref = this->val_ref(inst->getOperand(1));
-    auto op3_ref = this->val_ref(inst->getOperand(2));
+    ValueRef op1 = this->val_ref(inst->getOperand(0));
+    ValueRef op2 = this->val_ref(inst->getOperand(1));
+    ValueRef op3 = this->val_ref(inst->getOperand(2));
+    ValueRef res = this->result_ref(inst);
 
-    if (inst->getType()->isFP128Ty()) {
+    using EncodeFnTy = bool (Derived::*)(GenericValuePart &&,
+                                         GenericValuePart &&,
+                                         GenericValuePart &&,
+                                         ValuePart &&);
+    EncodeFnTy fn = nullptr;
+    switch (info.type) {
+      using enum LLVMBasicValType;
+    case f32: fn = &Derived::encode_fmuladdf32; break;
+    case f64: fn = &Derived::encode_fmuladdf64; break;
+    case v2f32: fn = &Derived::encode_fmuladdv2f32; break;
+    case v4f32: fn = &Derived::encode_fmuladdv4f32; break;
+    case v2f64: fn = &Derived::encode_fmuladdv2f64; break;
+    case f128: {
       auto cb1 = derived()->create_call_builder();
-      cb1->add_arg(op1_ref.part(0), tpde::CCAssignment{});
-      cb1->add_arg(op2_ref.part(0), tpde::CCAssignment{});
+      cb1->add_arg(op1.part(0), tpde::CCAssignment{});
+      cb1->add_arg(op2.part(0), tpde::CCAssignment{});
       cb1->call(get_libfunc_sym(LibFunc::multf3));
       ValuePartRef tmp{this, Config::FP_BANK};
       cb1->add_ret(tmp, tpde::CCAssignment{});
 
       auto cb2 = derived()->create_call_builder();
       cb2->add_arg(std::move(tmp), tpde::CCAssignment{});
-      cb2->add_arg(op3_ref.part(0), tpde::CCAssignment{});
+      cb2->add_arg(op3.part(0), tpde::CCAssignment{});
       cb2->call(get_libfunc_sym(LibFunc::addtf3));
-      auto res_vr2 = this->result_ref(inst);
-      cb2->add_ret(res_vr2);
+      cb2->add_ret(res);
       return true;
     }
-
-    if (!inst->getType()->isFloatTy() && !inst->getType()->isDoubleTy()) {
-      return false;
+    default: return false;
     }
 
-    const auto is_double = inst->getOperand(0)->getType()->isDoubleTy();
-
-    auto [res_vr, res_ref] = this->result_ref_single(inst);
-    if (is_double) {
-      derived()->encode_fmaf64(
-          op1_ref.part(0), op2_ref.part(0), op3_ref.part(0), res_ref);
-    } else {
-      derived()->encode_fmaf32(
-          op1_ref.part(0), op2_ref.part(0), op3_ref.part(0), res_ref);
-    }
-    return true;
+    return (derived()->*fn)(op1.part(0), op2.part(0), op3.part(0), res.part(0));
   }
   case llvm::Intrinsic::abs: {
     auto *val = inst->getOperand(0);
