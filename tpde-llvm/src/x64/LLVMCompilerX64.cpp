@@ -308,39 +308,67 @@ bool LLVMCompilerX64::compile_icmp(const llvm::Instruction *inst,
       jump = swap_jump(jump);
     }
 
-    if (int_width != 32 && int_width != 64) {
+    if (int_width < 8 || (int_width & (int_width - 1))) {
+      // We could handle comparisons of integers <32 bit against zero with
+      // TESTri. They occur very rarely and are not worth the effort.
       unsigned ext_bits = tpde::util::align_up(int_width, 32);
       lhs_op = std::move(lhs_op).into_extended(is_signed, int_width, ext_bits);
       rhs_op = std::move(rhs_op).into_extended(is_signed, int_width, ext_bits);
+      int_width = ext_bits;
     }
 
-    AsmReg lhs_reg = lhs_op.has_reg() ? lhs_op.cur_reg() : lhs_op.load_to_reg();
-    if (int_width <= 32) {
-      if (rhs_op.is_const()) {
-        if (i32 rhs_val = i32(rhs_op.const_data()[0])) {
-          ASM(CMP32ri, lhs_reg, rhs_val);
-        } else {
-          ASM(TEST32rr, lhs_reg, lhs_reg);
+    // We can do comparisons against small immediates more efficiently.
+    i64 rhs_val = rhs_op.is_const() ? rhs_op.const_data()[0] : 0;
+    if (rhs_op.is_const() && (int_width <= 32 || i32(rhs_val) == rhs_val)) {
+      // Comparison of 8/16/32/64-bit can use CMPmi. Only do so if the value
+      // doesn't reside in a register.
+      if (lhs_op.has_assignment()) {
+        tpde::AssignmentPartRef ap = lhs_op.assignment();
+        if (!ap.register_valid() && ap.stack_valid()) {
+          FeMem mem = FE_MEM(FE_BP, 0, FE_NOREG, ap.frame_off());
+          switch (int_width) {
+          case 8: ASM(CMP8mi, mem, i8(rhs_val)); goto done_compare;
+          case 16: ASM(CMP16mi, mem, i16(rhs_val)); goto done_compare;
+          case 32: ASM(CMP32mi, mem, i32(rhs_val)); goto done_compare;
+          case 64: ASM(CMP64mi, mem, rhs_val); goto done_compare;
+          default: TPDE_UNREACHABLE("impossible int bit width");
+          }
+        }
+      }
+
+      auto lhs_reg = lhs_op.has_reg() ? lhs_op.cur_reg() : lhs_op.load_to_reg();
+      if (rhs_val == 0) {
+        // Comparison of register with zero is TESTrr/TESTri.
+        switch (int_width) {
+        case 8: ASM(TEST8rr, lhs_reg, lhs_reg); break;
+        case 16: ASM(TEST16rr, lhs_reg, lhs_reg); break;
+        case 32: ASM(TEST32rr, lhs_reg, lhs_reg); break;
+        case 64: ASM(TEST64rr, lhs_reg, lhs_reg); break;
+        default: TPDE_UNREACHABLE("impossible int bit width");
         }
       } else {
-        AsmReg rhs_reg =
-            rhs_op.has_reg() ? rhs_op.cur_reg() : rhs_op.load_to_reg();
-        ASM(CMP32rr, lhs_reg, rhs_reg);
+        // Comparison of 8/16/32/64-bit is CMPri.
+        switch (int_width) {
+        case 8: ASM(CMP8ri, lhs_reg, i8(rhs_val)); break;
+        case 16: ASM(CMP16ri, lhs_reg, i16(rhs_val)); break;
+        case 32: ASM(CMP32ri, lhs_reg, i32(rhs_val)); break;
+        case 64: ASM(CMP64ri, lhs_reg, rhs_val); break;
+        default: TPDE_UNREACHABLE("impossible int bit width");
+        }
       }
     } else {
-      if (rhs_op.is_const() &&
-          i32(rhs_op.const_data()[0]) == i64(rhs_op.const_data()[0])) {
-        if (i64 rhs_val = rhs_op.const_data()[0]) {
-          ASM(CMP64ri, lhs_reg, rhs_val);
-        } else {
-          ASM(TEST64rr, lhs_reg, lhs_reg);
-        }
-      } else {
-        AsmReg rhs_reg =
-            rhs_op.has_reg() ? rhs_op.cur_reg() : rhs_op.load_to_reg();
-        ASM(CMP64rr, lhs_reg, rhs_reg);
+      auto lhs_reg = lhs_op.has_reg() ? lhs_op.cur_reg() : lhs_op.load_to_reg();
+      auto rhs_reg = rhs_op.has_reg() ? rhs_op.cur_reg() : rhs_op.load_to_reg();
+      switch (int_width) {
+      case 8: ASM(CMP8rr, lhs_reg, rhs_reg); break;
+      case 16: ASM(CMP16rr, lhs_reg, rhs_reg); break;
+      case 32: ASM(CMP32rr, lhs_reg, rhs_reg); break;
+      case 64: ASM(CMP64rr, lhs_reg, rhs_reg); break;
+      default: TPDE_UNREACHABLE("impossible int bit width");
       }
     }
+
+  done_compare:;
   }
 
   // No need for set_preserve_flags; we don't call helpers that could

@@ -8,8 +8,7 @@
 
 define void @icmp_eq_i8_0(i8 %0) {
 ; X64-LABEL: <icmp_eq_i8_0>:
-; X64:         movzx edi, dil
-; X64-NEXT:    test edi, edi
+; X64:         test dil, dil
 ; X64-NEXT:    sete al
 ; X64-NEXT:    ret
 ;
@@ -25,8 +24,7 @@ define void @icmp_eq_i8_0(i8 %0) {
 
 define void @icmp_ne_i8_0(i8 %0) {
 ; X64-LABEL: <icmp_ne_i8_0>:
-; X64:         movzx edi, dil
-; X64-NEXT:    test edi, edi
+; X64:         test dil, dil
 ; X64-NEXT:    setne al
 ; X64-NEXT:    ret
 ;
@@ -42,8 +40,7 @@ define void @icmp_ne_i8_0(i8 %0) {
 
 define void @icmp_eq_i8_1(i8 %0) {
 ; X64-LABEL: <icmp_eq_i8_1>:
-; X64:         movzx edi, dil
-; X64-NEXT:    cmp edi, 0x1
+; X64:         cmp dil, 0x1
 ; X64-NEXT:    sete al
 ; X64-NEXT:    ret
 ;
@@ -59,8 +56,7 @@ define void @icmp_eq_i8_1(i8 %0) {
 
 define void @icmp_eq_i8_-1(i8 %0) {
 ; X64-LABEL: <icmp_eq_i8_-1>:
-; X64:         movzx edi, dil
-; X64-NEXT:    cmp edi, 0xff
+; X64:         cmp dil, -0x1
 ; X64-NEXT:    sete al
 ; X64-NEXT:    ret
 ;
@@ -76,9 +72,7 @@ define void @icmp_eq_i8_-1(i8 %0) {
 
 define void @icmp_eq_i8_i8(i8 %0, i8 %1) {
 ; X64-LABEL: <icmp_eq_i8_i8>:
-; X64:         movzx edi, dil
-; X64-NEXT:    movzx esi, sil
-; X64-NEXT:    cmp edi, esi
+; X64:         cmp dil, sil
 ; X64-NEXT:    sete al
 ; X64-NEXT:    ret
 ;
@@ -95,9 +89,7 @@ define void @icmp_eq_i8_i8(i8 %0, i8 %1) {
 
 define void @icmp_sgt_i8_i8(i8 %0, i8 %1) {
 ; X64-LABEL: <icmp_sgt_i8_i8>:
-; X64:         movsx edi, dil
-; X64-NEXT:    movsx esi, sil
-; X64-NEXT:    cmp edi, esi
+; X64:         cmp dil, sil
 ; X64-NEXT:    setg al
 ; X64-NEXT:    ret
 ;
@@ -114,8 +106,7 @@ define void @icmp_sgt_i8_i8(i8 %0, i8 %1) {
 
 define void @icmp_ugt_i8_1(i8 %0) {
 ; X64-LABEL: <icmp_ugt_i8_1>:
-; X64:         movzx edi, dil
-; X64-NEXT:    cmp edi, 0x1
+; X64:         cmp dil, 0x1
 ; X64-NEXT:    seta al
 ; X64-NEXT:    ret
 ;
@@ -131,8 +122,7 @@ define void @icmp_ugt_i8_1(i8 %0) {
 
 define void @icmp_uge_i8_1(i8 %0) {
 ; X64-LABEL: <icmp_uge_i8_1>:
-; X64:         movzx edi, dil
-; X64-NEXT:    cmp edi, 0x1
+; X64:         cmp dil, 0x1
 ; X64-NEXT:    setae al
 ; X64-NEXT:    ret
 ;
@@ -148,8 +138,7 @@ define void @icmp_uge_i8_1(i8 %0) {
 
 define void @icmp_ult_i8_1(i8 %0) {
 ; X64-LABEL: <icmp_ult_i8_1>:
-; X64:         movzx edi, dil
-; X64-NEXT:    cmp edi, 0x1
+; X64:         cmp dil, 0x1
 ; X64-NEXT:    setb al
 ; X64-NEXT:    ret
 ;
@@ -165,8 +154,7 @@ define void @icmp_ult_i8_1(i8 %0) {
 
 define void @icmp_ule_i8_1(i8 %0) {
 ; X64-LABEL: <icmp_ule_i8_1>:
-; X64:         movzx edi, dil
-; X64-NEXT:    cmp edi, 0x1
+; X64:         cmp dil, 0x1
 ; X64-NEXT:    setbe al
 ; X64-NEXT:    ret
 ;
@@ -182,8 +170,7 @@ define void @icmp_ule_i8_1(i8 %0) {
 
 define void @icmp_sgt_i8_1(i8 %0) {
 ; X64-LABEL: <icmp_sgt_i8_1>:
-; X64:         movsx edi, dil
-; X64-NEXT:    cmp edi, 0x1
+; X64:         cmp dil, 0x1
 ; X64-NEXT:    setg al
 ; X64-NEXT:    ret
 ;
@@ -199,8 +186,7 @@ define void @icmp_sgt_i8_1(i8 %0) {
 
 define void @icmp_sge_i8_1(i8 %0) {
 ; X64-LABEL: <icmp_sge_i8_1>:
-; X64:         movsx edi, dil
-; X64-NEXT:    cmp edi, 0x1
+; X64:         cmp dil, 0x1
 ; X64-NEXT:    setge al
 ; X64-NEXT:    ret
 ;
@@ -216,8 +202,7 @@ define void @icmp_sge_i8_1(i8 %0) {
 
 define void @icmp_slt_i8_1(i8 %0) {
 ; X64-LABEL: <icmp_slt_i8_1>:
-; X64:         movsx edi, dil
-; X64-NEXT:    cmp edi, 0x1
+; X64:         cmp dil, 0x1
 ; X64-NEXT:    setl al
 ; X64-NEXT:    ret
 ;
@@ -233,8 +218,7 @@ define void @icmp_slt_i8_1(i8 %0) {
 
 define void @icmp_sle_i8_1(i8 %0) {
 ; X64-LABEL: <icmp_sle_i8_1>:
-; X64:         movsx edi, dil
-; X64-NEXT:    cmp edi, 0x1
+; X64:         cmp dil, 0x1
 ; X64-NEXT:    setle al
 ; X64-NEXT:    ret
 ;
@@ -250,8 +234,7 @@ define void @icmp_sle_i8_1(i8 %0) {
 
 define i1 @icmp_sle_i8_-1(i8 %0) {
 ; X64-LABEL: <icmp_sle_i8_-1>:
-; X64:         movsx edi, dil
-; X64-NEXT:    cmp edi, -0x1
+; X64:         cmp dil, -0x1
 ; X64-NEXT:    setle al
 ; X64-NEXT:    ret
 ;
@@ -269,8 +252,7 @@ entry:
 
 define void @icmp_eq_i16_0(i16 %0) {
 ; X64-LABEL: <icmp_eq_i16_0>:
-; X64:         movzx edi, di
-; X64-NEXT:    test edi, edi
+; X64:         test di, di
 ; X64-NEXT:    sete al
 ; X64-NEXT:    ret
 ;
@@ -286,8 +268,7 @@ define void @icmp_eq_i16_0(i16 %0) {
 
 define void @icmp_ne_i16_0(i16 %0) {
 ; X64-LABEL: <icmp_ne_i16_0>:
-; X64:         movzx edi, di
-; X64-NEXT:    test edi, edi
+; X64:         test di, di
 ; X64-NEXT:    setne al
 ; X64-NEXT:    ret
 ;
@@ -303,8 +284,7 @@ define void @icmp_ne_i16_0(i16 %0) {
 
 define void @icmp_eq_i16_1(i16 %0) {
 ; X64-LABEL: <icmp_eq_i16_1>:
-; X64:         movzx edi, di
-; X64-NEXT:    cmp edi, 0x1
+; X64:         cmp di, 0x1
 ; X64-NEXT:    sete al
 ; X64-NEXT:    ret
 ;
@@ -320,8 +300,7 @@ define void @icmp_eq_i16_1(i16 %0) {
 
 define void @icmp_eq_i16_-1(i16 %0) {
 ; X64-LABEL: <icmp_eq_i16_-1>:
-; X64:         movzx edi, di
-; X64-NEXT:    cmp edi, 0xffff
+; X64:         cmp di, -0x1
 ; X64-NEXT:    sete al
 ; X64-NEXT:    ret
 ;
@@ -338,8 +317,7 @@ define void @icmp_eq_i16_-1(i16 %0) {
 
 define void @icmp_eq_i16_f000(i16 %0) {
 ; X64-LABEL: <icmp_eq_i16_f000>:
-; X64:         movzx edi, di
-; X64-NEXT:    cmp edi, 0xf000
+; X64:         cmp di, 0xf000
 ; X64-NEXT:    sete al
 ; X64-NEXT:    ret
 ;
@@ -356,8 +334,7 @@ define void @icmp_eq_i16_f000(i16 %0) {
 
 define void @icmp_eq_i16_1001(i16 %0) {
 ; X64-LABEL: <icmp_eq_i16_1001>:
-; X64:         movzx edi, di
-; X64-NEXT:    cmp edi, 0x1001
+; X64:         cmp di, 0x1001
 ; X64-NEXT:    sete al
 ; X64-NEXT:    ret
 ;
@@ -374,9 +351,7 @@ define void @icmp_eq_i16_1001(i16 %0) {
 
 define void @icmp_eq_i16_i16(i16 %0, i16 %1) {
 ; X64-LABEL: <icmp_eq_i16_i16>:
-; X64:         movzx edi, di
-; X64-NEXT:    movzx esi, si
-; X64-NEXT:    cmp edi, esi
+; X64:         cmp di, si
 ; X64-NEXT:    sete al
 ; X64-NEXT:    ret
 ;
@@ -393,9 +368,7 @@ define void @icmp_eq_i16_i16(i16 %0, i16 %1) {
 
 define void @icmp_sgt_i16_i16(i16 %0, i16 %1) {
 ; X64-LABEL: <icmp_sgt_i16_i16>:
-; X64:         movsx edi, di
-; X64-NEXT:    movsx esi, si
-; X64-NEXT:    cmp edi, esi
+; X64:         cmp di, si
 ; X64-NEXT:    setg al
 ; X64-NEXT:    ret
 ;
@@ -412,8 +385,7 @@ define void @icmp_sgt_i16_i16(i16 %0, i16 %1) {
 
 define void @icmp_ugt_i16_1(i16 %0) {
 ; X64-LABEL: <icmp_ugt_i16_1>:
-; X64:         movzx edi, di
-; X64-NEXT:    cmp edi, 0x1
+; X64:         cmp di, 0x1
 ; X64-NEXT:    seta al
 ; X64-NEXT:    ret
 ;
@@ -429,8 +401,7 @@ define void @icmp_ugt_i16_1(i16 %0) {
 
 define void @icmp_uge_i16_1(i16 %0) {
 ; X64-LABEL: <icmp_uge_i16_1>:
-; X64:         movzx edi, di
-; X64-NEXT:    cmp edi, 0x1
+; X64:         cmp di, 0x1
 ; X64-NEXT:    setae al
 ; X64-NEXT:    ret
 ;
@@ -446,8 +417,7 @@ define void @icmp_uge_i16_1(i16 %0) {
 
 define void @icmp_ult_i16_1(i16 %0) {
 ; X64-LABEL: <icmp_ult_i16_1>:
-; X64:         movzx edi, di
-; X64-NEXT:    cmp edi, 0x1
+; X64:         cmp di, 0x1
 ; X64-NEXT:    setb al
 ; X64-NEXT:    ret
 ;
@@ -463,8 +433,7 @@ define void @icmp_ult_i16_1(i16 %0) {
 
 define void @icmp_ule_i16_1(i16 %0) {
 ; X64-LABEL: <icmp_ule_i16_1>:
-; X64:         movzx edi, di
-; X64-NEXT:    cmp edi, 0x1
+; X64:         cmp di, 0x1
 ; X64-NEXT:    setbe al
 ; X64-NEXT:    ret
 ;
@@ -480,8 +449,7 @@ define void @icmp_ule_i16_1(i16 %0) {
 
 define void @icmp_sgt_i16_1(i16 %0) {
 ; X64-LABEL: <icmp_sgt_i16_1>:
-; X64:         movsx edi, di
-; X64-NEXT:    cmp edi, 0x1
+; X64:         cmp di, 0x1
 ; X64-NEXT:    setg al
 ; X64-NEXT:    ret
 ;
@@ -497,8 +465,7 @@ define void @icmp_sgt_i16_1(i16 %0) {
 
 define void @icmp_sge_i16_1(i16 %0) {
 ; X64-LABEL: <icmp_sge_i16_1>:
-; X64:         movsx edi, di
-; X64-NEXT:    cmp edi, 0x1
+; X64:         cmp di, 0x1
 ; X64-NEXT:    setge al
 ; X64-NEXT:    ret
 ;
@@ -514,8 +481,7 @@ define void @icmp_sge_i16_1(i16 %0) {
 
 define void @icmp_slt_i16_1(i16 %0) {
 ; X64-LABEL: <icmp_slt_i16_1>:
-; X64:         movsx edi, di
-; X64-NEXT:    cmp edi, 0x1
+; X64:         cmp di, 0x1
 ; X64-NEXT:    setl al
 ; X64-NEXT:    ret
 ;
@@ -531,8 +497,7 @@ define void @icmp_slt_i16_1(i16 %0) {
 
 define i1 @icmp_slt_i16_m11776(i16 %0) {
 ; X64-LABEL: <icmp_slt_i16_m11776>:
-; X64:         movsx edi, di
-; X64-NEXT:    cmp edi, 0xffffd200
+; X64:         cmp di, 0xd200
 ; X64-NEXT:    setl al
 ; X64-NEXT:    ret
 ;
@@ -548,8 +513,7 @@ define i1 @icmp_slt_i16_m11776(i16 %0) {
 
 define void @icmp_sle_i16_1(i16 %0) {
 ; X64-LABEL: <icmp_sle_i16_1>:
-; X64:         movsx edi, di
-; X64-NEXT:    cmp edi, 0x1
+; X64:         cmp di, 0x1
 ; X64-NEXT:    setle al
 ; X64-NEXT:    ret
 ;

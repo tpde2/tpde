@@ -8,8 +8,7 @@
 
 define i8 @icmp_eq_i8_0_br(i8 %0) {
 ; X64-LABEL: <icmp_eq_i8_0_br>:
-; X64:         movzx edi, dil
-; X64-NEXT:    test edi, edi
+; X64:         test dil, dil
 ; X64-NEXT:    jne <L0>
 ; X64-NEXT:    mov eax, 0x1
 ; X64-NEXT:    jmp <L1>
@@ -114,8 +113,7 @@ block2:
 
 define i8 @icmp_eq_i8_1_br(i8 %0) {
 ; X64-LABEL: <icmp_eq_i8_1_br>:
-; X64:         movzx edi, dil
-; X64-NEXT:    cmp edi, 0x1
+; X64:         cmp dil, 0x1
 ; X64-NEXT:    jne <L0>
 ; X64-NEXT:    mov eax, 0x1
 ; X64-NEXT:    jmp <L1>
@@ -473,11 +471,10 @@ define void @cbz_nophi(i32 %param) {
 ; X64-NEXT:    lea eax, [1*rax]
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    lea eax, [1*rax]
-; X64-NEXT:    mov eax, dword ptr [rbp - 0x2c]
-; X64-NEXT:    test eax, eax
+; X64-NEXT:    cmp dword ptr [rbp - 0x2c], 0x0
 ; X64-NEXT:    jne <L0>
-; X64-NEXT:    xor ecx, ecx
-; X64-NEXT:    mov dword ptr [rbp - 0x30], ecx
+; X64-NEXT:    xor eax, eax
+; X64-NEXT:    mov dword ptr [rbp - 0x30], eax
 ; X64-NEXT:    jmp <L1>
 ;
 ; ARM64-LABEL: <cbz_nophi>:
@@ -531,11 +528,10 @@ define void @cbz_phi() {
 ; X64-NEXT:    lea eax, [1*rax]
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    lea eax, [1*rax]
-; X64-NEXT:    mov eax, dword ptr [rbp - 0x2c]
-; X64-NEXT:    test eax, eax
+; X64-NEXT:    cmp dword ptr [rbp - 0x2c], 0x0
 ; X64-NEXT:    jne <L0>
-; X64-NEXT:    xor ecx, ecx
-; X64-NEXT:    mov dword ptr [rbp - 0x2c], ecx
+; X64-NEXT:    xor eax, eax
+; X64-NEXT:    mov dword ptr [rbp - 0x2c], eax
 ; X64-NEXT:    jmp <L1>
 ;
 ; ARM64-LABEL: <cbz_phi>:
