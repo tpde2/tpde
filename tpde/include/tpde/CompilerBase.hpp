@@ -627,6 +627,11 @@ void CompilerBase<Adaptor, Derived, Config>::CallBuilderBase<
         } else {
           compiler.mov(cca.reg, vp_reg, size);
         }
+      } else if (needs_ext && vp.is_const()) {
+        u64 val = vp.const_data()[0];
+        u64 extended =
+            ext_sign ? util::sext(val, ext_bits) : util::zext(val, ext_bits);
+        compiler.materialize_constant(&extended, cca.bank, 8, cca.reg);
       } else {
         vp.reload_into_specific_fixed(&compiler, cca.reg);
         if (needs_ext) {
