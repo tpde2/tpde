@@ -424,3 +424,22 @@ define i1 @fcmp_ueq(x86_fp80 %0, x86_fp80 %1) {
   %cmp = fcmp ueq x86_fp80 %0, %1
   ret i1 %cmp
 }
+
+define x86_fp80 @select(i1 %c, x86_fp80 %a, x86_fp80 %b) {
+; X64-LABEL: <select>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    test dil, 0x1
+; X64-NEXT:    movapd xmm0, xmmword ptr [rbp + 0x10]
+; X64-NEXT:    movapd xmm1, xmmword ptr [rbp + 0x20]
+; X64-NEXT:    je <L0>
+; X64-NEXT:    movaps xmm1, xmm0
+; X64-NEXT:  <L0>:
+; X64-NEXT:    movaps xmm0, xmm1
+; X64-NEXT:    movapd xmmword ptr [rbp - 0x40], xmm0
+; X64-NEXT:    fld tbyte ptr [rbp - 0x40]
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+  %res = select i1 %c, x86_fp80 %a, x86_fp80 %b
+  ret x86_fp80 %res
+}

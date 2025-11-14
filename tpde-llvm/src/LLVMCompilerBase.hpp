@@ -3802,6 +3802,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_select(
     derived()->encode_select_f64(
         std::move(cond), lhs.part(0), rhs.part(0), res.part(0));
     break;
+  case f80: // x86_fp80 is mapped to XMM register, so we can reuse the logic.
   case f128:
   case v16i8:
   case v8i16:
