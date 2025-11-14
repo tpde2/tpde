@@ -151,6 +151,30 @@ struct LLVMCompilerX64 : tpde::x64::CompilerX64<LLVMAdaptor,
     fp80_push(std::move(src));
     ASM(FSTPm64, spill_slot_op(dst, true));
   }
+  void fp80_add(ValuePart &&lhs, ValuePart &&rhs, ValuePart &&res) noexcept {
+    fp80_push(std::move(rhs));
+    fp80_push(std::move(lhs));
+    ASM(FADDPrr, FE_ST(1), FE_ST(0));
+    fp80_pop(res);
+  }
+  void fp80_sub(ValuePart &&lhs, ValuePart &&rhs, ValuePart &&res) noexcept {
+    fp80_push(std::move(rhs));
+    fp80_push(std::move(lhs));
+    ASM(FSUBRPrr, FE_ST(1), FE_ST(0));
+    fp80_pop(res);
+  }
+  void fp80_mul(ValuePart &&lhs, ValuePart &&rhs, ValuePart &&res) noexcept {
+    fp80_push(std::move(rhs));
+    fp80_push(std::move(lhs));
+    ASM(FMULPrr, FE_ST(1), FE_ST(0));
+    fp80_pop(res);
+  }
+  void fp80_div(ValuePart &&lhs, ValuePart &&rhs, ValuePart &&res) noexcept {
+    fp80_push(std::move(rhs));
+    fp80_push(std::move(lhs));
+    ASM(FDIVRPrr, FE_ST(1), FE_ST(0));
+    fp80_pop(res);
+  }
   void fp80_cmp(llvm::CmpInst::Predicate pred,
                 ValuePart &&lhs,
                 ValuePart &&rhs,

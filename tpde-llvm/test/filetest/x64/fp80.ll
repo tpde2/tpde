@@ -443,3 +443,63 @@ define x86_fp80 @select(i1 %c, x86_fp80 %a, x86_fp80 %b) {
   %res = select i1 %c, x86_fp80 %a, x86_fp80 %b
   ret x86_fp80 %res
 }
+
+define x86_fp80 @fadd(x86_fp80 %0, x86_fp80 %1) {
+; X64-LABEL: <fadd>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    fld tbyte ptr [rbp + 0x20]
+; X64-NEXT:    fld tbyte ptr [rbp + 0x10]
+; X64-NEXT:    faddp st(1), st
+; X64-NEXT:    fstp tbyte ptr [rbp - 0x40]
+; X64-NEXT:    fld tbyte ptr [rbp - 0x40]
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+  %res = fadd x86_fp80 %0, %1
+  ret x86_fp80 %res
+}
+
+define x86_fp80 @fsub(x86_fp80 %0, x86_fp80 %1) {
+; X64-LABEL: <fsub>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    fld tbyte ptr [rbp + 0x20]
+; X64-NEXT:    fld tbyte ptr [rbp + 0x10]
+; X64-NEXT:    fsubrp st(1), st
+; X64-NEXT:    fstp tbyte ptr [rbp - 0x40]
+; X64-NEXT:    fld tbyte ptr [rbp - 0x40]
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+  %res = fsub x86_fp80 %0, %1
+  ret x86_fp80 %res
+}
+
+define x86_fp80 @fmul(x86_fp80 %0, x86_fp80 %1) {
+; X64-LABEL: <fmul>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    fld tbyte ptr [rbp + 0x20]
+; X64-NEXT:    fld tbyte ptr [rbp + 0x10]
+; X64-NEXT:    fmulp st(1), st
+; X64-NEXT:    fstp tbyte ptr [rbp - 0x40]
+; X64-NEXT:    fld tbyte ptr [rbp - 0x40]
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+  %res = fmul x86_fp80 %0, %1
+  ret x86_fp80 %res
+}
+
+define x86_fp80 @fdiv(x86_fp80 %0, x86_fp80 %1) {
+; X64-LABEL: <fdiv>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    fld tbyte ptr [rbp + 0x20]
+; X64-NEXT:    fld tbyte ptr [rbp + 0x10]
+; X64-NEXT:    fdivrp st(1), st
+; X64-NEXT:    fstp tbyte ptr [rbp - 0x40]
+; X64-NEXT:    fld tbyte ptr [rbp - 0x40]
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+  %res = fdiv x86_fp80 %0, %1
+  ret x86_fp80 %res
+}

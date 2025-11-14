@@ -2277,6 +2277,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_float_binary_op(
     const llvm::Instruction *inst, const ValInfo &val_info, u64 op) noexcept {
   auto lhs = this->val_ref(inst->getOperand(0));
   auto rhs = this->val_ref(inst->getOperand(1));
+  ValueRef res = this->result_ref(inst);
 
   if (val_info.type == LLVMBasicValType::f128) {
     LibFunc lf;
@@ -2292,8 +2293,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_float_binary_op(
     cb->add_arg(lhs.part(0), tpde::CCAssignment{});
     cb->add_arg(rhs.part(0), tpde::CCAssignment{});
     cb->call(get_libfunc_sym(lf));
-    auto res_vr = this->result_ref(inst);
-    cb->add_ret(res_vr);
+    cb->add_ret(res);
     return true;
   }
 
@@ -2309,8 +2309,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_float_binary_op(
     cb->add_arg(lhs.part(0), tpde::CCAssignment{});
     cb->add_arg(rhs.part(0), tpde::CCAssignment{});
     cb->call(get_libfunc_sym(lf));
-    auto res_vr = this->result_ref(inst);
-    cb->add_ret(res_vr);
+    cb->add_ret(res);
     return true;
   }
 
@@ -2365,10 +2364,29 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_float_binary_op(
     default: TPDE_UNREACHABLE("invalid FloatBinaryOp");
     }
     break;
+  case f80:
+    if constexpr (requires { &Derived::fp80_load; }) {
+      switch (op) {
+      case FloatBinaryOp::add:
+        derived()->fp80_add(lhs.part(0), rhs.part(0), res.part(0));
+        return true;
+      case FloatBinaryOp::sub:
+        derived()->fp80_sub(lhs.part(0), rhs.part(0), res.part(0));
+        return true;
+      case FloatBinaryOp::mul:
+        derived()->fp80_mul(lhs.part(0), rhs.part(0), res.part(0));
+        return true;
+      case FloatBinaryOp::div:
+        derived()->fp80_div(lhs.part(0), rhs.part(0), res.part(0));
+        return true;
+      default: TPDE_UNREACHABLE("invalid FloatBinaryOp");
+      }
+    } else {
+      return false;
+    }
   default: return false;
   }
 
-  ValueRef res = this->result_ref(inst);
   return (derived()->*encode_fn)(lhs.part(0), rhs.part(0), res.part(0));
 }
 
