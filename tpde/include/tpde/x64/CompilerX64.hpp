@@ -399,7 +399,14 @@ struct CompilerX64 : BaseTy<Adaptor, Derived, Config> {
 
   void start_func(u32 func_idx) noexcept;
 
-  void gen_func_prolog_and_args(CCAssigner *) noexcept;
+  /// Begin prologue, prepare for assigning arguments.
+  void prologue_begin(CCAssigner *cc_assigner) noexcept;
+  /// Assign argument part. Returns the stack offset if the value should be
+  /// initialized as stack variable.
+  std::optional<i32> prologue_assign_arg_part(ValuePart &&vp,
+                                              CCAssignment cca) noexcept;
+  /// Finish prologue.
+  void prologue_end(CCAssigner *cc_assigner) noexcept;
 
   void finish_func(u32 func_idx) noexcept;
 
@@ -564,23 +571,8 @@ template <IRAdaptor Adaptor,
           typename Derived,
           template <typename, typename, typename> typename BaseTy,
           typename Config>
-void CompilerX64<Adaptor, Derived, BaseTy, Config>::gen_func_prolog_and_args(
+void CompilerX64<Adaptor, Derived, BaseTy, Config>::prologue_begin(
     CCAssigner *cc_assigner) noexcept {
-  // prologue:
-  // push rbp
-  // mov rbp, rsp
-  // optionally create vararg save-area
-  // reserve space for callee-saved regs
-  //   = 1 byte for each of the lower 8 regs and 2
-  //   bytes for the higher 8 regs
-  // sub rsp, #<frame_size>+<largest_call_frame_usage>
-
-  // TODO(ts): technically we only need rbp if there
-  // is a dynamic alloca but then we need to make the
-  // frame indexing dynamic in CompilerBase and the
-  // unwind info needs to take the dynamic sub rsp for
-  // calls into account
-
   func_ret_offs.clear();
   func_start_off = this->text_writer.offset();
   scalar_arg_count = vec_arg_count = 0xFFFF'FFFF;
@@ -642,59 +634,53 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::gen_func_prolog_and_args(
     ASM(SSE_MOVDQUmr, mem, FE_XMM7);
     this->label_place(skip_fp);
   }
+}
 
-  // Temporarily prevent argument registers from being assigned.
-  assert((cc_info.allocatable_regs & cc_info.arg_regs) == cc_info.arg_regs &&
-         "argument registers must also be allocatable");
-  this->register_file.allocatable &= ~cc_info.arg_regs;
-
-  u32 arg_idx = 0;
-  for (const IRValueRef arg : this->adaptor->cur_args()) {
-    derived()->handle_func_arg(
-        arg_idx,
-        arg,
-        [&](ValuePart &&vp, CCAssignment cca) -> std::optional<i32> {
-          if (!cca.byval) {
-            cca.bank = vp.bank();
-            cca.size = vp.part_size();
-          }
-
-          cc_assigner->assign_arg(cca);
-
-          if (cca.reg.valid()) [[likely]] {
-            vp.set_value_reg(this, cca.reg);
-            // Mark register as allocatable as soon as it is assigned. If the
-            // argument is unused, the register will be freed immediately and
-            // can be used for later stack arguments.
-            this->register_file.allocatable |= u64{1} << cca.reg.id();
-            return {};
-          }
-
-          if (vp.is_owned()) {
-            // no need to handle unused arguments
-            return {};
-          }
-
-          this->stack.frame_used = true;
-          if (cca.byval) {
-            // Return byval frame_off.
-            return 0x10 + cca.stack_off;
-          } else {
-            //  TODO(ts): maybe allow negative frame offsets for value
-            //  assignments so we can simply reference this?
-            //  but this probably doesn't work with multi-part values
-            //  since the offsets are different
-            AsmReg dst = vp.alloc_reg(this);
-            this->load_from_stack(dst, 0x10 + cca.stack_off, cca.size);
-          }
-          return {};
-        });
-
-    arg_idx += 1;
+template <IRAdaptor Adaptor,
+          typename Derived,
+          template <typename, typename, typename> typename BaseTy,
+          typename Config>
+std::optional<i32>
+    CompilerX64<Adaptor, Derived, BaseTy, Config>::prologue_assign_arg_part(
+        ValuePart &&vp, CCAssignment cca) noexcept {
+  if (cca.reg.valid()) [[likely]] {
+    vp.set_value_reg(this, cca.reg);
+    // Mark register as allocatable as soon as it is assigned. If the argument
+    // is unused, the register will be freed immediately and can be used for
+    // later stack arguments.
+    this->register_file.allocatable |= u64{1} << cca.reg.id();
+    return {};
   }
 
+  if (vp.is_owned()) {
+    // No need to handle unused arguments.
+    return {};
+  }
+
+  this->stack.frame_used = true;
+  if (cca.byval) {
+    // Return byval frame_off.
+    return 0x10 + cca.stack_off;
+  } else {
+    //  TODO(ts): maybe allow negative frame offsets for value
+    //  assignments so we can simply reference this?
+    //  but this probably doesn't work with multi-part values
+    //  since the offsets are different
+    AsmReg dst = vp.alloc_reg(this);
+    this->load_from_stack(dst, 0x10 + cca.stack_off, cca.size);
+  }
+  return {};
+}
+
+template <IRAdaptor Adaptor,
+          typename Derived,
+          template <typename, typename, typename> typename BaseTy,
+          typename Config>
+void CompilerX64<Adaptor, Derived, BaseTy, Config>::prologue_end(
+    CCAssigner *cc_assigner) noexcept {
   if (this->adaptor->cur_is_vararg()) [[unlikely]] {
     // TODO: get this from CCAssigner?
+    const CCInfo &cc_info = cc_assigner->get_ccinfo();
     auto arg_regs = this->register_file.allocatable & cc_info.arg_regs;
     u64 gp_regs = arg_regs & this->register_file.bank_regs(Config::GP_BANK);
     u64 xmm_regs = arg_regs & this->register_file.bank_regs(Config::FP_BANK);
@@ -702,8 +688,6 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::gen_func_prolog_and_args(
     this->vec_arg_count = std::popcount(xmm_regs);
     this->var_arg_stack_off = 0x10 + cc_assigner->get_stack_size();
   }
-
-  this->register_file.allocatable |= cc_info.arg_regs;
 }
 
 template <IRAdaptor Adaptor,

@@ -400,7 +400,14 @@ struct CompilerA64 : BaseTy<Adaptor, Derived, Config> {
 
   void start_func(u32) noexcept {}
 
-  void gen_func_prolog_and_args(CCAssigner *cc_assigner) noexcept;
+  /// Begin prologue, prepare for assigning arguments.
+  void prologue_begin(CCAssigner *cc_assigner) noexcept;
+  /// Assign argument part. Returns the stack offset if the value should be
+  /// initialized as stack variable.
+  std::optional<i32> prologue_assign_arg_part(ValuePart &&vp,
+                                              CCAssignment cca) noexcept;
+  /// Finish prologue.
+  void prologue_end(CCAssigner *cc_assigner) noexcept;
 
   // note: this has to call assembler->end_func
   void finish_func(u32 func_idx) noexcept;
@@ -736,24 +743,8 @@ template <IRAdaptor Adaptor,
           typename Derived,
           template <typename, typename, typename> typename BaseTy,
           typename Config>
-void CompilerA64<Adaptor, Derived, BaseTy, Config>::gen_func_prolog_and_args(
+void CompilerA64<Adaptor, Derived, BaseTy, Config>::prologue_begin(
     CCAssigner *cc_assigner) noexcept {
-  // prologue:
-  // sub sp, sp, #<frame_size>
-  // stp x29, x30, [sp]
-  // mov x29, sp
-  // optionally create vararg save-area
-  // reserve space for callee-saved regs
-  //   4 byte per callee-saved reg pair since for each we do
-  //   stp r1, r2, [sp + XX]
-
-  // TODO(ts): for smaller functions we could enable an optimization
-  // to store the saved regs after the local variables
-  // which we could then use to not allocate space for unsaved regs
-  // which could help in the common case.
-  // However, we need to commit to this at the beginning of the function
-  // as otherwise stack accesses need to skip the reg-save area
-
   func_ret_offs.clear();
   func_start_off = this->text_writer.offset();
 
@@ -802,77 +793,69 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::gen_func_prolog_and_args(
     ASMNC(STPq, DA_V(6), DA_V(7), DA_SP, reg_save_frame_off + 160);
   }
 
-  // Temporarily prevent argument registers from being assigned.
-  assert((cc_info.allocatable_regs & cc_info.arg_regs) == cc_info.arg_regs &&
-         "argument registers must also be allocatable");
-  this->register_file.allocatable &= ~cc_info.arg_regs;
-
   this->func_arg_stack_add_off = ~0u;
+}
 
-  u32 arg_idx = 0;
-  for (const IRValueRef arg : this->adaptor->cur_args()) {
-    derived()->handle_func_arg(
-        arg_idx,
-        arg,
-        [&](ValuePart &&vp, CCAssignment cca) -> std::optional<i32> {
-          if (!cca.byval) {
-            cca.bank = vp.bank();
-            cca.size = vp.part_size();
-          }
-
-          cc_assigner->assign_arg(cca);
-
-          if (cca.reg.valid()) [[likely]] {
-            vp.set_value_reg(this, cca.reg);
-            // Mark register as allocatable as soon as it is assigned. If the
-            // argument is unused, the register will be freed immediately and
-            // can be used for later stack arguments.
-            this->register_file.allocatable |= u64{1} << cca.reg.id();
-            return {};
-          }
-
-          AsmReg dst = vp.alloc_reg(this);
-
-          this->text_writer.ensure_space(8);
-          AsmReg stack_reg = AsmReg::R17;
-          // TODO: allocate an actual scratch register for this.
-          assert(
-              !(this->register_file.allocatable & (u64{1} << stack_reg.id())) &&
-              "x17 must not be allocatable");
-          if (this->func_arg_stack_add_off == ~0u) {
-            this->func_arg_stack_add_off = this->text_writer.offset();
-            this->func_arg_stack_add_reg = stack_reg;
-            // Fixed in finish_func when frame size is known
-            ASMNC(ADDxi, stack_reg, DA_SP, 0);
-          }
-
-          if (cca.byval) {
-            ASMNC(ADDxi, dst, stack_reg, cca.stack_off);
-          } else if (cca.bank == Config::GP_BANK) {
-            switch (cca.size) {
-            case 1: ASMNC(LDRBu, dst, stack_reg, cca.stack_off); break;
-            case 2: ASMNC(LDRHu, dst, stack_reg, cca.stack_off); break;
-            case 4: ASMNC(LDRwu, dst, stack_reg, cca.stack_off); break;
-            case 8: ASMNC(LDRxu, dst, stack_reg, cca.stack_off); break;
-            default: TPDE_UNREACHABLE("invalid GP reg size");
-            }
-          } else {
-            assert(cca.bank == Config::FP_BANK);
-            switch (cca.size) {
-            case 1: ASMNC(LDRbu, dst, stack_reg, cca.stack_off); break;
-            case 2: ASMNC(LDRhu, dst, stack_reg, cca.stack_off); break;
-            case 4: ASMNC(LDRsu, dst, stack_reg, cca.stack_off); break;
-            case 8: ASMNC(LDRdu, dst, stack_reg, cca.stack_off); break;
-            case 16: ASMNC(LDRqu, dst, stack_reg, cca.stack_off); break;
-            default: TPDE_UNREACHABLE("invalid FP reg size");
-            }
-          }
-          return {};
-        });
-
-    arg_idx += 1;
+template <IRAdaptor Adaptor,
+          typename Derived,
+          template <typename, typename, typename> typename BaseTy,
+          typename Config>
+std::optional<i32>
+    CompilerA64<Adaptor, Derived, BaseTy, Config>::prologue_assign_arg_part(
+        ValuePart &&vp, CCAssignment cca) noexcept {
+  if (cca.reg.valid()) [[likely]] {
+    vp.set_value_reg(this, cca.reg);
+    // Mark register as allocatable as soon as it is assigned. If the argument
+    // is unused, the register will be freed immediately and can be used for
+    // later stack arguments.
+    this->register_file.allocatable |= u64{1} << cca.reg.id();
+    return {};
   }
 
+  AsmReg dst = vp.alloc_reg(this);
+
+  this->text_writer.ensure_space(8);
+  AsmReg stack_reg = AsmReg::R17;
+  // TODO: allocate an actual scratch register for this.
+  assert(!(this->register_file.allocatable & (u64{1} << stack_reg.id())) &&
+         "x17 must not be allocatable");
+  if (this->func_arg_stack_add_off == ~0u) {
+    this->func_arg_stack_add_off = this->text_writer.offset();
+    this->func_arg_stack_add_reg = stack_reg;
+    // Fixed in finish_func when frame size is known
+    ASMNC(ADDxi, stack_reg, DA_SP, 0);
+  }
+
+  if (cca.byval) {
+    ASMNC(ADDxi, dst, stack_reg, cca.stack_off);
+  } else if (cca.bank == Config::GP_BANK) {
+    switch (cca.size) {
+    case 1: ASMNC(LDRBu, dst, stack_reg, cca.stack_off); break;
+    case 2: ASMNC(LDRHu, dst, stack_reg, cca.stack_off); break;
+    case 4: ASMNC(LDRwu, dst, stack_reg, cca.stack_off); break;
+    case 8: ASMNC(LDRxu, dst, stack_reg, cca.stack_off); break;
+    default: TPDE_UNREACHABLE("invalid GP reg size");
+    }
+  } else {
+    assert(cca.bank == Config::FP_BANK);
+    switch (cca.size) {
+    case 1: ASMNC(LDRbu, dst, stack_reg, cca.stack_off); break;
+    case 2: ASMNC(LDRhu, dst, stack_reg, cca.stack_off); break;
+    case 4: ASMNC(LDRsu, dst, stack_reg, cca.stack_off); break;
+    case 8: ASMNC(LDRdu, dst, stack_reg, cca.stack_off); break;
+    case 16: ASMNC(LDRqu, dst, stack_reg, cca.stack_off); break;
+    default: TPDE_UNREACHABLE("invalid FP reg size");
+    }
+  }
+  return {};
+}
+
+template <IRAdaptor Adaptor,
+          typename Derived,
+          template <typename, typename, typename> typename BaseTy,
+          typename Config>
+void CompilerA64<Adaptor, Derived, BaseTy, Config>::prologue_end(
+    CCAssigner *cc_assigner) noexcept {
   // Hack: we don't know the frame size, so for a va_start(), we cannot easily
   // compute the offset from the frame pointer. But we have a stack_reg here,
   // so use it for var args.
@@ -894,14 +877,13 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::gen_func_prolog_and_args(
     // TODO: extract ngrn/nsrn from CCAssigner
     // TODO: this isn't quite accurate, e.g. for (i128, i128, i128, i64, i128),
     // this should be 8 but will end up with 7.
+    const CCInfo &cc_info = cc_assigner->get_ccinfo();
     auto arg_regs = this->register_file.allocatable & cc_info.arg_regs;
     u32 ngrn = 8 - util::cnt_lz<u16>((arg_regs & 0xff) << 8 | 0x80);
     u32 nsrn = 8 - util::cnt_lz<u16>(((arg_regs >> 32) & 0xff) << 8 | 0x80);
     this->scalar_arg_count = ngrn;
     this->vec_arg_count = nsrn;
   }
-
-  this->register_file.allocatable |= cc_info.arg_regs;
 }
 
 template <IRAdaptor Adaptor,

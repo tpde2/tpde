@@ -353,8 +353,10 @@ public:
 
   /// @}
 
-  template <typename Fn>
-  void handle_func_arg(u32 arg_idx, IRValueRef arg, Fn add_arg) noexcept;
+  /// Assign function argument in prologue.
+  void prologue_assign_arg(CCAssigner *cc_assigner,
+                           u32 arg_idx,
+                           IRValueRef arg) noexcept;
 
   /// \name Value References
   /// @{
@@ -1132,18 +1134,18 @@ void CompilerBase<Adaptor, Derived, Config>::free_stack_slot(
 }
 
 template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>
-template <typename Fn>
-void CompilerBase<Adaptor, Derived, Config>::handle_func_arg(
-    u32 arg_idx, IRValueRef arg, Fn add_arg) noexcept {
+void CompilerBase<Adaptor, Derived, Config>::prologue_assign_arg(
+    CCAssigner *cc_assigner, u32 arg_idx, IRValueRef arg) noexcept {
   ValueRef vr = derived()->result_ref(arg);
   if (adaptor->cur_arg_is_byval(arg_idx)) {
+    CCAssignment cca{
+        .byval = true,
+        .align = u8(adaptor->cur_arg_byval_align(arg_idx)),
+        .size = adaptor->cur_arg_byval_size(arg_idx),
+    };
+    cc_assigner->assign_arg(cca);
     std::optional<i32> byval_frame_off =
-        add_arg(vr.part(0),
-                CCAssignment{
-                    .byval = true,
-                    .align = u8(adaptor->cur_arg_byval_align(arg_idx)),
-                    .size = adaptor->cur_arg_byval_size(arg_idx),
-                });
+        derived()->prologue_assign_arg_part(vr.part(0), cca);
 
     if (byval_frame_off) {
       // We need to convert the assignment into a stack variable ref.
@@ -1165,7 +1167,12 @@ void CompilerBase<Adaptor, Derived, Config>::handle_func_arg(
   }
 
   if (adaptor->cur_arg_is_sret(arg_idx)) {
-    add_arg(vr.part(0), CCAssignment{.sret = true});
+    assert(vr.assignment()->part_count == 1 && "sret must be single-part");
+    ValuePartRef vp = vr.part(0);
+    CCAssignment cca{
+        .sret = true, .bank = vp.bank(), .size = Config::PLATFORM_POINTER_SIZE};
+    cc_assigner->assign_arg(cca);
+    derived()->prologue_assign_arg_part(std::move(vp), cca);
     return;
   }
 
@@ -1189,12 +1196,15 @@ void CompilerBase<Adaptor, Derived, Config>::handle_func_arg(
   }
 
   for (u32 part_idx = 0; part_idx < part_count; ++part_idx) {
-    add_arg(vr.part(part_idx),
-            CCAssignment{
-                .consecutive =
-                    u8(consecutive ? part_count - part_idx - 1 : consec_def),
-                .align = u8(part_idx == 0 ? align : 1),
-            });
+    ValuePartRef vp = vr.part(part_idx);
+    CCAssignment cca{
+        .consecutive = u8(consecutive ? part_count - part_idx - 1 : consec_def),
+        .align = u8(part_idx == 0 ? align : 1),
+        .bank = vp.bank(),
+        .size = vp.part_size(),
+    };
+    cc_assigner->assign_arg(cca);
+    derived()->prologue_assign_arg_part(std::move(vp), cca);
   }
 }
 
@@ -2319,10 +2329,25 @@ bool CompilerBase<Adaptor, Derived, Config>::compile_func(
 
   register_file.allocatable = cc_assigner->get_ccinfo().allocatable_regs;
 
-  // This initializes the stack frame, which must reserve space for
-  // callee-saved registers, vararg save area, etc.
   cc_assigner->reset();
-  derived()->gen_func_prolog_and_args(cc_assigner);
+  // Temporarily prevent argument registers from being assigned.
+  const CCInfo &cc_info = cc_assigner->get_ccinfo();
+  assert((cc_info.allocatable_regs & cc_info.arg_regs) == cc_info.arg_regs &&
+         "argument registers must also be allocatable");
+  this->register_file.allocatable &= ~cc_info.arg_regs;
+
+  // Begin prologue, prepare for handling arguments.
+  derived()->prologue_begin(cc_assigner);
+  u32 arg_idx = 0;
+  for (const IRValueRef arg : this->adaptor->cur_args()) {
+    // Init assignment for all arguments. This can be substituted for more
+    // complex mappings of arguments to value parts.
+    derived()->prologue_assign_arg(cc_assigner, arg_idx++, arg);
+  }
+  // Finish prologue, storing relevant data from the argument cc_assigner.
+  derived()->prologue_end(cc_assigner);
+
+  this->register_file.allocatable |= cc_info.arg_regs;
 
   for (const IRValueRef alloca : adaptor->cur_static_allocas()) {
     auto size = adaptor->val_alloca_size(alloca);

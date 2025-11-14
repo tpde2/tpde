@@ -52,7 +52,10 @@ concept Compiler = CompilerConfig<Config> && requires(T a) {
   // (func_idx)
   { a.start_func(ARG(u32)) };
 
-  { a.gen_func_prolog_and_args(ARG(CCAssigner *)) };
+  {
+    a.prologue_assign_arg(
+        ARG(CCAssigner *), ARG(u32), ARG(typename T::IRValueRef))
+  };
 
   // This has to call assembler->finish_func
   // (func_idx)
