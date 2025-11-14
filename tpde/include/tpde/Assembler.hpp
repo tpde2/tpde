@@ -66,9 +66,13 @@ enum class SectionKind : u8 {
   Max
 };
 
+namespace elf {
+class AssemblerElf;
+} // namespace elf
+
 struct DataSection {
   friend class Assembler;
-  friend class AssemblerElf;
+  friend class elf::AssemblerElf;
 
   /// 256 bytes inline storage is enough for 10 relocations, which is a typical
   /// number for a single function (relevant for COMDAT sections with one

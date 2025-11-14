@@ -9,7 +9,7 @@
 #include "tpde/util/SmallVector.hpp"
 #include "tpde/util/function_ref.hpp"
 
-namespace tpde {
+namespace tpde::elf {
 
 class ElfMapper {
 public:
@@ -41,4 +41,4 @@ public:
   void *get_sym_addr(SymRef sym) noexcept;
 };
 
-} // namespace tpde
+} // namespace tpde::elf

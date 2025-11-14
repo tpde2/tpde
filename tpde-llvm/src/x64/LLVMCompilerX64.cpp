@@ -11,6 +11,7 @@
 #include "LLVMAdaptor.hpp"
 #include "LLVMCompilerBase.hpp"
 #include "encode_template_x64.hpp"
+#include "tpde/ELF.hpp"
 #include "tpde/base.hpp"
 #include "tpde/util/misc.hpp"
 #include "tpde/x64/CompilerX64.hpp"
@@ -34,19 +35,12 @@ struct LLVMCompilerX64 : tpde::x64::CompilerX64<LLVMAdaptor,
                                       LLVMCompilerX64,
                                       LLVMCompilerBase,
                                       CompilerConfig>;
-  using EncCompiler = EncodeCompiler<LLVMAdaptor,
-                                     LLVMCompilerX64,
-                                     LLVMCompilerBase,
-                                     CompilerConfig>;
 
   using ScratchReg = typename Base::ScratchReg;
   using ValuePartRef = typename Base::ValuePartRef;
   using ValuePart = typename Base::ValuePart;
   using ValueRef = typename Base::ValueRef;
   using GenericValuePart = typename Base::GenericValuePart;
-  using InstRange = typename Base::InstRange;
-
-  using Assembler = typename Base::Assembler;
 
   using AsmReg = typename Base::AsmReg;
 
@@ -65,7 +59,7 @@ struct LLVMCompilerX64 : tpde::x64::CompilerX64<LLVMAdaptor,
   void reset() noexcept {
     // TODO: move to LLVMCompilerBase
     Base::reset();
-    EncCompiler::reset();
+    EncodeCompiler::reset();
   }
 
   bool arg_allow_split_reg_stack_passing(IRValueRef value) const noexcept {
@@ -126,11 +120,11 @@ void LLVMCompilerX64::load_address_of_var_reference(
   if (!use_local_access(global)) {
     // mov the ptr from the GOT
     ASM(MOV64rm, dst, FE_MEM(FE_IP, 0, FE_NOREG, -1));
-    reloc_text(sym, R_X86_64_GOTPCREL, text_writer.offset() - 4, -4);
+    reloc_text(sym, tpde::elf::R_X86_64_GOTPCREL, text_writer.offset() - 4, -4);
   } else {
     // emit lea with relocation
     ASM(LEA64rm, dst, FE_MEM(FE_IP, 0, FE_NOREG, -1));
-    reloc_text(sym, R_X86_64_PC32, text_writer.offset() - 4, -4);
+    reloc_text(sym, tpde::elf::R_X86_64_PC32, text_writer.offset() - 4, -4);
   }
 }
 

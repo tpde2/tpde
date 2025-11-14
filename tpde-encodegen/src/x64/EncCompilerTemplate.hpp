@@ -54,7 +54,6 @@ struct EncodeCompiler {
     using ValuePartRef = typename CompilerX64::ValuePartRef;
     using ValuePart = typename CompilerX64::ValuePart;
     using GenericValuePart = typename CompilerX64::GenericValuePart;
-    using Assembler    = typename CompilerX64::Assembler;
 
     [[nodiscard]] static std::optional<i32> encodeable_as_imm32_sext(GenericValuePart &gv) noexcept;
     [[nodiscard]] static std::optional<FeMem> encodeable_as_mem(GenericValuePart &gv, unsigned align) noexcept;

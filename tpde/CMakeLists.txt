@@ -53,6 +53,7 @@ target_sources(tpde PRIVATE
         include/tpde/CompilerBase.hpp
         include/tpde/AssemblerElf.hpp
         include/tpde/DWARF.hpp
+        include/tpde/ELF.hpp
         include/tpde/ElfMapper.hpp
         include/tpde/FunctionWriter.hpp
         include/tpde/IRAdaptor.hpp

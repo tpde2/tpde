@@ -183,7 +183,7 @@ void EncodingTargetX64::get_inst_candidates(
             os << "        "
                   "derived()->reloc_text("
                << cp_sym
-               << ", R_X86_64_PC32, "
+               << ", tpde::elf::R_X86_64_PC32, "
                   "derived()->text_writer.offset() - 4, -4);\n";
           }
         });
@@ -361,7 +361,7 @@ void EncodingTargetX64::get_inst_candidates(
             os << "        "
                   "derived()->reloc_text("
                << cp_sym
-               << ", R_X86_64_PC32, "
+               << ", tpde::elf::R_X86_64_PC32, "
                   "derived()->text_writer.offset() - 4, -4);\n";
           }
         });

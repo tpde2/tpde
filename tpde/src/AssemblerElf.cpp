@@ -3,16 +3,14 @@
 
 #include "tpde/AssemblerElf.hpp"
 #include "tpde/Assembler.hpp"
+#include "tpde/ELF.hpp"
 #include "tpde/StringTable.hpp"
 #include "tpde/util/misc.hpp"
 
-#include <elf.h>
-
-namespace tpde {
+namespace tpde::elf {
 
 // TODO(ts): maybe just outsource this to a helper func that can live in a cpp
 // file?
-namespace elf {
 // TODO(ts): this is linux-specific, no?
 constexpr static std::span<const char> SECTION_NAMES = {
     "\0" // first section is the null-section
@@ -97,8 +95,6 @@ consteval static u32 predef_sec_count() {
   return idx;
 }
 
-} // namespace elf
-
 void AssemblerElf::reset() noexcept {
   Assembler::reset();
 
@@ -115,7 +111,7 @@ void AssemblerElf::rename_section(SecRef ref, std::string_view name) noexcept {
   // This is possible, just not implemented. But maybe there's no requirement at
   // all that section symbols are named.
   assert(!sec.sym.valid() && "cannot rename after section symbol is created");
-  size_t rela_name = elf::SHSTRTAB.size();
+  size_t rela_name = SHSTRTAB.size();
   rela_name += shstrtab_extra.add_prefix(sec.has_relocs ? ".rela" : "", name);
   sec.name = rela_name + (sec.has_relocs ? 5 : 0);
 }
@@ -123,14 +119,14 @@ void AssemblerElf::rename_section(SecRef ref, std::string_view name) noexcept {
 SymRef AssemblerElf::section_symbol(SecRef ref) noexcept {
   SymRef &sym = get_section(ref).sym;
   if (!sym.valid()) {
-    unsigned shndx = sec_is_xindex(ref) ? SHN_XINDEX : ref.id();
+    u16 shndx = sec_is_xindex(ref) ? u16(SHN_XINDEX) : ref.id();
 
     sym = SymRef(local_symbols.size());
     local_symbols.push_back(Elf64_Sym{
         .st_name = 0, // TODO: proper name?
         .st_info = ELF64_ST_INFO(STB_LOCAL, STT_SECTION),
         .st_other = STV_DEFAULT,
-        .st_shndx = static_cast<Elf64_Section>(shndx),
+        .st_shndx = shndx,
         .st_value = 0,
         .st_size = 0,
     });
@@ -143,8 +139,8 @@ SymRef AssemblerElf::section_symbol(SecRef ref) noexcept {
 
 const char *AssemblerElf::sec_name(SecRef ref) const noexcept {
   const DataSection &sec = get_section(ref);
-  assert(sec.name < elf::SHSTRTAB.size());
-  return elf::SHSTRTAB.data() + sec.name;
+  assert(sec.name < SHSTRTAB.size());
+  return SHSTRTAB.data() + sec.name;
 }
 
 SecRef AssemblerElf::create_structor_section(bool init, SecRef group) noexcept {
@@ -166,14 +162,14 @@ SecRef AssemblerElf::create_group_section(SymRef signature_sym,
                                           bool is_comdat) noexcept {
   TargetInfo::SectionFlags flags{.type = SHT_GROUP,
                                  .flags = 0,
-                                 .name = elf::sec_off(".group"),
+                                 .name = sec_off(".group"),
                                  .align = 4,
                                  .has_relocs = false};
   SecRef ref = create_section(flags);
   DataSection &sec = get_section(ref);
   sec.sym = signature_sym;
   // Group flags.
-  sec.write<u32>(is_comdat ? GRP_COMDAT : 0);
+  sec.write<u32>(is_comdat ? u32(GRP_COMDAT) : 0);
   return ref;
 }
 
@@ -190,7 +186,7 @@ void AssemblerElf::add_to_group(SecRef group_ref, SecRef sec_ref) noexcept {
 }
 
 void AssemblerElf::init_sections() noexcept {
-  for (size_t i = 0; i < elf::predef_sec_count(); i++) {
+  for (size_t i = 0; i < predef_sec_count(); i++) {
     sections.emplace_back(nullptr);
   }
 }
@@ -220,7 +216,7 @@ SymRef AssemblerElf::sym_add(const std::string_view name,
   case GLOBAL: info = ELF64_ST_INFO(STB_GLOBAL, type); break;
   default: TPDE_UNREACHABLE("invalid symbol binding");
   }
-  auto sym = Elf64_Sym{.st_name = static_cast<Elf64_Word>(str_off),
+  auto sym = Elf64_Sym{.st_name = static_cast<u32>(str_off),
                        .st_info = info,
                        .st_other = STV_DEFAULT,
                        .st_shndx = SHN_UNDEF,
@@ -292,10 +288,10 @@ std::vector<u8> AssemblerElf::build_object_file() noexcept {
   {
     auto *hdr = reinterpret_cast<Elf64_Ehdr *>(out.data());
 
-    hdr->e_ident[0] = ELFMAG0;
-    hdr->e_ident[1] = ELFMAG1;
-    hdr->e_ident[2] = ELFMAG2;
-    hdr->e_ident[3] = ELFMAG3;
+    hdr->e_ident[0] = ELFMAG[0];
+    hdr->e_ident[1] = ELFMAG[1];
+    hdr->e_ident[2] = ELFMAG[2];
+    hdr->e_ident[3] = ELFMAG[3];
     hdr->e_ident[4] = ELFCLASS64;
     hdr->e_ident[5] = ELFDATA2LSB;
     hdr->e_ident[6] = EV_CURRENT;
@@ -494,45 +490,45 @@ static constexpr auto get_elf_section_flags() {
   section_flags[u8(SectionKind::Text)] =
       SectionFlags{.type = SHT_PROGBITS,
                    .flags = SHF_ALLOC | SHF_EXECINSTR,
-                   .name = elf::sec_off(".rela.text") + 5,
+                   .name = sec_off(".rela.text") + 5,
                    .align = 16};
   section_flags[u8(SectionKind::ReadOnly)] =
       SectionFlags{.type = SHT_PROGBITS,
                    .flags = SHF_ALLOC,
-                   .name = elf::sec_off(".rodata"),
+                   .name = sec_off(".rodata"),
                    .has_relocs = false};
   section_flags[u8(SectionKind::EHFrame)] =
-      SectionFlags{.type = SHT_PROGBITS,
+      SectionFlags{.type = SHT_PROGBITS, // TODO: use SHT_X86_64_UNWIND on x86
                    .flags = SHF_ALLOC,
-                   .name = elf::sec_off(".rela.eh_frame") + 5,
+                   .name = sec_off(".rela.eh_frame") + 5,
                    .align = 8};
   section_flags[u8(SectionKind::LSDA)] =
       SectionFlags{.type = SHT_PROGBITS,
                    .flags = SHF_ALLOC,
-                   .name = elf::sec_off(".rela.gcc_except_table") + 5,
+                   .name = sec_off(".rela.gcc_except_table") + 5,
                    .align = 8};
   section_flags[u8(SectionKind::Data)] =
       SectionFlags{.type = SHT_PROGBITS,
                    .flags = SHF_ALLOC | SHF_WRITE,
-                   .name = elf::sec_off(".rela.data") + 5};
+                   .name = sec_off(".rela.data") + 5};
   section_flags[u8(SectionKind::DataRelRO)] =
       SectionFlags{.type = SHT_PROGBITS,
                    .flags = SHF_ALLOC | SHF_WRITE,
-                   .name = elf::sec_off(".rela.data.rel.ro") + 5};
+                   .name = sec_off(".rela.data.rel.ro") + 5};
   section_flags[u8(SectionKind::BSS)] =
       SectionFlags{.type = SHT_NOBITS,
                    .flags = SHF_ALLOC | SHF_WRITE,
-                   .name = elf::sec_off(".bss"),
+                   .name = sec_off(".bss"),
                    .has_relocs = false,
                    .is_bss = true};
   section_flags[u8(SectionKind::ThreadData)] =
       SectionFlags{.type = SHT_PROGBITS,
                    .flags = SHF_ALLOC | SHF_WRITE | SHF_TLS,
-                   .name = elf::sec_off(".rela.tdata") + 5};
+                   .name = sec_off(".rela.tdata") + 5};
   section_flags[u8(SectionKind::ThreadBSS)] =
       SectionFlags{.type = SHT_NOBITS,
                    .flags = SHF_ALLOC | SHF_WRITE | SHF_TLS,
-                   .name = elf::sec_off(".tbss"),
+                   .name = sec_off(".tbss"),
                    .has_relocs = false,
                    .is_bss = true};
   return section_flags;
@@ -569,4 +565,4 @@ const AssemblerElf::TargetInfoElf AssemblerElfX64::TARGET_INFO{
 };
 // clang-format on
 
-} // end namespace tpde
+} // end namespace tpde::elf

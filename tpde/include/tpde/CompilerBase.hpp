@@ -108,7 +108,6 @@ struct CompilerBase {
 
   using BlockIndex = typename Analyzer<Adaptor>::BlockIndex;
 
-  using Assembler = typename Config::Assembler;
   using AsmReg = typename Config::AsmReg;
 
   using RegisterFile = tpde::RegisterFile<Config::NUM_BANKS, 32>;
@@ -185,7 +184,7 @@ private:
   typename Config::DefaultCCAssigner default_cc_assigner;
 
 public:
-  Assembler assembler;
+  typename Config::Assembler assembler;
   Config::FunctionWriter text_writer;
   // TODO(ts): smallvector?
   std::vector<SymRef> func_syms;

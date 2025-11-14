@@ -13,7 +13,7 @@ namespace tpde_llvm {
 class JITMapperImpl {
   using GlobalMap = llvm::DenseMap<const llvm::GlobalValue *, tpde::SymRef>;
 
-  tpde::ElfMapper mapper;
+  tpde::elf::ElfMapper mapper;
 
   GlobalMap globals;
 
@@ -21,7 +21,8 @@ public:
   JITMapperImpl(GlobalMap &&globals) : globals(std::move(globals)) {}
 
   /// Map the ELF from the assembler into memory, returns true on success.
-  bool map(tpde::AssemblerElf &, tpde::ElfMapper::SymbolResolver) noexcept;
+  bool map(tpde::elf::AssemblerElf &,
+           tpde::elf::ElfMapper::SymbolResolver) noexcept;
 
   void *lookup_global(llvm::GlobalValue *gv) noexcept {
     return mapper.get_sym_addr(globals.lookup(gv));

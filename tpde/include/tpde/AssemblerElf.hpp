@@ -4,17 +4,17 @@
 #pragma once
 
 #include <cassert>
-#include <elf.h>
 #include <span>
 #include <string_view>
 #include <vector>
 
 #include "base.hpp"
 #include "tpde/Assembler.hpp"
+#include "tpde/ELF.hpp"
 #include "tpde/StringTable.hpp"
 #include "util/SmallVector.hpp"
 
-namespace tpde {
+namespace tpde::elf {
 
 class AssemblerElf : public Assembler {
   friend class ElfMapper;
@@ -145,7 +145,7 @@ public:
   }
 
   SecRef sym_section(SymRef sym) const noexcept {
-    Elf64_Section shndx = sym_ptr(sym)->st_shndx;
+    auto shndx = sym_ptr(sym)->st_shndx;
     if (shndx < SHN_LORESERVE && shndx != SHN_UNDEF) [[likely]] {
       return SecRef(shndx);
     }
@@ -202,4 +202,4 @@ public:
   explicit AssemblerElfX64() noexcept : AssemblerElf(TARGET_INFO) {}
 };
 
-} // namespace tpde
+} // namespace tpde::elf

@@ -5,10 +5,10 @@
 
 #include <algorithm>
 #include <compare>
-#include <elf.h>
 #include <unistd.h>
 
 #include "tpde/AssemblerElf.hpp"
+#include "tpde/ELF.hpp"
 #include "tpde/base.hpp"
 #include "tpde/util/SmallVector.hpp"
 #include "tpde/util/misc.hpp"
@@ -25,7 +25,7 @@ extern "C" void __deregister_frame(void *);
   #error "unsupported architecture/os combo"
 #endif
 
-namespace tpde {
+namespace tpde::elf {
 
 namespace {
 
@@ -413,4 +413,4 @@ void *ElfMapper::get_sym_addr(SymRef sym) noexcept {
   return sym_addrs[idx];
 }
 
-} // namespace tpde
+} // namespace tpde::elf

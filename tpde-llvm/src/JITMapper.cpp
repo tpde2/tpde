@@ -11,8 +11,9 @@
 
 namespace tpde_llvm {
 
-bool JITMapperImpl::map(tpde::AssemblerElf &assembler,
-                        tpde::ElfMapper::SymbolResolver resolver) noexcept {
+bool JITMapperImpl::map(
+    tpde::elf::AssemblerElf &assembler,
+    tpde::elf::ElfMapper::SymbolResolver resolver) noexcept {
   llvm::TimeTraceScope time_scope("TPDE_JITMap");
   return mapper.map(assembler, resolver);
 }

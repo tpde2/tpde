@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
 
-# RUN: python3 %s 66000 | tpde-llc | llvm-readelf -Ss - | FileCheck %s
+# RUN: python3 %s 66000 | tpde-llc --target=aarch64 | llvm-readelf -Ss - | FileCheck %s
 
 # CHECK: Section Headers:
 # CHECK-DAG: [{{ *}}[[SEC65999:[0-9]+]]] sec65999 PROGBITS

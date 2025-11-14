@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 #pragma once
 
-#include <elf.h>
 #include <llvm/ADT/SmallString.h>
 #include <llvm/ADT/SmallVector.h>
 #include <llvm/Analysis/ConstantFolding.h>
@@ -55,7 +54,6 @@ struct LLVMCompilerBase : public LLVMCompiler,
   using GenericValuePart = typename Base::GenericValuePart;
   using InstRange = typename Base::InstRange;
 
-  using Assembler = typename Base::Assembler;
   using SecRef = typename tpde::SecRef;
   using SymRef = typename tpde::SymRef;
 
@@ -312,25 +310,25 @@ struct LLVMCompilerBase : public LLVMCompiler,
   }
 
 private:
-  static typename Assembler::SymBinding
+  static tpde::Assembler::SymBinding
       convert_linkage(llvm::GlobalValue::LinkageTypes linkage) noexcept {
     if (llvm::GlobalValue::isLocalLinkage(linkage)) {
-      return Assembler::SymBinding::LOCAL;
+      return tpde::Assembler::SymBinding::LOCAL;
     } else if (llvm::GlobalValue::isWeakForLinker(linkage)) {
-      return Assembler::SymBinding::WEAK;
+      return tpde::Assembler::SymBinding::WEAK;
     }
-    return Assembler::SymBinding::GLOBAL;
+    return tpde::Assembler::SymBinding::GLOBAL;
   }
 
-  static typename Assembler::SymVisibility
+  static tpde::elf::AssemblerElf::SymVisibility
       convert_visibility(const llvm::GlobalValue *gv) noexcept {
     switch (gv->getVisibility()) {
     case llvm::GlobalValue::DefaultVisibility:
-      return Assembler::SymVisibility::DEFAULT;
+      return tpde::elf::AssemblerElf::SymVisibility::DEFAULT;
     case llvm::GlobalValue::HiddenVisibility:
-      return Assembler::SymVisibility::HIDDEN;
+      return tpde::elf::AssemblerElf::SymVisibility::HIDDEN;
     case llvm::GlobalValue::ProtectedVisibility:
-      return Assembler::SymVisibility::PROTECTED;
+      return tpde::elf::AssemblerElf::SymVisibility::PROTECTED;
     default: TPDE_UNREACHABLE("invalid global visibility");
     }
   }
@@ -536,10 +534,6 @@ public:
   }
 
   bool compile_inline_asm(const llvm::CallBase *) { return false; }
-
-  bool compile_icmp(const llvm::ICmpInst *, InstRange) noexcept {
-    return false;
-  }
 
   bool handle_intrin(const llvm::IntrinsicInst *) noexcept { return false; }
 
@@ -775,7 +769,7 @@ LLVMCompilerBase<Adaptor, Derived, Config>::SecRef
       // Create a new symbol if no equally named global, thus symbol, exists.
       // The symbol will be STB_LOCAL, STT_NOTYPE, section=group.
       group_sym =
-          this->assembler.sym_add_undef(cn, Assembler::SymBinding::LOCAL);
+          this->assembler.sym_add_undef(cn, tpde::Assembler::SymBinding::LOCAL);
       define_group_sym = true;
     }
     it->second = this->assembler.create_group_section(group_sym, is_comdat);
@@ -844,7 +838,7 @@ LLVMCompilerBase<Adaptor, Derived, Config>::SecRef
 
   if (retain) {
     // TODO: ELF only
-    this->assembler.get_section(sec).flags |= SHF_GNU_RETAIN;
+    this->assembler.get_section(sec).flags |= tpde::elf::SHF_GNU_RETAIN;
   }
 
   return sec;
@@ -1287,7 +1281,8 @@ typename LLVMCompilerBase<Adaptor, Derived, Config>::SymRef
   default: TPDE_UNREACHABLE("invalid libfunc");
   }
 
-  sym = this->assembler.sym_add_undef(name, Assembler::SymBinding::GLOBAL);
+  sym =
+      this->assembler.sym_add_undef(name, tpde::Assembler::SymBinding::GLOBAL);
   return sym;
 }
 
@@ -4337,8 +4332,13 @@ typename LLVMCompilerBase<Adaptor, Derived, Config>::SymRef
   u32 off;
   u8 tmp[8] = {};
   auto rodata = this->assembler.get_data_section(true, true);
-  const auto addr_sym = this->assembler.sym_def_data(
-      rodata, {}, {tmp, sizeof(tmp)}, 8, Assembler::SymBinding::LOCAL, &off);
+  const auto addr_sym =
+      this->assembler.sym_def_data(rodata,
+                                   {},
+                                   {tmp, sizeof(tmp)},
+                                   8,
+                                   tpde::Assembler::SymBinding::LOCAL,
+                                   &off);
   this->assembler.reloc_abs(rodata, sym, off, 0);
 
   type_info_syms.emplace_back(value, addr_sym);

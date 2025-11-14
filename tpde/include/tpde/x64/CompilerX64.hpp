@@ -241,7 +241,7 @@ public:
 };
 
 struct PlatformConfig : CompilerConfigDefault {
-  using Assembler = AssemblerElfX64;
+  using Assembler = tpde::elf::AssemblerElfX64;
   using AsmReg = tpde::x64::AsmReg;
   using DefaultCCAssigner = CCAssignerSysV;
   using FunctionWriter = FunctionWriterX64;
@@ -271,7 +271,6 @@ struct CompilerX64 : BaseTy<Adaptor, Derived, Config> {
   using ValuePart = typename Base::ValuePart;
   using GenericValuePart = typename Base::GenericValuePart;
 
-  using Assembler = typename PlatformConfig::Assembler;
   using RegisterFile = typename Base::RegisterFile;
 
   using CallArg = typename Base::CallArg;
@@ -1291,7 +1290,7 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::materialize_constant(
     TPDE_FATAL("unable to materialize constant");
   }
 
-  this->reloc_text(sym, R_X86_64_PC32, this->text_writer.offset() - 4, -4);
+  this->reloc_text(sym, elf::R_X86_64_PC32, this->text_writer.offset() - 4, -4);
 }
 
 template <IRAdaptor Adaptor,
@@ -1799,7 +1798,7 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::CallBuilder::call_impl(
     this->compiler.text_writer.ensure_space(16);
     ASMC(&this->compiler, CALL, this->compiler.text_writer.cur_ptr());
     this->compiler.reloc_text(
-        *sym, R_X86_64_PLT32, this->compiler.text_writer.offset() - 4, -4);
+        *sym, elf::R_X86_64_PLT32, this->compiler.text_writer.offset() - 4, -4);
   } else {
     ValuePart &tvp = std::get<ValuePart>(target);
     if (tvp.has_assignment() && !tvp.assignment().register_valid()) {
@@ -1981,7 +1980,8 @@ CompilerX64<Adaptor, Derived, BaseTy, Config>::ScratchReg
     this->text_writer.ensure_space(0x10);
     *this->text_writer.cur_ptr()++ = 0x66;
     ASMNC(LEA64rm, arg_reg, FE_MEM(FE_IP, 0, FE_NOREG, 0));
-    this->reloc_text(sym, R_X86_64_TLSGD, this->text_writer.offset() - 4, -4);
+    this->reloc_text(
+        sym, elf::R_X86_64_TLSGD, this->text_writer.offset() - 4, -4);
     *this->text_writer.cur_ptr()++ = 0x66;
     *this->text_writer.cur_ptr()++ = 0x66;
     *this->text_writer.cur_ptr()++ = 0x48;
@@ -1991,7 +1991,7 @@ CompilerX64<Adaptor, Derived, BaseTy, Config>::ScratchReg
           "__tls_get_addr", Assembler::SymBinding::GLOBAL);
     }
     this->reloc_text(this->sym_tls_get_addr,
-                     R_X86_64_PLT32,
+                     elf::R_X86_64_PLT32,
                      this->text_writer.offset() - 4,
                      -4);
     arg.reset();

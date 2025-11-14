@@ -7,6 +7,7 @@
 #include "tpde/AssignmentPartRef.hpp"
 #include "tpde/CompilerBase.hpp"
 #include "tpde/DWARF.hpp"
+#include "tpde/ELF.hpp"
 #include "tpde/arm64/FunctionWriterA64.hpp"
 #include "tpde/base.hpp"
 #include "tpde/util/SmallVector.hpp"
@@ -14,7 +15,6 @@
 
 #include <bit>
 #include <disarm64.h>
-#include <elf.h>
 
 // Helper macros for assembling in the compiler
 #if defined(ASM) || defined(ASMNC) || defined(ASMC)
@@ -290,7 +290,7 @@ public:
 };
 
 struct PlatformConfig : CompilerConfigDefault {
-  using Assembler = AssemblerElfA64;
+  using Assembler = tpde::elf::AssemblerElfA64;
   using AsmReg = tpde::a64::AsmReg;
   using DefaultCCAssigner = CCAssignerAAPCS;
   using FunctionWriter = FunctionWriterA64;
@@ -320,7 +320,6 @@ struct CompilerA64 : BaseTy<Adaptor, Derived, Config> {
   using ValuePart = typename Base::ValuePart;
   using GenericValuePart = typename Base::GenericValuePart;
 
-  using Assembler = typename PlatformConfig::Assembler;
   using RegisterFile = typename Base::RegisterFile;
 
   using CallArg = typename Base::CallArg;
@@ -707,7 +706,7 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::CallBuilder::call_impl(
   if (auto *sym = std::get_if<SymRef>(&target)) {
     ASMC(&this->compiler, BL, 0);
     this->compiler.reloc_text(
-        *sym, R_AARCH64_CALL26, this->compiler.text_writer.offset() - 4);
+        *sym, elf::R_AARCH64_CALL26, this->compiler.text_writer.offset() - 4);
   } else {
     ValuePart &tvp = std::get<ValuePart>(target);
     if (tvp.can_salvage()) {
@@ -1482,10 +1481,10 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::materialize_constant(
         rodata, "", raw_data, 16, Assembler::SymBinding::LOCAL);
     this->text_writer.ensure_space(8); // ensure contiguous instructions
     this->reloc_text(
-        sym, R_AARCH64_ADR_PREL_PG_HI21, this->text_writer.offset(), 0);
+        sym, elf::R_AARCH64_ADR_PREL_PG_HI21, this->text_writer.offset(), 0);
     ASMNC(ADRP, permanent_scratch_reg, 0, 0);
     this->reloc_text(
-        sym, R_AARCH64_LDST128_ABS_LO12_NC, this->text_writer.offset(), 0);
+        sym, elf::R_AARCH64_LDST128_ABS_LO12_NC, this->text_writer.offset(), 0);
     ASMNC(LDRqu, dst, permanent_scratch_reg, 0);
     return;
   }
@@ -2070,16 +2069,16 @@ CompilerA64<Adaptor, Derived, BaseTy, Config>::ScratchReg
 
     this->text_writer.ensure_space(0x18);
     this->reloc_text(
-        sym, R_AARCH64_TLSDESC_ADR_PAGE21, this->text_writer.offset(), 0);
+        sym, elf::R_AARCH64_TLSDESC_ADR_PAGE21, this->text_writer.offset(), 0);
     ASMNC(ADRP, r0, 0, 0);
     this->reloc_text(
-        sym, R_AARCH64_TLSDESC_LD64_LO12, this->text_writer.offset(), 0);
+        sym, elf::R_AARCH64_TLSDESC_LD64_LO12, this->text_writer.offset(), 0);
     ASMNC(LDRxu, r1, r0, 0);
     this->reloc_text(
-        sym, R_AARCH64_TLSDESC_ADD_LO12, this->text_writer.offset(), 0);
+        sym, elf::R_AARCH64_TLSDESC_ADD_LO12, this->text_writer.offset(), 0);
     ASMNC(ADDxi, r0, r0, 0);
     this->reloc_text(
-        sym, R_AARCH64_TLSDESC_CALL, this->text_writer.offset(), 0);
+        sym, elf::R_AARCH64_TLSDESC_CALL, this->text_writer.offset(), 0);
     ASMNC(BLR, r1);
     ASMNC(MRS, r1, 0xde82); // TPIDR_EL0
     // TODO: maybe return expr x0+x1.
