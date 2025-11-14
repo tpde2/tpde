@@ -151,6 +151,10 @@ struct LLVMCompilerX64 : tpde::x64::CompilerX64<LLVMAdaptor,
     fp80_push(std::move(src));
     ASM(FSTPm64, spill_slot_op(dst, true));
   }
+  void fp80_cmp(llvm::CmpInst::Predicate pred,
+                ValuePart &&lhs,
+                ValuePart &&rhs,
+                ValuePart &&res) noexcept;
 };
 
 void LLVMCompilerX64::load_address_of_var_reference(
@@ -650,6 +654,49 @@ void LLVMCompilerX64::fp80_push(ValuePart &&value) noexcept {
     }
   }
   value.reset(this);
+}
+
+void LLVMCompilerX64::fp80_cmp(llvm::CmpInst::Predicate pred,
+                               ValuePart &&lhs,
+                               ValuePart &&rhs,
+                               ValuePart &&res) noexcept {
+  using enum llvm::CmpInst::Predicate;
+  bool swap = false;
+  switch (pred) {
+  case FCMP_OLT: swap = true, pred = FCMP_OGT; break;
+  case FCMP_UGE: swap = true, pred = FCMP_ULE; break;
+  case FCMP_OLE: swap = true, pred = FCMP_OGE; break;
+  case FCMP_UGT: swap = true, pred = FCMP_ULT; break;
+  default: break;
+  }
+
+  fp80_push(std::move(swap ? lhs : rhs));
+  fp80_push(std::move(swap ? rhs : lhs));
+  ASM(FUCOMIPrr, FE_ST(0), FE_ST(1));
+  ASM(FSTPr, FE_ST(0));
+  AsmReg dst = res.alloc_reg(this);
+  ScratchReg tmp{this};
+  switch (pred) {
+  case llvm::CmpInst::FCMP_OEQ:
+    ASM(SETNP8r, tmp.alloc_gp());
+    ASM(SETZ8r, dst);
+    ASM(AND8rr, dst, tmp.cur_reg());
+    break;
+  case llvm::CmpInst::FCMP_UNE:
+    ASM(SETP8r, tmp.alloc_gp());
+    ASM(SETNZ8r, dst);
+    ASM(OR8rr, dst, tmp.cur_reg());
+    break;
+  case llvm::CmpInst::FCMP_OGT: ASM(SETA8r, dst); break;
+  case llvm::CmpInst::FCMP_ULE: ASM(SETBE8r, dst); break;
+  case llvm::CmpInst::FCMP_OGE: ASM(SETNC8r, dst); break;
+  case llvm::CmpInst::FCMP_ULT: ASM(SETC8r, dst); break;
+  case llvm::CmpInst::FCMP_ORD: ASM(SETNP8r, dst); break;
+  case llvm::CmpInst::FCMP_UNO: ASM(SETP8r, dst); break;
+  case llvm::CmpInst::FCMP_ONE: ASM(SETNZ8r, dst); break;
+  case llvm::CmpInst::FCMP_UEQ: ASM(SETZ8r, dst); break;
+  default: TPDE_UNREACHABLE("unexpected fcmp predicate");
+  }
 }
 
 std::unique_ptr<LLVMCompiler>

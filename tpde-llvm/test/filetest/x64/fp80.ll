@@ -188,3 +188,239 @@ define x86_fp80 @ext_double(double %v) {
   %e = fpext double %v to x86_fp80
   ret x86_fp80 %e
 }
+
+define i1 @fcmp_false(x86_fp80 %0, x86_fp80 %1) {
+; X64-LABEL: <fcmp_false>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    xor eax, eax
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+  %cmp = fcmp false x86_fp80 %0, %1
+  ret i1 %cmp
+}
+
+define i1 @fcmp_true(x86_fp80 %0, x86_fp80 %1) {
+; X64-LABEL: <fcmp_true>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    mov eax, 0x1
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+  %cmp = fcmp true x86_fp80 %0, %1
+  ret i1 %cmp
+}
+
+define i1 @fcmp_oge(x86_fp80 %0, x86_fp80 %1) {
+; X64-LABEL: <fcmp_oge>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    fld tbyte ptr [rbp + 0x20]
+; X64-NEXT:    fld tbyte ptr [rbp + 0x10]
+; X64-NEXT:    fucompi st, st(1)
+; X64-NEXT:    fstp st(0)
+; X64-NEXT:    setae al
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+  %cmp = fcmp oge x86_fp80 %0, %1
+  ret i1 %cmp
+}
+
+define i1 @fcmp_ord(x86_fp80 %0, x86_fp80 %1) {
+; X64-LABEL: <fcmp_ord>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    fld tbyte ptr [rbp + 0x20]
+; X64-NEXT:    fld tbyte ptr [rbp + 0x10]
+; X64-NEXT:    fucompi st, st(1)
+; X64-NEXT:    fstp st(0)
+; X64-NEXT:    setnp al
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+  %cmp = fcmp ord x86_fp80 %0, %1
+  ret i1 %cmp
+}
+
+define i1 @fcmp_oeq(x86_fp80 %0, x86_fp80 %1) {
+; X64-LABEL: <fcmp_oeq>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    fld tbyte ptr [rbp + 0x20]
+; X64-NEXT:    fld tbyte ptr [rbp + 0x10]
+; X64-NEXT:    fucompi st, st(1)
+; X64-NEXT:    fstp st(0)
+; X64-NEXT:    setnp cl
+; X64-NEXT:    sete al
+; X64-NEXT:    and al, cl
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+  %cmp = fcmp oeq x86_fp80 %0, %1
+  ret i1 %cmp
+}
+
+define i1 @fcmp_ogt(x86_fp80 %0, x86_fp80 %1) {
+; X64-LABEL: <fcmp_ogt>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    fld tbyte ptr [rbp + 0x20]
+; X64-NEXT:    fld tbyte ptr [rbp + 0x10]
+; X64-NEXT:    fucompi st, st(1)
+; X64-NEXT:    fstp st(0)
+; X64-NEXT:    seta al
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+  %cmp = fcmp ogt x86_fp80 %0, %1
+  ret i1 %cmp
+}
+
+define i1 @fcmp_olt(x86_fp80 %0, x86_fp80 %1) {
+; X64-LABEL: <fcmp_olt>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    fld tbyte ptr [rbp + 0x10]
+; X64-NEXT:    fld tbyte ptr [rbp + 0x20]
+; X64-NEXT:    fucompi st, st(1)
+; X64-NEXT:    fstp st(0)
+; X64-NEXT:    seta al
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+  %cmp = fcmp olt x86_fp80 %0, %1
+  ret i1 %cmp
+}
+
+define i1 @fcmp_ole(x86_fp80 %0, x86_fp80 %1) {
+; X64-LABEL: <fcmp_ole>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    fld tbyte ptr [rbp + 0x10]
+; X64-NEXT:    fld tbyte ptr [rbp + 0x20]
+; X64-NEXT:    fucompi st, st(1)
+; X64-NEXT:    fstp st(0)
+; X64-NEXT:    setae al
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+  %cmp = fcmp ole x86_fp80 %0, %1
+  ret i1 %cmp
+}
+
+define i1 @fcmp_uno(x86_fp80 %0, x86_fp80 %1) {
+; X64-LABEL: <fcmp_uno>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    fld tbyte ptr [rbp + 0x20]
+; X64-NEXT:    fld tbyte ptr [rbp + 0x10]
+; X64-NEXT:    fucompi st, st(1)
+; X64-NEXT:    fstp st(0)
+; X64-NEXT:    setp al
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+  %cmp = fcmp uno x86_fp80 %0, %1
+  ret i1 %cmp
+}
+
+define i1 @fcmp_ugt(x86_fp80 %0, x86_fp80 %1) {
+; X64-LABEL: <fcmp_ugt>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    fld tbyte ptr [rbp + 0x10]
+; X64-NEXT:    fld tbyte ptr [rbp + 0x20]
+; X64-NEXT:    fucompi st, st(1)
+; X64-NEXT:    fstp st(0)
+; X64-NEXT:    setb al
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+  %cmp = fcmp ugt x86_fp80 %0, %1
+  ret i1 %cmp
+}
+
+define i1 @fcmp_uge(x86_fp80 %0, x86_fp80 %1) {
+; X64-LABEL: <fcmp_uge>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    fld tbyte ptr [rbp + 0x10]
+; X64-NEXT:    fld tbyte ptr [rbp + 0x20]
+; X64-NEXT:    fucompi st, st(1)
+; X64-NEXT:    fstp st(0)
+; X64-NEXT:    setbe al
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+  %cmp = fcmp uge x86_fp80 %0, %1
+  ret i1 %cmp
+}
+
+define i1 @fcmp_ult(x86_fp80 %0, x86_fp80 %1) {
+; X64-LABEL: <fcmp_ult>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    fld tbyte ptr [rbp + 0x20]
+; X64-NEXT:    fld tbyte ptr [rbp + 0x10]
+; X64-NEXT:    fucompi st, st(1)
+; X64-NEXT:    fstp st(0)
+; X64-NEXT:    setb al
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+  %cmp = fcmp ult x86_fp80 %0, %1
+  ret i1 %cmp
+}
+
+define i1 @fcmp_ule(x86_fp80 %0, x86_fp80 %1) {
+; X64-LABEL: <fcmp_ule>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    fld tbyte ptr [rbp + 0x20]
+; X64-NEXT:    fld tbyte ptr [rbp + 0x10]
+; X64-NEXT:    fucompi st, st(1)
+; X64-NEXT:    fstp st(0)
+; X64-NEXT:    setbe al
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+  %cmp = fcmp ule x86_fp80 %0, %1
+  ret i1 %cmp
+}
+
+define i1 @fcmp_une(x86_fp80 %0, x86_fp80 %1) {
+; X64-LABEL: <fcmp_une>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    fld tbyte ptr [rbp + 0x20]
+; X64-NEXT:    fld tbyte ptr [rbp + 0x10]
+; X64-NEXT:    fucompi st, st(1)
+; X64-NEXT:    fstp st(0)
+; X64-NEXT:    setp cl
+; X64-NEXT:    setne al
+; X64-NEXT:    or al, cl
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+  %cmp = fcmp une x86_fp80 %0, %1
+  ret i1 %cmp
+}
+
+define i1 @fcmp_one(x86_fp80 %0, x86_fp80 %1) {
+; X64-LABEL: <fcmp_one>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    fld tbyte ptr [rbp + 0x20]
+; X64-NEXT:    fld tbyte ptr [rbp + 0x10]
+; X64-NEXT:    fucompi st, st(1)
+; X64-NEXT:    fstp st(0)
+; X64-NEXT:    setne al
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+  %cmp = fcmp one x86_fp80 %0, %1
+  ret i1 %cmp
+}
+
+define i1 @fcmp_ueq(x86_fp80 %0, x86_fp80 %1) {
+; X64-LABEL: <fcmp_ueq>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    fld tbyte ptr [rbp + 0x20]
+; X64-NEXT:    fld tbyte ptr [rbp + 0x10]
+; X64-NEXT:    fucompi st, st(1)
+; X64-NEXT:    fstp st(0)
+; X64-NEXT:    sete al
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+  %cmp = fcmp ueq x86_fp80 %0, %1
+  ret i1 %cmp
+}

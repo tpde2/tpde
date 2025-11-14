@@ -4140,6 +4140,16 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_fcmp(
     return true;
   }
 
+  ValueRef lhs = this->val_ref(cmp->getOperand(0));
+  ValueRef rhs = this->val_ref(cmp->getOperand(1));
+  ValueRef res = this->result_ref(cmp);
+  if (cmp_ty->isX86_FP80Ty()) {
+    if constexpr (requires { &Derived::fp80_cmp; }) {
+      derived()->fp80_cmp(pred, lhs.part(0), rhs.part(0), res.part(0));
+      return true;
+    }
+  }
+
   if (!cmp_ty->isFloatTy() && !cmp_ty->isDoubleTy()) {
     return false;
   }
@@ -4188,9 +4198,6 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_fcmp(
     }
   }
 
-  ValueRef lhs = this->val_ref(cmp->getOperand(0));
-  ValueRef rhs = this->val_ref(cmp->getOperand(1));
-  ValueRef res = this->result_ref(cmp);
   return (derived()->*fn)(lhs.part(0), rhs.part(0), res.part(0));
 }
 
