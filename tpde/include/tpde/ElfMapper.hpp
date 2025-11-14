@@ -17,7 +17,7 @@ public:
   using SymbolResolver = util::function_ref<void *(std::string_view)>;
 
 private:
-  u8 *mapped_addr;
+  u8 *mapped_addr = nullptr;
   size_t mapped_size;
   u32 registered_frame_off = 0;
 

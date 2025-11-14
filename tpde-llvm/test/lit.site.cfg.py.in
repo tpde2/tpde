@@ -7,6 +7,7 @@ import os
 config.tpde_llvm_src_root = r'@CMAKE_CURRENT_SOURCE_DIR@'
 config.tpde_llvm_bin_dir = r'@PROJECT_BINARY_DIR@'
 
+config.system_name = r'@CMAKE_SYSTEM_NAME@'
 config.llvm_version = r'@LLVM_VERSION_MAJOR@.@LLVM_VERSION_MINOR@'
 config.llvm_tools_dir = r'@LLVM_TOOLS_BINARY_DIR@'
 

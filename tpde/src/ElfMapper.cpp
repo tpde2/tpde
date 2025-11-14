@@ -21,10 +21,6 @@
 extern "C" void __register_frame(void *);
 extern "C" void __deregister_frame(void *);
 
-#else
-  #error "unsupported architecture/os combo"
-#endif
-
 namespace tpde::elf {
 
 namespace {
@@ -35,13 +31,13 @@ enum class Arch {
   AArch64,
 };
 
-#if defined(__x86_64__)
+  #if defined(__x86_64__)
 static constexpr Arch TargetArch = Arch::X86_64;
-#elif defined(__aarch64__)
+  #elif defined(__aarch64__)
 static constexpr Arch TargetArch = Arch::AArch64;
-#else
+  #else
 static constexpr Arch TargetArch = Arch::Unknown;
-#endif
+  #endif
 
 } // anonymous namespace
 
@@ -65,13 +61,13 @@ bool ElfMapper::map(AssemblerElf &assembler, SymbolResolver resolver) noexcept {
   u32 got_plt_slot_count =
       assembler.local_symbols.size() + assembler.global_symbols.size();
 
-#ifdef __x86_64__
+  #ifdef __x86_64__
   // PLT+GOT slot: jmp qword ptr [rip + 2]; ud2; <address>
   constexpr size_t PLT_ENTRY_SIZE = 16;
-#elif defined(__aarch64__)
+  #elif defined(__aarch64__)
   // PLT+GOT slot: ldr x16, pc+8; br x16; <address>
   constexpr size_t PLT_ENTRY_SIZE = 16;
-#endif
+  #endif
 
   // Sort sections by permissions
   struct AllocSection {
@@ -414,3 +410,19 @@ void *ElfMapper::get_sym_addr(SymRef sym) noexcept {
 }
 
 } // namespace tpde::elf
+
+#else
+
+// Dummy implementation for non-ELF platforms
+namespace tpde::elf {
+void ElfMapper::reset() noexcept {
+  (void)mapped_addr;
+  (void)mapped_size;
+  (void)registered_frame_off;
+  (void)local_sym_count;
+}
+bool ElfMapper::map(AssemblerElf &, SymbolResolver) noexcept { return false; }
+void *ElfMapper::get_sym_addr(SymRef) noexcept { return nullptr; }
+} // namespace tpde::elf
+
+#endif

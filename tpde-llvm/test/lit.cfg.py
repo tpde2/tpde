@@ -22,5 +22,6 @@ config.substitutions.append(('tpde-llc', 'tpde-llc --regular-exit'))
 config.substitutions.append(('%objdump', 'llvm-objdump -d -r --no-show-raw-insn --symbolize-operands --no-addresses --x86-asm-syntax=intel -'))
 
 config.available_features.add(f'llvm{config.llvm_version}')
+config.available_features.add(f'os-{config.system_name.lower()}')
 
 # TODO(ts): arch config
