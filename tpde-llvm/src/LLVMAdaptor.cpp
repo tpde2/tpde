@@ -663,6 +663,13 @@ std::pair<unsigned, unsigned>
       incompatible = true;
     }
     complex_part_types[desc_idx].desc.incompatible_layout |= incompatible;
+  } else if (type->isX86_FP80Ty()) [[unlikely]] {
+    ty = LLVMBasicValType::f80;
+    num = 1;
+    // Mark x86_fp80 inside structs as incompatible for now. This is difficult
+    // to handle: for returns, it would need special handling, and for
+    // parameters, a part of the argument would need to be passed byval.
+    complex_part_types[desc_idx].desc.incompatible_layout |= true;
   }
 
   if (ty != LLVMBasicValType::invalid) {
@@ -758,6 +765,9 @@ std::pair<unsigned, unsigned>
         it->second = std::make_pair(ty, num);
         return it->second;
       }
+    } else if (type->isX86_FP80Ty()) [[unlikely]] {
+      it->second = {LLVMBasicValType::f80, 1};
+      return it->second;
     }
 
     unsigned start = complex_part_types.size();

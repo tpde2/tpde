@@ -5,29 +5,13 @@
 ; RUN: not tpde-llc --target=x86_64 %s | FileCheck %s
 ; RUN: not tpde-llc --target=aarch64 %s | FileCheck %s
 
-; CHECK: unsupported type: x86_fp80
-; CHECK-NEXT: Failed to compile function f_x86_fp80_1
-define void @f_x86_fp80_1(ptr %p) {
-  %l = load x86_fp80, ptr %p
-  ret void
-}
-
-; CHECK: unsupported type: x86_fp80
-; CHECK-NEXT: type with incompatible layout at function/call: x86_fp80
-; CHECK-NEXT: Failed to compile function f_x86_fp80_2
-define x86_fp80 @f_x86_fp80_2() {
-  ret x86_fp80 zeroinitializer
-}
-
-; CHECK: unsupported type: x86_fp80
-; CHECK-NEXT: type with incompatible layout at function/call: x86_fp80
+; CHECK: type with incompatible layout at function/call: { x86_fp80, i64 }
 ; CHECK-NEXT: Failed to compile function f_x86_fp80_3
-define void @f_x86_fp80_3(x86_fp80) {
+define void @f_x86_fp80_3({x86_fp80, i64}) {
   ret void
 }
 
-; CHECK: unsupported type: [2 x x86_fp80]
-; CHECK-NEXT: type with incompatible layout at function/call: [2 x x86_fp80]
+; CHECK: type with incompatible layout at function/call: [2 x x86_fp80]
 ; CHECK-NEXT: Failed to compile function f_x86_fp80_4
 define void @f_x86_fp80_4([2 x x86_fp80]) {
   ret void

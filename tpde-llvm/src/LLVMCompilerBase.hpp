@@ -1428,7 +1428,8 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_ret(
   if (inst->getNumOperands() != 0) {
     llvm::Value *retval = inst->getOperand(0);
     bool handled = false;
-    if (auto ret_ty = retval->getType(); ret_ty->isIntegerTy()) {
+    llvm::Type *ret_ty = retval->getType();
+    if (ret_ty->isIntegerTy()) {
       if (unsigned width = ret_ty->getIntegerBitWidth(); width % 32 != 0) {
         assert(width < 64 && "non-i128 multi-word int should be illegal");
         unsigned dst_width = width < 32 ? 32 : 64;
@@ -1443,6 +1444,13 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_ret(
           rb.add(std::move(vpr).into_extended(true, width, dst_width), {});
           handled = true;
         }
+      }
+    } else if (ret_ty->isX86_FP80Ty()) {
+      if constexpr (requires { &Derived::fp80_push; }) {
+        derived()->fp80_push(this->val_ref(retval).part(0));
+        handled = true;
+      } else {
+        return false;
       }
     }
 
@@ -1615,6 +1623,12 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_load_generic(
     derived()->encode_loadv128(std::move(ptr_op),
                                this->result_ref(load).part(0));
     break;
+  case f80:
+    if constexpr (requires { &Derived::fp80_load; }) {
+      derived()->fp80_load(std::move(ptr_op), this->result_ref(load).part(0));
+      break;
+    }
+    return false;
   case complex: {
     auto ty_idx = this->adaptor->val_info(load).complex_part_tys_idx;
     const LLVMComplexPart *part_descs =
@@ -1671,6 +1685,12 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_load_generic(
       case f128:
         derived()->encode_loadv128(std::move(part_addr), res.part(i));
         break;
+      case f80:
+        if constexpr (requires { &Derived::fp80_load; }) {
+          derived()->fp80_load(std::move(part_addr), res.part(i));
+          break;
+        }
+        return false;
       default: return false;
       }
 
@@ -1837,6 +1857,12 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_store_generic(
   case f128:
     derived()->encode_storev128(std::move(ptr_op), op_ref.part(0));
     break;
+  case f80:
+    if constexpr (requires { &Derived::fp80_store; }) {
+      derived()->fp80_store(std::move(ptr_op), op_ref.part(0));
+      break;
+    }
+    return false;
   case complex: {
     const LLVMComplexPart *part_descs =
         &this->adaptor->complex_part_types[ty_idx + 1];
@@ -1897,6 +1923,12 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_store_generic(
       case f128:
         derived()->encode_storev128(std::move(part_addr), std::move(part_ref));
         break;
+      case f80:
+        if constexpr (requires { &Derived::fp80_store; }) {
+          derived()->fp80_store(std::move(part_addr), std::move(part_ref));
+          break;
+        }
+        return false;
       default: return false;
       }
 
@@ -3668,6 +3700,13 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_call(
       }
       break;
     case LLVMBasicValType::i128: arg.byval_align = 16; break;
+    case LLVMBasicValType::f80: {
+      auto [vr, vpr] = this->val_ref_single(op);
+      tpde::CCAssignment cca{
+          .align = 16, .bank = tpde::RegBank(-2), .size = 16};
+      cb->add_arg(std::move(vpr), cca);
+      continue;
+    }
     case LLVMBasicValType::complex:
       if (derived()->arg_allow_split_reg_stack_passing(op)) {
         arg.flag = CallArg::Flag::allow_split;
@@ -3692,7 +3731,16 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_call(
 
   if (!call->getType()->isVoidTy()) {
     ValueRef res = this->result_ref(call);
-    cb->add_ret(res);
+    if (call->getType()->isX86_FP80Ty()) [[unlikely]] {
+      if constexpr (requires { &Derived::fp80_pop; }) {
+        ValuePartRef res_vpr = res.part(0);
+        derived()->fp80_pop(res_vpr);
+      } else {
+        return false;
+      }
+    } else {
+      cb->add_ret(res);
+    }
   }
 
   return true;

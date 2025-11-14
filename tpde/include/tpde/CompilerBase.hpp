@@ -591,7 +591,7 @@ template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>
 template <typename CBDerived>
 void CompilerBase<Adaptor, Derived, Config>::CallBuilderBase<
     CBDerived>::add_arg(ValuePart &&vp, CCAssignment cca) noexcept {
-  if (!cca.byval) {
+  if (!cca.byval && cca.bank == RegBank{}) {
     cca.bank = vp.bank();
     cca.size = vp.part_size();
   }

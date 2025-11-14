@@ -67,6 +67,16 @@ struct LLVMCompilerX64 : tpde::x64::CompilerX64<LLVMAdaptor,
     return !value->getType()->isIntegerTy(128);
   }
 
+  void prologue_assign_arg(tpde::CCAssigner *cc_assigner,
+                           u32 arg_idx,
+                           IRValueRef arg) noexcept {
+    if (arg->getType()->isX86_FP80Ty()) [[unlikely]] {
+      fp80_assign_arg(cc_assigner, arg);
+    } else {
+      Base::prologue_assign_arg(cc_assigner, arg_idx, arg);
+    }
+  }
+
   void load_address_of_var_reference(AsmReg dst,
                                      tpde::AssignmentPartRef ap) noexcept;
 
@@ -94,6 +104,35 @@ struct LLVMCompilerX64 : tpde::x64::CompilerX64<LLVMAdaptor,
                                   ValuePart &&res_lo,
                                   ValuePart &&res_hi,
                                   ValuePart &&res_of) noexcept;
+
+  // x86_fp80 support.
+
+  /// Get memory operand for spill slot of a value, which must have an
+  /// assignment. If write is false, the value is spilled; otherwise, if write
+  /// is true, the value is marked as spilled (stack valid).
+  FeMem spill_slot_op(ValuePart &val, bool write = false) {
+    allocate_spill_slot(val.assignment());
+    if (write) {
+      val.assignment().set_stack_valid();
+    }
+    return FE_MEM(FE_BP, 0, FE_NOREG, val.assignment().frame_off());
+  }
+
+  void fp80_assign_arg(tpde::CCAssigner *, IRValueRef arg) noexcept;
+  void fp80_push(ValuePart &&value) noexcept;
+  void fp80_pop(ValuePart &val) noexcept {
+    ASM(FSTPm80, spill_slot_op(val, true));
+  }
+  void fp80_load(GenericValuePart &&addr, ValuePart &&res) noexcept {
+    // TODO: use encodeable_with? need to move that to CompilerX64.
+    ASM(FLDm80, FE_MEM(gval_as_reg(addr), 0, FE_NOREG, 0));
+    fp80_pop(res);
+  }
+  void fp80_store(GenericValuePart &&addr, ValuePart &&val) noexcept {
+    fp80_push(std::move(val));
+    // TODO: use encodeable_with? need to move that to CompilerX64.
+    ASM(FSTPm80, FE_MEM(gval_as_reg(addr), 0, FE_NOREG, 0));
+  }
 };
 
 void LLVMCompilerX64::load_address_of_var_reference(
@@ -558,6 +597,41 @@ bool LLVMCompilerX64::handle_overflow_intrin_128(OverflowOp op,
                             res_lo,
                             res_hi,
                             res_of);
+}
+
+void LLVMCompilerX64::fp80_assign_arg(tpde::CCAssigner *cc_assigner,
+                                      IRValueRef arg) noexcept {
+  auto [vr, vpr] = result_ref_single(arg);
+  assert(vr.assignment()->part_count == 1);
+  tpde::CCAssignment cca{.align = 16, .bank = tpde::RegBank(-2), .size = 16};
+  cc_assigner->assign_arg(cca);
+  prologue_assign_arg_part(std::move(vpr), cca);
+}
+
+void LLVMCompilerX64::fp80_push(ValuePart &&value) noexcept {
+  if (value.has_assignment()) {
+    spill(value.assignment());
+    ASM(FLDm80, FE_MEM(FE_BP, 0, FE_NOREG, value.assignment().frame_off()));
+  } else {
+    assert(value.is_const());
+    std::span<const u64> data = value.const_data();
+    assert(data.size() == 2);
+    if (data[0] == 0 && data[1] == 0) {
+      ASM(FLDZ);
+    } else if (data[0] == 0x8000'0000'0000'0000 && data[1] == 0x3fff) {
+      ASM(FLD1);
+    } else {
+      std::span<const u8> raw{reinterpret_cast<const u8 *>(data.data()), 10};
+      // TODO: deduplicate/pool constants?
+      tpde::SecRef rodata = this->assembler.get_data_section(true, false);
+      tpde::SymRef sym = this->assembler.sym_def_data(
+          rodata, "", raw, 16, tpde::Assembler::SymBinding::LOCAL);
+      ASM(FLDm80, FE_MEM(FE_IP, 0, FE_NOREG, -1));
+      this->reloc_text(
+          sym, tpde::elf::R_X86_64_PC32, this->text_writer.offset() - 4, -4);
+    }
+  }
+  value.reset(this);
 }
 
 std::unique_ptr<LLVMCompiler>

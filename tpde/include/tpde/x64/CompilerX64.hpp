@@ -196,7 +196,7 @@ public:
         arg.stack_off = stack;
         stack += 8;
       }
-    } else {
+    } else if (arg.bank == RegBank{1}) {
       if (!must_assign_stack && xmm_cnt < 8) {
         arg.reg = Reg{AsmReg::XMM0 + xmm_cnt};
         xmm_cnt += 1;
@@ -209,6 +209,11 @@ public:
         arg.stack_off = stack;
         stack += size;
       }
+    } else {
+      // Argument without valid register bank, pass on stack.
+      stack = util::align_up(stack, arg.align < 8 ? 8 : arg.align);
+      arg.stack_off = stack;
+      stack += util::align_up(arg.size, 8);
     }
 
     if (must_assign_stack > 0) {
@@ -227,15 +232,17 @@ public:
         arg.reg = Reg{ret_gp_cnt == 0 ? AsmReg::AX : AsmReg::DX};
         ret_gp_cnt += 1;
       } else {
-        assert(false);
+        TPDE_UNREACHABLE("too many return values");
       }
-    } else {
+    } else if (arg.bank == RegBank{1}) {
       if (ret_xmm_cnt + arg.consecutive < 2) {
         arg.reg = Reg{ret_xmm_cnt == 0 ? AsmReg::XMM0 : AsmReg::XMM1};
         ret_xmm_cnt += 1;
       } else {
-        assert(false);
+        TPDE_UNREACHABLE("too many return values");
       }
+    } else {
+      TPDE_UNREACHABLE("return value must have valid register bank");
     }
   }
 };
