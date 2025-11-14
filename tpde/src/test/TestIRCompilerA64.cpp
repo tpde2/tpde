@@ -22,11 +22,6 @@ struct TestIRCompilerA64 : a64::CompilerA64<TestIRAdaptor, TestIRCompilerA64> {
 
   SymRef cur_personality_func() const noexcept { return {}; }
 
-  static bool arg_is_int128(IRValueRef) noexcept { return false; }
-  static bool arg_allow_split_reg_stack_passing(IRValueRef) noexcept {
-    return false;
-  }
-
   bool cur_func_may_emit_calls() const noexcept {
     return this->ir()->functions[this->adaptor->cur_func].has_call;
   }

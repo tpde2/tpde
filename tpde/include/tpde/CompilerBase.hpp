@@ -217,12 +217,13 @@ public:
       zext,
       sext,
       sret,
-      byval
+      byval,
+      allow_split,
     };
 
     explicit CallArg(IRValueRef value,
                      Flag flags = Flag::none,
-                     u8 byval_align = 0,
+                     u8 byval_align = 1,
                      u32 byval_size = 0)
         : value(value),
           flag(flags),
@@ -353,10 +354,16 @@ public:
 
   /// @}
 
-  /// Assign function argument in prologue.
+  /// Assign function argument in prologue. \ref align can be used to increase
+  /// the minimal stack alignment of the first part of the argument. If \ref
+  /// allow_split is set, the argument can be passed partially in registers,
+  /// otherwise (default) it must be either passed completely in registers or
+  /// completely on the stack.
   void prologue_assign_arg(CCAssigner *cc_assigner,
                            u32 arg_idx,
-                           IRValueRef arg) noexcept;
+                           IRValueRef arg,
+                           u32 align = 1,
+                           bool allow_split = false) noexcept;
 
   /// \name Value References
   /// @{
@@ -667,22 +674,8 @@ void CompilerBase<Adaptor, Derived, Config>::CallBuilderBase<
     return;
   }
 
-  u32 align = 1;
-  bool consecutive = false;
-  u32 consec_def = 0;
-  if (compiler.arg_is_int128(arg.value)) {
-    // TODO: this also applies to composites with 16-byte alignment
-    align = 16;
-    consecutive = true;
-  } else if (part_count > 1 &&
-             !compiler.arg_allow_split_reg_stack_passing(arg.value)) {
-    consecutive = true;
-    if (part_count > UINT8_MAX) {
-      // Must be completely passed on the stack.
-      consecutive = false;
-      consec_def = -1;
-    }
-  }
+  u32 align = arg.byval_align;
+  bool allow_split = arg.flag == CallArg::Flag::allow_split;
 
   for (u32 part_idx = 0; part_idx < part_count; ++part_idx) {
     u8 int_ext = 0;
@@ -690,15 +683,14 @@ void CompilerBase<Adaptor, Derived, Config>::CallBuilderBase<
       assert(arg.ext_bits != 0 && "cannot extend zero-bit integer");
       int_ext = arg.ext_bits | (arg.flag == CallArg::Flag::sext ? 0x80 : 0);
     }
-    derived()->add_arg(
-        vr.part(part_idx),
-        CCAssignment{
-            .consecutive =
-                u8(consecutive ? part_count - part_idx - 1 : consec_def),
-            .sret = arg.flag == CallArg::Flag::sret,
-            .int_ext = int_ext,
-            .align = u8(part_idx == 0 ? align : 1),
-        });
+    u32 remaining = part_count < 256 ? part_count - part_idx - 1 : 255;
+    derived()->add_arg(vr.part(part_idx),
+                       CCAssignment{
+                           .consecutive = u8(allow_split ? 0 : remaining),
+                           .sret = arg.flag == CallArg::Flag::sret,
+                           .int_ext = int_ext,
+                           .align = u8(part_idx == 0 ? align : 1),
+                       });
   }
 }
 
@@ -1135,7 +1127,11 @@ void CompilerBase<Adaptor, Derived, Config>::free_stack_slot(
 
 template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>
 void CompilerBase<Adaptor, Derived, Config>::prologue_assign_arg(
-    CCAssigner *cc_assigner, u32 arg_idx, IRValueRef arg) noexcept {
+    CCAssigner *cc_assigner,
+    u32 arg_idx,
+    IRValueRef arg,
+    u32 align,
+    bool allow_split) noexcept {
   ValueRef vr = derived()->result_ref(arg);
   if (adaptor->cur_arg_is_byval(arg_idx)) {
     CCAssignment cca{
@@ -1177,28 +1173,11 @@ void CompilerBase<Adaptor, Derived, Config>::prologue_assign_arg(
   }
 
   const u32 part_count = vr.assignment()->part_count;
-
-  u32 align = 1;
-  u32 consecutive = 0;
-  u32 consec_def = 0;
-  if (derived()->arg_is_int128(arg)) {
-    // TODO: this also applies to composites with 16-byte alignment
-    align = 16;
-    consecutive = 1;
-  } else if (part_count > 1 &&
-             !derived()->arg_allow_split_reg_stack_passing(arg)) {
-    consecutive = 1;
-    if (part_count > UINT8_MAX) {
-      // Must be completely passed on the stack.
-      consecutive = 0;
-      consec_def = -1;
-    }
-  }
-
   for (u32 part_idx = 0; part_idx < part_count; ++part_idx) {
     ValuePartRef vp = vr.part(part_idx);
+    u32 remaining = part_count < 256 ? part_count - part_idx - 1 : 255;
     CCAssignment cca{
-        .consecutive = u8(consecutive ? part_count - part_idx - 1 : consec_def),
+        .consecutive = u8(allow_split ? 0 : remaining),
         .align = u8(part_idx == 0 ? align : 1),
         .bank = vp.bank(),
         .size = vp.part_size(),

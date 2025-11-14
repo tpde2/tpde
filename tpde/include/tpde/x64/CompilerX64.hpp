@@ -253,19 +253,6 @@ struct PlatformConfig : CompilerConfigDefault {
   static constexpr u32 NUM_BANKS = 2;
 };
 
-namespace concepts {
-template <typename T, typename Config>
-concept Compiler = tpde::Compiler<T, Config> && requires(T a) {
-  {
-    a.arg_is_int128(std::declval<typename T::IRValueRef>())
-  } -> std::convertible_to<bool>;
-
-  {
-    a.arg_allow_split_reg_stack_passing(std::declval<typename T::IRValueRef>())
-  } -> std::convertible_to<bool>;
-};
-} // namespace concepts
-
 /// Compiler mixin for targeting x86-64.
 template <IRAdaptor Adaptor,
           typename Derived,
@@ -377,7 +364,6 @@ struct CompilerX64 : BaseTy<Adaptor, Derived, Config> {
                        const CPU_FEATURES cpu_features = CPU_BASELINE)
       : Base{adaptor}, cpu_feats(cpu_features) {
     static_assert(std::is_base_of_v<CompilerX64, Derived>);
-    static_assert(concepts::Compiler<Derived, PlatformConfig>);
   }
 
   template <typename... Args>

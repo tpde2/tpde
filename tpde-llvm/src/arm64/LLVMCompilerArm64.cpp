@@ -66,13 +66,8 @@ struct LLVMCompilerArm64 : tpde::a64::CompilerA64<LLVMAdaptor,
     EncCompiler::reset();
   }
 
-  bool arg_is_int128(const IRValueRef value) const noexcept {
-    return value->getType()->isIntegerTy(128);
-  }
-
   bool arg_allow_split_reg_stack_passing(IRValueRef value) const noexcept {
-    // we allow splitting the value if it is an aggregate but not if it is an
-    // i128 or array
+    // All types except i128 and arrays can be split across registers/stack.
     llvm::Type *ty = value->getType();
     return !ty->isIntegerTy(128) && !ty->isArrayTy();
   }

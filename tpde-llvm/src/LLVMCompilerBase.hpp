@@ -303,6 +303,14 @@ struct LLVMCompilerBase : public LLVMCompiler,
     return res;
   }
 
+  void prologue_assign_arg(tpde::CCAssigner *cc_assigner,
+                           u32 arg_idx,
+                           IRValueRef arg) noexcept {
+    u32 align = arg->getType()->isIntegerTy(128) ? 16 : 1;
+    bool allow_split = derived()->arg_allow_split_reg_stack_passing(arg);
+    Base::prologue_assign_arg(cc_assigner, arg_idx, arg, align, allow_split);
+  }
+
 private:
   static typename Assembler::SymBinding
       convert_linkage(llvm::GlobalValue::LinkageTypes linkage) noexcept {
@@ -3662,6 +3670,12 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_call(
       } else if (call->paramHasAttr(i, llvm::Attribute::AttrKind::SExt)) {
         arg.flag = CallArg::Flag::sext;
         arg.ext_bits = op->getType()->getIntegerBitWidth();
+      }
+      break;
+    case LLVMBasicValType::i128: arg.byval_align = 16; break;
+    case LLVMBasicValType::complex:
+      if (derived()->arg_allow_split_reg_stack_passing(op)) {
+        arg.flag = CallArg::Flag::allow_split;
       }
       break;
     default: break;

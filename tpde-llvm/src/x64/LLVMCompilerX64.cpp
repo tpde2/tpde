@@ -68,15 +68,9 @@ struct LLVMCompilerX64 : tpde::x64::CompilerX64<LLVMAdaptor,
     EncCompiler::reset();
   }
 
-  bool arg_is_int128(const IRValueRef value) const noexcept {
-    return value->getType()->isIntegerTy(128);
-  }
-
-  bool arg_allow_split_reg_stack_passing(
-      const IRValueRef val_idx) const noexcept {
-    // we allow splitting the value if it is an aggregate but not if it is an
-    // i128
-    return !arg_is_int128(val_idx);
+  bool arg_allow_split_reg_stack_passing(IRValueRef value) const noexcept {
+    // All types except i128 can be split across registers/stack.
+    return !value->getType()->isIntegerTy(128);
   }
 
   void load_address_of_var_reference(AsmReg dst,
