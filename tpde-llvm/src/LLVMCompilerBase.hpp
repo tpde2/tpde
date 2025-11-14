@@ -2393,16 +2393,22 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_float_binary_op(
 template <typename Adaptor, typename Derived, typename Config>
 bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_fneg(
     const llvm::Instruction *inst, const ValInfo &val_info, u64) noexcept {
-  auto src = this->val_ref(inst->getOperand(0));
-  auto [res_vr, res_ref] = this->result_ref_single(inst);
+  ValueRef src = this->val_ref(inst->getOperand(0));
+  ValueRef res = this->result_ref(inst);
   switch (val_info.type) {
     using enum LLVMBasicValType;
-  case f32: derived()->encode_fnegf32(src.part(0), res_ref); break;
-  case f64: derived()->encode_fnegf64(src.part(0), res_ref); break;
-  case f128: derived()->encode_fnegf128(src.part(0), res_ref); break;
-  case v2f32: derived()->encode_fnegv2f32(src.part(0), res_ref); break;
-  case v4f32: derived()->encode_fnegv4f32(src.part(0), res_ref); break;
-  case v2f64: derived()->encode_fnegv2f64(src.part(0), res_ref); break;
+  case f32: derived()->encode_fnegf32(src.part(0), res.part(0)); break;
+  case f64: derived()->encode_fnegf64(src.part(0), res.part(0)); break;
+  case f128: derived()->encode_fnegf128(src.part(0), res.part(0)); break;
+  case v2f32: derived()->encode_fnegv2f32(src.part(0), res.part(0)); break;
+  case v4f32: derived()->encode_fnegv4f32(src.part(0), res.part(0)); break;
+  case v2f64: derived()->encode_fnegv2f64(src.part(0), res.part(0)); break;
+  case f80:
+    if constexpr (requires { &Derived::fp80_neg; }) {
+      derived()->fp80_neg(src.part(0), res.part(0));
+      return true;
+    }
+    return false;
   default: return false;
   }
   return true;

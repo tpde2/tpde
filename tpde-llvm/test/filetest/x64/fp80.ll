@@ -503,3 +503,17 @@ define x86_fp80 @fdiv(x86_fp80 %0, x86_fp80 %1) {
   %res = fdiv x86_fp80 %0, %1
   ret x86_fp80 %res
 }
+
+define x86_fp80 @fneg(x86_fp80 %0) {
+; X64-LABEL: <fneg>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    fld tbyte ptr [rbp + 0x10]
+; X64-NEXT:    fchs
+; X64-NEXT:    fstp tbyte ptr [rbp - 0x40]
+; X64-NEXT:    fld tbyte ptr [rbp - 0x40]
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+  %res = fneg x86_fp80 %0
+  ret x86_fp80 %res
+}
