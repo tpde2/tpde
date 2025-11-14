@@ -134,3 +134,57 @@ define void @store_const(ptr %p) {
   store x86_fp80 0xK3FFF8000000000000000, ptr %p
   ret void
 }
+
+define float @trunc_float(x86_fp80 %v) {
+; X64-LABEL: <trunc_float>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    fld tbyte ptr [rbp + 0x10]
+; X64-NEXT:    fstp dword ptr [rbp - 0x2c]
+; X64-NEXT:    movd xmm0, dword ptr [rbp - 0x2c]
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+  %t = fptrunc x86_fp80 %v to float
+  ret float %t
+}
+
+define double @trunc_double(x86_fp80 %v) {
+; X64-LABEL: <trunc_double>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    fld tbyte ptr [rbp + 0x10]
+; X64-NEXT:    fstp qword ptr [rbp - 0x30]
+; X64-NEXT:    movq xmm0, qword ptr [rbp - 0x30]
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+  %t = fptrunc x86_fp80 %v to double
+  ret double %t
+}
+
+define x86_fp80 @ext_float(float %v) {
+; X64-LABEL: <ext_float>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    movd dword ptr [rbp - 0x2c], xmm0
+; X64-NEXT:    fld dword ptr [rbp - 0x2c]
+; X64-NEXT:    fstp tbyte ptr [rbp - 0x40]
+; X64-NEXT:    fld tbyte ptr [rbp - 0x40]
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+  %e = fpext float %v to x86_fp80
+  ret x86_fp80 %e
+}
+
+define x86_fp80 @ext_double(double %v) {
+; X64-LABEL: <ext_double>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    movq qword ptr [rbp - 0x30], xmm0
+; X64-NEXT:    fld qword ptr [rbp - 0x30]
+; X64-NEXT:    fstp tbyte ptr [rbp - 0x40]
+; X64-NEXT:    fld tbyte ptr [rbp - 0x40]
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+  %e = fpext double %v to x86_fp80
+  ret x86_fp80 %e
+}

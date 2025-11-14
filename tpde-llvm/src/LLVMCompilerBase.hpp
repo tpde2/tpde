@@ -2414,6 +2414,19 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_float_ext_trunc(
     sym = get_libfunc_sym(LibFunc::extendsftf2);
   } else if (src_ty->isDoubleTy() && dst_ty->isFP128Ty()) {
     sym = get_libfunc_sym(LibFunc::extenddftf2);
+  } else if constexpr (requires { &Derived::fp80_load; }) {
+    auto src_ref = this->val_ref(src_val);
+    if (src_ty->isFloatTy() && dst_ty->isX86_FP80Ty()) {
+      derived()->fp80_ext_float(src_ref.part(0), res_vr.part(0));
+    } else if (src_ty->isDoubleTy() && dst_ty->isX86_FP80Ty()) {
+      derived()->fp80_ext_double(src_ref.part(0), res_vr.part(0));
+    } else if (src_ty->isX86_FP80Ty() && dst_ty->isFloatTy()) {
+      derived()->fp80_trunc_float(src_ref.part(0), res_vr.part(0));
+    } else if (src_ty->isX86_FP80Ty() && dst_ty->isDoubleTy()) {
+      derived()->fp80_trunc_double(src_ref.part(0), res_vr.part(0));
+    } else {
+      return false;
+    }
   } else {
     return false;
   }

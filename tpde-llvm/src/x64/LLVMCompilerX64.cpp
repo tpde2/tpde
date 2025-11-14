@@ -111,9 +111,11 @@ struct LLVMCompilerX64 : tpde::x64::CompilerX64<LLVMAdaptor,
   /// assignment. If write is false, the value is spilled; otherwise, if write
   /// is true, the value is marked as spilled (stack valid).
   FeMem spill_slot_op(ValuePart &val, bool write = false) {
-    allocate_spill_slot(val.assignment());
     if (write) {
+      allocate_spill_slot(val.assignment());
       val.assignment().set_stack_valid();
+    } else {
+      spill(val.assignment());
     }
     return FE_MEM(FE_BP, 0, FE_NOREG, val.assignment().frame_off());
   }
@@ -132,6 +134,22 @@ struct LLVMCompilerX64 : tpde::x64::CompilerX64<LLVMAdaptor,
     fp80_push(std::move(val));
     // TODO: use encodeable_with? need to move that to CompilerX64.
     ASM(FSTPm80, FE_MEM(gval_as_reg(addr), 0, FE_NOREG, 0));
+  }
+  void fp80_ext_float(ValuePart &&src, ValuePart &&dst) noexcept {
+    ASM(FLDm32, spill_slot_op(src, false));
+    fp80_pop(dst);
+  }
+  void fp80_ext_double(ValuePart &&src, ValuePart &&dst) noexcept {
+    ASM(FLDm64, spill_slot_op(src, false));
+    fp80_pop(dst);
+  }
+  void fp80_trunc_float(ValuePart &&src, ValuePart &&dst) noexcept {
+    fp80_push(std::move(src));
+    ASM(FSTPm32, spill_slot_op(dst, true));
+  }
+  void fp80_trunc_double(ValuePart &&src, ValuePart &&dst) noexcept {
+    fp80_push(std::move(src));
+    ASM(FSTPm64, spill_slot_op(dst, true));
   }
 };
 
