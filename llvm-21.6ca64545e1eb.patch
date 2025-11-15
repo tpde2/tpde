@@ -1,0 +1,255 @@
+From 185170abb301a2ebacb6fc2238e7ebeb8674af10 Mon Sep 17 00:00:00 2001
+From: Alexis Engelke <engelke@in.tum.de>
+Date: Wed, 15 Jan 2025 11:00:36 +0100
+Subject: [PATCH] Add TPDE back-end
+
+To compile, add the tpde2 repository to clang/lib/CodeGen/tpde2, e.g.
+via a symlink. TPDE can be enabled using "-ftpde". By default, TPDE
+failures cause a fallback to LLVM, this can be disabled with
+"-ftpde-abort".
+---
+ clang/include/clang/Basic/CodeGenOptions.def  |  3 ++
+ clang/include/clang/Driver/Options.td         | 12 ++++++++
+ clang/lib/CodeGen/BackendUtil.cpp             | 30 +++++++++++++++++++
+ clang/lib/CodeGen/CMakeLists.txt              | 10 +++++++
+ clang/lib/Driver/ToolChains/Clang.cpp         |  4 +++
+ clang/lib/Driver/ToolChains/Flang.cpp         |  3 +-
+ .../include/flang/Frontend/CodeGenOptions.def |  3 ++
+ flang/lib/Frontend/CMakeLists.txt             |  3 ++
+ flang/lib/Frontend/CompilerInvocation.cpp     |  8 +++++
+ flang/lib/Frontend/FrontendActions.cpp        | 30 +++++++++++++++++++
+ 10 files changed, 105 insertions(+), 1 deletion(-)
+
+diff --git a/clang/include/clang/Basic/CodeGenOptions.def b/clang/include/clang/Basic/CodeGenOptions.def
+index 41031026c99f..529cb3022bbe 100644
+--- a/clang/include/clang/Basic/CodeGenOptions.def
++++ b/clang/include/clang/Basic/CodeGenOptions.def
+@@ -480,6 +480,9 @@ CODEGENOPT(ResMayAlias, 1, 0, Benign)
+ ENUM_CODEGENOPT(WinX64EHUnwindV2, llvm::WinX64EHUnwindV2Mode,
+                 2, llvm::WinX64EHUnwindV2Mode::Disabled, Benign)
+ 
++CODEGENOPT(TPDEEnable, 1, 0, Benign) ///< Enable TPDE
++CODEGENOPT(TPDEAbort, 1, 0, Benign) ///< Error on TPDE abort instead of LLVM fallback
++
+ /// FIXME: Make DebugOptions its own top-level .def file.
+ #include "DebugOptions.def"
+ 
+diff --git a/clang/include/clang/Driver/Options.td b/clang/include/clang/Driver/Options.td
+index 958d0d05ade2..eb930ee4a421 100644
+--- a/clang/include/clang/Driver/Options.td
++++ b/clang/include/clang/Driver/Options.td
+@@ -3674,6 +3674,18 @@ defm disable_block_signature_string : BoolFOption<"disable-block-signature-strin
+   NegFlag<SetFalse, [], [ClangOption], "Don't disable">,
+   BothFlags<[], [CC1Option], " block signature string)">>;
+ 
++
++defm tpde : BoolFOption<"tpde",
++  CodeGenOpts<"TPDEEnable">, DefaultFalse,
++  PosFlag<SetTrue, [], [ClangOption, CC1Option, FlangOption, FC1Option], "Enable">,
++  NegFlag<SetFalse, [], [ClangOption, CC1Option, FlangOption, FC1Option], "Disable">,
++  BothFlags<[], [ClangOption, CC1Option, FlangOption, FC1Option], " TPDE back-end">>;
++defm tpde_abort : BoolFOption<"tpde-abort",
++  CodeGenOpts<"TPDEAbort">, DefaultFalse,
++  PosFlag<SetTrue, [], [ClangOption, CC1Option, FlangOption, FC1Option], "Abort">,
++  NegFlag<SetFalse, [], [ClangOption, CC1Option, FlangOption, FC1Option], "Do not abort">,
++  BothFlags<[], [ClangOption, CC1Option, FlangOption, FC1Option], " on TPDE error">>;
++
+ def fomit_frame_pointer : Flag<["-"], "fomit-frame-pointer">, Group<f_Group>,
+   Visibility<[ClangOption, FlangOption]>,
+   HelpText<"Omit the frame pointer from functions that don't need it. "
+diff --git a/clang/lib/CodeGen/BackendUtil.cpp b/clang/lib/CodeGen/BackendUtil.cpp
+index 2f6d4c414e73..5f28138a21a3 100644
+--- a/clang/lib/CodeGen/BackendUtil.cpp
++++ b/clang/lib/CodeGen/BackendUtil.cpp
+@@ -9,6 +9,7 @@
+ #include "clang/CodeGen/BackendUtil.h"
+ #include "BackendConsumer.h"
+ #include "LinkInModulesPass.h"
++#include "tpde-llvm/LLVMCompiler.hpp"
+ #include "clang/Basic/CodeGenOptions.h"
+ #include "clang/Basic/Diagnostic.h"
+ #include "clang/Basic/LangOptions.h"
+@@ -1216,6 +1217,35 @@ void EmitAssemblyHelper::RunOptimizationPipeline(
+ void EmitAssemblyHelper::RunCodegenPipeline(
+     BackendAction Action, std::unique_ptr<raw_pwrite_stream> &OS,
+     std::unique_ptr<llvm::ToolOutputFile> &DwoOS) {
++  if (CodeGenOpts.TPDEEnable) {
++    if (Action != Backend_EmitObj) {
++      Diags.Report(
++          Diags.getCustomDiagID(DiagnosticsEngine::Error,
++                                "TPDE only supports emitting object files"));
++      return;
++    }
++
++    PrettyStackTraceString CrashInfo("TPDE");
++    llvm::TimeTraceScope TimeScope("TPDE");
++
++    auto Compiler = tpde_llvm::LLVMCompiler::create(TargetTriple);
++    std::vector<uint8_t> ObjectBuf;
++    if (Compiler && Compiler->compile_to_elf(*TheModule, ObjectBuf)) {
++      OS->write(reinterpret_cast<char *>(ObjectBuf.data()), ObjectBuf.size());
++      return;
++    }
++
++    if (CodeGenOpts.TPDEAbort) {
++      Diags.Report(Diags.getCustomDiagID(DiagnosticsEngine::Error,
++                                         "TPDE compilation failed"));
++      return;
++    }
++
++    Diags.Report(
++        Diags.getCustomDiagID(DiagnosticsEngine::Warning,
++                              "TPDE compilation failed, falling back to LLVM"));
++  }
++
+   // We still use the legacy PM to run the codegen pipeline since the new PM
+   // does not work with the codegen pipeline.
+   // FIXME: make the new PM work with the codegen pipeline.
+diff --git a/clang/lib/CodeGen/CMakeLists.txt b/clang/lib/CodeGen/CMakeLists.txt
+index a05b31f971e1..68bd62588cc3 100644
+--- a/clang/lib/CodeGen/CMakeLists.txt
++++ b/clang/lib/CodeGen/CMakeLists.txt
+@@ -172,3 +172,13 @@ add_clang_library(clangCodeGen
+   clangLex
+   clangSerialization
+   )
++
++if (LLVM_LINK_LLVM_DYLIB)
++  set(TPDE_LINK_LLVM_STATIC OFF)
++else()
++  set(TPDE_LINK_LLVM_STATIC ON)
++endif()
++set(LLVM_FOUND TRUE)
++set(LIT ${LLVM_MAIN_SRC_DIR}/utils/lit/lit.py)
++add_subdirectory(tpde2)
++target_link_libraries(clangCodeGen PRIVATE $<BUILD_LOCAL_INTERFACE:tpde_llvm>)
+diff --git a/clang/lib/Driver/ToolChains/Clang.cpp b/clang/lib/Driver/ToolChains/Clang.cpp
+index 62613322320c..c1481ba6e897 100644
+--- a/clang/lib/Driver/ToolChains/Clang.cpp
++++ b/clang/lib/Driver/ToolChains/Clang.cpp
+@@ -7896,6 +7896,10 @@ void Clang::ConstructJob(Compilation &C, const JobAction &JA,
+     }
+   }
+ 
++  Args.AddLastArg(CmdArgs, options::OPT_ftpde, options::OPT_fno_tpde);
++  Args.AddLastArg(CmdArgs, options::OPT_ftpde_abort,
++                  options::OPT_fno_tpde_abort);
++
+   if (Arg *A = Args.getLastArg(options::OPT_fglobal_isel,
+                                options::OPT_fno_global_isel)) {
+     CmdArgs.push_back("-mllvm");
+diff --git a/clang/lib/Driver/ToolChains/Flang.cpp b/clang/lib/Driver/ToolChains/Flang.cpp
+index 7ab41e9b85a0..5f0d290309b0 100644
+--- a/clang/lib/Driver/ToolChains/Flang.cpp
++++ b/clang/lib/Driver/ToolChains/Flang.cpp
+@@ -177,7 +177,8 @@ void Flang::addCodegenOptions(const ArgList &Args,
+        options::OPT_frepack_arrays_contiguity_EQ,
+        options::OPT_fstack_repack_arrays, options::OPT_fno_stack_repack_arrays,
+        options::OPT_ftime_report, options::OPT_ftime_report_EQ,
+-       options::OPT_funroll_loops, options::OPT_fno_unroll_loops});
++       options::OPT_funroll_loops, options::OPT_fno_unroll_loops,
++       options::OPT_ftpde, options::OPT_ftpde_abort});
+ }
+ 
+ void Flang::addPicOptions(const ArgList &Args, ArgStringList &CmdArgs) const {
+diff --git a/flang/include/flang/Frontend/CodeGenOptions.def b/flang/include/flang/Frontend/CodeGenOptions.def
+index cdeea93c9aec..deb83d37dd9f 100644
+--- a/flang/include/flang/Frontend/CodeGenOptions.def
++++ b/flang/include/flang/Frontend/CodeGenOptions.def
+@@ -56,5 +56,8 @@ ENUM_CODEGENOPT(ComplexRange, ComplexRangeKind, 3, ComplexRangeKind::CX_Full) //
+ 
+ ENUM_CODEGENOPT(DoConcurrentMapping, DoConcurrentMappingKind, 2, DoConcurrentMappingKind::DCMK_None) ///< Map `do concurrent` to OpenMP
+ 
++CODEGENOPT(TPDEEnable, 1, 0)
++CODEGENOPT(TPDEAbort, 1, 0)
++
+ #undef CODEGENOPT
+ #undef ENUM_CODEGENOPT
+diff --git a/flang/lib/Frontend/CMakeLists.txt b/flang/lib/Frontend/CMakeLists.txt
+index 96ba27ad418f..b54f05ed3c6d 100644
+--- a/flang/lib/Frontend/CMakeLists.txt
++++ b/flang/lib/Frontend/CMakeLists.txt
+@@ -72,6 +72,7 @@ add_flang_library(flangFrontend
+ 
+   CLANG_LIBS
+   clangBasic
++  clangCodeGen
+   clangDriver
+ )
+ 
+@@ -82,3 +83,5 @@ target_precompile_headers(flangFrontend PRIVATE
+   [["flang/Lower/PFTBuilder.h"]]
+   [["flang/Lower/Bridge.h"]]
+ )
++
++target_link_libraries(flangFrontend PRIVATE $<BUILD_LOCAL_INTERFACE:tpde_llvm>)
+diff --git a/flang/lib/Frontend/CompilerInvocation.cpp b/flang/lib/Frontend/CompilerInvocation.cpp
+index f55d86643599..f972aabb47c3 100644
+--- a/flang/lib/Frontend/CompilerInvocation.cpp
++++ b/flang/lib/Frontend/CompilerInvocation.cpp
+@@ -500,6 +500,14 @@ static void parseCodeGenArgs(Fortran::frontend::CodeGenOptions &opts,
+           << arg->getAsString(args) << arg->getValue();
+     }
+   }
++
++  if (args.hasFlag(clang::driver::options::OPT_ftpde,
++                   clang::driver::options::OPT_fno_tpde, false)) {
++    opts.TPDEEnable = 1;
++    if (args.hasFlag(clang::driver::options::OPT_ftpde_abort,
++                     clang::driver::options::OPT_fno_tpde_abort, false))
++      opts.TPDEAbort = 1;
++  }
+ }
+ 
+ /// Parses all target input arguments and populates the target
+diff --git a/flang/lib/Frontend/FrontendActions.cpp b/flang/lib/Frontend/FrontendActions.cpp
+index b5f4f9421f63..3bb96f65429d 100644
+--- a/flang/lib/Frontend/FrontendActions.cpp
++++ b/flang/lib/Frontend/FrontendActions.cpp
+@@ -35,6 +35,7 @@
+ #include "mlir/Support/LLVM.h"
+ #include "mlir/Target/LLVMIR/Import.h"
+ #include "mlir/Target/LLVMIR/ModuleTranslation.h"
++#include "tpde-llvm/LLVMCompiler.hpp"
+ #include "clang/Basic/Diagnostic.h"
+ #include "clang/Basic/DiagnosticFrontend.h"
+ #include "clang/Basic/FileManager.h"
+@@ -873,6 +874,35 @@ static void generateMachineCodeOrAssemblyImpl(clang::DiagnosticsEngine &diags,
+           (act == BackendActionTy::Backend_EmitAssembly)) &&
+          "Unsupported action");
+ 
++  if (codeGenOpts.TPDEEnable) {
++    if (act != BackendActionTy::Backend_EmitObj) {
++      diags.Report(
++          diags.getCustomDiagID(clang::DiagnosticsEngine::Error,
++                                "TPDE only supports emitting object files"));
++      return;
++    }
++
++    llvm::TimeTraceScope timeScope("TPDE");
++
++    llvm::Triple triple(llvmModule.getTargetTriple());
++    auto compiler = tpde_llvm::LLVMCompiler::create(triple);
++    std::vector<uint8_t> objectBuf;
++    if (compiler && compiler->compile_to_elf(llvmModule, objectBuf)) {
++      os.write(reinterpret_cast<char *>(objectBuf.data()), objectBuf.size());
++      return;
++    }
++
++    if (codeGenOpts.TPDEAbort) {
++      diags.Report(diags.getCustomDiagID(clang::DiagnosticsEngine::Error,
++                                         "TPDE compilation failed"));
++      return;
++    }
++
++    diags.Report(
++        diags.getCustomDiagID(clang::DiagnosticsEngine::Warning,
++                              "TPDE compilation failed, falling back to LLVM"));
++  }
++
+   // Set-up the pass manager, i.e create an LLVM code-gen pass pipeline.
+   // Currently only the legacy pass manager is supported.
+   // TODO: Switch to the new PM once it's available in the backend.
+-- 
+2.48.1
+
