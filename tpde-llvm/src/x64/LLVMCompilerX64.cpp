@@ -151,6 +151,7 @@ struct LLVMCompilerX64 : tpde::x64::CompilerX64<LLVMAdaptor,
     fp80_push(std::move(src));
     ASM(FSTPm64, spill_slot_op(dst, true));
   }
+  void fp80_from_int(bool sign, bool is64, ValuePart &&, ValuePart &&) noexcept;
   void fp80_add(ValuePart &&lhs, ValuePart &&rhs, ValuePart &&res) noexcept {
     fp80_push(std::move(rhs));
     fp80_push(std::move(lhs));
@@ -726,6 +727,54 @@ void LLVMCompilerX64::fp80_cmp(llvm::CmpInst::Predicate pred,
   case llvm::CmpInst::FCMP_UEQ: ASM(SETZ8r, dst); break;
   default: TPDE_UNREACHABLE("unexpected fcmp predicate");
   }
+}
+
+void LLVMCompilerX64::fp80_from_int(bool sign,
+                                    bool is64,
+                                    ValuePart &&src,
+                                    ValuePart &&dst) noexcept {
+  FeMem dst_stack_slot = spill_slot_op(dst, true);
+  FeMem src_stack_slot;
+  if (!sign && !is64) {
+    ValuePart tmp = std::move(src).into_extended(this, false, 32, 64);
+    src.reset(this);
+    src = std::move(tmp);
+  }
+  if (src.has_assignment()) {
+    src_stack_slot = spill_slot_op(src, false);
+  } else {
+    // Temporarily reuse the spill slot of dst.
+    if (sign && !is64) {
+      ASM(MOV32mr, dst_stack_slot, src.cur_reg());
+    } else {
+      ASM(MOV64mr, dst_stack_slot, src.cur_reg());
+    }
+    src_stack_slot = dst_stack_slot;
+  }
+  if (sign && !is64) {
+    ASM(FILDm32, src_stack_slot);
+  } else {
+    ASM(FILDm64, src_stack_slot);
+  }
+  if (!sign && is64) {
+    // Add 2**64 if the value is negative.
+    src = std::move(src).into_temporary(this);
+    ASM(SHR64ri, src.cur_reg(), 63);
+    ScratchReg tmp{this};
+    AsmReg tmp_reg = tmp.alloc_gp();
+    ASM(LEA64rm, tmp_reg, FE_MEM(FE_IP, 0, FE_NOREG, -1));
+    // Pair of float: first float is zero, second float is 2**64.
+    static constexpr u64 num = 0x5f80'0000'0000'0000;
+    std::span<const u8> raw{reinterpret_cast<const u8 *>(&num), 8};
+    // TODO: deduplicate/pool constants?
+    tpde::SecRef rodata = this->assembler.get_data_section(true, false);
+    tpde::SymRef sym = this->assembler.sym_def_data(
+        rodata, "", raw, 8, tpde::Assembler::SymBinding::LOCAL);
+    this->reloc_text(
+        sym, tpde::elf::R_X86_64_PC32, this->text_writer.offset() - 4, -4);
+    ASM(FADDm32, FE_MEM(tmp_reg, 4, src.cur_reg(), 0));
+  }
+  fp80_pop(dst);
 }
 
 std::unique_ptr<LLVMCompiler>

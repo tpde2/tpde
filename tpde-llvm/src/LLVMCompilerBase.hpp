@@ -2535,7 +2535,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_float_to_int(
 
 template <typename Adaptor, typename Derived, typename Config>
 bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_int_to_float(
-    const llvm::Instruction *inst, const ValInfo &, u64 sign) noexcept {
+    const llvm::Instruction *inst, const ValInfo &val_info, u64 sign) noexcept {
   const llvm::Value *src_val = inst->getOperand(0);
   auto *dst_ty = inst->getType();
   if (dst_ty->isVectorTy()) {
@@ -2565,50 +2565,44 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_int_to_float(
     return true;
   }
 
-  if (!dst_ty->isFloatTy() && !dst_ty->isDoubleTy()) {
-    return false;
-  }
-
-  const auto dst_double = dst_ty->isDoubleTy();
-
   ValueRef src_ref = this->val_ref(src_val);
   ValuePartRef src_op = src_ref.part(0);
-  auto [res_vr, res_ref] = this->result_ref_single(inst);
+  ValueRef res = this->result_ref(inst);
 
   if (bit_width != 32 && bit_width != 64) {
     unsigned ext = tpde::util::align_up(bit_width, 32);
     src_op = std::move(src_op).into_extended(sign, bit_width, ext);
   }
 
-  if (sign) {
-    if (bit_width > 32) {
-      if (dst_double) {
-        derived()->encode_i64tof64(std::move(src_op), res_ref);
-      } else {
-        derived()->encode_i64tof32(std::move(src_op), res_ref);
-      }
-    } else {
-      if (dst_double) {
-        derived()->encode_i32tof64(std::move(src_op), res_ref);
-      } else {
-        derived()->encode_i32tof32(std::move(src_op), res_ref);
-      }
+  unsigned ty_idx;
+  switch (val_info.type) {
+  case LLVMBasicValType::f32: ty_idx = 0; break;
+  case LLVMBasicValType::f64: ty_idx = 1; break;
+  case LLVMBasicValType::f80:
+    if constexpr (requires { &Derived::fp80_from_int; }) {
+      derived()->fp80_from_int(
+          sign, bit_width > 32, std::move(src_op), res.part(0));
+      return true;
     }
-  } else {
-    if (bit_width > 32) {
-      if (dst_double) {
-        derived()->encode_u64tof64(std::move(src_op), res_ref);
-      } else {
-        derived()->encode_u64tof32(std::move(src_op), res_ref);
-      }
-    } else {
-      if (dst_double) {
-        derived()->encode_u32tof64(std::move(src_op), res_ref);
-      } else {
-        derived()->encode_u32tof32(std::move(src_op), res_ref);
-      }
-    }
+    return false;
+  default: return false;
   }
+
+  using EncodeFnTy = bool (Derived::*)(GenericValuePart &&, ValuePart &&);
+  static constexpr auto encode_fns = []() consteval {
+    std::array<EncodeFnTy[2][2], 2> res;
+    res[0][0][0] = &Derived::encode_i32tof32;
+    res[0][0][1] = &Derived::encode_i32tof64;
+    res[0][1][0] = &Derived::encode_i64tof32;
+    res[0][1][1] = &Derived::encode_i64tof64;
+    res[1][0][0] = &Derived::encode_u32tof32;
+    res[1][0][1] = &Derived::encode_u32tof64;
+    res[1][1][0] = &Derived::encode_u64tof32;
+    res[1][1][1] = &Derived::encode_u64tof64;
+    return res;
+  }();
+  EncodeFnTy fn = encode_fns[!sign][bit_width > 32][ty_idx];
+  (derived()->*fn)(std::move(src_op), res.part(0));
   return true;
 }
 

@@ -189,6 +189,232 @@ define x86_fp80 @ext_double(double %v) {
   ret x86_fp80 %e
 }
 
+define x86_fp80 @sitofp_16(i16 %v) {
+; X64-LABEL: <sitofp_16>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    movsx edi, di
+; X64-NEXT:    mov dword ptr [rbp - 0x40], edi
+; X64-NEXT:    fild dword ptr [rbp - 0x40]
+; X64-NEXT:    fstp tbyte ptr [rbp - 0x40]
+; X64-NEXT:    fld tbyte ptr [rbp - 0x40]
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+  %e = sitofp i16 %v to x86_fp80
+  ret x86_fp80 %e
+}
+
+define x86_fp80 @sitofp_32(i32 %v) {
+; X64-LABEL: <sitofp_32>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    mov dword ptr [rbp - 0x44], edi
+; X64-NEXT:    fild dword ptr [rbp - 0x44]
+; X64-NEXT:    fstp tbyte ptr [rbp - 0x40]
+; X64-NEXT:    fld tbyte ptr [rbp - 0x40]
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+  %e = sitofp i32 %v to x86_fp80
+  ret x86_fp80 %e
+}
+
+define x86_fp80 @sitofp_37(i37 %v) {
+; X64-LABEL: <sitofp_37>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    shl rdi, 0x1b
+; X64-NEXT:    sar rdi, 0x1b
+; X64-NEXT:    mov qword ptr [rbp - 0x40], rdi
+; X64-NEXT:    fild qword ptr [rbp - 0x40]
+; X64-NEXT:    fstp tbyte ptr [rbp - 0x40]
+; X64-NEXT:    fld tbyte ptr [rbp - 0x40]
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+  %e = sitofp i37 %v to x86_fp80
+  ret x86_fp80 %e
+}
+
+define x86_fp80 @sitofp_64(i64 %v) {
+; X64-LABEL: <sitofp_64>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    mov qword ptr [rbp - 0x30], rdi
+; X64-NEXT:    fild qword ptr [rbp - 0x30]
+; X64-NEXT:    fstp tbyte ptr [rbp - 0x40]
+; X64-NEXT:    fld tbyte ptr [rbp - 0x40]
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+  %e = sitofp i64 %v to x86_fp80
+  ret x86_fp80 %e
+}
+
+define x86_fp80 @uitofp_16(i16 %v) {
+; X64-LABEL: <uitofp_16>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    movzx edi, di
+; X64-NEXT:    mov edi, edi
+; X64-NEXT:    mov qword ptr [rbp - 0x40], rdi
+; X64-NEXT:    fild qword ptr [rbp - 0x40]
+; X64-NEXT:    fstp tbyte ptr [rbp - 0x40]
+; X64-NEXT:    fld tbyte ptr [rbp - 0x40]
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+  %e = uitofp i16 %v to x86_fp80
+  ret x86_fp80 %e
+}
+
+define x86_fp80 @uitofp_32(i32 %v) {
+; X64-LABEL: <uitofp_32>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    mov edi, edi
+; X64-NEXT:    mov qword ptr [rbp - 0x40], rdi
+; X64-NEXT:    fild qword ptr [rbp - 0x40]
+; X64-NEXT:    fstp tbyte ptr [rbp - 0x40]
+; X64-NEXT:    fld tbyte ptr [rbp - 0x40]
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+  %e = uitofp i32 %v to x86_fp80
+  ret x86_fp80 %e
+}
+
+define x86_fp80 @uitofp_37(i37 %v) {
+; X64-LABEL: <uitofp_37>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    movabs rax, 0x1fffffffff
+; X64-NEXT:    and rdi, rax
+; X64-NEXT:    mov qword ptr [rbp - 0x40], rdi
+; X64-NEXT:    fild qword ptr [rbp - 0x40]
+; X64-NEXT:    shr rdi, 0x3f
+; X64-NEXT:    lea rax, <uitofp_37+0x1b>
+; X64-NEXT:     R_X86_64_PC32 -0x4
+; X64-NEXT:    fadd dword ptr [rax + 4*rdi]
+; X64-NEXT:    fstp tbyte ptr [rbp - 0x40]
+; X64-NEXT:    fld tbyte ptr [rbp - 0x40]
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+  %e = uitofp i37 %v to x86_fp80
+  ret x86_fp80 %e
+}
+
+define x86_fp80 @uitofp_64(i64 %v) {
+; X64-LABEL: <uitofp_64>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    mov qword ptr [rbp - 0x30], rdi
+; X64-NEXT:    fild qword ptr [rbp - 0x30]
+; X64-NEXT:    shr rdi, 0x3f
+; X64-NEXT:    lea rax, <uitofp_64+0xe>
+; X64-NEXT:     R_X86_64_PC32 -0x4
+; X64-NEXT:    fadd dword ptr [rax + 4*rdi]
+; X64-NEXT:    fstp tbyte ptr [rbp - 0x40]
+; X64-NEXT:    fld tbyte ptr [rbp - 0x40]
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+  %e = uitofp i64 %v to x86_fp80
+  ret x86_fp80 %e
+}
+
+define x86_fp80 @uitofp_16_twice(i16 %v) {
+; X64-LABEL: <uitofp_16_twice>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    movzx eax, di
+; X64-NEXT:    mov eax, eax
+; X64-NEXT:    mov qword ptr [rbp - 0x40], rax
+; X64-NEXT:    fild qword ptr [rbp - 0x40]
+; X64-NEXT:    fstp tbyte ptr [rbp - 0x40]
+; X64-NEXT:    movzx edi, di
+; X64-NEXT:    mov edi, edi
+; X64-NEXT:    mov qword ptr [rbp - 0x40], rdi
+; X64-NEXT:    fild qword ptr [rbp - 0x40]
+; X64-NEXT:    fstp tbyte ptr [rbp - 0x40]
+; X64-NEXT:    fld tbyte ptr [rbp - 0x40]
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+  %e1 = uitofp i16 %v to x86_fp80
+  %e2 = uitofp i16 %v to x86_fp80
+  ret x86_fp80 %e2
+}
+
+define x86_fp80 @uitofp_32_twice(i32 %v) {
+; X64-LABEL: <uitofp_32_twice>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    mov eax, edi
+; X64-NEXT:    mov qword ptr [rbp - 0x40], rax
+; X64-NEXT:    fild qword ptr [rbp - 0x40]
+; X64-NEXT:    fstp tbyte ptr [rbp - 0x40]
+; X64-NEXT:    mov edi, edi
+; X64-NEXT:    mov qword ptr [rbp - 0x40], rdi
+; X64-NEXT:    fild qword ptr [rbp - 0x40]
+; X64-NEXT:    fstp tbyte ptr [rbp - 0x40]
+; X64-NEXT:    fld tbyte ptr [rbp - 0x40]
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+  %e1 = uitofp i32 %v to x86_fp80
+  %e2 = uitofp i32 %v to x86_fp80
+  ret x86_fp80 %e2
+}
+
+define x86_fp80 @uitofp_37_twice(i37 %v) {
+; X64-LABEL: <uitofp_37_twice>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    movabs rax, 0x1fffffffff
+; X64-NEXT:    and rax, rdi
+; X64-NEXT:    mov qword ptr [rbp - 0x40], rax
+; X64-NEXT:    fild qword ptr [rbp - 0x40]
+; X64-NEXT:    shr rax, 0x3f
+; X64-NEXT:    lea rcx, <uitofp_37_twice+0x1b>
+; X64-NEXT:     R_X86_64_PC32 -0x4
+; X64-NEXT:    fadd dword ptr [rcx + 4*rax]
+; X64-NEXT:    fstp tbyte ptr [rbp - 0x40]
+; X64-NEXT:    movabs rax, 0x1fffffffff
+; X64-NEXT:    and rdi, rax
+; X64-NEXT:    mov qword ptr [rbp - 0x40], rdi
+; X64-NEXT:    fild qword ptr [rbp - 0x40]
+; X64-NEXT:    shr rdi, 0x3f
+; X64-NEXT:    lea rax, <uitofp_37_twice+0x40>
+; X64-NEXT:     R_X86_64_PC32 -0x4
+; X64-NEXT:    fadd dword ptr [rax + 4*rdi]
+; X64-NEXT:    fstp tbyte ptr [rbp - 0x40]
+; X64-NEXT:    fld tbyte ptr [rbp - 0x40]
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+  %e1 = uitofp i37 %v to x86_fp80
+  %e2 = uitofp i37 %v to x86_fp80
+  ret x86_fp80 %e2
+}
+
+define x86_fp80 @uitofp_64_twice(i64 %v) {
+; X64-LABEL: <uitofp_64_twice>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    mov qword ptr [rbp - 0x30], rdi
+; X64-NEXT:    fild qword ptr [rbp - 0x30]
+; X64-NEXT:    mov rax, rdi
+; X64-NEXT:    shr rax, 0x3f
+; X64-NEXT:    lea rcx, <uitofp_64_twice+0x11>
+; X64-NEXT:     R_X86_64_PC32 -0x4
+; X64-NEXT:    fadd dword ptr [rcx + 4*rax]
+; X64-NEXT:    fstp tbyte ptr [rbp - 0x40]
+; X64-NEXT:    fild qword ptr [rbp - 0x30]
+; X64-NEXT:    shr rdi, 0x3f
+; X64-NEXT:    lea rax, <uitofp_64_twice+0x25>
+; X64-NEXT:     R_X86_64_PC32 -0x4
+; X64-NEXT:    fadd dword ptr [rax + 4*rdi]
+; X64-NEXT:    fstp tbyte ptr [rbp - 0x40]
+; X64-NEXT:    fld tbyte ptr [rbp - 0x40]
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+  %e1 = uitofp i64 %v to x86_fp80
+  %e2 = uitofp i64 %v to x86_fp80
+  ret x86_fp80 %e2
+}
+
 define i1 @fcmp_false(x86_fp80 %0, x86_fp80 %1) {
 ; X64-LABEL: <fcmp_false>:
 ; X64:         push rbp
