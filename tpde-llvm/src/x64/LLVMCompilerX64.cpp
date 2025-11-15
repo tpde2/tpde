@@ -182,6 +182,17 @@ struct LLVMCompilerX64 : tpde::x64::CompilerX64<LLVMAdaptor,
     ASM(FCHS);
     fp80_pop(res);
   }
+  void fp80_muladd(ValuePart &&a,
+                   ValuePart &&b,
+                   ValuePart &&c,
+                   ValuePart &&res) noexcept {
+    fp80_push(std::move(c));
+    fp80_push(std::move(b));
+    fp80_push(std::move(a));
+    ASM(FMULPrr, FE_ST(1), FE_ST(0));
+    ASM(FADDPrr, FE_ST(1), FE_ST(0));
+    fp80_pop(res);
+  }
   void fp80_cmp(llvm::CmpInst::Predicate pred,
                 ValuePart &&lhs,
                 ValuePart &&rhs,

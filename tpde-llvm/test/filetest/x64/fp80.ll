@@ -829,3 +829,20 @@ define x86_fp80 @fneg(x86_fp80 %0) {
   %res = fneg x86_fp80 %0
   ret x86_fp80 %res
 }
+
+define x86_fp80 @fmuladd(x86_fp80 %0, x86_fp80 %1, x86_fp80 %2) {
+; X64-LABEL: <fmuladd>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    fld tbyte ptr [rbp + 0x30]
+; X64-NEXT:    fld tbyte ptr [rbp + 0x20]
+; X64-NEXT:    fld tbyte ptr [rbp + 0x10]
+; X64-NEXT:    fmulp st(1), st
+; X64-NEXT:    faddp st(1), st
+; X64-NEXT:    fstp tbyte ptr [rbp - 0x40]
+; X64-NEXT:    fld tbyte ptr [rbp - 0x40]
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+  %res = call x86_fp80 @llvm.fmuladd(x86_fp80 %0, x86_fp80 %1, x86_fp80 %2)
+  ret x86_fp80 %res
+}

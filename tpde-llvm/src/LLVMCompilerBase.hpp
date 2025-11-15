@@ -4683,6 +4683,13 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_intrin(
       cb2->add_ret(res);
       return true;
     }
+    case f80:
+      if constexpr (requires { &Derived::fp80_muladd; }) {
+        derived()->fp80_muladd(
+            op1.part(0), op2.part(0), op3.part(0), res.part(0));
+        return true;
+      }
+      return false;
     default: return false;
     }
 
