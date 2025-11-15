@@ -36,12 +36,12 @@ Unsupported features currently include:
 
 - Targets other than x86-64-v1/AArch64 (ARMv8.1) (Linux) ELF.
 - Code models other than Small-PIC.
-- Scalar types: integer types larger than `i64` except `i128` (`i128` is supported), pointers with non-zero address space, `half`, `bfloat`, `ppc_fp128`, `x86_fp80`, `x86_amx`. Code with x86-64 `long double` needs to be compiled with `-mlong-double-64`.
+- Scalar types: integer types larger than `i64` except `i128` (`i128` is supported), pointers with non-zero address space, `half`, `bfloat`, `ppc_fp128`, `x86_amx`.
 - Aggregate types with in total more than 65535 elements.
 - `select` aggregate type other than `{i64, i64}`.
-- `bitcast` larger than 64 bit.
 - Atomic operations might use a stronger consistency than required (e.g., always `seqcst` for `atomicrmw`).
 - Calling conventions other than the C calling convention (SysV on x86-64, AAPCS on AArch64).
+- `x86_fp80`: `frem`, most intrinsics. Values must not be part of an aggregate type at function boundaries (including multiple return values like `{x86_fp80, x86_fp80}`. Use `x86_fp80` is likely to result in inefficient code and is best avoided.
 - `fp128`: `fneg`, `fcmp one/ueq`, many intrinsics.
 - Computed `goto` (`blockaddress`, `indirectbr`).
 - `landingpad` with non-empty `filter` clause.
