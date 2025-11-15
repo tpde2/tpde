@@ -8,3 +8,4 @@ build*
 tmp/
 .cache
 .DS_Store
+/CMakeUserPresets.json
