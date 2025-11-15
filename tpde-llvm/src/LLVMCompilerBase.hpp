@@ -2480,7 +2480,11 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_float_to_int(
     return false;
   }
 
-  if (src_ty->isFP128Ty()) {
+  unsigned ty_idx;
+  switch (src_ty->getTypeID()) {
+  case llvm::Type::FloatTyID: ty_idx = 0; break;
+  case llvm::Type::DoubleTyID: ty_idx = 1; break;
+  case llvm::Type::FP128TyID: {
     if (saturate) {
       return false;
     }
@@ -2492,12 +2496,19 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_float_to_int(
     derived()->create_helper_call({&src_val, 1}, &res_vr, sym);
     return true;
   }
-
-  if (!src_ty->isFloatTy() && !src_ty->isDoubleTy()) {
+  case llvm::Type::X86_FP80TyID:
+    if (saturate) {
+      return false;
+    }
+    if constexpr (requires { &Derived::fp80_to_int; }) {
+      ValueRef src = this->val_ref(src_val);
+      ValueRef res = this->result_ref(inst);
+      derived()->fp80_to_int(sign, bit_width > 32, src.part(0), res.part(0));
+      return true;
+    }
     return false;
+  default: return false;
   }
-
-  const auto src_double = src_ty->isDoubleTy();
 
   using EncodeFnTy = bool (Derived::*)(GenericValuePart &&, ValuePart &&);
   static constexpr auto fns = []() {
@@ -2521,7 +2532,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_float_to_int(
     fns[1][1][1][1] = &Derived::encode_f64toi64_sat;
     return fns;
   }();
-  EncodeFnTy fn = fns[src_double][bit_width > 32][sign][saturate];
+  EncodeFnTy fn = fns[ty_idx][bit_width > 32][sign][saturate];
 
   if (saturate && bit_width % 32 != 0) {
     // TODO: clamp result to smaller integer bounds

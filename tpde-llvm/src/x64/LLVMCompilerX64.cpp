@@ -152,6 +152,7 @@ struct LLVMCompilerX64 : tpde::x64::CompilerX64<LLVMAdaptor,
     ASM(FSTPm64, spill_slot_op(dst, true));
   }
   void fp80_from_int(bool sign, bool is64, ValuePart &&, ValuePart &&) noexcept;
+  void fp80_to_int(bool sign, bool is64, ValuePart &&, ValuePart &&) noexcept;
   void fp80_add(ValuePart &&lhs, ValuePart &&rhs, ValuePart &&res) noexcept {
     fp80_push(std::move(rhs));
     fp80_push(std::move(lhs));
@@ -775,6 +776,60 @@ void LLVMCompilerX64::fp80_from_int(bool sign,
     ASM(FADDm32, FE_MEM(tmp_reg, 4, src.cur_reg(), 0));
   }
   fp80_pop(dst);
+}
+
+void LLVMCompilerX64::fp80_to_int(bool sign,
+                                  bool is64,
+                                  ValuePart &&src,
+                                  ValuePart &&dst) noexcept {
+  fp80_push(std::move(src));
+  if (!sign && is64) {
+    ASM(FLDm32, FE_MEM(FE_IP, 0, FE_NOREG, -1));
+    static constexpr u32 num = 0x5f00'0000; // Float 2**63.
+    std::span<const u8> raw{reinterpret_cast<const u8 *>(&num), 4};
+    // TODO: deduplicate/pool constants?
+    tpde::SecRef rodata = this->assembler.get_data_section(true, false);
+    tpde::SymRef sym = this->assembler.sym_def_data(
+        rodata, "", raw, 4, tpde::Assembler::SymBinding::LOCAL);
+    this->reloc_text(
+        sym, tpde::elf::R_X86_64_PC32, this->text_writer.offset() - 4, -4);
+    AsmReg dst_reg = dst.alloc_reg(this);
+    ASM(XOR32rr, dst_reg, dst_reg);
+    ASM(FUCOMIr, FE_ST(1));
+    ASM(SETBE8r, dst_reg);
+    ASM(FLDZ);
+    ASM(FCMOVBEr, FE_ST(1));
+    ASM(FSTPr, FE_ST(1));
+    ASM(FSUBPrr, FE_ST(1), FE_ST(0));
+  }
+  i32 stcw_slot = allocate_stack_slot(4);
+  {
+    ASM(FSTCWm, FE_MEM(FE_BP, 0, FE_NOREG, stcw_slot));
+    ScratchReg tmp{this};
+    ASM(MOVZXr32m16, tmp.alloc_gp(), FE_MEM(FE_BP, 0, FE_NOREG, stcw_slot));
+    ASM(OR32ri, tmp.cur_reg(), 0xc00);
+    ASM(MOV16mr, FE_MEM(FE_BP, 0, FE_NOREG, stcw_slot + 2), tmp.cur_reg());
+    ASM(FLDCWm, FE_MEM(FE_BP, 0, FE_NOREG, stcw_slot + 2));
+  }
+  if (sign) {
+    if (!is64) {
+      ASM(FISTPm32, spill_slot_op(dst, true));
+    } else {
+      ASM(FISTPm64, spill_slot_op(dst, true));
+    }
+  } else {
+    i32 tmp_slot = allocate_stack_slot(8);
+    ASM(FISTPm64, FE_MEM(FE_BP, 0, FE_NOREG, tmp_slot));
+    if (!is64) {
+      ASM(MOV32rm, dst.alloc_reg(this), FE_MEM(FE_BP, 0, FE_NOREG, tmp_slot));
+    } else {
+      ASM(SHL64ri, dst.cur_reg(), 63);
+      ASM(XOR64rm, dst.cur_reg(), FE_MEM(FE_BP, 0, FE_NOREG, tmp_slot));
+    }
+    free_stack_slot(tmp_slot, 8);
+  }
+  ASM(FLDCWm, FE_MEM(FE_BP, 0, FE_NOREG, stcw_slot));
+  free_stack_slot(stcw_slot, 2);
 }
 
 std::unique_ptr<LLVMCompiler>

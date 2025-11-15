@@ -415,6 +415,92 @@ define x86_fp80 @uitofp_64_twice(i64 %v) {
   ret x86_fp80 %e2
 }
 
+define i32 @fptosi_32(x86_fp80 %v) {
+; X64-LABEL: <fptosi_32>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    fld tbyte ptr [rbp + 0x10]
+; X64-NEXT:    fnstcw word ptr [rbp - 0x2c]
+; X64-NEXT:    movzx eax, word ptr [rbp - 0x2c]
+; X64-NEXT:    or eax, 0xc00
+; X64-NEXT:    mov word ptr [rbp - 0x2a], ax
+; X64-NEXT:    fldcw word ptr [rbp - 0x2a]
+; X64-NEXT:    fistp dword ptr [rbp - 0x30]
+; X64-NEXT:    fldcw word ptr [rbp - 0x2c]
+; X64-NEXT:    mov eax, dword ptr [rbp - 0x30]
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+  %res = fptosi x86_fp80 %v to i32
+  ret i32 %res
+}
+
+define i32 @fptoui_32(x86_fp80 %v) {
+; X64-LABEL: <fptoui_32>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    fld tbyte ptr [rbp + 0x10]
+; X64-NEXT:    fnstcw word ptr [rbp - 0x2c]
+; X64-NEXT:    movzx eax, word ptr [rbp - 0x2c]
+; X64-NEXT:    or eax, 0xc00
+; X64-NEXT:    mov word ptr [rbp - 0x2a], ax
+; X64-NEXT:    fldcw word ptr [rbp - 0x2a]
+; X64-NEXT:    fistp qword ptr [rbp - 0x38]
+; X64-NEXT:    mov eax, dword ptr [rbp - 0x38]
+; X64-NEXT:    fldcw word ptr [rbp - 0x2c]
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+  %res = fptoui x86_fp80 %v to i32
+  ret i32 %res
+}
+
+define i64 @fptosi_64(x86_fp80 %v) {
+; X64-LABEL: <fptosi_64>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    fld tbyte ptr [rbp + 0x10]
+; X64-NEXT:    fnstcw word ptr [rbp - 0x2c]
+; X64-NEXT:    movzx eax, word ptr [rbp - 0x2c]
+; X64-NEXT:    or eax, 0xc00
+; X64-NEXT:    mov word ptr [rbp - 0x2a], ax
+; X64-NEXT:    fldcw word ptr [rbp - 0x2a]
+; X64-NEXT:    fistp qword ptr [rbp - 0x38]
+; X64-NEXT:    fldcw word ptr [rbp - 0x2c]
+; X64-NEXT:    mov rax, qword ptr [rbp - 0x38]
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+  %res = fptosi x86_fp80 %v to i64
+  ret i64 %res
+}
+
+define i64 @fptoui_64(x86_fp80 %v) {
+; X64-LABEL: <fptoui_64>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    fld tbyte ptr [rbp + 0x10]
+; X64-NEXT:    fld dword ptr <fptoui_64+0x6>
+; X64-NEXT:     R_X86_64_PC32 -0x4
+; X64-NEXT:    xor eax, eax
+; X64-NEXT:    fucomi st, st(1)
+; X64-NEXT:    setbe al
+; X64-NEXT:    fldz
+; X64-NEXT:    fcmovbe st, st(1)
+; X64-NEXT:    fstp st(1)
+; X64-NEXT:    fsubp st(1), st
+; X64-NEXT:    fnstcw word ptr [rbp - 0x2c]
+; X64-NEXT:    movzx ecx, word ptr [rbp - 0x2c]
+; X64-NEXT:    or ecx, 0xc00
+; X64-NEXT:    mov word ptr [rbp - 0x2a], cx
+; X64-NEXT:    fldcw word ptr [rbp - 0x2a]
+; X64-NEXT:    fistp qword ptr [rbp - 0x38]
+; X64-NEXT:    shl rax, 0x3f
+; X64-NEXT:    xor rax, qword ptr [rbp - 0x38]
+; X64-NEXT:    fldcw word ptr [rbp - 0x2c]
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+  %res = fptoui x86_fp80 %v to i64
+  ret i64 %res
+}
+
 define i1 @fcmp_false(x86_fp80 %0, x86_fp80 %1) {
 ; X64-LABEL: <fcmp_false>:
 ; X64:         push rbp
