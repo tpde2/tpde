@@ -12,9 +12,6 @@ project(tpde)
 set(TPDE_LOGGING "ON" CACHE STRING "Enable logging with spdlog (DebugOnly/ON(default)/OFF)")
 set_property(CACHE TPDE_LOGGING PROPERTY STRINGS DebugOnly ON OFF)
 
-option(TPDE_X64 "enable x86-64 support" ON)
-option(TPDE_A64 "enable AArch64 support" ON)
-
 add_library(tpde)
 add_library(tpde::tpde ALIAS tpde)
 set_target_properties(tpde PROPERTIES
@@ -68,41 +65,37 @@ target_sources(tpde PRIVATE
 )
 
 # fadec
-if (TPDE_X64)
-    set(FADEC_DECODE OFF BOOL "no fadec decode")
-    set(FADEC_ENCODE OFF BOOL "no fadec encode")
-    set(FADEC_ENCODE2 ON BOOL "fadec encode2 support")
-    add_subdirectory(../deps/fadec ${CMAKE_CURRENT_BINARY_DIR}/deps/fadec)
+set(FADEC_DECODE OFF BOOL "no fadec decode")
+set(FADEC_ENCODE OFF BOOL "no fadec encode")
+set(FADEC_ENCODE2 ON BOOL "fadec encode2 support")
+add_subdirectory(../deps/fadec ${CMAKE_CURRENT_BINARY_DIR}/deps/fadec)
 
-    target_link_libraries(tpde PUBLIC fadec::fadec)
-    target_sources(tpde PRIVATE
-        src/x64/FunctionWriterX64.cpp
+target_link_libraries(tpde PUBLIC fadec::fadec)
+target_sources(tpde PRIVATE
+    src/x64/FunctionWriterX64.cpp
 
-        PUBLIC
-        FILE_SET HEADERS
-        BASE_DIRS include
-        FILES
-            include/tpde/x64/CompilerX64.hpp
-            include/tpde/x64/FunctionWriterX64.hpp
-    )
-endif ()
+    PUBLIC
+    FILE_SET HEADERS
+    BASE_DIRS include
+    FILES
+        include/tpde/x64/CompilerX64.hpp
+        include/tpde/x64/FunctionWriterX64.hpp
+)
 
 # disarm
-if (TPDE_A64)
-    add_subdirectory(../deps/disarm ${CMAKE_CURRENT_BINARY_DIR}/deps/disarm)
+add_subdirectory(../deps/disarm ${CMAKE_CURRENT_BINARY_DIR}/deps/disarm)
 
-    target_link_libraries(tpde PUBLIC disarm64::disarm64)
-    target_sources(tpde PRIVATE
-        src/arm64/FunctionWriterA64.cpp
+target_link_libraries(tpde PUBLIC disarm64::disarm64)
+target_sources(tpde PRIVATE
+    src/arm64/FunctionWriterA64.cpp
 
-        PUBLIC
-        FILE_SET HEADERS
-        BASE_DIRS include
-        FILES
-            include/tpde/arm64/CompilerA64.hpp
-            include/tpde/arm64/FunctionWriterA64.hpp
-    )
-endif ()
+    PUBLIC
+    FILE_SET HEADERS
+    BASE_DIRS include
+    FILES
+        include/tpde/arm64/CompilerA64.hpp
+        include/tpde/arm64/FunctionWriterA64.hpp
+)
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     target_compile_definitions(tpde PUBLIC TPDE_DEBUG)
