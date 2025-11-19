@@ -91,11 +91,11 @@ struct GenerationState {
 
   bool can_salvage_operand(const llvm::MachineOperand &op);
 
-  void generate_cp_entry_sym(llvm::raw_ostream &os,
+  bool generate_cp_entry_sym(llvm::raw_ostream &os,
                              std::string_view sym_name,
                              unsigned cp_idx);
 
-  void handle_terminator(llvm::raw_ostream &os, llvm::MachineInstr *inst);
+  bool handle_terminator(llvm::raw_ostream &os, llvm::MachineInstr *inst);
 
   void handle_end_of_block(llvm::raw_ostream &os, llvm::MachineBasicBlock *);
 };
@@ -160,7 +160,7 @@ bool const_to_bytes(const llvm::DataLayout &dl,
   return false;
 }
 
-void GenerationState::generate_cp_entry_sym(llvm::raw_ostream &os,
+bool GenerationState::generate_cp_entry_sym(llvm::raw_ostream &os,
                                             std::string_view sym_name,
                                             unsigned cp_idx) {
   auto [it, inserted] = const_pool_indices_used.try_emplace(cp_idx, sym_count);
@@ -173,13 +173,13 @@ void GenerationState::generate_cp_entry_sym(llvm::raw_ostream &os,
 
   if (cp_entry.isMachineConstantPoolEntry()) {
     std::cerr << "ERROR: encountered MachineConstantPoolEntry\n";
-    exit(1);
+    return false;
   }
 
   if (cp_entry.needsRelocation()) {
     std::cerr
         << "ERROR: encountered constant pool entry that needs relocation\n";
-    exit(1);
+    return false;
   }
 
   const auto *constant = cp_entry.Val.ConstVal;
@@ -192,7 +192,7 @@ void GenerationState::generate_cp_entry_sym(llvm::raw_ostream &os,
   bytes.resize(size);
   if (!const_to_bytes(func->getDataLayout(), constant, bytes, 0)) {
     std::cerr << "ERROR: could not convert constant to bytes\n";
-    exit(1);
+    return false;
   }
 
   os << "    auto &" << sym_name << " = symbols[" << it->second << "];\n";
@@ -206,6 +206,7 @@ void GenerationState::generate_cp_entry_sym(llvm::raw_ostream &os,
   os << "      " << sym_name << " = derived()->assembler.sym_def_data(sec, "
      << "\"\", data, " << align << ", Assembler::SymBinding::LOCAL);\n";
   os << "    }\n";
+  return true;
 }
 
 bool generate_inst(std::string &buf,
@@ -272,7 +273,9 @@ bool generate_inst(std::string &buf,
 
   llvm::SmallVector<MICandidate> candidates;
   state.target->get_inst_candidates(*inst, candidates);
-  assert(candidates.size() > 0);
+  if (candidates.empty()) {
+    return false;
+  }
 
   if (candidates.size() > 1) {
     state.fmt_line(buf, 4, "do {{");
@@ -388,7 +391,9 @@ bool generate_inst(std::string &buf,
         auto var_name = std::format("op{}_sym", use.getOperandNo());
         use_ops.push_back(var_name);
         llvm::raw_string_ostream os(buf);
-        state.generate_cp_entry_sym(os, var_name, use.getIndex());
+        if (!state.generate_cp_entry_sym(os, var_name, use.getIndex())) {
+          return false;
+        }
         continue;
       }
 
@@ -760,11 +765,11 @@ void GenerationState::handle_end_of_block(llvm::raw_ostream &os,
   }
 }
 
-void GenerationState::handle_terminator(llvm::raw_ostream &os,
+bool GenerationState::handle_terminator(llvm::raw_ostream &os,
                                         llvm::MachineInstr *inst) {
   if (!inst->isBranch() || inst->isIndirectBranch()) {
     llvm::errs() << "ERROR: unhandled terminator: " << inst << "\n";
-    exit(1);
+    return false;
   }
 
   handle_end_of_block(os, inst->getParent());
@@ -790,7 +795,7 @@ void GenerationState::handle_terminator(llvm::raw_ostream &os,
 
     if (jump_code.empty()) {
       llvm::errs() << "ERROR: encountered jump without known condition code\n";
-      exit(1);
+      return false;
     }
   }
   llvm::MachineBasicBlock *target = nullptr;
@@ -798,18 +803,19 @@ void GenerationState::handle_terminator(llvm::raw_ostream &os,
     if (op.isMBB()) {
       if (target) {
         llvm::errs() << "ERROR: multiple block targets for branch\n";
-        exit(1);
+        return false;
       }
       target = op.getMBB();
     }
   }
   if (!target) {
     llvm::errs() << "ERROR: could not find block target for branch\n";
-    exit(1);
+    return false;
   }
 
   os << "  derived()->generate_raw_jump(Derived::Jump::" << jump_code
      << ", block" << target->getNumber() << "_label);\n\n";
+  return true;
 }
 
 bool encode_prepass(llvm::MachineFunction *func, GenerationState &state) {
@@ -1057,7 +1063,9 @@ bool create_encode_function(llvm::MachineFunction *func,
                 "ret_converge_label);\n";
         }
       } else if (inst->isTerminator()) {
-        state.handle_terminator(os, inst);
+        if (!state.handle_terminator(os, inst)) {
+          return false;
+        }
       } else {
         if (!generate_inst(write_buf_inner, state, inst)) {
           llvm::errs() << "ERROR: failed for instruction: " << *inst << "\n";

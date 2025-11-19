@@ -39,12 +39,8 @@ struct EncodingTargetX64 : EncodingTarget {
   }
 
   bool reg_is_gp(const llvm::Register reg) const {
+    assert(reg.isPhysical());
     const auto *target_reg_info = func->getSubtarget().getRegisterInfo();
-
-    if (!reg.isPhysical()) {
-      assert(0);
-      exit(1);
-    }
     return target_reg_info->isGeneralPurposeRegister(*func, reg);
   }
 
@@ -54,7 +50,7 @@ struct EncodingTargetX64 : EncodingTarget {
   }
 
   std::string_view reg_name_lower(unsigned id) override {
-    std::string_view gp_names[] = {
+    static constexpr std::string_view gp_names[] = {
         "ax",
         "cx",
         "dx",
@@ -72,7 +68,7 @@ struct EncodingTargetX64 : EncodingTarget {
         "r14",
         "r15",
     };
-    std::string_view xmm_names[] = {
+    static constexpr std::string_view xmm_names[] = {
         "xmm0",  "xmm1",  "xmm2",  "xmm3",  "xmm4",  "xmm5",  "xmm6",  "xmm7",
         "xmm8",  "xmm9",  "xmm10", "xmm11", "xmm12", "xmm13", "xmm14", "xmm15",
         "xmm16", "xmm17", "xmm18", "xmm19", "xmm20", "xmm21", "xmm22", "xmm23",
@@ -81,11 +77,10 @@ struct EncodingTargetX64 : EncodingTarget {
 
     if (id < 0x10) {
       return gp_names[id];
-    } else if (id >= 0x20 && id <= 0x40) {
+    } else if (id >= 0x20 && id < 0x40) {
       return xmm_names[id - 0x20];
     } else {
-      assert(0);
-      exit(1);
+      llvm_unreachable("invalid register");
     }
   }
 
@@ -95,8 +90,7 @@ struct EncodingTargetX64 : EncodingTarget {
     } else if (id >= 0x20 && id <= 0x40) {
       return 1;
     } else {
-      assert(0);
-      exit(1);
+      llvm_unreachable("invalid register");
     }
   }
 
@@ -210,10 +204,7 @@ struct EncodingTargetX64 : EncodingTarget {
                                                "jge",
                                                "jle",
                                                "jg"};
-    if (imm >= cond_codes.size()) {
-      assert(0);
-      return {};
-    }
+    assert(imm < cond_codes.size() && "invalid jump condition");
     return cond_codes[imm];
   }
 };

@@ -28,12 +28,8 @@ struct EncodingTargetArm64 : EncodingTarget {
       is_move(const llvm::MachineInstr &mi) override;
 
   bool reg_is_gp(const llvm::Register reg) const {
+    assert(reg.isPhysical());
     const auto *target_reg_info = func->getSubtarget().getRegisterInfo();
-
-    if (!reg.isPhysical()) {
-      assert(0);
-      exit(1);
-    }
     return target_reg_info->isGeneralPurposeRegister(*func, reg);
   }
 
@@ -43,32 +39,24 @@ struct EncodingTargetArm64 : EncodingTarget {
   }
 
   std::string_view reg_name_lower(unsigned id) override {
-    if (id <= 0x40) {
-      std::string_view names[] = {
-          "x0",  "x1",  "x2",  "x3",  "x4",  "x5",  "x6",  "x7",  "x8",  "x9",
-          "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x18", "x19",
-          "x20", "x21", "x22", "x23", "x24", "x25", "x26", "x27", "x28", "x29",
-          "x30", "???", "v0",  "v1",  "v2",  "v3",  "v4",  "v5",  "v6",  "v7",
-          "v8",  "v9",  "v10", "v11", "v12", "v13", "v14", "v15", "v16", "v17",
-          "v18", "v19", "v20", "v21", "v22", "v23", "v24", "v25", "v26", "v27",
-          "v28", "v29", "v30", "v31",
-      };
-      return names[id];
-    } else {
-      assert(0);
-      exit(1);
-    }
+    static constexpr std::array<std::string_view, 0x40> names = {
+        {
+         "x0",  "x1",  "x2",  "x3",  "x4",  "x5",  "x6",  "x7",
+         "x8",  "x9",  "x10", "x11", "x12", "x13", "x14", "x15",
+         "x16", "x17", "x18", "x19", "x20", "x21", "x22", "x23",
+         "x24", "x25", "x26", "x27", "x28", "x29", "x30", "???",
+         "v0",  "v1",  "v2",  "v3",  "v4",  "v5",  "v6",  "v7",
+         "v8",  "v9",  "v10", "v11", "v12", "v13", "v14", "v15",
+         "v16", "v17", "v18", "v19", "v20", "v21", "v22", "v23",
+         "v24", "v25", "v26", "v27", "v28", "v29", "v30", "v31",
+         }
+    };
+    return names[id];
   }
 
   unsigned reg_bank(const unsigned id) override {
-    if (id < 0x20) {
-      return 0;
-    } else if (id <= 0x40) {
-      return 1;
-    } else {
-      assert(0);
-      exit(1);
-    }
+    assert(id < 0x40);
+    return id / 0x20;
   }
 
   bool reg_should_be_ignored(const llvm::MCRegister reg) override {
@@ -122,10 +110,7 @@ struct EncodingTargetArm64 : EncodingTarget {
                                                "Jle",
                                                "Jal",
                                                "Jal"};
-    if (imm >= cond_codes.size()) {
-      assert(0);
-      return {};
-    }
+    assert(imm < cond_codes.size() && "invalid jump condition");
     return cond_codes[imm];
   }
 };

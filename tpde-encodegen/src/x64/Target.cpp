@@ -1013,12 +1013,6 @@ void EncodingTargetX64::get_inst_candidates(
   } else if (Name == "INT3") {
     handle_default("INT3");
   }
-
-  if (candidates.size() == 0) {
-    llvm::errs() << "ERROR: unhandled instruction " << Name << "\n";
-    assert(false);
-    exit(1);
-  }
 }
 
 } // namespace tpde_encgen::x64

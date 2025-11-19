@@ -1049,12 +1049,6 @@ void EncodingTargetArm64::get_inst_candidates(
   case_default("STLRX", "STLRx");
 
   case_default("BRK", "BRK");
-
-  if (candidates.empty()) {
-    llvm::errs() << "ERROR: unhandled instruction " << Name << "\n";
-    assert(false);
-    exit(1);
-  }
 }
 
 std::optional<std::pair<unsigned, unsigned>>
