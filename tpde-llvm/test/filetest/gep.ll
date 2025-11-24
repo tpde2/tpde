@@ -1588,7 +1588,7 @@ entry:
 
 define ptr @gep_ptr_i21_nosalvage(ptr %0, i21 %1) {
 ; X64-LABEL: <gep_ptr_i21_nosalvage>:
-; X64:         mov rax, rsi
+; X64:         mov eax, esi
 ; X64-NEXT:    shl rax, 0x2b
 ; X64-NEXT:    sar rax, 0x2b
 ; X64-NEXT:    lea rax, [rdi + 8*rax]

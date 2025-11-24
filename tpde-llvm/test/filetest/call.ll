@@ -1469,8 +1469,8 @@ define void @call_fn_v_i1z_i1s_i37z_i37s(i1 %a, i1 %b, i37 %c, i37 %d) {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    sub rsp, 0x30
 ; X64-NEXT:    and edi, 0x1
-; X64-NEXT:    shl rsi, 0x3f
-; X64-NEXT:    sar rsi, 0x3f
+; X64-NEXT:    and esi, 0x1
+; X64-NEXT:    neg rsi
 ; X64-NEXT:    movabs rax, 0x1fffffffff
 ; X64-NEXT:    and rdx, rax
 ; X64-NEXT:    shl rcx, 0x1b
@@ -1555,8 +1555,8 @@ define void @call_fn_v_stack_i1z_i1s_i37z_i37s(i1 %a, i1 %b, i37 %c, i37 %d) {
 ; X64-NEXT:    and eax, 0x1
 ; X64-NEXT:    mov byte ptr [rsp + 0x10], al
 ; X64-NEXT:    movzx eax, byte ptr [rbp - 0x2a]
-; X64-NEXT:    shl rax, 0x3f
-; X64-NEXT:    sar rax, 0x3f
+; X64-NEXT:    and eax, 0x1
+; X64-NEXT:    neg rax
 ; X64-NEXT:    mov byte ptr [rsp + 0x18], al
 ; X64-NEXT:    mov rax, qword ptr [rbp - 0x38]
 ; X64-NEXT:    movabs rbx, 0x1fffffffff

@@ -1554,8 +1554,13 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::generate_raw_intext(
       if (dst != src) {
         ASM(MOV32rr, dst, src);
       }
-      ASM(SHL32ri, dst, 32 - from);
-      ASM(SAR32ri, dst, 32 - from);
+      if (from == 1) {
+        ASM(AND32ri, dst, 1);
+        ASM(NEG32r, dst);
+      } else {
+        ASM(SHL32ri, dst, 32 - from);
+        ASM(SAR32ri, dst, 32 - from);
+      }
     }
   } else {
     switch (from) {
@@ -1564,10 +1569,19 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::generate_raw_intext(
     case 32: ASM(MOVSXr64r32, dst, src); break;
     default:
       if (dst != src) {
-        ASM(MOV64rr, dst, src);
+        if (from < 32) {
+          ASM(MOV32rr, dst, src);
+        } else {
+          ASM(MOV64rr, dst, src);
+        }
       }
-      ASM(SHL64ri, dst, 64 - from);
-      ASM(SAR64ri, dst, 64 - from);
+      if (from == 1) {
+        ASM(AND32ri, dst, 1);
+        ASM(NEG64r, dst);
+      } else {
+        ASM(SHL64ri, dst, 64 - from);
+        ASM(SAR64ri, dst, 64 - from);
+      }
     }
   }
 }
