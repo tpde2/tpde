@@ -1676,39 +1676,28 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::CallBuilder::add_arg_byval(
   auto size = cca.size;
   set_stack_used();
   i32 off = 0;
+  i32 soff = cca.stack_off;
   while (size >= 8) {
     ASMC(&this->compiler, MOV64rm, tmp, FE_MEM(ptr, 0, FE_NOREG, off));
-    ASMC(&this->compiler,
-         MOV64mr,
-         FE_MEM(FE_SP, 0, FE_NOREG, (i32)(cca.stack_off + off)),
-         tmp);
+    ASMC(&this->compiler, MOV64mr, FE_MEM(FE_SP, 0, FE_NOREG, soff + off), tmp);
     off += 8;
     size -= 8;
   }
   if (size >= 4) {
     ASMC(&this->compiler, MOV32rm, tmp, FE_MEM(ptr, 0, FE_NOREG, off));
-    ASMC(&this->compiler,
-         MOV32mr,
-         FE_MEM(FE_SP, 0, FE_NOREG, (i32)(cca.stack_off + off)),
-         tmp);
+    ASMC(&this->compiler, MOV32mr, FE_MEM(FE_SP, 0, FE_NOREG, soff + off), tmp);
     off += 4;
     size -= 4;
   }
   if (size >= 2) {
     ASMC(&this->compiler, MOVZXr32m16, tmp, FE_MEM(ptr, 0, FE_NOREG, off));
-    ASMC(&this->compiler,
-         MOV16mr,
-         FE_MEM(FE_SP, 0, FE_NOREG, (i32)(cca.stack_off + off)),
-         tmp);
+    ASMC(&this->compiler, MOV16mr, FE_MEM(FE_SP, 0, FE_NOREG, soff + off), tmp);
     off += 2;
     size -= 2;
   }
   if (size >= 1) {
     ASMC(&this->compiler, MOVZXr32m8, tmp, FE_MEM(ptr, 0, FE_NOREG, off));
-    ASMC(&this->compiler,
-         MOV8mr,
-         FE_MEM(FE_SP, 0, FE_NOREG, (i32)(cca.stack_off + off)),
-         tmp);
+    ASMC(&this->compiler, MOV8mr, FE_MEM(FE_SP, 0, FE_NOREG, soff + off), tmp);
   }
 }
 
@@ -1721,56 +1710,22 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::CallBuilder::add_arg_stack(
   set_stack_used();
 
   auto reg = vp.has_reg() ? vp.cur_reg() : vp.load_to_reg(&this->compiler);
+  FeMem mem_op = FE_MEM(FE_SP, 0, FE_NOREG, i32(cca.stack_off));
   if (this->compiler.register_file.reg_bank(reg) == Config::GP_BANK) {
     switch (cca.size) {
-    case 1:
-      ASMC(&this->compiler,
-           MOV8mr,
-           FE_MEM(FE_SP, 0, FE_NOREG, i32(cca.stack_off)),
-           reg);
-      break;
-    case 2:
-      ASMC(&this->compiler,
-           MOV16mr,
-           FE_MEM(FE_SP, 0, FE_NOREG, i32(cca.stack_off)),
-           reg);
-      break;
-    case 4:
-      ASMC(&this->compiler,
-           MOV32mr,
-           FE_MEM(FE_SP, 0, FE_NOREG, i32(cca.stack_off)),
-           reg);
-      break;
-    case 8:
-      ASMC(&this->compiler,
-           MOV64mr,
-           FE_MEM(FE_SP, 0, FE_NOREG, i32(cca.stack_off)),
-           reg);
-      break;
+    case 1: ASMC(&this->compiler, MOV8mr, mem_op, reg); break;
+    case 2: ASMC(&this->compiler, MOV16mr, mem_op, reg); break;
+    case 4: ASMC(&this->compiler, MOV32mr, mem_op, reg); break;
+    case 8: ASMC(&this->compiler, MOV64mr, mem_op, reg); break;
     default: TPDE_UNREACHABLE("invalid GP reg size");
     }
   } else {
     assert(this->compiler.register_file.reg_bank(reg) == Config::FP_BANK);
     switch (cca.size) {
-    case 4:
-      ASMC(&this->compiler,
-           SSE_MOVSSmr,
-           FE_MEM(FE_SP, 0, FE_NOREG, i32(cca.stack_off)),
-           reg);
-      break;
-    case 8:
-      ASMC(&this->compiler,
-           SSE_MOVSDmr,
-           FE_MEM(FE_SP, 0, FE_NOREG, i32(cca.stack_off)),
-           reg);
-      break;
-    case 16:
-      ASMC(&this->compiler,
-           SSE_MOVDQAmr,
-           FE_MEM(FE_SP, 0, FE_NOREG, i32(cca.stack_off)),
-           reg);
-      break;
-    default: TPDE_UNREACHABLE("invalid GP reg size");
+    case 4: ASMC(&this->compiler, SSE_MOVSSmr, mem_op, reg); break;
+    case 8: ASMC(&this->compiler, SSE_MOVSDmr, mem_op, reg); break;
+    case 16: ASMC(&this->compiler, SSE_MOVDQAmr, mem_op, reg); break;
+    default: TPDE_UNREACHABLE("invalid SSE reg size");
     }
   }
 }
