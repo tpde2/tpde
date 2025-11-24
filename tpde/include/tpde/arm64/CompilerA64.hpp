@@ -359,6 +359,7 @@ struct CompilerA64 : BaseTy<Adaptor, Derived, Config> {
   u32 reg_save_frame_off = 0;
   util::SmallVector<u32, 8> func_ret_offs = {};
 
+  /// Helper class for building call sequences.
   class CallBuilder : public Base::template CallBuilderBase<CallBuilder> {
     u32 stack_adjust_off = 0;
     u32 stack_size = 0;
@@ -367,6 +368,7 @@ struct CompilerA64 : BaseTy<Adaptor, Derived, Config> {
     void set_stack_used() noexcept;
 
   public:
+    /// Constructor.
     CallBuilder(Derived &compiler, CCAssigner &assigner) noexcept
         : Base::template CallBuilderBase<CallBuilder>(compiler, assigner) {}
 

@@ -210,14 +210,15 @@ public:
     EndIter to;
   };
 
+  /// Call argument, enhancing an IRValueRef with information on how to pass it.
   struct CallArg {
     enum class Flag : u8 {
-      none,
-      zext,
-      sext,
-      sret,
-      byval,
-      allow_split,
+      none,        ///< No extra handling.
+      zext,        ///< Scalar integer, zero-extend to target-specific size.
+      sext,        ///< Scalar integer, sign-extend to target-specific size.
+      sret,        ///< Struct return pointer.
+      byval,       ///< Value is copied into corresponding stack slot.
+      allow_split, ///< Value parts can be split across stack/registers.
     };
 
     explicit CallArg(IRValueRef value,
@@ -229,13 +230,14 @@ public:
           byval_align(byval_align),
           byval_size(byval_size) {}
 
-    IRValueRef value;
-    Flag flag;
-    u8 byval_align;
-    u8 ext_bits = 0;
-    u32 byval_size;
+    IRValueRef value; ///< Argument IR value.
+    Flag flag;        ///< Value handling flag.
+    u8 byval_align;   ///< For Flag::byval, the stack alignment.
+    u8 ext_bits = 0;  ///< For Flag::zext and Flag::sext, the source bit width.
+    u32 byval_size;   ///< For Flag::byval, the argument size.
   };
 
+  /// Base class for target-specific CallBuilder implementations.
   template <typename CBDerived>
   class CallBuilderBase {
   protected:
@@ -244,7 +246,6 @@ public:
 
     RegisterFile::RegBitSet arg_regs{};
 
-  public:
     CallBuilderBase(Derived &compiler, CCAssigner &assigner) noexcept
         : compiler(compiler), assigner(assigner) {}
 
@@ -254,19 +255,34 @@ public:
     // void call_impl(std::variant<SymRef, ValuePart> &&) noexcept;
     CBDerived *derived() noexcept { return static_cast<CBDerived *>(this); }
 
+  public:
+    /// Add a value part as argument. cca must be populated with information
+    /// about the argument, except for the reg/stack_off, which are set by the
+    /// CCAssigner. If no register bank is assigned, the register bank and size
+    /// are retrieved from the value part, otherwise, the size must be set, too.
     void add_arg(ValuePart &&vp, CCAssignment cca) noexcept;
+    /// Add a full IR value as argument, with an explicit number of parts.
+    /// Values are decomposed into their parts and are typically either fully
+    /// in registers or fully on the stack (except CallArg::Flag::allow_split).
     void add_arg(const CallArg &arg, u32 part_count) noexcept;
+    /// Add a full IR value as argument. The number of value parts must be
+    /// exposed via val_parts. Values are decomposed into their parts and are
+    /// typically either fully in registers or fully on the stack (except
+    /// CallArg::Flag::allow_split).
     void add_arg(const CallArg &arg) noexcept {
       add_arg(std::move(arg), compiler.val_parts(arg.value).count());
     }
 
-    // evict registers, do call, reset stack frame
+    /// Generate the function call (evict registers, call, reset stack frame).
     void call(std::variant<SymRef, ValuePart>) noexcept;
 
+    /// Assign next return value part to vp.
     void add_ret(ValuePart &vp, CCAssignment cca) noexcept;
+    /// Assign next return value part to vp.
     void add_ret(ValuePart &&vp, CCAssignment cca) noexcept {
       add_ret(vp, cca);
     }
+    /// Assign return values to the IR value.
     void add_ret(ValueRef &vr) noexcept;
   };
 

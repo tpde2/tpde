@@ -350,12 +350,14 @@ struct CompilerX64 : BaseTy<Adaptor, Derived, Config> {
   /// Symbol for __tls_get_addr.
   SymRef sym_tls_get_addr;
 
+  /// Helper class for building call sequences.
   class CallBuilder : public Base::template CallBuilderBase<CallBuilder> {
     u32 stack_adjust_off = 0;
 
     void set_stack_used() noexcept;
 
   public:
+    /// Constructor.
     CallBuilder(Derived &compiler, CCAssigner &assigner) noexcept
         : Base::template CallBuilderBase<CallBuilder>(compiler, assigner) {}
 
