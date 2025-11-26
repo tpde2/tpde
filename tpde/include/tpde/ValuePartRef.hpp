@@ -429,13 +429,14 @@ typename CompilerBase<Adaptor, Derived, Config>::AsmReg
   reg_file.mark_clobbered(reg);
   if (has_assignment()) {
     reg_file.mark_used(reg, state.v.local_idx, state.v.part);
+    // Essentially lock(), except that we know that the lock count is zero.
+    // We must lock the value here, otherwise, load_from_stack could evict the
+    // register again.
+    reg_file.mark_fixed(reg);
+    state.v.reg = reg;
     auto ap = assignment();
     ap.set_reg(reg);
     ap.set_register_valid(true);
-
-    // We must lock the value here, otherwise, load_from_stack could evict the
-    // register again.
-    lock(compiler);
 
     if constexpr (Reload) {
       compiler->derived()->reload_to_reg(reg, ap);
