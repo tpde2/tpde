@@ -166,9 +166,8 @@ public:
   bool has_reg() const noexcept { return state.v.reg.valid(); }
 
 private:
-  AsmReg alloc_reg_impl(CompilerBase *compiler,
-                        u64 exclusion_mask,
-                        bool reload) noexcept;
+  template <bool Reload>
+  AsmReg alloc_reg_impl(CompilerBase *compiler, u64 exclusion_mask) noexcept;
   AsmReg alloc_specific_impl(CompilerBase *compiler,
                              AsmReg reg,
                              bool reload) noexcept;
@@ -177,14 +176,14 @@ public:
   /// Allocate and lock a register for the value part, *without* reloading the
   /// value. Asserts that no register is currently allocated.
   AsmReg alloc_reg(CompilerBase *compiler, u64 exclusion_mask = 0) noexcept {
-    return alloc_reg_impl(compiler, exclusion_mask, /*reload=*/false);
+    return alloc_reg_impl</*Reload=*/false>(compiler, exclusion_mask);
   }
 
   /// Allocate and lock a register for the value part, *without* reloading the
   /// value. Does nothing if a register is already allocated.
   AsmReg cur_reg_or_alloc(CompilerBase *compiler) noexcept {
     if (!has_reg()) {
-      alloc_reg_impl(compiler, 0, /*reload=*/false);
+      alloc_reg_impl</*Reload=*/false>(compiler, 0);
     }
     return cur_reg();
   }
@@ -232,7 +231,7 @@ public:
   /// the stack or materializing the constant if necessary. Requires that the
   /// value is currently unlocked (i.e., has_reg() is false).
   AsmReg load_to_reg(CompilerBase *compiler) noexcept {
-    return alloc_reg_impl(compiler, 0, /*reload=*/true);
+    return alloc_reg_impl</*Reload=*/true>(compiler, 0);
   }
 
   /// Allocate, fill, and lock a specific register for the value part, spilling
@@ -399,11 +398,10 @@ public:
 };
 
 template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>
+template <bool Reload>
 typename CompilerBase<Adaptor, Derived, Config>::AsmReg
     CompilerBase<Adaptor, Derived, Config>::ValuePart::alloc_reg_impl(
-        CompilerBase *compiler,
-        u64 exclusion_mask,
-        const bool reload) noexcept {
+        CompilerBase *compiler, u64 exclusion_mask) noexcept {
   // The caller has no control over the selected register, so it must assume
   // that this function evicts some register. This is not permitted if the value
   // state ought to be the same.
@@ -439,7 +437,7 @@ typename CompilerBase<Adaptor, Derived, Config>::AsmReg
     // register again.
     lock(compiler);
 
-    if (reload) {
+    if constexpr (Reload) {
       compiler->derived()->reload_to_reg(reg, ap);
     } else {
       assert(!ap.stack_valid() && "alloc_reg called on initialized value");
@@ -450,7 +448,7 @@ typename CompilerBase<Adaptor, Derived, Config>::AsmReg
     state.c.reg = reg;
     state.c.owned = true;
 
-    if (reload) {
+    if constexpr (Reload) {
       assert(is_const() && "cannot reload temporary value");
       compiler->derived()->materialize_constant(
           const_data().data(), state.c.bank, state.c.size, reg);

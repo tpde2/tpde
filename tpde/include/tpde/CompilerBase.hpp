@@ -1376,11 +1376,15 @@ typename CompilerBase<Adaptor, Derived, Config>::AsmReg
     // TODO: make this less expensive
     if (auto *scratch = std::get_if<ScratchReg>(&gv.state)) {
       dst.set_value(this, std::move(*scratch));
-      dst.cur_reg_or_alloc(this);
+      if (dst.has_assignment()) {
+        dst.lock(this);
+      }
     } else if (auto *val_ref = std::get_if<ValuePartRef>(&gv.state)) {
       if (val_ref->can_salvage()) {
         dst.set_value(this, std::move(*val_ref));
-        dst.cur_reg_or_alloc(this);
+        if (dst.has_assignment()) {
+          dst.lock(this);
+        }
       }
     }
   }
