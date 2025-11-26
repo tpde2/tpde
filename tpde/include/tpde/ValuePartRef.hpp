@@ -167,7 +167,7 @@ public:
 
 private:
   template <bool Reload>
-  AsmReg alloc_reg_impl(CompilerBase *compiler, u64 exclusion_mask) noexcept;
+  void alloc_reg_impl(CompilerBase *compiler, u64 exclusion_mask) noexcept;
   AsmReg alloc_specific_impl(CompilerBase *compiler,
                              AsmReg reg,
                              bool reload) noexcept;
@@ -176,7 +176,8 @@ public:
   /// Allocate and lock a register for the value part, *without* reloading the
   /// value. Asserts that no register is currently allocated.
   AsmReg alloc_reg(CompilerBase *compiler, u64 exclusion_mask = 0) noexcept {
-    return alloc_reg_impl</*Reload=*/false>(compiler, exclusion_mask);
+    alloc_reg_impl</*Reload=*/false>(compiler, exclusion_mask);
+    return cur_reg();
   }
 
   /// Allocate and lock a register for the value part, *without* reloading the
@@ -231,7 +232,8 @@ public:
   /// the stack or materializing the constant if necessary. Requires that the
   /// value is currently unlocked (i.e., has_reg() is false).
   AsmReg load_to_reg(CompilerBase *compiler) noexcept {
-    return alloc_reg_impl</*Reload=*/true>(compiler, 0);
+    alloc_reg_impl</*Reload=*/true>(compiler, 0);
+    return cur_reg();
   }
 
   /// Allocate, fill, and lock a specific register for the value part, spilling
@@ -399,9 +401,8 @@ public:
 
 template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>
 template <bool Reload>
-typename CompilerBase<Adaptor, Derived, Config>::AsmReg
-    CompilerBase<Adaptor, Derived, Config>::ValuePart::alloc_reg_impl(
-        CompilerBase *compiler, u64 exclusion_mask) noexcept {
+void CompilerBase<Adaptor, Derived, Config>::ValuePart::alloc_reg_impl(
+    CompilerBase *compiler, u64 exclusion_mask) noexcept {
   // The caller has no control over the selected register, so it must assume
   // that this function evicts some register. This is not permitted if the value
   // state ought to be the same.
@@ -416,7 +417,7 @@ typename CompilerBase<Adaptor, Derived, Config>::AsmReg
       // TODO: implement this if needed
       assert((exclusion_mask & (1ull << state.v.reg.id())) == 0 &&
              "moving registers in alloc_reg is unsupported");
-      return state.v.reg;
+      return;
     }
 
     bank = ap.bank();
@@ -455,8 +456,6 @@ typename CompilerBase<Adaptor, Derived, Config>::AsmReg
           const_data().data(), state.c.bank, state.c.size, reg);
     }
   }
-
-  return reg;
 }
 
 template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>
