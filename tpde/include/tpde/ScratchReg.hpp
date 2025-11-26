@@ -113,7 +113,7 @@ CompilerBase<Adaptor, Derived, Config>::AsmReg
     return reg;
   }
 
-  reg = compiler->select_reg(bank, /*exclusion_mask=*/0);
+  reg = compiler->select_reg(bank);
   reg_file.mark_used(reg, INVALID_VAL_LOCAL_IDX, 0);
   reg_file.mark_clobbered(reg);
   reg_file.mark_fixed(reg);

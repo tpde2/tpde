@@ -167,7 +167,7 @@ public:
 
 private:
   template <bool Reload>
-  void alloc_reg_impl(CompilerBase *compiler, u64 exclusion_mask) noexcept;
+  void alloc_reg_impl(CompilerBase *compiler) noexcept;
   AsmReg alloc_specific_impl(CompilerBase *compiler,
                              AsmReg reg,
                              bool reload) noexcept;
@@ -175,8 +175,8 @@ private:
 public:
   /// Allocate and lock a register for the value part, *without* reloading the
   /// value. Asserts that no register is currently allocated.
-  AsmReg alloc_reg(CompilerBase *compiler, u64 exclusion_mask = 0) noexcept {
-    alloc_reg_impl</*Reload=*/false>(compiler, exclusion_mask);
+  AsmReg alloc_reg(CompilerBase *compiler) noexcept {
+    alloc_reg_impl</*Reload=*/false>(compiler);
     return cur_reg();
   }
 
@@ -184,7 +184,7 @@ public:
   /// value. Does nothing if a register is already allocated.
   AsmReg cur_reg_or_alloc(CompilerBase *compiler) noexcept {
     if (!has_reg()) {
-      alloc_reg_impl</*Reload=*/false>(compiler, 0);
+      alloc_reg_impl</*Reload=*/false>(compiler);
     }
     return cur_reg();
   }
@@ -232,7 +232,7 @@ public:
   /// the stack or materializing the constant if necessary. Requires that the
   /// value is currently unlocked (i.e., has_reg() is false).
   AsmReg load_to_reg(CompilerBase *compiler) noexcept {
-    alloc_reg_impl</*Reload=*/true>(compiler, 0);
+    alloc_reg_impl</*Reload=*/true>(compiler);
     return cur_reg();
   }
 
@@ -402,7 +402,7 @@ public:
 template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>
 template <bool Reload>
 void CompilerBase<Adaptor, Derived, Config>::ValuePart::alloc_reg_impl(
-    CompilerBase *compiler, u64 exclusion_mask) noexcept {
+    CompilerBase *compiler) noexcept {
   // The caller has no control over the selected register, so it must assume
   // that this function evicts some register. This is not permitted if the value
   // state ought to be the same.
@@ -414,9 +414,6 @@ void CompilerBase<Adaptor, Derived, Config>::ValuePart::alloc_reg_impl(
     auto ap = assignment();
     if (ap.register_valid()) {
       lock(compiler);
-      // TODO: implement this if needed
-      assert((exclusion_mask & (1ull << state.v.reg.id())) == 0 &&
-             "moving registers in alloc_reg is unsupported");
       return;
     }
 
@@ -425,7 +422,7 @@ void CompilerBase<Adaptor, Derived, Config>::ValuePart::alloc_reg_impl(
     bank = state.c.bank;
   }
 
-  Reg reg = compiler->select_reg(bank, exclusion_mask);
+  Reg reg = compiler->select_reg(bank);
   auto &reg_file = compiler->register_file;
   reg_file.mark_clobbered(reg);
   if (has_assignment()) {
@@ -870,9 +867,7 @@ struct CompilerBase<Adaptor, Derived, Config>::ValuePartRef : ValuePart {
     return *this;
   }
 
-  AsmReg alloc_reg(u64 exclusion_mask = 0) noexcept {
-    return ValuePart::alloc_reg(compiler, exclusion_mask);
-  }
+  AsmReg alloc_reg() noexcept { return ValuePart::alloc_reg(compiler); }
 
   AsmReg cur_reg_or_alloc() noexcept {
     return ValuePart::cur_reg_or_alloc(compiler);

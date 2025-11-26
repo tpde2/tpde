@@ -438,19 +438,19 @@ public:
 
 private:
   /// @internal Select register when a value needs to be evicted.
-  Reg select_reg_evict(RegBank bank, u64 exclusion_mask) noexcept;
+  Reg select_reg_evict(RegBank bank) noexcept;
 
 public:
   /// \name Low-Level Assignment Register Handling
   /// @{
 
   /// Select an available register, evicting loaded values if needed.
-  Reg select_reg(RegBank bank, u64 exclusion_mask) noexcept {
-    Reg res = register_file.find_first_free_excluding(bank, exclusion_mask);
+  Reg select_reg(RegBank bank) noexcept {
+    Reg res = register_file.find_first_free_excluding(bank, 0);
     if (res.valid()) [[likely]] {
       return res;
     }
-    return select_reg_evict(bank, exclusion_mask);
+    return select_reg_evict(bank);
   }
 
   /// Reload a value part from memory or recompute variable address.
@@ -1393,10 +1393,9 @@ typename CompilerBase<Adaptor, Derived, Config>::AsmReg
 
 template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>
 Reg CompilerBase<Adaptor, Derived, Config>::select_reg_evict(
-    RegBank bank, u64 exclusion_mask) noexcept {
+    RegBank bank) noexcept {
   TPDE_LOG_DBG("select_reg_evict for bank {}", bank.id());
-  auto candidates =
-      register_file.used & register_file.bank_regs(bank) & ~exclusion_mask;
+  auto candidates = register_file.used & register_file.bank_regs(bank);
 
   Reg candidate = Reg::make_invalid();
   u32 max_score = 0;
