@@ -13,34 +13,36 @@ if (NOT TPDE_ENABLE_ENCODEGEN)
     message(FATAL_ERROR "TPDE_ENABLE_LLVM needs TPDE_ENABLE_ENCODEGEN")
 endif ()
 
-add_library(tpde_llvm)
-add_library(tpde::tpde_llvm ALIAS tpde_llvm)
-set_target_properties(tpde_llvm PROPERTIES
+# We first create an object library that does NOT link against LLVM, this is
+# required for the plugin. Later we create a static library for use with e.g.
+# executables that also includes LLVM in its public dependencies.
+add_library(tpde_llvm_impl OBJECT)
+set_target_properties(tpde_llvm_impl PROPERTIES
     VERSION 0.1.0
     LINKER_LANGUAGE CXX
 )
 
-target_link_libraries(tpde_llvm PRIVATE tpde)
+target_link_libraries(tpde_llvm_impl PRIVATE tpde)
 
 # Configure LLVM
 set(TPDE_LINK_LLVM_STATIC FALSE CACHE BOOL "Should LLVM be linked statically?")
-
-target_include_directories(tpde_llvm SYSTEM PUBLIC ${LLVM_INCLUDE_DIRS})
-separate_arguments(LLVM_DEFINITIONS_LIST NATIVE_COMMAND ${LLVM_DEFINITIONS})
-target_compile_definitions(tpde_llvm PUBLIC ${LLVM_DEFINITIONS_LIST})
-if (NOT LLVM_ENABLE_RTTI)
-    target_compile_options(tpde_llvm PUBLIC -fno-rtti)
-endif ()
-if (TPDE_LINK_LLVM_STATIC)
-    llvm_map_components_to_libnames(TPDE_LLVM_LIBS
-        analysis core irreader irprinter jitlink orcjit passes support bitreader bitstreamreader targetparser
-    )
-    target_link_libraries(tpde_llvm PUBLIC ${TPDE_LLVM_LIBS})
+# ASan is not very compatible with dynamically loaded plugins. It is, in
+# principle, possible to preload libasan.so, but this requires knowledge of the
+# system-dependent path, which is not viable for tests.
+if (LLVM_VERSION_MAJOR LESS 22 OR TPDE_ENABLE_ASAN)
+    set(TPDE_ENABLE_LLVM_PLUGIN FALSE)
 else ()
-    target_link_libraries(tpde_llvm PUBLIC LLVM)
+    set(TPDE_ENABLE_LLVM_PLUGIN TRUE CACHE BOOL "Whether to build LLVM plugin")
 endif ()
 
-target_sources(tpde_llvm PRIVATE
+target_include_directories(tpde_llvm_impl SYSTEM PUBLIC ${LLVM_INCLUDE_DIRS})
+separate_arguments(LLVM_DEFINITIONS_LIST NATIVE_COMMAND ${LLVM_DEFINITIONS})
+target_compile_definitions(tpde_llvm_impl PUBLIC ${LLVM_DEFINITIONS_LIST})
+if (NOT LLVM_ENABLE_RTTI)
+    target_compile_options(tpde_llvm_impl PUBLIC -fno-rtti)
+endif ()
+
+target_sources(tpde_llvm_impl PRIVATE
     src/JITMapper.cpp
     src/LLVMAdaptor.cpp
     src/LLVMCompiler.cpp
@@ -64,7 +66,7 @@ target_sources(tpde_llvm PRIVATE
 )
 
 if (TPDE_ENABLE_PCH)
-    target_precompile_headers(tpde_llvm PRIVATE
+    target_precompile_headers(tpde_llvm_impl PRIVATE
         src/base.hpp
         <llvm/ADT/STLExtras.h>
         <llvm/ADT/SmallString.h>
@@ -136,8 +138,8 @@ if ("x86_64" IN_LIST TPDE_TARGETS)
             ${CMAKE_CURRENT_BINARY_DIR}/encode_template_x64.bc
     )
 
-    target_compile_definitions(tpde_llvm PRIVATE TPDE_LLVM_X64)
-    target_sources(tpde_llvm PRIVATE
+    target_compile_definitions(tpde_llvm_impl PRIVATE TPDE_LLVM_X64)
+    target_sources(tpde_llvm_impl PRIVATE
         src/x64/LLVMCompilerX64.cpp
 
         PRIVATE
@@ -174,8 +176,8 @@ if ("aarch64" IN_LIST TPDE_TARGETS)
             ${CMAKE_CURRENT_BINARY_DIR}/encode_template_arm64.bc
     )
 
-    target_compile_definitions(tpde_llvm PRIVATE TPDE_LLVM_ARM64)
-    target_sources(tpde_llvm PRIVATE
+    target_compile_definitions(tpde_llvm_impl PRIVATE TPDE_LLVM_ARM64)
+    target_sources(tpde_llvm_impl PRIVATE
         src/arm64/LLVMCompilerArm64.cpp
 
         PRIVATE
@@ -192,6 +194,19 @@ if ("aarch64" IN_LIST TPDE_TARGETS)
     )
 endif()
 
+# The library that does link against LLVM.
+add_library(tpde_llvm)
+add_library(tpde::tpde_llvm ALIAS tpde_llvm)
+target_link_libraries(tpde_llvm PUBLIC tpde_llvm_impl)
+if (TPDE_LINK_LLVM_STATIC)
+    llvm_map_components_to_libnames(TPDE_LLVM_LIBS
+        analysis core irreader irprinter jitlink orcjit passes support bitreader bitstreamreader targetparser
+    )
+    target_link_libraries(tpde_llvm PUBLIC ${TPDE_LLVM_LIBS})
+else ()
+    target_link_libraries(tpde_llvm PUBLIC LLVM)
+endif ()
+
 
 # tpde-llc binary
 
@@ -203,6 +218,8 @@ target_link_libraries(tpde-llc PRIVATE tpde)
 
 # general deps directory (for args)
 target_include_directories(tpde-llc PRIVATE ../deps/)
+
+list(APPEND TPDE_LLVM_TEST_DEPENDS tpde-llc)
 
 
 # tpde-lli binary
@@ -216,14 +233,34 @@ target_link_libraries(tpde-lli PRIVATE tpde)
 # general deps directory (for args)
 target_include_directories(tpde-lli PRIVATE ../deps/)
 
+list(APPEND TPDE_LLVM_TEST_DEPENDS tpde-lli)
+
+
+# tpde-plugin.so LLVM plugin
+
+if (TPDE_ENABLE_LLVM_PLUGIN)
+    if (LLVM_VERSION_MAJOR LESS 22)
+        message(SEND_ERROR "TPDE LLVM plugin requires LLVM 22 or newer")
+    endif ()
+    add_library(tpde-plugin MODULE tools/tpde-plugin.cpp)
+    target_link_libraries(tpde-plugin PRIVATE tpde_llvm_impl)
+    set_target_properties(tpde-plugin PROPERTIES
+        PREFIX ""
+        SUFFIX ${LLVM_PLUGIN_EXT}
+    )
+
+    list(APPEND TPDE_LLVM_TEST_DEPENDS tpde-plugin)
+endif ()
+
 
 # Tests
 
 if (TPDE_INCLUDE_TESTS)
     # configure lit.site.cfg.py
+    tpde_canonicalize_bool(TPDE_ENABLE_LLVM_PLUGIN)
     configure_file(test/lit.site.cfg.py.in test/lit.site.cfg.py @ONLY)
     add_tpde_lit_testsuite(check-tpde-llvm "${CMAKE_CURRENT_BINARY_DIR}/test"
-        DEPENDS tpde-llc tpde-lli)
+        DEPENDS ${TPDE_LLVM_TEST_DEPENDS})
 
     # Backwards-compatibility
     add_custom_target(tpde_llvm_filetest DEPENDS check-tpde-llvm)

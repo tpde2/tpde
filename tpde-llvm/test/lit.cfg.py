@@ -21,9 +21,12 @@ llvm_config.with_environment('PATH', config.tpde_llvm_bin_dir, append_path=True)
 # Abort on ASan errors so that also tests running with "not" fail.
 llvm_config.with_environment('ASAN_OPTIONS', "abort_on_error=1", append_path=True)
 config.substitutions.append(('tpde-llc', 'tpde-llc --regular-exit'))
+config.substitutions.append(('%tpde-plugin', config.tpde_llvm_bin_dir + "/tpde-plugin" + config.llvm_plugin_ext))
 config.substitutions.append(('%objdump', 'llvm-objdump -d -r --no-show-raw-insn --symbolize-operands --no-addresses --x86-asm-syntax=intel -'))
 
 config.available_features.add(f'llvm{config.llvm_version}')
 config.available_features.add(f'os-{config.system_name.lower()}')
+if config.enable_llvm_plugin:
+    config.available_features.add("tpde-plugin")
 
 # TODO(ts): arch config
