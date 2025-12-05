@@ -32,7 +32,7 @@ target_include_directories(tpde_llvm SYSTEM PUBLIC ${LLVM_INCLUDE_DIRS})
 target_compile_definitions(tpde_llvm PUBLIC ${LLVM_DEFINITIONS})
 if (TPDE_LINK_LLVM_STATIC)
     llvm_map_components_to_libnames(TPDE_LLVM_LIBS
-        core irreader irprinter jitlink orcjit passes support bitreader bitstreamreader targetparser
+        analysis core irreader irprinter jitlink orcjit passes support bitreader bitstreamreader targetparser
     )
     target_link_libraries(tpde_llvm PUBLIC ${TPDE_LLVM_LIBS})
 else ()

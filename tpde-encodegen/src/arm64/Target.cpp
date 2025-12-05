@@ -692,6 +692,8 @@ void EncodingTargetArm64::get_inst_candidates(
   case_default("CMGEv4i32", "CMGE4s");
   case_default("CMGEv2i64", "CMGE2d");
   case_default("DUPv16i8lane", "DUP16b");
+  case_default("DUPv8i16lane", "DUP8h");
+  case_default("DUPv4i32lane", "DUP4s");
   case_default("DUPv2i64gpr", "DUP2dx");
   case_default("ADDv8i8", "ADD8b");
   case_default("ADDv16i8", "ADD16b");
