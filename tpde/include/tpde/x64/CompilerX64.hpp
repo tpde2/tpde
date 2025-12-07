@@ -1836,7 +1836,7 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::switch_emit_cmp(
   if (width_is_32) {
     ASM(CMP32ri, cmp_reg, case_value);
   } else {
-    if ((i64)((i32)case_value) == (i64)case_value) {
+    if (i64(i32(case_value)) == i64(case_value)) {
       ASM(CMP64ri, cmp_reg, case_value);
     } else {
       this->materialize_constant(&case_value, Config::GP_BANK, 8, tmp_reg);
@@ -1872,25 +1872,24 @@ FunctionWriterBase::JumpTable *
         u64 high_bound,
         bool width_is_32) noexcept {
   // NB: we must not evict any registers here.
-  if (low_bound != 0) {
-    switch_emit_cmp(cmp_reg, tmp_reg, low_bound, width_is_32);
-    generate_raw_jump(Jump::jb, default_label);
-  }
-  switch_emit_cmp(cmp_reg, tmp_reg, high_bound, width_is_32);
-  generate_raw_jump(Jump::ja, default_label);
-
-  if (width_is_32) {
-    // zero-extend cmp_reg since we use the full width
-    ASM(MOV32rr, cmp_reg, cmp_reg);
-  }
-
-  if (low_bound != 0) {
-    if (i32(low_bound) == i64(low_bound)) {
+  bool needs_ext = width_is_32;
+  if (low_bound > 0) {
+    if (width_is_32) {
+      needs_ext = false;
+      ASM(SUB32ri, cmp_reg, i32(low_bound));
+    } else if (i32(low_bound) == i64(low_bound)) {
       ASM(SUB64ri, cmp_reg, low_bound);
     } else {
       this->materialize_constant(&low_bound, Config::GP_BANK, 8, tmp_reg);
       ASM(SUB64rr, cmp_reg, tmp_reg);
     }
+  }
+  switch_emit_cmp(cmp_reg, tmp_reg, high_bound - low_bound, width_is_32);
+  generate_raw_jump(Jump::ja, default_label);
+
+  if (needs_ext) {
+    // zero-extend cmp_reg since we use the full width
+    ASM(MOV32rr, cmp_reg, cmp_reg);
   }
 
   u64 range = high_bound - low_bound + 1;

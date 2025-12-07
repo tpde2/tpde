@@ -1989,19 +1989,21 @@ FunctionWriterBase::JumpTable *
         u64 low_bound,
         u64 high_bound,
         bool width_is_32) noexcept {
-  if (low_bound != 0) {
-    switch_emit_cmp(cmp_reg, tmp_reg, low_bound, width_is_32);
-    generate_raw_jump(Jump::Jcc, default_label);
-  }
-  switch_emit_cmp(cmp_reg, tmp_reg, high_bound, width_is_32);
-  generate_raw_jump(Jump::Jhi, default_label);
-
-  if (low_bound != 0) {
-    if (!ASMIF(SUBxi, cmp_reg, cmp_reg, low_bound)) {
-      this->materialize_constant(&low_bound, Config::GP_BANK, 8, tmp_reg);
-      ASM(SUBx, cmp_reg, cmp_reg, tmp_reg);
+  if (low_bound > 0) {
+    if (width_is_32) {
+      if (!ASMIF(SUBwi, cmp_reg, cmp_reg, low_bound)) {
+        materialize_constant(low_bound, Config::GP_BANK, 4, tmp_reg);
+        ASM(SUBw, cmp_reg, cmp_reg, tmp_reg);
+      }
+    } else {
+      if (!ASMIF(SUBxi, cmp_reg, cmp_reg, low_bound)) {
+        materialize_constant(low_bound, Config::GP_BANK, 4, tmp_reg);
+        ASM(SUBx, cmp_reg, cmp_reg, tmp_reg);
+      }
     }
   }
+  switch_emit_cmp(cmp_reg, tmp_reg, high_bound - low_bound, width_is_32);
+  generate_raw_jump(Jump::Jhi, default_label);
 
   u64 range = high_bound - low_bound + 1;
   return &this->text_writer.create_jump_table(
