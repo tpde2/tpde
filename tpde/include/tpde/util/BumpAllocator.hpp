@@ -106,6 +106,7 @@ private:
     for (auto [slab, size] : large_slabs) {
       deallocate_mem(slab, size, SLAB_ALIGNMENT);
     }
+    large_slabs.clear();
   }
 };
 
