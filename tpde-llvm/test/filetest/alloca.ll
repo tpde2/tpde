@@ -786,6 +786,223 @@ bb1:
     ret ptr %a
 }
 
+declare void @take_ptr(ptr)
+
+define void @alloca_4k() {
+; X64-LABEL: <alloca_4k>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    sub rsp, 0x1030
+; X64-NEXT:    lea rdi, [rbp - 0x1030]
+; X64-NEXT:  <L0>:
+; X64-NEXT:    call <L0>
+; X64-NEXT:     R_X86_64_PLT32 take_ptr-0x4
+; X64-NEXT:    add rsp, 0x1030
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <alloca_4k>:
+; ARM64:         sub sp, sp, #0x2, lsl #12 // =0x2000
+; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    add x0, x29, #0xa0
+; ARM64-NEXT:    bl 0x480 <alloca_4k+0x10>
+; ARM64-NEXT:     R_AARCH64_CALL26 take_ptr
+; ARM64-NEXT:    ldp x29, x30, [sp]
+; ARM64-NEXT:    add sp, sp, #0x2, lsl #12 // =0x2000
+; ARM64-NEXT:    ret
+    %a = alloca [4096 x i8]
+    call void @take_ptr(ptr %a)
+    ret void
+}
+
+define void @dyn_alloca_4k() {
+; X64-LABEL: <dyn_alloca_4k>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    sub rsp, 0x1000
+; X64-NEXT:    mov rax, rsp
+; X64-NEXT:    mov rdi, rax
+; X64-NEXT:  <L0>:
+; X64-NEXT:    call <L0>
+; X64-NEXT:     R_X86_64_PLT32 take_ptr-0x4
+; X64-NEXT:    mov rsp, rbp
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <dyn_alloca_4k>:
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    sub x0, sp, #0x1, lsl #12 // =0x1000
+; ARM64-NEXT:    mov sp, x0
+; ARM64-NEXT:    bl 0x4a0 <dyn_alloca_4k+0x10>
+; ARM64-NEXT:     R_AARCH64_CALL26 take_ptr
+; ARM64-NEXT:    mov sp, x29
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64-NEXT:    ret
+    br label %bb
+bb:
+    %a = alloca [4096 x i8]
+    call void @take_ptr(ptr %a)
+    ret void
+}
+
+define void @alloca_32k() {
+; X64-LABEL: <alloca_32k>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    sub rsp, 0x8030
+; X64-NEXT:    lea rdi, [rbp - 0x8030]
+; X64-NEXT:  <L0>:
+; X64-NEXT:    call <L0>
+; X64-NEXT:     R_X86_64_PLT32 take_ptr-0x4
+; X64-NEXT:    add rsp, 0x8030
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <alloca_32k>:
+; ARM64:         sub sp, sp, #0x9, lsl #12 // =0x9000
+; ARM64-NEXT:    stp x29, x30, [sp]
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    add x0, x29, #0xa0
+; ARM64-NEXT:    bl 0x4c0 <alloca_32k+0x10>
+; ARM64-NEXT:     R_AARCH64_CALL26 take_ptr
+; ARM64-NEXT:    ldp x29, x30, [sp]
+; ARM64-NEXT:    add sp, sp, #0x9, lsl #12 // =0x9000
+; ARM64-NEXT:    ret
+    %a = alloca [32768 x i8]
+    call void @take_ptr(ptr %a)
+    ret void
+}
+
+define void @dyn_alloca_32k() {
+; X64-LABEL: <dyn_alloca_32k>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    sub rsp, 0x8000
+; X64-NEXT:    mov rax, rsp
+; X64-NEXT:    mov rdi, rax
+; X64-NEXT:  <L0>:
+; X64-NEXT:    call <L0>
+; X64-NEXT:     R_X86_64_PLT32 take_ptr-0x4
+; X64-NEXT:    mov rsp, rbp
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <dyn_alloca_32k>:
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    sub x0, sp, #0x8, lsl #12 // =0x8000
+; ARM64-NEXT:    mov sp, x0
+; ARM64-NEXT:    bl 0x4e0 <dyn_alloca_32k+0x10>
+; ARM64-NEXT:     R_AARCH64_CALL26 take_ptr
+; ARM64-NEXT:    mov sp, x29
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64-NEXT:    ret
+    br label %bb
+bb:
+    %a = alloca [32768 x i8]
+    call void @take_ptr(ptr %a)
+    ret void
+}
+
+define void @dyn_alloca_33k() {
+; X64-LABEL: <dyn_alloca_33k>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    sub rsp, 0x8400
+; X64-NEXT:    mov rax, rsp
+; X64-NEXT:    mov rdi, rax
+; X64-NEXT:  <L0>:
+; X64-NEXT:    call <L0>
+; X64-NEXT:     R_X86_64_PLT32 take_ptr-0x4
+; X64-NEXT:    mov rsp, rbp
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <dyn_alloca_33k>:
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    sub x0, sp, #0x8, lsl #12 // =0x8000
+; ARM64-NEXT:    sub x0, x0, #0x400
+; ARM64-NEXT:    mov sp, x0
+; ARM64-NEXT:    bl 0x504 <dyn_alloca_33k+0x14>
+; ARM64-NEXT:     R_AARCH64_CALL26 take_ptr
+; ARM64-NEXT:    mov sp, x29
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64-NEXT:    ret
+    br label %bb
+bb:
+    %a = alloca [33792 x i8]
+    call void @take_ptr(ptr %a)
+    ret void
+}
+
+define void @alloca_16M() {
+; X64-LABEL: <alloca_16M>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    sub rsp, 0x1000030
+; X64-NEXT:    lea rdi, [rbp - 0x1000030]
+; X64-NEXT:  <L0>:
+; X64-NEXT:    call <L0>
+; X64-NEXT:     R_X86_64_PLT32 take_ptr-0x4
+; X64-NEXT:    add rsp, 0x1000030
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <alloca_16M>:
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    mov x16, #0x1000000 // =16777216
+; ARM64-NEXT:    sub x0, sp, x16
+; ARM64-NEXT:    mov sp, x0
+; ARM64-NEXT:    bl 0x534 <alloca_16M+0x14>
+; ARM64-NEXT:     R_AARCH64_CALL26 take_ptr
+; ARM64-NEXT:    mov sp, x29
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64-NEXT:    ret
+    %a = alloca [16777216 x i8]
+    call void @take_ptr(ptr %a)
+    ret void
+}
+
+define void @dyn_alloca_16M() {
+; X64-LABEL: <dyn_alloca_16M>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    sub rsp, 0x1000000
+; X64-NEXT:    mov rax, rsp
+; X64-NEXT:    mov rdi, rax
+; X64-NEXT:  <L0>:
+; X64-NEXT:    call <L0>
+; X64-NEXT:     R_X86_64_PLT32 take_ptr-0x4
+; X64-NEXT:    mov rsp, rbp
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <dyn_alloca_16M>:
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    mov x16, #0x1000000 // =16777216
+; ARM64-NEXT:    sub x0, sp, x16
+; ARM64-NEXT:    mov sp, x0
+; ARM64-NEXT:    bl 0x564 <dyn_alloca_16M+0x14>
+; ARM64-NEXT:     R_AARCH64_CALL26 take_ptr
+; ARM64-NEXT:    mov sp, x29
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64-NEXT:    ret
+    br label %bb
+bb:
+    %a = alloca [16777216 x i8]
+    call void @take_ptr(ptr %a)
+    ret void
+}
+
 ; Reduced test case causing register exhaustion during spilling.
 declare void @f1(i32, ...);
 define void @f2(ptr %0, ptr %1, ptr %2, ptr %3, ptr %4, ptr %5, ptr %6, ptr %7, ptr %8, ptr %9, ptr %10, ptr %11, ptr %12, ptr %13, ptr %14, ptr %15, ptr %16, ptr %17, ptr %18, ptr %19, ptr %20, ptr %21, ptr %22, ptr %23) {
@@ -1040,7 +1257,7 @@ define void @f2(ptr %0, ptr %1, ptr %2, ptr %3, ptr %4, ptr %5, ptr %6, ptr %7, 
 ; ARM64-NEXT:    str x8, [sp, #0x100]
 ; ARM64-NEXT:    str x28, [sp, #0x108]
 ; ARM64-NEXT:    str x30, [sp, #0x110]
-; ARM64-NEXT:    bl 0x640 <f2+0x1d0>
+; ARM64-NEXT:    bl 0x750 <f2+0x1d0>
 ; ARM64-NEXT:     R_AARCH64_CALL26 f1
 ; ARM64-NEXT:    add sp, sp, #0x120
 ; ARM64-NEXT:    ldp x19, x20, [sp, #0x10]
@@ -1336,7 +1553,7 @@ define void @alloca_manyregs(i32 %0, ptr %1, ptr %2, ptr %3, i64 %4, i32 %5, ptr
 ; ARM64-NEXT:    orr w30, w30, w0
 ; ARM64-NEXT:    add x16, x29, #0x40, lsl #12 // =0x40000
 ; ARM64-NEXT:    str w14, [x16, #0x898]
-; ARM64-NEXT:    b 0x7c4 <alloca_manyregs+0x154>
+; ARM64-NEXT:    b 0x8d4 <alloca_manyregs+0x154>
   %23 = alloca [66000 x i32], align 4
   br label %24
 

@@ -462,7 +462,7 @@ private:
     // realign the stack at the beginning, but for now, treat them like
     // dynamic allocas.
     // TODO: properly support over-aligned static allocas.
-    return alloca->isStaticAlloca() && alloca->getAlign().value() <= 16;
+    return alloca->isStaticAlloca();
   }
 
 public:
@@ -477,9 +477,7 @@ public:
   [[nodiscard]] u32 val_alloca_align(const IRValueRef value) const noexcept {
     const auto *alloca = llvm::cast<llvm::AllocaInst>(value);
     assert(alloca->isStaticAlloca());
-    const u64 align = alloca->getAlign().value();
-    assert(align <= 16);
-    return align;
+    return alloca->getAlign().value();
   }
 
   bool cur_arg_is_byval(const u32 idx) const noexcept {

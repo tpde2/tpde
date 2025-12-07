@@ -332,6 +332,10 @@ struct CompilerA64 : BaseTy<Adaptor, Derived, Config> {
   static constexpr u32 NUM_FIXED_ASSIGNMENTS[PlatformConfig::NUM_BANKS] = {5,
                                                                            6};
 
+  // Maximum frame size is 0xfff000, therefore convert overly large static
+  // allocas directly to dynamic allocations.
+  static constexpr u32 MaxStaticAllocaSize = 0x100000;
+
   enum CPU_FEATURES : u32 {
     CPU_BASELINE = 0, // ARMV8.0
   };
@@ -1362,7 +1366,9 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::alloca_fixed(
     ASM(SUBx_uxtx, res_reg, DA_SP, tmp, 0);
   } else if (size >= 0x1000) {
     ASM(SUBxi, res_reg, DA_SP, size & 0xff'f000);
-    ASM(SUBxi, res_reg, res_reg, size & 0xfff);
+    if (size & 0xfff) {
+      ASM(SUBxi, res_reg, res_reg, size & 0xfff);
+    }
   } else {
     ASM(SUBxi, res_reg, DA_SP, size & 0xfff);
   }

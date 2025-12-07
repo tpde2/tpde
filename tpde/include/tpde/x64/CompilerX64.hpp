@@ -291,6 +291,8 @@ struct CompilerX64 : BaseTy<Adaptor, Derived, Config> {
   static constexpr u32 NUM_FIXED_ASSIGNMENTS[PlatformConfig::NUM_BANKS] = {5,
                                                                            6};
 
+  static constexpr u32 MaxStaticAllocaSize = 0x10000000;
+
   enum CPU_FEATURES : u32 {
     CPU_BASELINE = 0, // x86-64-v1
     CPU_CMPXCHG16B = (1 << 0),

@@ -129,7 +129,9 @@ struct CompilerBase {
     /// The current size of the stack frame
     u32 frame_size = 0;
     /// Whether the stack frame might have dynamic alloca. Dynamic allocas may
-    /// require a different and less efficient frame setup.
+    /// require a different and less efficient frame setup. As static allocas
+    /// can be converted into dynamic allocas, this is only valid after static
+    /// allocas were processed.
     bool has_dynamic_alloca;
     /// Whether the function is guaranteed to be a leaf function. Throughout the
     /// entire function, the compiler may assume the absence of function calls.
@@ -2363,19 +2365,31 @@ bool CompilerBase<Adaptor, Derived, Config>::compile_func(
 
   this->register_file.allocatable |= cc_info.arg_regs;
 
+  // Small allocas get stack slot, larger allocas need dynamic allocations.
+  util::SmallVector<std::tuple<IRValueRef, u32, u32>> dyn_allocas;
   for (const IRValueRef alloca : adaptor->cur_static_allocas()) {
     auto size = adaptor->val_alloca_size(alloca);
-    size = util::align_up(size, adaptor->val_alloca_align(alloca));
+    auto align = adaptor->val_alloca_align(alloca);
+    if (align > 16 || size > Derived::MaxStaticAllocaSize) {
+      stack.has_dynamic_alloca = true;
+      dyn_allocas.emplace_back(alloca, size, align);
+      continue;
+    }
 
     ValLocalIdx local_idx = adaptor->val_local_idx(alloca);
     init_variable_ref(local_idx, 0);
     ValueAssignment *assignment = val_assignment(local_idx);
     assignment->stack_variable = true;
-    assignment->frame_off = allocate_stack_slot(size);
+    assignment->frame_off = allocate_stack_slot(util::align_up(size, align));
   }
 
   if constexpr (!Config::DEFAULT_VAR_REF_HANDLING) {
     derived()->setup_var_ref_assignments();
+  }
+
+  for (auto &[alloca, size, align] : dyn_allocas) {
+    auto [_, vr] = this->result_ref_single(alloca);
+    derived()->alloca_fixed(size, align, vr);
   }
 
   for (u32 i = 0; i < analyzer.block_layout.size(); ++i) {
