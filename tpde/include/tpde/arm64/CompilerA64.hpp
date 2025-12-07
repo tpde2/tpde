@@ -114,10 +114,6 @@ struct AsmReg : Reg {
 
   constexpr AsmReg(const Reg base) noexcept : Reg(base) {}
 
-  constexpr explicit AsmReg(const u8 id) noexcept : Reg(id) {
-    assert(id <= SP || (id >= V0 && id <= V31));
-  }
-
   constexpr explicit AsmReg(const u64 id) noexcept : Reg(id) {
     assert(id <= SP || (id >= V0 && id <= V31));
   }
@@ -402,8 +398,6 @@ struct CompilerA64 : BaseTy<Adaptor, Derived, Config> {
 
   // note: this has to call assembler->end_func
   void finish_func(u32 func_idx) noexcept;
-
-  void reset() noexcept;
 
   // helpers
 
@@ -1092,15 +1086,6 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::finish_func(
   this->assembler.sym_def(func_sym, func_sec, func_start_off, func_size);
   this->text_writer.eh_end_fde();
   this->text_writer.except_encode_func();
-}
-
-template <IRAdaptor Adaptor,
-          typename Derived,
-          template <typename, typename, typename> typename BaseTy,
-          typename Config>
-void CompilerA64<Adaptor, Derived, BaseTy, Config>::reset() noexcept {
-  func_ret_offs.clear();
-  Base::reset();
 }
 
 template <IRAdaptor Adaptor,

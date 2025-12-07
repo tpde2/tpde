@@ -8,7 +8,7 @@
 
 namespace tpde::a64 {
 
-static constexpr auto get_cie_initial_instrs_a64() {
+static consteval auto get_cie_initial_instrs_a64() {
   std::array<u8, 32> data{};
   // the current frame setup does not have a constant offset from the FP
   // to the CFA so we need to encode that at the end

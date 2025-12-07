@@ -77,10 +77,6 @@ struct AsmReg : Reg {
 
   constexpr AsmReg(const Reg base) noexcept : Reg(base) {}
 
-  constexpr explicit AsmReg(const u8 id) noexcept : Reg(id) {
-    assert(id <= R15 || (id >= XMM0 && id <= XMM15));
-  }
-
   constexpr explicit AsmReg(const u64 id) noexcept : Reg(id) {
     assert(id <= R15 || (id >= XMM0 && id <= XMM15));
   }

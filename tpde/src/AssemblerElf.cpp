@@ -6,6 +6,8 @@
 #include "tpde/ELF.hpp"
 #include "tpde/StringTable.hpp"
 #include "tpde/util/misc.hpp"
+#include <span>
+#include <string_view>
 
 namespace tpde::elf {
 
@@ -40,10 +42,7 @@ constexpr static std::span<const char> SHSTRTAB = {
     ".group\0"
     ".symtab_shndx\0"};
 
-static void fail_constexpr_compile(const char *) {
-  assert(0);
-  exit(1);
-}
+void fail_constexpr_compile(const char *) {}
 
 consteval static u32 sec_idx(const std::string_view name) {
   // skip the first null string
@@ -64,21 +63,13 @@ consteval static u32 sec_idx(const std::string_view name) {
   return ~0u;
 }
 
-consteval static u32 sec_off(const std::string_view name) {
-  // skip the first null string
-  const char *data = SHSTRTAB.data() + 1;
-  auto sec_name = std::string_view{data};
-  while (!sec_name.empty()) {
-    if (sec_name.ends_with(name)) {
-      return sec_name.data() + sec_name.size() - name.size() - SHSTRTAB.data();
-    }
-
-    data += sec_name.size() + 1;
-    sec_name = std::string_view{data};
+consteval static u32 sec_off(const char *name) {
+  std::string_view tab(SHSTRTAB.data(), SHSTRTAB.size());
+  size_t pos = tab.find(name, 1, std::string_view(name).size() + 1);
+  if (pos == std::string_view::npos) {
+    fail_constexpr_compile("unknown section name");
   }
-
-  fail_constexpr_compile("unknown section name");
-  return ~0u;
+  return pos;
 }
 
 consteval static u32 predef_sec_count() {
@@ -484,7 +475,7 @@ std::vector<u8> AssemblerElf::build_object_file() noexcept {
 
 namespace {
 
-static constexpr auto get_elf_section_flags() {
+static consteval auto get_elf_section_flags() {
   using SectionFlags = Assembler::TargetInfo::SectionFlags;
   std::array<SectionFlags, unsigned(SectionKind::Max)> section_flags;
   section_flags[u8(SectionKind::Text)] =

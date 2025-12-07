@@ -7,7 +7,7 @@
 namespace tpde::x64 {
 
 // TODO: use static constexpr array in C++23.
-static constexpr auto get_cie_initial_instrs_x64() {
+static consteval auto get_cie_initial_instrs_x64() {
   std::array<u8, 32> data{};
   // the current frame setup does not have a constant offset from the FP
   // to the CFA so we need to encode that at the end
