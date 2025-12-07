@@ -201,9 +201,9 @@ define i32 @switch_table(i32 %0) {
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
 ; ARM64-NEXT:    add x1, x1, #0x0
 ; ARM64-NEXT:     R_AARCH64_ADD_ABS_LO12_NC
-; ARM64-NEXT:    ldrsw x0, [x1, w0, uxtw #2]
+; ARM64-NEXT:    ldrb w0, [x1, w0, uxtw #0]
 ; ARM64-NEXT:    adr x1, 0x64 <switch_table+0x14>
-; ARM64-NEXT:    add x1, x1, x0
+; ARM64-NEXT:    add x1, x1, x0, lsl #2
 ; ARM64-NEXT:    br x1
 ; ARM64-NEXT:    b 0xa4 <switch_table+0x54>
 ; ARM64-NEXT:    mov w0, #0x0 // =0
@@ -299,9 +299,9 @@ define i32 @switch_table2(i32 %0) {
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
 ; ARM64-NEXT:    add x1, x1, #0x0
 ; ARM64-NEXT:     R_AARCH64_ADD_ABS_LO12_NC
-; ARM64-NEXT:    ldrsw x0, [x1, w0, uxtw #2]
+; ARM64-NEXT:    ldrb w0, [x1, w0, uxtw #0]
 ; ARM64-NEXT:    adr x1, 0xc8 <switch_table2+0x18>
-; ARM64-NEXT:    add x1, x1, x0
+; ARM64-NEXT:    add x1, x1, x0, lsl #2
 ; ARM64-NEXT:    br x1
 ; ARM64-NEXT:    b 0x108 <switch_table2+0x58>
 ; ARM64-NEXT:    mov x0, #0x3 // =3
@@ -410,9 +410,9 @@ define i32 @switch_table3(i32 %0) {
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
 ; ARM64-NEXT:    add x1, x1, #0x0
 ; ARM64-NEXT:     R_AARCH64_ADD_ABS_LO12_NC
-; ARM64-NEXT:    ldrsw x0, [x1, w0, uxtw #2]
+; ARM64-NEXT:    ldrb w0, [x1, w0, uxtw #0]
 ; ARM64-NEXT:    adr x1, 0x134 <switch_table3+0x24>
-; ARM64-NEXT:    add x1, x1, x0
+; ARM64-NEXT:    add x1, x1, x0, lsl #2
 ; ARM64-NEXT:    br x1
 ; ARM64-NEXT:    sub w0, w0, #0x3ea
 ; ARM64-NEXT:    cmp w0, #0x4
@@ -421,9 +421,9 @@ define i32 @switch_table3(i32 %0) {
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
 ; ARM64-NEXT:    add x1, x1, #0x0
 ; ARM64-NEXT:     R_AARCH64_ADD_ABS_LO12_NC
-; ARM64-NEXT:    ldrsw x0, [x1, w0, uxtw #2]
+; ARM64-NEXT:    ldrb w0, [x1, w0, uxtw #0]
 ; ARM64-NEXT:    adr x1, 0x158 <switch_table3+0x48>
-; ARM64-NEXT:    add x1, x1, x0
+; ARM64-NEXT:    add x1, x1, x0, lsl #2
 ; ARM64-NEXT:    br x1
 ; ARM64-NEXT:    b 0x180 <switch_table3+0x70>
 ; ARM64-NEXT:    mov x0, #0x3 // =3
@@ -814,9 +814,9 @@ define i32 @switch_to_self() {
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
 ; ARM64-NEXT:    add x1, x1, #0x0
 ; ARM64-NEXT:     R_AARCH64_ADD_ABS_LO12_NC
-; ARM64-NEXT:    ldrsw x0, [x1, w0, uxtw #2]
-; ARM64-NEXT:    adr x1, 0x2c8 <switch_to_self+0x28>
-; ARM64-NEXT:    add x1, x1, x0
+; ARM64-NEXT:    ldrb w0, [x1, w0, uxtw #0]
+; ARM64-NEXT:    adr x1, 0x2a0 <switch_to_self>
+; ARM64-NEXT:    add x1, x1, x0, lsl #2
 ; ARM64-NEXT:    br x1
 ; ARM64-NEXT:    cmp w0, #0x62
 ; ARM64-NEXT:    b.eq 0x314 <switch_to_self+0x74>

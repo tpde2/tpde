@@ -118,14 +118,28 @@ void FunctionWriterA64::handle_fixups() noexcept {
 
   // TODO: move jump tables to separate read-only data section if function is
   // part of a section group.
-  // TODO: use smaller entry sizes of labels are close together.
   SecRef jt_sec = get_jump_table_section();
   for (JumpTable *jt : jump_tables) {
     SymRef sym = assembler->sym_predef_data("", Assembler::SymBinding::LOCAL);
-    u32 jt_sec_off = assembler->sym_def_predef_data(
-        jt_sec, sym, jt->size * sizeof(i32), /*align=*/4);
     u32 code_off = jt->off - label_skew;
+
     u32 jt_base = code_off + 12;
+    // Initialize to address of ADR to make sure that min_off is reachable.
+    u32 min_off = jt_base;
+    u32 max_off = jt_base;
+    for (Label label : jt->labels()) {
+      min_off = std::min(min_off, label_offset(label));
+      max_off = std::max(max_off, label_offset(label));
+    }
+    unsigned element_size = 4;
+    if (max_off - min_off < (u32{1} << 10)) {
+      element_size = 1;
+      jt_base = min_off;
+    } else if (max_off - min_off < (u32{1} << 18)) {
+      element_size = 2;
+      jt_base = min_off;
+    }
+
     {
       DA_GReg idx = DA_GReg(jt->idx.id());
       DA_GReg tmp = DA_GReg(jt->tmp.id());
@@ -134,20 +148,43 @@ void FunctionWriterA64::handle_fixups() noexcept {
       reloc(sym, elf::R_AARCH64_ADR_PREL_PG_HI21, code_off, 0);
       code[1] = de64_ADDxi(tmp, tmp, 0);
       reloc(sym, elf::R_AARCH64_ADD_ABS_LO12_NC, code_off + 4, 0);
-      if (jt->misc) {
-        code[2] = de64_LDRSWxr_uxtw(idx, tmp, idx, /*scale=*/true);
-      } else {
-        code[2] = de64_LDRSWxr_lsl(idx, tmp, idx, /*scale=*/true);
+      switch (element_size) {
+      case 1:
+        code[2] = jt->misc ? de64_LDRBr_uxtw(idx, tmp, idx, /*scale=*/true)
+                           : de64_LDRBr_lsl(idx, tmp, idx, /*scale=*/true);
+        break;
+      case 2:
+        code[2] = jt->misc ? de64_LDRHr_uxtw(idx, tmp, idx, /*scale=*/true)
+                           : de64_LDRHr_lsl(idx, tmp, idx, /*scale=*/true);
+        break;
+      case 4:
+        code[2] = jt->misc ? de64_LDRSWxr_uxtw(idx, tmp, idx, /*scale=*/true)
+                           : de64_LDRSWxr_lsl(idx, tmp, idx, /*scale=*/true);
+        break;
+      default: TPDE_UNREACHABLE("invalid jump table element size");
       }
       code[3] = de64_ADR(tmp, code_off + 12, jt_base);
-      code[4] = de64_ADDx(tmp, tmp, idx);
+      code[4] = de64_ADDx_lsl(tmp, tmp, idx, 2);
       code[5] = de64_BR(tmp);
     }
 
+    u32 jt_sec_off = assembler->sym_def_predef_data(
+        jt_sec, sym, jt->size * element_size, /*align=*/element_size);
     u8 *jt_ptr_raw = assembler->get_section(jt_sec).data.data() + jt_sec_off;
-    u32 *jt_ptr = reinterpret_cast<u32 *>(jt_ptr_raw);
-    for (Label label : jt->labels()) {
-      *jt_ptr++ = label_offset(label) - jt_base;
+    auto write_jt = [this, jt, jt_ptr_raw, jt_base]<typename T>() {
+      T *jt_ptr = reinterpret_cast<T *>(jt_ptr_raw);
+      for (Label label : jt->labels()) {
+        // For T==u32, everything is fine, the assertion targets u8/u16.
+        assert(u32(label_offset(label) - jt_base) < u64{0x4} << 8 * sizeof(T));
+        *jt_ptr++ = (label_offset(label) - jt_base) >> 2;
+      }
+    };
+
+    switch (element_size) {
+    case 1: write_jt.template operator()<u8>(); break;
+    case 2: write_jt.template operator()<u16>(); break;
+    case 4: write_jt.template operator()<u32>(); break;
+    default: TPDE_UNREACHABLE("invalid jump table element size");
     }
   }
 }
