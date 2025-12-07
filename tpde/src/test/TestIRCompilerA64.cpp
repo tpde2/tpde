@@ -108,11 +108,17 @@ bool TestIRCompilerA64::compile_inst(IRInstRef inst_idx, InstRange) noexcept {
     return true;
   }
   case zerofill: {
-    auto size = ir()->value_operands[value.op_begin_idx];
-    this->text_writer.ensure_space(size);
-    ASM(B, size / 4);
-    std::memset(this->text_writer.cur_ptr(), 0, (size - 4) & -4u);
-    this->text_writer.cur_ptr() += (size - 4) & -4u;
+    auto skip = [this](size_t skip) {
+      this->text_writer.ensure_space(skip);
+      ASMNC(B, skip / 4);
+      std::memset(this->text_writer.cur_ptr(), 0, skip - 4);
+      this->text_writer.cur_ptr() += skip - 4;
+    };
+    size_t size = ((ir()->value_operands[value.op_begin_idx] - 4) & -4u) + 4;
+    for (; size > 0x4000; size -= 0x4000) {
+      skip(0x4000);
+    }
+    skip(size);
     return true;
   }
   case condbr:

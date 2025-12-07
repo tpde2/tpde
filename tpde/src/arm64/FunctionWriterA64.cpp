@@ -35,33 +35,37 @@ void FunctionWriterA64::more_space(u32 size) noexcept {
     TPDE_FATAL("AArch64 doesn't support sections larger than 128 MiB");
   }
 
-  // If the section has no unresolved conditional branch, veneer_info is null.
-  // In that case, we don't need to do anything regarding veneers.
-  u32 unresolved_count = unresolved_test_brs + unresolved_cond_brs;
-  u32 veneer_size = sizeof(u32) * unresolved_count;
-  FunctionWriter::more_space(size + veneer_size + 4);
-  if (veneer_size == 0) {
-    return;
-  }
-
   // TBZ has 14 bits, CBZ has 19 bits; but the first bit is the sign bit
-  u32 max_dist = unresolved_test_brs ? 4 << (14 - 1) : 4 << (19 - 1);
-  max_dist -= veneer_size; // must be able to reach last veneer
+  constexpr size_t TbzMaxDist = 4 << (14 - 1);
+  constexpr size_t CbzMaxDist = 4 << (19 - 1);
+
+  // If the section has no unresolved conditional branch, veneer_info is null.
+  // In that case, we only need to make sure that we don't grow too large at
+  // once; otherwise, the distance to the next veneer might be too large.
+  u32 unresolved_count = unresolved_test_brs + unresolved_cond_brs;
+  u32 veneer_size = unresolved_count ? sizeof(u32) * unresolved_count + 4 : 0;
+  FunctionWriter::more_space(size + veneer_size);
+
+  u32 max_dist = unresolved_test_brs ? TbzMaxDist : CbzMaxDist;
+  max_dist -= veneer_size - 4; // must be able to reach last veneer
   // TODO: get a better approximation of the first unresolved condbr after the
   // last veneer.
   u32 first_condbr = veneers.empty() ? 0 : veneers.back();
   // If all condbrs can only jump inside the now-reserved memory, do nothing.
-  if (first_condbr + max_dist > allocated_size()) {
-    return;
+  if (unresolved_count > 0 && first_condbr + max_dist <= allocated_size()) {
+    u32 cur_off = offset();
+    veneers.push_back(cur_off + 4);
+    unresolved_test_brs = unresolved_cond_brs = 0;
+
+    *reinterpret_cast<u32 *>(data_begin + cur_off) = de64_B(veneer_size / 4);
+    std::memset(data_begin + cur_off + 4, 0, veneer_size - 4);
+    cur_ptr() += veneer_size;
   }
 
-  u32 cur_off = offset();
-  veneers.push_back(cur_off + 4);
-  unresolved_test_brs = unresolved_cond_brs = 0;
-
-  *reinterpret_cast<u32 *>(data_begin + cur_off) = de64_B(veneer_size / 4 + 1);
-  std::memset(data_begin + cur_off + 4, 0, veneer_size);
-  cur_ptr() += veneer_size + 4;
+  // Large increase happens primarily when more_space is called from begin_func.
+  if (size_t(data_reserve_end - data_cur) > TbzMaxDist / 2) {
+    data_reserve_end = data_cur + TbzMaxDist / 2;
+  }
 }
 
 void FunctionWriterA64::handle_fixups() noexcept {
@@ -82,8 +86,8 @@ void FunctionWriterA64::handle_fixups() noexcept {
         // Create intermediate branch at v.begin
         auto *br = reinterpret_cast<u32 *>(begin_ptr() + *veneer - label_skew);
         assert(*br == 0 && "overwriting instructions with veneer branch");
-        *br = de64_B((label_off - *veneer) / 4);
-        diff = *veneer - fixup_off;
+        *br = de64_B((label_off - *veneer + label_skew) / 4);
+        diff = *veneer - label_skew - fixup_off;
         *veneer += 4;
       }
       u32 off_mask = ((1 << nbits) - 1) << 5;

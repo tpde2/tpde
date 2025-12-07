@@ -28,14 +28,25 @@ public:
     FunctionWriter::begin_func(align, expected_size);
   }
 
+private:
   void more_space(u32 size) noexcept;
 
+public:
   JumpTable &create_jump_table(u32 size, Reg idx, Reg tmp, bool is32) noexcept {
     JumpTable &jt = alloc_jump_table(size, idx, tmp);
     jt.misc = is32;
     ensure_space(JumpTableCodeSize);
     cur_ptr() += JumpTableCodeSize;
     return jt;
+  }
+
+  void ensure_space(size_t size) noexcept {
+    // Advancing by more than 32kiB is problematic: when inserting a tbz,
+    // more_space might not be called within 32kiB, preventing the insertion of
+    // required veneer space. However, all veneers must be reachable from every
+    // instruction, therefore, reduce by factor 2.
+    assert(size <= (4 << (14 - 1 - 1)) && "cannot skip beyond tbz max dist");
+    FunctionWriter::ensure_space(size);
   }
 
   bool try_write_inst(u32 inst) noexcept {

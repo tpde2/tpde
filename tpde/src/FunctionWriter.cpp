@@ -458,7 +458,8 @@ u32 FunctionWriterBase::except_type_idx_for_sym(const SymRef sym) noexcept {
 }
 
 void FunctionWriterBase::more_space(size_t size) noexcept {
-  size_t cur_size = section->data.size();
+  // NB: data_reserved_end can point before section->data.end().
+  size_t cur_size = allocated_size();
   size_t new_size;
   if (cur_size + size <= section->data.capacity()) {
     new_size = section->data.capacity();

@@ -174,8 +174,10 @@ public:
   /// be moved beyond the allocated region.
   u8 *&cur_ptr() noexcept { return data_cur; }
 
+protected:
   void more_space(size_t size) noexcept;
 
+public:
   /// Record relocation at the given offset.
   void reloc(SymRef sym, u32 type, u64 off, i64 addend = 0) noexcept {
     assembler->reloc_sec(get_sec_ref(), sym, type, off, addend);
