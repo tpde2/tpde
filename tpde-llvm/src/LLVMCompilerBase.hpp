@@ -1289,7 +1289,9 @@ typename LLVMCompilerBase<Adaptor, Derived, Config>::SymRef
 template <typename Adaptor, typename Derived, typename Config>
 bool LLVMCompilerBase<Adaptor, Derived, Config>::compile(
     llvm::Module &mod) noexcept {
-  this->adaptor->switch_module(mod);
+  if (!this->adaptor->switch_module(mod)) {
+    return false;
+  }
 
   type_info_syms.clear();
   global_syms.clear();

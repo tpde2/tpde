@@ -226,7 +226,6 @@ struct LLVMAdaptor {
 
   llvm::Function *cur_func = nullptr;
   bool func_unsupported = false;
-  bool globals_init = false;
   bool func_has_dynamic_alloca = false;
 
   tpde::util::SmallVector<BlockInfo, 128> blocks;
@@ -527,7 +526,7 @@ private:
 public:
   bool switch_func(const IRFuncRef function) noexcept;
 
-  void switch_module(llvm::Module &mod) noexcept;
+  bool switch_module(llvm::Module &mod) noexcept;
 
   void reset() noexcept;
 
