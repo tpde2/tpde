@@ -1814,38 +1814,29 @@ void CompilerBase<Adaptor, Derived, Config>::generate_switch(
 
     // check if the density of the values is high enough to warrant building
     // a jump table
-    auto range = cases[end - 1].first - cases[begin].first;
-    // we will get wrong results if range is -1 so skip the jump table if
+    u64 low_bound = cases[begin].first;
+    u64 high_bound = cases[end - 1].first;
+    auto range = high_bound - low_bound + 1;
+    // we will get wrong results if range is 0 so skip the jump table if
     // that is the case
-    if (range != 0xFFFF'FFFF'FFFF'FFFF && (range / num_cases) < 8) {
+    if (range != 0 && (range / num_cases) < 8) {
       // for gcc, it seems that if there are less than 8 values per
       // case it will build a jump table so we do that, too
 
-      // the actual range is one greater than the result we get from
-      // subtracting so adjust for that
-      range += 1;
-
-      tpde::util::SmallVector<tpde::Label, 32> label_vec;
-      std::span<tpde::Label> labels;
-      if (range == num_cases) {
-        labels = std::span{case_labels.begin() + begin, num_cases};
-      } else {
-        label_vec.resize(range, default_label);
-        for (auto i = 0u; i < num_cases; ++i) {
-          label_vec[cases[begin + i].first - cases[begin].first] =
-              case_labels[begin + i];
-        }
-        labels = std::span{label_vec.begin(), range};
-      }
-
       // Give target the option to emit a jump table.
-      if (derived()->switch_emit_jump_table(default_label,
-                                            labels,
-                                            cmp_reg,
-                                            tmp_reg,
-                                            cases[begin].first,
-                                            cases[end - 1].first,
-                                            width_is_32)) {
+      auto *jt = derived()->switch_create_jump_table(
+          default_label, cmp_reg, tmp_reg, low_bound, high_bound, width_is_32);
+      if (jt) {
+        if (range == num_cases) {
+          std::copy(case_labels.begin() + begin,
+                    case_labels.begin() + end,
+                    jt->labels().begin());
+        } else {
+          std::ranges::fill(jt->labels(), default_label);
+          for (auto i = begin; i != end; ++i) {
+            jt->labels()[cases[i].first - low_bound] = case_labels[i];
+          }
+        }
         return;
       }
     }

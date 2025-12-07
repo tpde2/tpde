@@ -39,6 +39,9 @@ void FunctionWriterBase::begin_func() noexcept {
   label_skew = 0;
   label_fixups.clear();
 
+  jump_table_alloc.reset();
+  jump_tables.clear();
+
   except_call_site_table.clear();
   except_action_table.clear();
   except_type_info_table.clear();
@@ -65,6 +68,20 @@ void FunctionWriterBase::remove_prologue_bytes(u32 start, u32 size) noexcept {
   section->adjust_relocation_offsets(reloc_begin, size);
   data_cur -= size;
   label_skew += size;
+}
+
+FunctionWriterBase::JumpTable &
+    FunctionWriterBase::alloc_jump_table(u32 size, Reg idx, Reg tmp) noexcept {
+  size_t alloc_size = sizeof(JumpTable) + size * sizeof(Label);
+  auto *buf = jump_table_alloc.allocate(alloc_size, alignof(JumpTable));
+  JumpTable *jt = new (reinterpret_cast<JumpTable *>(buf)) JumpTable{
+      .size = size,
+      .off = static_cast<u32>(offset()),
+      .idx = idx,
+      .tmp = tmp,
+  };
+  jump_tables.push_back(jt);
+  return *jt;
 }
 
 void FunctionWriterBase::eh_align_frame() noexcept {

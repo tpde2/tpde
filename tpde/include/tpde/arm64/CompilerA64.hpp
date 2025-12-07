@@ -573,14 +573,14 @@ public:
                          AsmReg tmp_reg,
                          u64 case_value,
                          bool width_is_32) noexcept;
-  /// @internal Emit bounds check and jump table.
-  bool switch_emit_jump_table(Label default_label,
-                              std::span<const Label> labels,
-                              AsmReg cmp_reg,
-                              AsmReg tmp_reg,
-                              u64 low_bound,
-                              u64 high_bound,
-                              bool width_is_32) noexcept;
+  /// @internal Emit bounds check and create jump table.
+  FunctionWriterBase::JumpTable *
+      switch_create_jump_table(Label default_label,
+                               AsmReg cmp_reg,
+                               AsmReg tmp_reg,
+                               u64 low_bound,
+                               u64 high_bound,
+                               bool width_is_32) noexcept;
   /// @internal Jump if cmp_reg is greater than case_value.
   void switch_emit_binary_step(Label case_label,
                                Label gt_label,
@@ -1981,14 +1981,14 @@ template <IRAdaptor Adaptor,
           typename Derived,
           template <typename, typename, typename> typename BaseTy,
           typename Config>
-bool CompilerA64<Adaptor, Derived, BaseTy, Config>::switch_emit_jump_table(
-    Label default_label,
-    std::span<const Label> labels,
-    AsmReg cmp_reg,
-    AsmReg tmp_reg,
-    u64 low_bound,
-    u64 high_bound,
-    bool width_is_32) noexcept {
+FunctionWriterBase::JumpTable *
+    CompilerA64<Adaptor, Derived, BaseTy, Config>::switch_create_jump_table(
+        Label default_label,
+        AsmReg cmp_reg,
+        AsmReg tmp_reg,
+        u64 low_bound,
+        u64 high_bound,
+        bool width_is_32) noexcept {
   if (low_bound != 0) {
     switch_emit_cmp(cmp_reg, tmp_reg, low_bound, width_is_32);
     generate_raw_jump(Jump::Jcc, default_label);
@@ -2003,33 +2003,9 @@ bool CompilerA64<Adaptor, Derived, BaseTy, Config>::switch_emit_jump_table(
     }
   }
 
-  // TODO: move jump table to read-only data section.
-  this->text_writer.ensure_space(4 * 4 + 4 * labels.size());
-
-  Label jump_table = this->text_writer.label_create();
-  u32 adr_off = this->text_writer.offset();
-  this->text_writer.write_unchecked(u32(0)); // ADR tmp_reg, patched below.
-
-  if (width_is_32) {
-    ASMNC(LDRSWxr_uxtw, cmp_reg, tmp_reg, cmp_reg, /*scale=*/true);
-  } else {
-    ASMNC(LDRSWxr_lsl, cmp_reg, tmp_reg, cmp_reg, /*scale=*/true);
-  }
-  ASMNC(ADDx, tmp_reg, tmp_reg, cmp_reg);
-  ASMNC(BR, tmp_reg);
-
-  u32 table_off = this->text_writer.offset();
-  this->text_writer.label_place(jump_table, table_off);
-  for (Label label : labels) {
-    this->text_writer.label_ref(
-        label, this->text_writer.offset(), LabelFixupKind::AARCH64_JUMP_TABLE);
-    this->text_writer.write_unchecked(table_off);
-  }
-
-  assert(table_off - adr_off <= 1 * 1024 * 1024); // ADR has a 1 MiB range.
-  u32 *adr = reinterpret_cast<u32 *>(this->text_writer.begin_ptr() + adr_off);
-  *adr = de64_ADR(tmp_reg, adr_off, table_off);
-  return true;
+  u64 range = high_bound - low_bound + 1;
+  return &this->text_writer.create_jump_table(
+      range, cmp_reg, tmp_reg, width_is_32);
 }
 
 template <IRAdaptor Adaptor,

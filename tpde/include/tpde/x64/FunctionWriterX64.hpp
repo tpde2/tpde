@@ -14,6 +14,10 @@ class FunctionWriterX64 : public FunctionWriter<FunctionWriterX64> {
 
   static const TargetCIEInfo CIEInfo;
 
+  // LEA tmp, [rip+table]; MOVSX idx, [tmp+4*idx]; ADD tmp, idx; JMP tmp
+  // NB: MOVSX can be 5 bytes in case tmp is r13.
+  static constexpr u32 JumpTableCodeSize = 18;
+
 public:
   FunctionWriterX64() noexcept : FunctionWriter(CIEInfo) {}
 
@@ -26,31 +30,15 @@ public:
     }
   }
 
+  JumpTable &create_jump_table(u32 size, Reg idx, Reg tmp) noexcept {
+    JumpTable &jt = alloc_jump_table(size, idx, tmp);
+    ensure_space(JumpTableCodeSize);
+    cur_ptr() += JumpTableCodeSize;
+    return jt;
+  }
+
 private:
   void handle_fixups() noexcept;
 };
-
-inline void FunctionWriterX64::handle_fixups() noexcept {
-  for (const LabelFixup &fixup : label_fixups) {
-    u32 label_off = label_offset(fixup.label);
-    u32 fixup_off = fixup.off - label_skew;
-    u8 *dst_ptr = begin_ptr() + fixup_off;
-    switch (fixup.kind) {
-    case LabelFixupKind::X64_JMP_OR_MEM_DISP: {
-      // fix the jump immediate
-      u32 value = (label_off - fixup_off) - 4;
-      std::memcpy(dst_ptr, &value, sizeof(u32));
-      break;
-    }
-    case LabelFixupKind::X64_JUMP_TABLE: {
-      const auto table_off = *reinterpret_cast<u32 *>(dst_ptr) - label_skew;
-      const auto diff = (i32)label_off - (i32)table_off;
-      std::memcpy(dst_ptr, &diff, sizeof(u32));
-      break;
-    }
-    default: TPDE_UNREACHABLE("unexpected label fixup kind");
-    }
-  }
-}
 
 } // namespace tpde::x64

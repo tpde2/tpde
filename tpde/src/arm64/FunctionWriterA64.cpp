@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
 #include "tpde/arm64/FunctionWriterA64.hpp"
+#include "tpde/ELF.hpp"
 
 #include <disarm64.h>
 
@@ -111,12 +112,42 @@ void FunctionWriterA64::handle_fixups() noexcept {
       }
       fix_condbr(14); // TBZ/TBNZ has 14 bits.
       break;
-    case LabelFixupKind::AARCH64_JUMP_TABLE: {
-      auto table_off = *dst_ptr - label_skew;
-      *dst_ptr = (i32)label_off - (i32)table_off;
-      break;
-    }
     default: TPDE_UNREACHABLE("unexpected label fixup kind");
+    }
+  }
+
+  // TODO: move jump tables to separate read-only data section if function is
+  // part of a section group.
+  // TODO: use smaller entry sizes of labels are close together.
+  SecRef jt_sec = get_jump_table_section();
+  for (JumpTable *jt : jump_tables) {
+    SymRef sym = assembler->sym_predef_data("", Assembler::SymBinding::LOCAL);
+    u32 jt_sec_off = assembler->sym_def_predef_data(
+        jt_sec, sym, jt->size * sizeof(i32), /*align=*/4);
+    u32 code_off = jt->off - label_skew;
+    u32 jt_base = code_off + 12;
+    {
+      DA_GReg idx = DA_GReg(jt->idx.id());
+      DA_GReg tmp = DA_GReg(jt->tmp.id());
+      u32 *code = reinterpret_cast<u32 *>(begin_ptr() + code_off);
+      code[0] = de64_ADRP(tmp, 0, 0);
+      reloc(sym, elf::R_AARCH64_ADR_PREL_PG_HI21, code_off, 0);
+      code[1] = de64_ADDxi(tmp, tmp, 0);
+      reloc(sym, elf::R_AARCH64_ADD_ABS_LO12_NC, code_off + 4, 0);
+      if (jt->misc) {
+        code[2] = de64_LDRSWxr_uxtw(idx, tmp, idx, /*scale=*/true);
+      } else {
+        code[2] = de64_LDRSWxr_lsl(idx, tmp, idx, /*scale=*/true);
+      }
+      code[3] = de64_ADR(tmp, code_off + 12, jt_base);
+      code[4] = de64_ADDx(tmp, tmp, idx);
+      code[5] = de64_BR(tmp);
+    }
+
+    u8 *jt_ptr_raw = assembler->get_section(jt_sec).data.data() + jt_sec_off;
+    u32 *jt_ptr = reinterpret_cast<u32 *>(jt_ptr_raw);
+    for (Label label : jt->labels()) {
+      *jt_ptr++ = label_offset(label) - jt_base;
     }
   }
 }

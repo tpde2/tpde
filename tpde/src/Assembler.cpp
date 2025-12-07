@@ -30,19 +30,31 @@ SecRef
   return ref;
 }
 
+u32 Assembler::sym_def_predef_data(SecRef sec_ref,
+                                   SymRef sym,
+                                   u64 size,
+                                   u32 align) noexcept {
+  DataSection &sec = get_section(sec_ref);
+  sec.align = std::max(sec.align, align);
+  size_t old_size = sec.size();
+  size_t pos = util::align_up(sec.size(), align);
+  sym_def(sym, sec_ref, pos, size);
+  assert(!sec.is_virtual && "cannot add data to virtual section");
+  sec.data.resize_uninitialized(pos + size);
+  if (old_size < pos) {
+    // Clear padding to avoid uninitialized bytes in output.
+    std::memset(sec.data.data() + old_size, 0, pos - old_size);
+  }
+  return pos;
+}
+
 void Assembler::sym_def_predef_data(SecRef sec_ref,
                                     SymRef sym_ref,
                                     std::span<const u8> data,
                                     const u32 align,
                                     u32 *off) noexcept {
-  DataSection &sec = get_section(sec_ref);
-  sec.align = std::max(sec.align, align);
-  size_t pos = util::align_up(sec.size(), align);
-  sym_def(sym_ref, sec_ref, pos, data.size());
-  assert(!sec.is_virtual && "cannot add data to virtual section");
-  sec.data.resize(pos);
-  sec.data.append(data.begin(), data.end());
-
+  u32 pos = sym_def_predef_data(sec_ref, sym_ref, data.size(), align);
+  std::memcpy(get_section(sec_ref).data.data() + pos, data.data(), data.size());
   if (off) {
     *off = pos;
   }

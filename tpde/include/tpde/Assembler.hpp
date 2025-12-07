@@ -250,6 +250,9 @@ public:
   /// Define a symbol at the specified location.
   virtual void sym_def(SymRef, SecRef, u64 pos, u64 size) noexcept = 0;
 
+  /// Define symbol and allocate space for data; returns offset into section.
+  u32 sym_def_predef_data(SecRef sec, SymRef sym, u64 size, u32 align) noexcept;
+
   /// Define predefined symbol with the specified data.
   void sym_def_predef_data(SecRef sec,
                            SymRef sym,

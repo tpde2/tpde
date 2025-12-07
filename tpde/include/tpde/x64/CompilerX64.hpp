@@ -6,6 +6,7 @@
 #include "tpde/AssemblerElf.hpp"
 #include "tpde/AssignmentPartRef.hpp"
 #include "tpde/CompilerBase.hpp"
+#include "tpde/FunctionWriter.hpp"
 #include "tpde/base.hpp"
 #include "tpde/x64/FunctionWriterX64.hpp"
 
@@ -527,14 +528,14 @@ public:
                          AsmReg tmp_reg,
                          u64 case_value,
                          bool width_is_32) noexcept;
-  /// @internal Emit bounds check and jump table.
-  bool switch_emit_jump_table(Label default_label,
-                              std::span<const Label> labels,
-                              AsmReg cmp_reg,
-                              AsmReg tmp_reg,
-                              u64 low_bound,
-                              u64 high_bound,
-                              bool width_is_32) noexcept;
+  /// @internal Emit bounds check and create jump table.
+  FunctionWriterBase::JumpTable *
+      switch_create_jump_table(Label default_label,
+                               AsmReg cmp_reg,
+                               AsmReg tmp_reg,
+                               u64 low_bound,
+                               u64 high_bound,
+                               bool width_is_32) noexcept;
   /// @internal Jump if cmp_reg is greater than case_value.
   void switch_emit_binary_step(Label case_label,
                                Label gt_label,
@@ -1862,14 +1863,14 @@ template <IRAdaptor Adaptor,
           typename Derived,
           template <typename, typename, typename> typename BaseTy,
           typename Config>
-bool CompilerX64<Adaptor, Derived, BaseTy, Config>::switch_emit_jump_table(
-    Label default_label,
-    std::span<const Label> labels,
-    AsmReg cmp_reg,
-    AsmReg tmp_reg,
-    u64 low_bound,
-    u64 high_bound,
-    bool width_is_32) noexcept {
+FunctionWriterBase::JumpTable *
+    CompilerX64<Adaptor, Derived, BaseTy, Config>::switch_create_jump_table(
+        Label default_label,
+        AsmReg cmp_reg,
+        AsmReg tmp_reg,
+        u64 low_bound,
+        u64 high_bound,
+        bool width_is_32) noexcept {
   // NB: we must not evict any registers here.
   if (low_bound != 0) {
     switch_emit_cmp(cmp_reg, tmp_reg, low_bound, width_is_32);
@@ -1892,33 +1893,8 @@ bool CompilerX64<Adaptor, Derived, BaseTy, Config>::switch_emit_jump_table(
     }
   }
 
-  Label jump_table = this->text_writer.label_create();
-  ASM(LEA64rm, tmp_reg, FE_MEM(FE_IP, 0, FE_NOREG, -1));
-  // we reuse the jump offset stuff since the patch procedure is the same
-  this->text_writer.label_ref(jump_table,
-                              this->text_writer.offset() - 4,
-                              LabelFixupKind::X64_JMP_OR_MEM_DISP);
-  // load the 4 byte displacement from the jump table
-  ASM(MOVSXr64m32, cmp_reg, FE_MEM(tmp_reg, 4, cmp_reg, 0));
-  ASM(ADD64rr, tmp_reg, cmp_reg);
-  ASM(JMPr, tmp_reg);
-
-  this->text_writer.align(4);
-  this->text_writer.ensure_space(4 + 4 * labels.size());
-  this->label_place(jump_table);
-  const u32 table_off = this->text_writer.offset();
-  for (u32 i = 0; i < labels.size(); i++) {
-    if (this->text_writer.label_is_pending(labels[i])) {
-      this->text_writer.label_ref(labels[i],
-                                  this->text_writer.offset(),
-                                  LabelFixupKind::X64_JUMP_TABLE);
-      this->text_writer.write(table_off);
-    } else {
-      const auto label_off = this->text_writer.label_offset(labels[i]);
-      this->text_writer.write((i32)label_off - (i32)table_off);
-    }
-  }
-  return true;
+  u64 range = high_bound - low_bound + 1;
+  return &this->text_writer.create_jump_table(range, cmp_reg, tmp_reg);
 }
 
 template <IRAdaptor Adaptor,

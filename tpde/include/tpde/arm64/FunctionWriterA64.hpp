@@ -15,6 +15,9 @@ class FunctionWriterA64 : public FunctionWriter<FunctionWriterA64> {
 
   static const TargetCIEInfo CIEInfo;
 
+  // ADRP; ADD; LDR; ADR; ADD; BR.
+  static constexpr u32 JumpTableCodeSize = 24;
+
 public:
   FunctionWriterA64() noexcept : FunctionWriter(CIEInfo) {}
 
@@ -26,6 +29,14 @@ public:
   }
 
   void more_space(u32 size) noexcept;
+
+  JumpTable &create_jump_table(u32 size, Reg idx, Reg tmp, bool is32) noexcept {
+    JumpTable &jt = alloc_jump_table(size, idx, tmp);
+    jt.misc = is32;
+    ensure_space(JumpTableCodeSize);
+    cur_ptr() += JumpTableCodeSize;
+    return jt;
+  }
 
   bool try_write_inst(u32 inst) noexcept {
     if (inst == 0) {

@@ -4,7 +4,9 @@
 
 #include "tpde/Assembler.hpp"
 #include "tpde/DWARF.hpp"
+#include "tpde/RegisterFile.hpp"
 #include "tpde/base.hpp"
+#include "tpde/util/BumpAllocator.hpp"
 #include "tpde/util/SmallVector.hpp"
 #include "tpde/util/VectorWriter.hpp"
 #include <cstring>
@@ -19,12 +21,10 @@ enum class LabelFixupKind : u8 {
   ArchKindBegin,
 
   X64_JMP_OR_MEM_DISP = ArchKindBegin,
-  X64_JUMP_TABLE,
 
   AARCH64_BR = ArchKindBegin,
   AARCH64_COND_BR,
   AARCH64_TEST_BR,
-  AARCH64_JUMP_TABLE,
 };
 
 /// Architecture-independent base for helper class to write function text.
@@ -41,11 +41,9 @@ protected:
     u8 data_alignment_factor;
   };
 
-private:
   Assembler *assembler;
   const TargetCIEInfo &cie_info;
 
-protected:
   DataSection *section = nullptr;
   u8 *data_begin = nullptr;
   u8 *data_cur = nullptr;
@@ -70,6 +68,28 @@ protected:
 
   /// Growth size for more_space; adjusted exponentially after every grow.
   u32 growth_size = 0x10000;
+
+public:
+  struct JumpTable {
+    u32 size; ///< Number of jump table entries.
+    u32 off;  ///< Start offset in code, must hold sufficient space for jump.
+
+    Reg idx; ///< Register holding the table index.
+    Reg tmp; ///< Second temporary register.
+    u8 misc; ///< Target-specific data.
+
+    std::span<Label> labels() {
+      return {reinterpret_cast<Label *>(this + 1), size};
+    }
+  };
+
+  static_assert(std::is_trivially_destructible_v<JumpTable>);
+
+private:
+  util::BumpAllocator<> jump_table_alloc;
+
+protected:
+  util::SmallVector<JumpTable *> jump_tables;
 
 private:
   DataSection *eh_frame_section;
@@ -156,6 +176,11 @@ public:
 
   void more_space(size_t size) noexcept;
 
+  /// Record relocation at the given offset.
+  void reloc(SymRef sym, u32 type, u64 off, i64 addend = 0) noexcept {
+    assembler->reloc_sec(get_sec_ref(), sym, type, off, addend);
+  }
+
   /// Remove bytes and adjust labels/relocations accordingly. The covered region
   /// must be before the first label, i.e., this function can only be used to
   /// cut out bytes from the function prologue.
@@ -207,9 +232,20 @@ public:
 
   /// @}
 
+protected:
+  /// Allocate a jump table for the current location.
+  JumpTable &alloc_jump_table(u32 size, Reg idx, Reg tmp) noexcept;
+
+  SecRef get_jump_table_section() noexcept {
+    // TODO: move jump tables to separate read-only data section if function is
+    // not in the default text section (e.g., part of a section group).
+    return assembler->get_default_section(SectionKind::ReadOnly);
+  }
+
   /// \name DWARF CFI
   /// @{
 
+public:
   static constexpr u32 write_eh_inst(u8 *dst, u8 opcode, u64 arg) noexcept {
     if (opcode & dwarf::DWARF_CFI_PRIMARY_OPCODE_MASK) {
       assert((arg & dwarf::DWARF_CFI_PRIMARY_OPCODE_MASK) == 0);
