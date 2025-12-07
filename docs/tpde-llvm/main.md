@@ -38,11 +38,11 @@ Unsupported features currently include:
 - Code models other than Small-PIC.
 - Scalar types: integer types larger than `i64` except `i128` (`i128` is supported), pointers with non-zero address space, `half`, `bfloat`, `ppc_fp128`, `x86_amx`.
 - Aggregate types with in total more than 65535 elements.
-- `select` aggregate type other than `{i64, i64}`.
+- `select` aggregate type other than `{i64, i64}` and `[2 x i64]`.
 - Atomic operations might use a stronger consistency than required (e.g., always `seqcst` for `atomicrmw`).
 - Calling conventions other than the C calling convention (SysV on x86-64, AAPCS on AArch64).
-- `x86_fp80`: `frem`, most intrinsics. Values must not be part of an aggregate type at function boundaries (including multiple return values like `{x86_fp80, x86_fp80}`. Use `x86_fp80` is likely to result in inefficient code and is best avoided.
-- `fp128`: `fneg`, `fcmp one/ueq`, many intrinsics.
+- `x86_fp80`: `frem`, most intrinsics. Values must not be part of an aggregate type at function boundaries (including multiple return values like `{x86_fp80, x86_fp80}`. Use of `x86_fp80` is likely to result in inefficient code and is best avoided.
+- `fp128`: `fcmp one/ueq`, many intrinsics.
 - Computed `goto` (`blockaddress`, `indirectbr`).
 - `landingpad` with non-empty `filter` clause.
 - Many intrinsics, and some intrinsics are only implemented for commonly used types (e.g., `llvm.cttz` only for 8/16/32/64-bit).
@@ -64,7 +64,7 @@ The only supported element types are `i1`/`i8`/`i16`/`i32`/`i64`/`ptr`/`float`/`
 Only certain types (*layout-compatible types*) are lowered to a layout guaranteed to be compatible with LLVM, which are typically the types defined by the ABI (16-byte non-`i1` vectors on x86-64, 8/16-byte non-`i1` vectors on AArch64). For other types, the in-register layout is often incompatible with LLVM. Such types therefore cannot cross function boundaries as argument/return value, even for purely internal functions. TPDE's current lowering rules for non-layout-compatible types are:
 
 - `i1` vectors are represented as compact integer in a single general-purpose register. (LLVM typically promotes these to a larger vector type, e.g. `<16 x i1>` to `<16 x i8>`.)
-- Vectors where the element type is a multiple of a directly supported vector type are lowered as multiple parts of the same type, e.g. `<64 x i8>` behaves like `[4 x <16 x i8>]`. (LLVM typically widens to the next power of two first.)
+- Vectors where the element type is a multiple of a directly supported vector type are lowered as multiple parts of the same type, e.g. `<48 x i8>` behaves like `[3 x <16 x i8>]`. (LLVM typically widens to the next power of two first.)
 - Other vector types are scalarized, e.g. `<63 x i8>` behaves like `[63 x i8]`. (LLVM has very complex and type/target-dependent rules for promoting/widening integers.)
 
 Note that the in-memory representation of vectors always matches the representation of LLVM.
@@ -73,7 +73,7 @@ Note that the in-memory representation of vectors always matches the representat
 
 Support for arithmetic operations, comparisons, casts, and conversions is generally limited. Some operations are only implemented for layout-compatible types. Some operations are unconditionally scalarized, even if a native vector instruction exists. Additionally, the following operations are currently unsupported:
 
-- `<N x i1>` `insertelement`, `extractelement`, and `shufflevector`.
+- `<N x i1> shufflevector`.
 - Vector `getelementptr`.
 - Vector-predicated `select`.
 - `extractelement` with a constant source vector.
