@@ -7,13 +7,21 @@
 
 # CHECK: Section Headers:
 # CHECK-DAG: [{{ *}}[[SEC65999:[0-9]+]]] sec65999 PROGBITS
+# CHECK-DAG: [{{ *}}[[LSEC65999:[0-9]+]]] lsec65999 PROGBITS
 # CHECK-DAG: [{{ *[0-9]+}}] .symtab_shndx SYMTAB SECTION INDICES
 
 # CHECK: Symbol table '.symtab'
+# CHECK:     4 OBJECT  LOCAL  DEFAULT [[LSEC65999]]     lg65999
 # CHECK-DAG: 4 OBJECT  GLOBAL DEFAULT [[SEC65999]]      g65999
+# CHECK-DAG: 4 OBJECT  GLOBAL DEFAULT [[SEC65999]]      a65999
+# CHECK-DAG: 4 OBJECT  GLOBAL DEFAULT [[LSEC65999]]     b65999
 
 
 import sys
 
 for i in range(int(sys.argv[1])):
     print(f'@g{i} = global i32 1, section "sec{i}"')
+    if i == 65999:
+        print(f'@lg{i} = internal global i32 1, section "lsec{i}"')
+        print(f'@a{i} = alias i32, ptr @g{i}')
+        print(f'@b{i} = alias i32, ptr @lg{i}')
