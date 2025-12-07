@@ -1018,12 +1018,12 @@ void CompilerBase<Adaptor, Derived, Config>::free_assignment(
     }
   }
 
-#ifdef TPDE_ASSERTS
-  for (auto reg_id : register_file.used_regs()) {
-    assert(register_file.reg_local_idx(AsmReg{reg_id}) != local_idx &&
-           "freeing assignment that is still referenced by a register");
+  if constexpr (WithAsserts) {
+    for (auto reg_id : register_file.used_regs()) {
+      assert(register_file.reg_local_idx(AsmReg{reg_id}) != local_idx &&
+             "freeing assignment that is still referenced by a register");
+    }
   }
-#endif
 
   // variable references do not have a stack slot
   bool has_stack = Config::FRAME_INDEXING_NEGATIVE ? assignment->frame_off < 0
@@ -1270,8 +1270,7 @@ typename CompilerBase<Adaptor, Derived, Config>::ValueRef
   assert(!assignment->pending_free);
   assert(!assignment->variable_ref);
   assert(!assignment->pending_free);
-#ifndef NDEBUG
-  {
+  if constexpr (WithAsserts) {
     const auto &src_liveness = analyzer.liveness_info(src.local_idx());
     assert(!src_liveness.last_full);          // implied by is_owned()
     assert(assignment->references_left == 1); // implied by is_owned()
@@ -1285,7 +1284,6 @@ typename CompilerBase<Adaptor, Derived, Config>::ValueRef
       assert(parts.size_bytes(part_idx) == ap.part_size());
     }
   }
-#endif
 
   // Update local_idx of registers.
   for (u32 part_idx = 0; part_idx < part_count; ++part_idx) {
@@ -2292,9 +2290,9 @@ bool CompilerBase<Adaptor, Derived, Config>::compile_func(
   analyzer.switch_func(func);
   derived()->analysis_end();
 
-#ifndef NDEBUG
-  stack.frame_size = ~0u;
-#endif
+  if constexpr (WithAsserts) {
+    stack.frame_size = ~0u;
+  }
   for (auto &e : stack.fixed_free_lists) {
     e.clear();
   }
@@ -2437,20 +2435,20 @@ bool CompilerBase<Adaptor, Derived, Config>::compile_block(
     }
   }
 
-#ifndef NDEBUG
-  // Some consistency checks. Register assignment information must match, all
-  // used registers must have an assignment (no temporaries across blocks), and
-  // fixed registers must be fixed assignments.
-  for (auto reg_id : register_file.used_regs()) {
-    Reg reg{reg_id};
-    assert(register_file.reg_local_idx(reg) != INVALID_VAL_LOCAL_IDX);
-    AssignmentPartRef ap{val_assignment(register_file.reg_local_idx(reg)),
-                         register_file.reg_part(reg)};
-    assert(ap.register_valid());
-    assert(ap.get_reg() == reg);
-    assert(!register_file.is_fixed(reg) || ap.fixed_assignment());
+  if constexpr (WithAsserts) {
+    // Some consistency checks. Register assignment information must match, all
+    // used registers must have an assignment (no temporaries across blocks),
+    // and fixed registers must be fixed assignments.
+    for (auto reg_id : register_file.used_regs()) {
+      Reg reg{reg_id};
+      assert(register_file.reg_local_idx(reg) != INVALID_VAL_LOCAL_IDX);
+      AssignmentPartRef ap{val_assignment(register_file.reg_local_idx(reg)),
+                           register_file.reg_part(reg)};
+      assert(ap.register_valid());
+      assert(ap.get_reg() == reg);
+      assert(!register_file.is_fixed(reg) || ap.fixed_assignment());
+    }
   }
-#endif
 
   if (static_cast<u32>(assignments.delayed_free_lists[block_idx]) != ~0u) {
     auto list_entry = assignments.delayed_free_lists[block_idx];

@@ -37,19 +37,19 @@ struct CompilerBase<Adaptor, Derived, Config>::ValueRef {
     assert(!state.a.assignment->pending_free && "access of free'd assignment");
 
     // Extended liveness checks in debug builds.
-#ifndef NDEBUG
-    if (!variable_ref()) {
-      const auto &liveness =
-          compiler->analyzer.liveness_info(state.a.local_idx);
-      assert(liveness.last >= compiler->cur_block_idx &&
-             "ref-counted value used outside of its live range");
-      assert(state.a.assignment->references_left != 0);
-      if (state.a.assignment->references_left == 1 && !liveness.last_full) {
-        assert(liveness.last == compiler->cur_block_idx &&
-               "liveness of non-last-full value must end at last use");
+    if constexpr (WithAsserts) {
+      if (!variable_ref()) {
+        const auto &liveness =
+            compiler->analyzer.liveness_info(state.a.local_idx);
+        assert(liveness.last >= compiler->cur_block_idx &&
+               "ref-counted value used outside of its live range");
+        assert(state.a.assignment->references_left != 0);
+        if (state.a.assignment->references_left == 1 && !liveness.last_full) {
+          assert(liveness.last == compiler->cur_block_idx &&
+                 "liveness of non-last-full value must end at last use");
+        }
       }
     }
-#endif
 
     if (variable_ref()) {
       state.a.mode = 0;
@@ -168,9 +168,9 @@ void CompilerBase<Adaptor, Derived, Config>::ValueRef::reset() noexcept {
     }
   }
 
-#ifndef NDEBUG
-  state.a.assignment = nullptr;
-  state.a.local_idx = INVALID_VAL_LOCAL_IDX;
-#endif
+  if constexpr (WithAsserts) {
+    state.a.assignment = nullptr;
+    state.a.local_idx = INVALID_VAL_LOCAL_IDX;
+  }
 }
 } // namespace tpde

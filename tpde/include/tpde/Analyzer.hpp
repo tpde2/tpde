@@ -532,14 +532,14 @@ void Analyzer<Adaptor>::build_rpo_block_order(
       adaptor->block_set_info(out[i], i);
     }
 
-#ifndef NDEBUG
-    // In debug builds, reset block index of unreachable blocks.
-    for (IRBlockRef cur : adaptor->cur_blocks()) {
-      if (adaptor->block_info2(cur) == 0) {
-        adaptor->block_set_info(cur, 0xFFFF'FFFF);
+    if constexpr (WithAsserts) {
+      // In debug builds, reset block index of unreachable blocks.
+      for (IRBlockRef cur : adaptor->cur_blocks()) {
+        if (adaptor->block_info2(cur) == 0) {
+          adaptor->block_set_info(cur, 0xFFFF'FFFF);
+        }
       }
     }
-#endif
   }
 
 #ifdef TPDE_LOGGING
@@ -999,14 +999,14 @@ void Analyzer<Adaptor>::compute_liveness() noexcept {
         loop.definitions_in_childs + loop.definitions;
   }
 
-#ifdef TPDE_ASSERTS
-  // reset the incorrect ref_counts in the liveness infos
-  for (auto &entry : liveness) {
-    if (entry.ref_count == ~0u) {
-      entry.ref_count = 0;
+  if constexpr (WithAsserts) {
+    // reset the incorrect ref_counts in the liveness infos
+    for (auto &entry : liveness) {
+      if (entry.ref_count == ~0u) {
+        entry.ref_count = 0;
+      }
     }
   }
-#endif
 
   TPDE_LOG_TRACE("Finished Liveness Analysis");
 }

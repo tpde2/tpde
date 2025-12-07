@@ -17,6 +17,11 @@ option(TPDE_ENABLE_ENCODEGEN "enable tpde-encodegen tool (needs LLVM)" ON)
 option(TPDE_ENABLE_LLVM "enable LLVM back-end (needs LLVM)" ON)
 option(TPDE_ENABLE_COVERAGE "enable coverage instrumentation" OFF)
 option(TPDE_ENABLE_PCH "enable pre-compiled headers" OFF)
+if (NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
+    option(TPDE_ENABLE_ASSERTIONS "Enable assertions" OFF)
+else ()
+    option(TPDE_ENABLE_ASSERTIONS "Enable assertions" ON)
+endif ()
 option(TPDE_BUILD_DOCS "Build documentation" OFF)
 
 # warnings
@@ -48,11 +53,19 @@ else ()
         add_link_options(LINKER:--gc-sections)
     endif ()
 
+    if (TPDE_ENABLE_ASSERTIONS)
+        # CMake defined NDEBUG by default for non-Debug builds, override this.
+        if (NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
+            add_compile_options($<$<OR:$<COMPILE_LANGUAGE:C>,$<COMPILE_LANGUAGE:CXX>>:-UNDEBUG>)
+        endif ()
+        add_compile_definitions(_GLIBCXX_ASSERTIONS)
+    endif ()
+
     # for development builds use -Werror and enable sanitizers
     if (PROJECT_IS_TOP_LEVEL)
         add_compile_options(-Werror -Wno-error=deprecated-declarations)
         if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-            add_compile_options(-fsanitize=address -D_GLIBCXX_ASSERTIONS)
+            add_compile_options(-fsanitize=address)
             add_link_options(-fsanitize=address)
         endif ()
     endif ()

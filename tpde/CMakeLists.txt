@@ -99,7 +99,6 @@ target_sources(tpde PRIVATE
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     target_compile_definitions(tpde PUBLIC TPDE_DEBUG)
-    target_compile_definitions(tpde PUBLIC TPDE_ASSERTS)
 endif ()
 
 

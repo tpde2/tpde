@@ -3,23 +3,8 @@
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
 #pragma once
+#include <cassert>
 #include <cstdint>
-
-// TODO: basic stuff like asserts etc...
-
-#ifdef TPDE_ASSERTS
-  // make sure this always works even if NDEBUG is set
-  #ifdef NDEBUG
-    #undef NDEBUG
-    #include <cassert>
-    #define NDEBUG
-  #else
-    #include <cassert>
-  #endif
-#else
-  #undef assert
-  #define assert(x) (void)(x)
-#endif
 
 #ifdef TPDE_LOGGING
   #include <spdlog/spdlog.h>
@@ -73,6 +58,12 @@ using i8 = int8_t;
 using i16 = int16_t;
 using i32 = int32_t;
 using i64 = int64_t;
+
+#ifndef NDEBUG
+constexpr bool WithAsserts = true;
+#else
+constexpr bool WithAsserts = false;
+#endif
 
 /// Abort program with a fatal error
 [[noreturn]] void fatal_error(const char *msg) noexcept;
