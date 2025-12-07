@@ -3,9 +3,9 @@
 
 find_package(Doxygen REQUIRED)
 
-file(GLOB TPDE_HEADERS ${PROJECT_SOURCE_DIR}/tpde/include/**/*)
-file(GLOB TPDE_LLVM_HEADERS ${PROJECT_SOURCE_DIR}/tpde-llvm/include/*)
-file(GLOB MARKDOWN_SOURCES ${PROJECT_SOURCE_DIR}/docs/**/*.md)
+file(GLOB_RECURSE TPDE_HEADERS ${PROJECT_SOURCE_DIR}/tpde/include/*)
+file(GLOB_RECURSE TPDE_LLVM_HEADERS ${PROJECT_SOURCE_DIR}/tpde-llvm/include/*)
+file(GLOB_RECURSE MARKDOWN_SOURCES ${PROJECT_SOURCE_DIR}/docs/*.md)
 
 CONFIGURE_FILE(Doxyfile.in Doxyfile @ONLY)
 

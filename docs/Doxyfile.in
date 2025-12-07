@@ -965,7 +965,7 @@ WARN_LOGFILE           =
 # spaces. See also FILE_PATTERNS and EXTENSION_MAPPING
 # Note: If this tag is empty the current directory is searched.
 
-INPUT                  = tpde/include tpde-llvm/include docs/main.md docs/tpde/main.md docs/tpde/overview.md docs/tpde/adaptor.md docs/tpde/compiler-ref.md docs/tpde/encodegen.md docs/tpde/guide.md docs/tpde-llvm/main.md
+INPUT                  = tpde/include tpde-llvm/include docs
 
 # This tag can be used to specify the character encoding of the source files
 # that Doxygen parses. Internally Doxygen uses the UTF-8 encoding. Doxygen uses

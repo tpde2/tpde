@@ -6,9 +6,9 @@ Currently, TPDE only targets ELF-based x86-64 and AArch64 (Armv8.1) platforms.
 
 This repository contains:
 
-- [TPDE](@ref tpde-main): the core compiler framework.
-- [TPDE-Encodegen](@ref tpde-encodegen): a utility for easing the use of TPDE by deriving code generators through LLVM's Machine IR.
-- [TPDE-LLVM](@ref tpde-llvm-main): a standalone back-end for LLVM-IR, which compiles 10--20x faster than LLVM -O0 with similar code quality, usable as library (e.g., for JIT), as tool (`tpde-llc`), and integrated in Clang/Flang (with a patch).
+- \subpage tpde-main "TPDE": the core compiler framework.
+- \ref tpde-encodegen "TPDE-Encodegen": a utility for easing the use of TPDE by deriving code generators through LLVM's Machine IR.
+- \subpage tpde-llvm-main "TPDE-LLVM": a standalone back-end for LLVM-IR, which compiles 10--20x faster than LLVM -O0 with similar code quality, usable as library (e.g., for JIT), as tool (`tpde-llc`), and integrated in Clang/Flang (with a patch).
 
 ### Getting Started
 
