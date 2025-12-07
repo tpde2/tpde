@@ -12,6 +12,7 @@
 #include <llvm/TargetParser/Triple.h>
 
 #include "tpde-llvm/LLVMCompiler.hpp"
+#include "tpde/base.hpp"
 
 #include <cstdlib>
 #include <fstream>
@@ -39,6 +40,13 @@ int main(int argc, char *argv[]) {
   args::Flag print_ir(parser, "print_ir", "Print LLVM-IR", {"print-ir"});
   args::Flag regular_exit(
       parser, "regular_exit", "Exit regularly (no _Exit)", {"regular-exit"});
+
+  args::ValueFlag<bool> compile_twice(
+      parser,
+      "",
+      "Compile twice and compare outputs (default in assert builds)",
+      {"compile-twice"},
+      tpde::WithAsserts);
 
   args::ValueFlag<std::string> target(
       parser, "target", "Target architecture", {"target"}, args::Options::None);
@@ -137,20 +145,25 @@ int main(int argc, char *argv[]) {
     }
   }
 
-#ifndef NDEBUG
-  // In debug builds, assert that compiling the module a second time in the same
-  // compiler instance yields the same result.
-  std::vector<uint8_t> buf2;
-  if (!compiler->compile_to_elf(*mod, buf2)) {
-    assert(false && "second compilation failed");
+  unsigned exit_code = EXIT_SUCCESS;
+
+  if (compile_twice.Get()) {
+    // Check that compiling the module a second time in the same compiler
+    // instance yields the same result.
+    std::vector<uint8_t> buf2;
+    if (!compiler->compile_to_elf(*mod, buf2)) {
+      std::cerr << "Second compile failed; writing result of first compile.\n";
+      exit_code = EXIT_FAILURE;
+    }
+    if (buf.size() != buf2.size() ||
+        !std::equal(buf.begin(), buf.end(), buf2.begin())) {
+      std::cerr << "Result mismatch from second compilation!\n";
+      std::cerr << "  sizeA=" << buf.size() << " sizeB=" << buf2.size() << "\n";
+      std::cerr << "Writing second result; pass --compile-twice=0 for first.\n";
+      buf = std::move(buf2);
+      exit_code = EXIT_FAILURE;
+    }
   }
-  if (buf.size() != buf2.size() ||
-      !std::equal(buf.begin(), buf.end(), buf2.begin())) {
-    std::cerr << "result mismatch from second compilation!\n";
-    std::cerr << "  sizeA=" << buf.size() << " sizeB=" << buf2.size() << "\n";
-    assert(false);
-  }
-#endif
 
   if (obj_out_path.Get() == "-") {
     std::cout.write(reinterpret_cast<const char *>(buf.data()), buf.size());
@@ -177,8 +190,8 @@ int main(int argc, char *argv[]) {
   }
 
   if (!regular_exit) {
-    std::_Exit(0);
+    std::_Exit(exit_code);
   }
 
-  return 0;
+  return exit_code;
 }
