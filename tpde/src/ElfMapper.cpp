@@ -21,9 +21,30 @@
 extern "C" void __register_frame(void *);
 extern "C" void __deregister_frame(void *);
 
+// Weak symbols to distinguish LLVM's libunwind from libgcc_s, which have
+// different semantics for __register_frame/__deregister_frame.
+extern "C" void __unw_add_dynamic_eh_frame_section(uintptr_t)
+    __attribute__((weak));
+extern "C" void __unw_remove_dynamic_eh_frame_section(uintptr_t)
+    __attribute__((weak));
+
 namespace tpde::elf {
 
-namespace {
+static void register_frame_wrapper(void *fdes) {
+  if (__unw_add_dynamic_eh_frame_section) {
+    __unw_add_dynamic_eh_frame_section(reinterpret_cast<uintptr_t>(fdes));
+  } else {
+    __register_frame(fdes);
+  }
+}
+
+static void deregister_frame_wrapper(void *fdes) {
+  if (__unw_add_dynamic_eh_frame_section) {
+    __unw_remove_dynamic_eh_frame_section(reinterpret_cast<uintptr_t>(fdes));
+  } else {
+    __deregister_frame(fdes);
+  }
+}
 
 enum class Arch {
   Unknown,
@@ -39,15 +60,13 @@ static constexpr Arch TargetArch = Arch::AArch64;
 static constexpr Arch TargetArch = Arch::Unknown;
   #endif
 
-} // anonymous namespace
-
 void ElfMapper::reset() noexcept {
   if (!mapped_addr) {
     return;
   }
 
   if (registered_frame_off) {
-    __deregister_frame(mapped_addr + registered_frame_off);
+    deregister_frame_wrapper(mapped_addr + registered_frame_off);
   }
 
   munmap(mapped_addr, mapped_size);
@@ -395,7 +414,7 @@ bool ElfMapper::map(AssemblerElf &assembler, SymbolResolver resolver) noexcept {
   auto &eh_frame = assembler.get_section(
       assembler.get_default_section(SectionKind::EHFrame));
   registered_frame_off = eh_frame.addr;
-  __register_frame(mapped_addr + registered_frame_off);
+  register_frame_wrapper(mapped_addr + registered_frame_off);
 
   return true;
 }
