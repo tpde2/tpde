@@ -219,24 +219,6 @@ public:
     return res;
   }
 
-  SecRef get_text_section() noexcept {
-    return get_default_section(SectionKind::Text);
-  }
-  SecRef get_data_section(bool rodata, bool relro = false) noexcept {
-    return get_default_section(!rodata ? SectionKind::Data
-                               : relro ? SectionKind::DataRelRO
-                                       : SectionKind::ReadOnly);
-  }
-  SecRef get_bss_section() noexcept {
-    return get_default_section(SectionKind::BSS);
-  }
-  SecRef get_tdata_section() noexcept {
-    return get_default_section(SectionKind::ThreadData);
-  }
-  SecRef get_tbss_section() noexcept {
-    return get_default_section(SectionKind::ThreadBSS);
-  }
-
   virtual void rename_section(SecRef, std::string_view name) noexcept = 0;
 
   virtual SymRef section_symbol(SecRef) noexcept = 0;

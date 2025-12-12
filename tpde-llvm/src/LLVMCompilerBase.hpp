@@ -4431,15 +4431,10 @@ typename LLVMCompilerBase<Adaptor, Derived, Config>::SymRef
 
   u32 off;
   u8 tmp[8] = {};
-  auto rodata = this->assembler.get_data_section(true, true);
-  const auto addr_sym =
-      this->assembler.sym_def_data(rodata,
-                                   {},
-                                   {tmp, sizeof(tmp)},
-                                   8,
-                                   tpde::Assembler::SymBinding::LOCAL,
-                                   &off);
-  this->assembler.reloc_abs(rodata, sym, off, 0);
+  auto sec = this->assembler.get_default_section(tpde::SectionKind::DataRelRO);
+  auto addr_sym = this->assembler.sym_def_data(
+      sec, {}, {tmp, sizeof(tmp)}, 8, tpde::Assembler::SymBinding::LOCAL, &off);
+  this->assembler.reloc_abs(sec, sym, off, 0);
 
   type_info_syms.emplace_back(value, addr_sym);
   return addr_sym;

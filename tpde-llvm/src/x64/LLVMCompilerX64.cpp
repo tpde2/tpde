@@ -687,7 +687,8 @@ void LLVMCompilerX64::fp80_push(ValuePart &&value) noexcept {
     } else {
       std::span<const u8> raw{reinterpret_cast<const u8 *>(data.data()), 10};
       // TODO: deduplicate/pool constants?
-      tpde::SecRef rodata = this->assembler.get_data_section(true, false);
+      tpde::SecRef rodata =
+          this->assembler.get_default_section(tpde::SectionKind::ReadOnly);
       tpde::SymRef sym = this->assembler.sym_def_data(
           rodata, "", raw, 16, tpde::Assembler::SymBinding::LOCAL);
       ASM(FLDm80, FE_MEM(FE_IP, 0, FE_NOREG, -1));
@@ -779,7 +780,8 @@ void LLVMCompilerX64::fp80_from_int(bool sign,
     static constexpr u64 num = 0x5f80'0000'0000'0000;
     std::span<const u8> raw{reinterpret_cast<const u8 *>(&num), 8};
     // TODO: deduplicate/pool constants?
-    tpde::SecRef rodata = this->assembler.get_data_section(true, false);
+    tpde::SecRef rodata =
+        this->assembler.get_default_section(tpde::SectionKind::ReadOnly);
     tpde::SymRef sym = this->assembler.sym_def_data(
         rodata, "", raw, 8, tpde::Assembler::SymBinding::LOCAL);
     this->reloc_text(
@@ -799,7 +801,8 @@ void LLVMCompilerX64::fp80_to_int(bool sign,
     static constexpr u32 num = 0x5f00'0000; // Float 2**63.
     std::span<const u8> raw{reinterpret_cast<const u8 *>(&num), 4};
     // TODO: deduplicate/pool constants?
-    tpde::SecRef rodata = this->assembler.get_data_section(true, false);
+    tpde::SecRef rodata =
+        this->assembler.get_default_section(tpde::SectionKind::ReadOnly);
     tpde::SymRef sym = this->assembler.sym_def_data(
         rodata, "", raw, 4, tpde::Assembler::SymBinding::LOCAL);
     this->reloc_text(

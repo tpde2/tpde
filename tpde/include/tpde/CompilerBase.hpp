@@ -835,7 +835,7 @@ bool CompilerBase<Adaptor, Derived, Config>::compile() {
   // create function symbols
   text_writer.begin_module(assembler);
   text_writer.switch_section(
-      assembler.get_section(assembler.get_text_section()));
+      assembler.get_section(assembler.get_default_section(SectionKind::Text)));
 
   assert(func_syms.empty());
   for (const IRFuncRef func : adaptor->funcs()) {
@@ -2270,7 +2270,8 @@ SymRef CompilerBase<Adaptor, Derived, Config>::get_personality_sym() noexcept {
         u32 off;
         static constexpr std::array<u8, 8> zero{};
 
-        auto rodata = this->assembler.get_data_section(true, true);
+        auto rodata =
+            this->assembler.get_default_section(SectionKind::DataRelRO);
         personality_sym = this->assembler.sym_def_data(
             rodata, "", zero, 8, Assembler::SymBinding::LOCAL, &off);
         this->assembler.reloc_abs(rodata, personality_func, off, 0);

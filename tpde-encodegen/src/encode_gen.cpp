@@ -204,7 +204,8 @@ bool GenerationState::generate_cp_entry_sym(llvm::raw_ostream &os,
     os << llvm::format_hex(byte, 2) << ',';
   }
   os << "}};\n";
-  os << "      auto sec = derived()->assembler.get_data_section(true);\n";
+  os << "      auto sec = "
+        "derived()->assembler.get_default_section(SectionKind::ReadOnly);\n";
   os << "      " << sym_name << " = derived()->assembler.sym_def_data(sec, "
      << "\"\", data, " << align << ", Assembler::SymBinding::LOCAL);\n";
   os << "    }\n";

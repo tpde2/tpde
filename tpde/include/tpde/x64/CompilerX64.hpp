@@ -1277,7 +1277,7 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::materialize_constant(
   auto alloc_size = util::align_up(size, 8);
   std::span<const u8> raw_data{reinterpret_cast<const u8 *>(data), alloc_size};
   // TODO: deduplicate/pool constants?
-  auto rodata = this->assembler.get_data_section(true, false);
+  auto rodata = this->assembler.get_default_section(SectionKind::ReadOnly);
   auto sym = this->assembler.sym_def_data(
       rodata, "", raw_data, alloc_size, Assembler::SymBinding::LOCAL);
   if (size <= 4) {

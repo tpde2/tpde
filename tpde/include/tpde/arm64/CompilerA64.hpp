@@ -1468,7 +1468,7 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::materialize_constant(
       return;
     }
 
-    auto rodata = this->assembler.get_data_section(true, false);
+    auto rodata = this->assembler.get_default_section(SectionKind::ReadOnly);
     std::span<const u8> raw_data{reinterpret_cast<const u8 *>(data), size};
     auto sym = this->assembler.sym_def_data(
         rodata, "", raw_data, 16, Assembler::SymBinding::LOCAL);
