@@ -197,6 +197,10 @@ bool ElfMapper::map(AssemblerElf &assembler, SymbolResolver resolver) noexcept {
       const Elf64_Sym *elf_sym = assembler.sym_ptr(sym);
       if (elf_sym->st_shndx == SHN_UNDEF) {
         void *addr = resolver(assembler.sym_name(sym));
+        if (!addr && elf_sym->st_bind() == STB_GLOBAL) {
+          TPDE_LOG_ERR("unresolved symbol {}", assembler.sym_name(sym));
+          success = false;
+        }
         sym_addrs[idx] = addr;
       } else if (elf_sym->st_shndx == SHN_ABS) {
         sym_addrs[idx] = reinterpret_cast<void *>(elf_sym->st_value);

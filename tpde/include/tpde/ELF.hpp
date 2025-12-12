@@ -163,6 +163,9 @@ struct Elf64_Sym {
   u16 st_shndx;
   u64 st_value;
   u64 st_size;
+
+  u8 st_bind() const noexcept { return st_info >> 4; }
+  u8 st_type() const noexcept { return st_info & 0xf; }
 };
 
 #define ELF64_ST_INFO(bind, type) (((bind) << 4) + ((type) & 0xf))
