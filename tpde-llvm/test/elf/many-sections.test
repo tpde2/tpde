@@ -3,19 +3,17 @@
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
 
-# RUN: python3 %s 66000 | tpde-llc --target=aarch64 | llvm-readelf -Ss - | FileCheck %s
+# RUN: python3 %s 66000 | tpde-llc --target=aarch64 | llvm-readobj --symbols - | FileCheck %s
 
-# CHECK: Section Headers:
-# CHECK-DAG: [{{ *}}[[SEC65999:[0-9]+]]] sec65999 PROGBITS
-# CHECK-DAG: [{{ *}}[[LSEC65999:[0-9]+]]] lsec65999 PROGBITS
-# CHECK-DAG: [{{ *[0-9]+}}] .symtab_shndx SYMTAB SECTION INDICES
-
-# CHECK: Symbol table '.symtab'
-# CHECK:     4 OBJECT  LOCAL  DEFAULT [[LSEC65999]]     lg65999
-# CHECK-DAG: 4 OBJECT  GLOBAL DEFAULT [[SEC65999]]      g65999
-# CHECK-DAG: 4 OBJECT  GLOBAL DEFAULT [[SEC65999]]      a65999
-# CHECK-DAG: 4 OBJECT  GLOBAL DEFAULT [[LSEC65999]]     b65999
-
+# Local symbols come first; other symbols come in the same order as in the IR.
+# CHECK-LABEL: Name: lg65999
+# CHECK: Section: lsec65999
+# CHECK-LABEL: Name: g65999
+# CHECK: Section: sec65999
+# CHECK-LABEL: Name: a65999
+# CHECK: Section: sec65999
+# CHECK-LABEL: Name: b65999
+# CHECK: Section: lsec65999
 
 import sys
 

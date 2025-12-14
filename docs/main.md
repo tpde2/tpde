@@ -17,7 +17,7 @@ Requirements/external dependencies:
 - GNU-compatible C++20 compiler (e.g., Clang 19+, GCC 14+)
 - LLVM/Clang 20.1 or 19.1 (only for tests, TPDE-LLVM and TPDE-Encodegen)
   - Prefer LLVM 20.1. LLVM 19.1 should work, but some tests are disabled due to different code generation. More recent LLVM versions typically work, but some tests will fail.
-  - Note: for tests, also the LLVM tools (`lit`, `llc`, `llvm-objdump`, `llvm-readelf`, `llvm-dwarfdump`, `llvm-as`, `FileCheck`, etc.) are required.
+  - Note: for tests, also the LLVM tools (`lit`, `llc`, `llvm-objdump`, `llvm-readelf`, `llvm-readobj`, `llvm-dwarfdump`, `llvm-as`, `FileCheck`, etc.) are required.
 - Python 3.10+
 - Other dependencies are bundled as submodules.
 

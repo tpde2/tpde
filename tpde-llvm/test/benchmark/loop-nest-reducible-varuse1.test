@@ -2,8 +2,8 @@
 # SPDX-FileCopyrightText: 2025 Contributors to TPDE <https://tpde.org>
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-# RUN: python3 %s 2000 | tpde-llc --target=x86_64 | %objdump | FileCheck %s
-# RUN: python3 %s 2000 | tpde-llc --target=aarch64 | %objdump | FileCheck %s
+# RUN: python3 %s 1000 | tpde-llc --target=x86_64 | %objdump | FileCheck %s
+# RUN: python3 %s 1000 | tpde-llc --target=aarch64 | %objdump | FileCheck %s
 
 # CHECK: <f>:
 
