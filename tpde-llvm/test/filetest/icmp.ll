@@ -1480,9 +1480,9 @@ define void @icmp_ugt_i128_i128(i128 %0, i128 %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_ugt_i128_i128>:
-; ARM64:         cmp x0, x2
-; ARM64-NEXT:    sbcs xzr, x1, x3
-; ARM64-NEXT:    cset w0, hi
+; ARM64:         cmp x2, x0
+; ARM64-NEXT:    sbcs xzr, x3, x1
+; ARM64-NEXT:    cset w0, lo
 ; ARM64-NEXT:    ret
   entry:
     %2 = icmp ugt i128 %0, %1
@@ -1534,9 +1534,9 @@ define void @icmp_ule_i128_i128(i128 %0, i128 %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_ule_i128_i128>:
-; ARM64:         cmp x0, x2
-; ARM64-NEXT:    sbcs xzr, x1, x3
-; ARM64-NEXT:    cset w0, ls
+; ARM64:         cmp x2, x0
+; ARM64-NEXT:    sbcs xzr, x3, x1
+; ARM64-NEXT:    cset w0, hs
 ; ARM64-NEXT:    ret
   entry:
     %2 = icmp ule i128 %0, %1
@@ -1552,9 +1552,9 @@ define void @icmp_sgt_i128_i128(i128 %0, i128 %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_sgt_i128_i128>:
-; ARM64:         cmp x0, x2
-; ARM64-NEXT:    sbcs xzr, x1, x3
-; ARM64-NEXT:    cset w0, gt
+; ARM64:         cmp x2, x0
+; ARM64-NEXT:    sbcs xzr, x3, x1
+; ARM64-NEXT:    cset w0, lt
 ; ARM64-NEXT:    ret
   entry:
     %2 = icmp sgt i128 %0, %1
@@ -1606,9 +1606,9 @@ define void @icmp_sle_i128_i128(i128 %0, i128 %1) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_sle_i128_i128>:
-; ARM64:         cmp x0, x2
-; ARM64-NEXT:    sbcs xzr, x1, x3
-; ARM64-NEXT:    cset w0, le
+; ARM64:         cmp x2, x0
+; ARM64-NEXT:    sbcs xzr, x3, x1
+; ARM64-NEXT:    cset w0, ge
 ; ARM64-NEXT:    ret
   entry:
     %2 = icmp sle i128 %0, %1

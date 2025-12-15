@@ -356,8 +356,13 @@ bool LLVMCompilerArm64::compile_icmp(const llvm::Instruction *inst,
       // Use CCMP for equality
       ASM(CMPx, lhs_reg_lo, rhs_reg_lo);
       ASM(CCMPx, lhs_reg_hi, rhs_reg_hi, 0, DA_EQ);
+    } else if (jump == Jump::Jhi || jump == Jump::Jls || jump == Jump::Jle ||
+               jump == Jump::Jgt) {
+      // gt and le need inverse operand order for comparison.
+      jump = swap_jump(jump).kind;
+      ASM(CMPx, rhs_reg_lo, lhs_reg_lo);
+      ASM(SBCSx, DA_ZR, rhs_reg_hi, lhs_reg_hi);
     } else {
-      // Compare the ints using carried subtraction
       ASM(CMPx, lhs_reg_lo, rhs_reg_lo);
       ASM(SBCSx, DA_ZR, lhs_reg_hi, rhs_reg_hi);
     }
