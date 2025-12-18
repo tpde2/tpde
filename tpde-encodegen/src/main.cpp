@@ -106,15 +106,9 @@ int main(const int argc, char *argv[]) {
 #endif
 
   // Required so that our target triple is actually found
-  LLVMInitializeX86TargetInfo();
-  LLVMInitializeAArch64TargetInfo();
-  LLVMInitializeX86Target();
-  LLVMInitializeAArch64Target();
-  LLVMInitializeX86TargetMC();
-  LLVMInitializeAArch64TargetMC();
-  LLVMInitializeX86AsmPrinter();
-  LLVMInitializeAArch64AsmPrinter();
-
+  llvm::InitializeAllTargets();
+  llvm::InitializeAllTargetMCs();
+  llvm::InitializeAllAsmPrinters();
 
   std::string error;
   const llvm::Target *target =

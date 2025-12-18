@@ -16,9 +16,18 @@ target_include_directories(tpde_encodegen SYSTEM PRIVATE ${LLVM_INCLUDE_DIRS})
 target_compile_definitions(tpde_encodegen PRIVATE ${LLVM_DEFINITIONS})
 target_compile_options(tpde_encodegen PRIVATE "$<$<COMPILE_LANGUAGE:CXX>:-fno-rtti;-fno-exceptions>")
 if (TPDE_LINK_LLVM_STATIC)
-    llvm_map_components_to_libnames(TPDE_ENCODEGEN_LLVM_LIBS
-        core X86 AArch64 CodeGen irreader irprinter passes mc support targetparser asmparser asmprinter bitreader bitstreamreader
+    set(LLVM_COMPONENTS
+        core CodeGen irreader irprinter passes mc support targetparser asmparser asmprinter bitreader bitstreamreader
     )
+
+    if (x86_64 IN_LIST TPDE_TARGETS)
+        list(APPEND LLVM_COMPONENTS X86)
+    endif()
+    if (aarch64 IN_LIST TPDE_TARGETS)
+        list(APPEND LLVM_COMPONENTS AArch64)
+    endif()
+
+    llvm_map_components_to_libnames(TPDE_ENCODEGEN_LLVM_LIBS ${LLVM_COMPONENTS})
     target_link_libraries(tpde_encodegen PRIVATE ${TPDE_ENCODEGEN_LLVM_LIBS})
 else ()
     target_link_libraries(tpde_encodegen PRIVATE LLVM)
