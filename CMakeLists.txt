@@ -76,6 +76,22 @@ else ()
     endif ()
 endif ()
 
+# CAUTION: This option is untested and it is recommended to always use all available targets
+set(TPDE_TARGETS "x86_64;aarch64" CACHE STRING "Target architectures: x86_64;aarch64 (semicolon-separated)")
+set(_allowed_archs "x86_64" "aarch64")
+foreach(arch IN LISTS TPDE_TARGETS)
+    list(FIND _allowed_archs "${arch}" _idx)
+    if(_idx EQUAL -1)
+        message(FATAL_ERROR "Invalid architecture '${arch}'. Allowed: ${_allowed_archs}")
+    endif()
+
+    string(TOUPPER ${arch} arch_upper)
+    add_compile_definitions(TPDE_ARCH_${arch_upper})
+endforeach()
+if(NOT TPDE_TARGETS)
+    message(FATAL_ERROR "No target architectures specified")
+endif()
+
 if (TPDE_ENABLE_COVERAGE)
     if (NOT CMAKE_CXX_COMPILER_ID MATCHES "Clang")
         error("coverage build only supported with Clang")
@@ -120,6 +136,10 @@ endif()
 if (TPDE_INCLUDE_TESTS)
     find_program(LIT NAMES ${LLVM_DEFAULT_EXTERNAL_LIT} lit llvm-lit REQUIRED)
     message(STATUS "Found lit: ${LIT}")
+
+    if (NOT ("x86_64" IN_LIST TPDE_TARGETS AND "aarch64" IN_LIST TPDE_TARGETS))
+        message(FATAL_ERROR "Not all targets are enabled. Please enable all by not setting -DTPDE_TARGETS")
+    endif ()
 endif ()
 
 function(add_tpde_lit_target target)
