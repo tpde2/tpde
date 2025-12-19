@@ -18,16 +18,32 @@ option(TPDE_ENABLE_LLVM "enable LLVM back-end (needs LLVM)" ON)
 option(TPDE_ENABLE_COVERAGE "enable coverage instrumentation" OFF)
 option(TPDE_ENABLE_PCH "enable pre-compiled headers" OFF)
 option(TPDE_BUILD_DOCS "Build documentation" OFF)
+option(TPDE_ENABLE_EH "Build with exception handling" OFF)
+option(TPDE_ENABLE_RTTI "Build with run-time type information" OFF)
 
 # warnings
 if (MSVC)
     add_compile_options(/W4 /WX)
-    # disable RTTI and exceptions
-    add_compile_options(/GR- /EHsc /D_HAS_EXCEPTIONS=0)
+
+    # enable/disable exceptions
+    if (NOT TPDE_ENABLE_EH)
+        add_compile_options(/GR-)
+    endif ()
+    # enable/disable runtime type info
+    if (NOT TPDE_ENABLE_RTTI)
+        add_compile_options(/EHsc /D_HAS_EXCEPTIONS=0)
+    endif ()
 else ()
     add_compile_options(-Wall -Wextra -Wpedantic)
-    # disable RTTI and exceptions
-    add_compile_options("$<$<COMPILE_LANGUAGE:CXX>:-fno-rtti;-fno-exceptions>")
+
+    # enable/disable exceptions
+    if (NOT TPDE_ENABLE_EH)
+        add_compile_options("$<$<COMPILE_LANGUAGE:CXX>:-fno-exceptions>")
+    endif ()
+    # enable/disable runtime type info
+    if (NOT TPDE_ENABLE_RTTI)
+        add_compile_options("$<$<COMPILE_LANGUAGE:CXX>:-fno-rtti>")
+    endif ()
 
     # this is annoying
     add_compile_options(-Wno-missing-field-initializers)
