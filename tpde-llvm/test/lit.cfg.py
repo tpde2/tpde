@@ -18,6 +18,8 @@ config.environment["FILECHECK_OPTS"] = "--enable-var-scope --dump-input-filter=a
 # Tweak the PATH to include the tools dir and TPDE binaries.
 llvm_config.with_environment('PATH', config.llvm_tools_dir, append_path=True)
 llvm_config.with_environment('PATH', config.tpde_llvm_bin_dir, append_path=True)
+# Abort on ASan errors so that also tests running with "not" fail.
+llvm_config.with_environment('ASAN_OPTIONS', "abort_on_error=1", append_path=True)
 config.substitutions.append(('tpde-llc', 'tpde-llc --regular-exit'))
 config.substitutions.append(('%objdump', 'llvm-objdump -d -r --no-show-raw-insn --symbolize-operands --no-addresses --x86-asm-syntax=intel -'))
 

@@ -93,7 +93,11 @@ private:
   // Free list 2 holds twice as much as free list 1. Etc.
   static constexpr size_t SlabSize = 16 * 1024;
 
-  static constexpr u32 NumFreeLists = 2;
+  // TODO: define a sensible limit on the maximum number of parts and reduce the
+  // number of free lists. Currently the limit is a little under 2**31; limiting
+  // the number to e.g. 2**16 would allow halving the number of free lists,
+  // where most are unused in the vast majority of cases.
+  static constexpr u32 NumFreeLists = 29;
   static constexpr u32 FirstPartOff = offsetof(ValueAssignment, parts);
 
 public:

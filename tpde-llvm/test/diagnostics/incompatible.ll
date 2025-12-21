@@ -126,3 +126,11 @@ define void @f_v4i64_2(<4 x i64>) {
 define void @f_v4i64_3([2 x <4 x i64>]) {
   ret void
 }
+
+; CHECK: type with incompatible layout at function/call: [2 x <4 x i25>]
+; CHECK-NEXT: unsupported type: [2 x <4 x i25>]
+; CHECK-NEXT: Failed to compile function f_call_v4i25_2
+define void @f_call_v4i25_2(ptr %f) {
+  call void %f([2 x <4 x i25>] zeroinitializer)
+  ret void
+}

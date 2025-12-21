@@ -28,3 +28,13 @@ define void @f_sa40000i8a40000i8(ptr %p) {
   store {[40000 x i8], [40000 x i8]} %l, ptr %p
   ret void
 }
+
+; CHECK: Failed to compile instruction   store atomic [40000 x i8] %l
+; CHECK: Failed to compile function f_atomic_a40000i8
+; Note: check that large value assignment doesn't leak.
+define void @f_atomic_a40000i8(ptr %p) {
+  %l = load [40000 x i8], ptr %p
+  store atomic [40000 x i8] %l, ptr %p monotonic, align 1
+  store atomic [40000 x i8] %l, ptr %p monotonic, align 1
+  ret void
+}
