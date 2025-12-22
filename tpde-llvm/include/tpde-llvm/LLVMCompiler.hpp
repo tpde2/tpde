@@ -27,21 +27,21 @@ private:
   std::unique_ptr<JITMapperImpl> impl;
 
 public:
-  explicit JITMapper(std::unique_ptr<JITMapperImpl> impl) noexcept;
+  explicit JITMapper(std::unique_ptr<JITMapperImpl> impl);
   ~JITMapper();
 
   JITMapper(const JITMapper &) = delete;
-  JITMapper(JITMapper &&other) noexcept;
+  JITMapper(JITMapper &&other);
 
   JITMapper &operator=(const JITMapper &) = delete;
-  JITMapper &operator=(JITMapper &&other) noexcept;
+  JITMapper &operator=(JITMapper &&other);
 
   /// Get the address for a global, which must be contained in the compiled
   /// module.
-  void *lookup_global(llvm::GlobalValue *) noexcept;
+  void *lookup_global(llvm::GlobalValue *);
 
   /// Indicate whether compilation and in-memory mapping was successful.
-  operator bool() const noexcept { return impl != nullptr; }
+  operator bool() const { return impl != nullptr; }
 };
 
 /// Compiler for LLVM modules
@@ -58,21 +58,19 @@ public:
   /// Create a compiler for the specified target triple; returns null if the
   /// triple is not supported. The only supported code model is small, the only
   /// supported relocation model is PIC.
-  static std::unique_ptr<LLVMCompiler>
-      create(const llvm::Triple &triple) noexcept;
+  static std::unique_ptr<LLVMCompiler> create(const llvm::Triple &triple);
 
   /// Compile the module to an object file and emit it into the buffer. The
   /// module might be modified during compilation.
   /// \returns true on success.
-  virtual bool compile_to_elf(llvm::Module &mod,
-                              std::vector<uint8_t> &buf) noexcept = 0;
+  virtual bool compile_to_elf(llvm::Module &mod, std::vector<uint8_t> &buf) = 0;
 
   /// Compile the module and map it into memory, calling resolver to resolve
   /// references to external symbols. This function will also register unwind
   /// information. The module might be modified during compilation.
-  virtual JITMapper compile_and_map(
-      llvm::Module &mod,
-      std::function<void *(std::string_view)> resolver) noexcept = 0;
+  virtual JITMapper
+      compile_and_map(llvm::Module &mod,
+                      std::function<void *(std::string_view)> resolver) = 0;
 };
 
 } // namespace tpde_llvm

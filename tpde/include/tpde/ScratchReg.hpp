@@ -18,50 +18,50 @@ public:
   explicit ScratchReg(CompilerBase *compiler) : compiler(compiler) {}
 
   explicit ScratchReg(const ScratchReg &) = delete;
-  ScratchReg(ScratchReg &&) noexcept;
+  ScratchReg(ScratchReg &&);
 
-  ~ScratchReg() noexcept { reset(); }
+  ~ScratchReg() { reset(); }
 
   ScratchReg &operator=(const ScratchReg &) = delete;
-  ScratchReg &operator=(ScratchReg &&) noexcept;
+  ScratchReg &operator=(ScratchReg &&);
 
   /// Whether a register is currently allocated.
-  bool has_reg() const noexcept { return reg.valid(); }
+  bool has_reg() const { return reg.valid(); }
 
   /// The allocated register.
-  AsmReg cur_reg() const noexcept {
+  AsmReg cur_reg() const {
     assert(has_reg());
     return reg;
   }
 
   /// Allocate a specific register.
-  AsmReg alloc_specific(AsmReg reg) noexcept;
+  AsmReg alloc_specific(AsmReg reg);
 
   /// Allocate a general-purpose register.
-  AsmReg alloc_gp() noexcept { return alloc(Config::GP_BANK); }
+  AsmReg alloc_gp() { return alloc(Config::GP_BANK); }
 
   /// Allocate register in the specified bank. Does nothing if it holds a
   /// register in the specified bank. Evicts a register if required.
-  AsmReg alloc(RegBank bank) noexcept;
+  AsmReg alloc(RegBank bank);
 
   /// Release register, marking it as unused; returns the register.
-  AsmReg release() noexcept {
+  AsmReg release() {
     AsmReg res = reg;
     reset();
     return res;
   }
 
   /// Deallocate register.
-  void reset() noexcept;
+  void reset();
 
   /// @internal Forcefully change register without updating register file.
   /// Avoid.
-  void force_set_reg(AsmReg reg) noexcept { this->reg = reg; }
+  void force_set_reg(AsmReg reg) { this->reg = reg; }
 };
 
 template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>
 CompilerBase<Adaptor, Derived, Config>::ScratchReg::ScratchReg(
-    ScratchReg &&other) noexcept {
+    ScratchReg &&other) {
   this->compiler = other.compiler;
   this->reg = other.reg;
   other.reg = AsmReg::make_invalid();
@@ -70,7 +70,7 @@ CompilerBase<Adaptor, Derived, Config>::ScratchReg::ScratchReg(
 template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>
 typename CompilerBase<Adaptor, Derived, Config>::ScratchReg &
     CompilerBase<Adaptor, Derived, Config>::ScratchReg::operator=(
-        ScratchReg &&other) noexcept {
+        ScratchReg &&other) {
   if (this == &other) {
     return *this;
   }
@@ -85,7 +85,7 @@ typename CompilerBase<Adaptor, Derived, Config>::ScratchReg &
 template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>
 typename CompilerBase<Adaptor, Derived, Config>::AsmReg
     CompilerBase<Adaptor, Derived, Config>::ScratchReg::alloc_specific(
-        AsmReg reg) noexcept {
+        AsmReg reg) {
   assert(compiler->may_change_value_state());
   assert(!compiler->register_file.is_fixed(reg));
   reset();
@@ -103,8 +103,7 @@ typename CompilerBase<Adaptor, Derived, Config>::AsmReg
 
 template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>
 CompilerBase<Adaptor, Derived, Config>::AsmReg
-    CompilerBase<Adaptor, Derived, Config>::ScratchReg::alloc(
-        RegBank bank) noexcept {
+    CompilerBase<Adaptor, Derived, Config>::ScratchReg::alloc(RegBank bank) {
   assert(compiler->may_change_value_state());
 
   auto &reg_file = compiler->register_file;
@@ -121,7 +120,7 @@ CompilerBase<Adaptor, Derived, Config>::AsmReg
 }
 
 template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>
-void CompilerBase<Adaptor, Derived, Config>::ScratchReg::reset() noexcept {
+void CompilerBase<Adaptor, Derived, Config>::ScratchReg::reset() {
   if (reg.invalid()) {
     return;
   }

@@ -108,33 +108,33 @@ struct AsmReg : Reg {
     V31
   };
 
-  constexpr explicit AsmReg() noexcept : Reg((u8)0xFF) {}
+  constexpr explicit AsmReg() : Reg((u8)0xFF) {}
 
-  constexpr AsmReg(const REG id) noexcept : Reg((u8)id) {}
+  constexpr AsmReg(const REG id) : Reg((u8)id) {}
 
-  constexpr AsmReg(const Reg base) noexcept : Reg(base) {}
+  constexpr AsmReg(const Reg base) : Reg(base) {}
 
-  constexpr explicit AsmReg(const u64 id) noexcept : Reg(id) {
+  constexpr explicit AsmReg(const u64 id) : Reg(id) {
     assert(id <= SP || (id >= V0 && id <= V31));
   }
 
-  operator DA_GReg() const noexcept {
+  operator DA_GReg() const {
     assert(reg_id < V0);
     return DA_GReg{reg_id};
   }
 
-  operator DA_GRegZR() const noexcept {
+  operator DA_GRegZR() const {
     assert(reg_id < V0);
     assert(reg_id != SP); // 31 means SP in our enums
     return DA_GRegZR{reg_id};
   }
 
-  operator DA_GRegSP() const noexcept {
+  operator DA_GRegSP() const {
     assert(reg_id <= SP);
     return DA_GRegSP{reg_id};
   }
 
-  operator DA_VReg() const noexcept {
+  operator DA_VReg() const {
     assert(reg_id >= V0 && reg_id <= V31);
     return DA_VReg{static_cast<u8>(reg_id - V0)};
   }
@@ -214,13 +214,11 @@ class CCAssignerAAPCS : public CCAssigner {
   u32 ret_ngrn = 0, ret_nsrn = 0;
 
 public:
-  CCAssignerAAPCS() noexcept : CCAssigner(Info) {}
+  CCAssignerAAPCS() : CCAssigner(Info) {}
 
-  void reset() noexcept override {
-    ngrn = nsrn = nsaa = ret_ngrn = ret_nsrn = 0;
-  }
+  void reset() override { ngrn = nsrn = nsaa = ret_ngrn = ret_nsrn = 0; }
 
-  void assign_arg(CCAssignment &arg) noexcept override {
+  void assign_arg(CCAssignment &arg) override {
     if (arg.byval) [[unlikely]] {
       nsaa = util::align_up(nsaa, arg.align < 8 ? 8 : arg.align);
       arg.stack_off = nsaa;
@@ -260,9 +258,9 @@ public:
     }
   }
 
-  u32 get_stack_size() noexcept override { return nsaa; }
+  u32 get_stack_size() override { return nsaa; }
 
-  void assign_ret(CCAssignment &arg) noexcept override {
+  void assign_ret(CCAssignment &arg) override {
     assert(!arg.byval && !arg.sret);
     if (arg.bank == RegBank{0}) {
       if (arg.align > 8) {
@@ -365,17 +363,17 @@ struct CompilerA64 : BaseTy<Adaptor, Derived, Config> {
     u32 stack_size = 0;
     u32 stack_sub = 0;
 
-    void set_stack_used() noexcept;
+    void set_stack_used();
 
   public:
     /// Constructor.
-    CallBuilder(Derived &compiler, CCAssigner &assigner) noexcept
+    CallBuilder(Derived &compiler, CCAssigner &assigner)
         : Base::template CallBuilderBase<CallBuilder>(compiler, assigner) {}
 
-    void add_arg_byval(ValuePart &vp, CCAssignment &cca) noexcept;
-    void add_arg_stack(ValuePart &vp, CCAssignment &cca) noexcept;
-    void call_impl(std::variant<SymRef, ValuePart> &&) noexcept;
-    void reset_stack() noexcept;
+    void add_arg_byval(ValuePart &vp, CCAssignment &cca);
+    void add_arg_stack(ValuePart &vp, CCAssignment &cca);
+    void call_impl(std::variant<SymRef, ValuePart> &&);
+    void reset_stack();
   };
 
   // for now, always generate an object
@@ -385,68 +383,61 @@ struct CompilerA64 : BaseTy<Adaptor, Derived, Config> {
     static_assert(std::is_base_of_v<CompilerA64, Derived>);
   }
 
-  void start_func(u32) noexcept {}
+  void start_func(u32) {}
 
   /// Begin prologue, prepare for assigning arguments.
-  void prologue_begin(CCAssigner *cc_assigner) noexcept;
+  void prologue_begin(CCAssigner *cc_assigner);
   /// Assign argument part. Returns the stack offset if the value should be
   /// initialized as stack variable.
-  std::optional<i32> prologue_assign_arg_part(ValuePart &&vp,
-                                              CCAssignment cca) noexcept;
+  std::optional<i32> prologue_assign_arg_part(ValuePart &&vp, CCAssignment cca);
   /// Finish prologue.
-  void prologue_end(CCAssigner *cc_assigner) noexcept;
+  void prologue_end(CCAssigner *cc_assigner);
 
   // note: this has to call assembler->end_func
-  void finish_func(u32 func_idx) noexcept;
+  void finish_func(u32 func_idx);
 
   // helpers
 
-  void gen_func_epilog() noexcept;
+  void gen_func_epilog();
 
-  void
-      spill_reg(const AsmReg reg, const u32 frame_off, const u32 size) noexcept;
+  void spill_reg(const AsmReg reg, const u32 frame_off, const u32 size);
 
   void load_from_stack(AsmReg dst,
                        i32 frame_off,
                        u32 size,
-                       bool sign_extend = false) noexcept;
+                       bool sign_extend = false);
 
-  void load_address_of_stack_var(AsmReg dst, AssignmentPartRef ap) noexcept;
+  void load_address_of_stack_var(AsmReg dst, AssignmentPartRef ap);
 
-  void mov(AsmReg dst, AsmReg src, u32 size) noexcept;
+  void mov(AsmReg dst, AsmReg src, u32 size);
 
-  GenericValuePart val_spill_slot(AssignmentPartRef ap) noexcept {
+  GenericValuePart val_spill_slot(AssignmentPartRef ap) {
     assert(ap.stack_valid() && !ap.variable_ref());
     return typename GenericValuePart::Expr(AsmReg::R29, ap.frame_off());
   }
 
-  AsmReg gval_expr_as_reg(GenericValuePart &gv) noexcept;
+  AsmReg gval_expr_as_reg(GenericValuePart &gv);
 
   /// Dynamic alloca of a fixed-size region.
-  void alloca_fixed(u64 size, u32 align, ValuePart &res) noexcept;
+  void alloca_fixed(u64 size, u32 align, ValuePart &res);
 
   /// Dynamic alloca of a dynamically-sized region (elem_size * count bytes).
   /// count must have a size of 64 bit.
   void alloca_dynamic(u64 elem_size,
                       ValuePart &&count,
                       u32 align,
-                      ValuePart &res) noexcept;
+                      ValuePart &res);
 
   /// Materialize constant into a register.
-  void materialize_constant(const u64 *data,
-                            RegBank bank,
-                            u32 size,
-                            AsmReg dst) noexcept;
+  void
+      materialize_constant(const u64 *data, RegBank bank, u32 size, AsmReg dst);
   /// Materialize constant into a register.
-  void materialize_constant(u64 const_u64,
-                            RegBank bank,
-                            u32 size,
-                            AsmReg dst) noexcept {
+  void materialize_constant(u64 const_u64, RegBank bank, u32 size, AsmReg dst) {
     assert(size <= sizeof(const_u64));
     materialize_constant(&const_u64, bank, size, dst);
   }
 
-  AsmReg select_fixed_assignment_reg(AssignmentPartRef, IRValueRef) noexcept;
+  AsmReg select_fixed_assignment_reg(AssignmentPartRef, IRValueRef);
 
   /// Jump conditions.
   struct Jump {
@@ -507,38 +498,34 @@ struct CompilerA64 : BaseTy<Adaptor, Derived, Config> {
     }
   };
 
-  Jump invert_jump(Jump jmp) noexcept;
-  Jump swap_jump(Jump jmp) noexcept;
+  Jump invert_jump(Jump jmp);
+  Jump swap_jump(Jump jmp);
 
   /// Generate jump instruction to target label.
-  void generate_raw_jump(Jump jmp, Label target) noexcept;
+  void generate_raw_jump(Jump jmp, Label target);
 
   /// Convert jump condition to disarms Da64Cond.
   /// \warning Cbz,Cbnz,Tbz and Tbnz are not supported
-  Da64Cond jump_to_cond(Jump jmp) noexcept;
+  Da64Cond jump_to_cond(Jump jmp);
   /// Set dst to 1 if cc is true, otherwise set it to zero
-  void generate_raw_set(Jump cc, AsmReg dst) noexcept;
+  void generate_raw_set(Jump cc, AsmReg dst);
   /// Set all bits of dst to 1 if cc is true, otherwise set dst to zero
-  void generate_raw_mask(Jump cc, AsmReg dst) noexcept;
+  void generate_raw_mask(Jump cc, AsmReg dst);
 
   /// Moves true_select into dst if cc is true,
   /// otherwise move false_select into dst
-  void generate_raw_select(Jump cc,
-                           AsmReg dst,
-                           AsmReg true_select,
-                           AsmReg false_select,
-                           bool is_64) noexcept;
+  void generate_raw_select(
+      Jump cc, AsmReg dst, AsmReg true_select, AsmReg false_select, bool is_64);
 
   /// Integer extension. src is not modified.
-  void generate_raw_intext(
-      AsmReg dst, AsmReg src, bool sign, u32 from, u32 to) noexcept;
+  void generate_raw_intext(AsmReg dst, AsmReg src, bool sign, u32 from, u32 to);
 
   /// Bitfield insert. src is not modified.
-  void generate_raw_bfi(AsmReg dst, AsmReg src, u32 lsb, u32 width) noexcept {
+  void generate_raw_bfi(AsmReg dst, AsmReg src, u32 lsb, u32 width) {
     ASM(BFIx, dst, src, lsb, width);
   }
   /// Bitfield insert in zero. src is not modified.
-  void generate_raw_bfiz(AsmReg dst, AsmReg src, u32 lsb, u32 width) noexcept {
+  void generate_raw_bfiz(AsmReg dst, AsmReg src, u32 lsb, u32 width) {
     ASM(UBFIZx, dst, src, lsb, width);
   }
 
@@ -562,7 +549,7 @@ private:
   void switch_emit_cmp(AsmReg cmp_reg,
                        AsmReg tmp_reg,
                        u64 case_value,
-                       bool width_is_32) noexcept;
+                       bool width_is_32);
 
 public:
   /// @internal Jump if cmp_reg equals case_value.
@@ -570,28 +557,27 @@ public:
                          AsmReg cmp_reg,
                          AsmReg tmp_reg,
                          u64 case_value,
-                         bool width_is_32) noexcept;
+                         bool width_is_32);
   /// @internal Emit bounds check and create jump table.
-  FunctionWriterBase::JumpTable *
-      switch_create_jump_table(Label default_label,
-                               AsmReg cmp_reg,
-                               AsmReg tmp_reg,
-                               u64 low_bound,
-                               u64 high_bound,
-                               bool width_is_32) noexcept;
+  FunctionWriterBase::JumpTable *switch_create_jump_table(Label default_label,
+                                                          AsmReg cmp_reg,
+                                                          AsmReg tmp_reg,
+                                                          u64 low_bound,
+                                                          u64 high_bound,
+                                                          bool width_is_32);
   /// @internal Jump if cmp_reg is greater than case_value.
   void switch_emit_binary_step(Label case_label,
                                Label gt_label,
                                AsmReg cmp_reg,
                                AsmReg tmp_reg,
                                u64 case_value,
-                               bool width_is_32) noexcept;
+                               bool width_is_32);
 
   /// Generate code sequence to load address of sym into a register. This will
   /// generate a function call for dynamic TLS access models.
-  ScratchReg tls_get_addr(SymRef sym, TLSModel model) noexcept;
+  ScratchReg tls_get_addr(SymRef sym, TLSModel model);
 
-  bool has_cpu_feats(CPU_FEATURES feats) const noexcept {
+  bool has_cpu_feats(CPU_FEATURES feats) const {
     return ((cpu_feats & feats) == feats);
   }
 };
@@ -601,7 +587,7 @@ template <IRAdaptor Adaptor,
           template <typename, typename, typename> class BaseTy,
           typename Config>
 void CompilerA64<Adaptor, Derived, BaseTy, Config>::CallBuilder::
-    set_stack_used() noexcept {
+    set_stack_used() {
   if (stack_adjust_off == 0) {
     this->compiler.text_writer.ensure_space(16);
     stack_adjust_off = this->compiler.text_writer.offset();
@@ -614,7 +600,7 @@ template <IRAdaptor Adaptor,
           template <typename, typename, typename> class BaseTy,
           typename Config>
 void CompilerA64<Adaptor, Derived, BaseTy, Config>::CallBuilder::add_arg_byval(
-    ValuePart &vp, CCAssignment &cca) noexcept {
+    ValuePart &vp, CCAssignment &cca) {
   AsmReg ptr_reg = vp.load_to_reg(&this->compiler);
   AsmReg tmp_reg = AsmReg::R16;
 
@@ -646,7 +632,7 @@ template <IRAdaptor Adaptor,
           template <typename, typename, typename> class BaseTy,
           typename Config>
 void CompilerA64<Adaptor, Derived, BaseTy, Config>::CallBuilder::add_arg_stack(
-    ValuePart &vp, CCAssignment &cca) noexcept {
+    ValuePart &vp, CCAssignment &cca) {
   set_stack_used();
 
   auto reg = vp.has_reg() ? vp.cur_reg() : vp.load_to_reg(&this->compiler);
@@ -676,7 +662,7 @@ template <IRAdaptor Adaptor,
           template <typename, typename, typename> class BaseTy,
           typename Config>
 void CompilerA64<Adaptor, Derived, BaseTy, Config>::CallBuilder::call_impl(
-    std::variant<SymRef, ValuePart> &&target) noexcept {
+    std::variant<SymRef, ValuePart> &&target) {
   u32 sub = 0;
   if (stack_adjust_off != 0) {
     auto *text_data = this->compiler.text_writer.begin_ptr();
@@ -729,7 +715,7 @@ template <IRAdaptor Adaptor,
           template <typename, typename, typename> typename BaseTy,
           typename Config>
 void CompilerA64<Adaptor, Derived, BaseTy, Config>::prologue_begin(
-    CCAssigner *cc_assigner) noexcept {
+    CCAssigner *cc_assigner) {
   func_ret_offs.clear();
   func_start_off = this->text_writer.offset();
 
@@ -787,7 +773,7 @@ template <IRAdaptor Adaptor,
           typename Config>
 std::optional<i32>
     CompilerA64<Adaptor, Derived, BaseTy, Config>::prologue_assign_arg_part(
-        ValuePart &&vp, CCAssignment cca) noexcept {
+        ValuePart &&vp, CCAssignment cca) {
   if (cca.reg.valid()) [[likely]] {
     vp.set_value_reg(this, cca.reg);
     // Mark register as allocatable as soon as it is assigned. If the argument
@@ -840,7 +826,7 @@ template <IRAdaptor Adaptor,
           template <typename, typename, typename> typename BaseTy,
           typename Config>
 void CompilerA64<Adaptor, Derived, BaseTy, Config>::prologue_end(
-    CCAssigner *cc_assigner) noexcept {
+    CCAssigner *cc_assigner) {
   // Hack: we don't know the frame size, so for a va_start(), we cannot easily
   // compute the offset from the frame pointer. But we have a stack_reg here,
   // so use it for var args.
@@ -875,8 +861,7 @@ template <IRAdaptor Adaptor,
           typename Derived,
           template <typename, typename, typename> typename BaseTy,
           typename Config>
-void CompilerA64<Adaptor, Derived, BaseTy, Config>::finish_func(
-    u32 func_idx) noexcept {
+void CompilerA64<Adaptor, Derived, BaseTy, Config>::finish_func(u32 func_idx) {
   auto csr = derived()->cur_cc_assigner()->get_ccinfo().callee_saved_regs;
   u64 saved_regs = this->register_file.clobbered & csr;
 
@@ -1092,7 +1077,7 @@ template <IRAdaptor Adaptor,
           typename Derived,
           template <typename, typename, typename> typename BaseTy,
           typename Config>
-void CompilerA64<Adaptor, Derived, BaseTy, Config>::gen_func_epilog() noexcept {
+void CompilerA64<Adaptor, Derived, BaseTy, Config>::gen_func_epilog() {
   // Patched at the end, just reserve the space here.
   func_ret_offs.push_back(this->text_writer.offset());
   this->text_writer.ensure_space(4); // Single branch to actual epilogue.
@@ -1104,7 +1089,7 @@ template <IRAdaptor Adaptor,
           template <typename, typename, typename> typename BaseTy,
           typename Config>
 void CompilerA64<Adaptor, Derived, BaseTy, Config>::spill_reg(
-    const AsmReg reg, const u32 frame_off, const u32 size) noexcept {
+    const AsmReg reg, const u32 frame_off, const u32 size) {
   assert(this->stack.frame_used);
   assert((size & (size - 1)) == 0);
   assert(util::align_up(frame_off, size) == frame_off);
@@ -1150,7 +1135,7 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::load_from_stack(
     const AsmReg dst,
     const i32 frame_off,
     const u32 size,
-    const bool sign_extend) noexcept {
+    const bool sign_extend) {
   assert(this->stack.frame_used);
   assert((size & (size - 1)) == 0);
   assert(util::align_up(frame_off, size) == frame_off);
@@ -1205,7 +1190,7 @@ template <IRAdaptor Adaptor,
           template <typename, typename, typename> typename BaseTy,
           typename Config>
 void CompilerA64<Adaptor, Derived, BaseTy, Config>::load_address_of_stack_var(
-    const AsmReg dst, const AssignmentPartRef ap) noexcept {
+    const AsmReg dst, const AssignmentPartRef ap) {
   assert(this->stack.frame_used);
   auto frame_off = ap.variable_stack_off();
   assert(frame_off >= 0);
@@ -1219,8 +1204,9 @@ template <IRAdaptor Adaptor,
           typename Derived,
           template <typename, typename, typename> typename BaseTy,
           typename Config>
-void CompilerA64<Adaptor, Derived, BaseTy, Config>::mov(
-    const AsmReg dst, const AsmReg src, const u32 size) noexcept {
+void CompilerA64<Adaptor, Derived, BaseTy, Config>::mov(const AsmReg dst,
+                                                        const AsmReg src,
+                                                        const u32 size) {
   this->text_writer.ensure_space(4);
   assert(dst.valid());
   assert(src.valid());
@@ -1261,7 +1247,7 @@ template <IRAdaptor Adaptor,
           template <typename, typename, typename> typename BaseTy,
           typename Config>
 AsmReg CompilerA64<Adaptor, Derived, BaseTy, Config>::gval_expr_as_reg(
-    GenericValuePart &gv) noexcept {
+    GenericValuePart &gv) {
   auto &expr = std::get<typename GenericValuePart::Expr>(gv.state);
 
   ScratchReg scratch{derived()};
@@ -1339,7 +1325,7 @@ template <IRAdaptor Adaptor,
           template <typename, typename, typename> typename BaseTy,
           typename Config>
 void CompilerA64<Adaptor, Derived, BaseTy, Config>::alloca_fixed(
-    u64 size, u32 align, ValuePart &res) noexcept {
+    u64 size, u32 align, ValuePart &res) {
   assert(this->stack.has_dynamic_alloca &&
          "function marked as not having dynamic allocas can't have alloca");
   assert(align != 0 && (align & (align - 1)) == 0 && "invalid alignment");
@@ -1373,7 +1359,7 @@ template <IRAdaptor Adaptor,
           template <typename, typename, typename> typename BaseTy,
           typename Config>
 void CompilerA64<Adaptor, Derived, BaseTy, Config>::alloca_dynamic(
-    u64 elem_size, ValuePart &&count, u32 align, ValuePart &res) noexcept {
+    u64 elem_size, ValuePart &&count, u32 align, ValuePart &res) {
   assert(this->stack.has_dynamic_alloca &&
          "function marked as not having dynamic allocas can't have alloca");
   assert(align != 0 && (align & (align - 1)) == 0 && "invalid alignment");
@@ -1410,7 +1396,7 @@ template <IRAdaptor Adaptor,
           template <typename, typename, typename> typename BaseTy,
           typename Config>
 void CompilerA64<Adaptor, Derived, BaseTy, Config>::materialize_constant(
-    const u64 *data, const RegBank bank, const u32 size, AsmReg dst) noexcept {
+    const u64 *data, const RegBank bank, const u32 size, AsmReg dst) {
   this->text_writer.ensure_space(5 * 4);
 
   const auto const_u64 = data[0];
@@ -1491,7 +1477,7 @@ template <IRAdaptor Adaptor,
           typename Config>
 AsmReg
     CompilerA64<Adaptor, Derived, BaseTy, Config>::select_fixed_assignment_reg(
-        AssignmentPartRef ap, IRValueRef) noexcept {
+        AssignmentPartRef ap, IRValueRef) {
   RegBank bank = ap.bank();
   if (bank == Config::FP_BANK && ap.part_size() > 8) {
     // FP registers can not in general be fixed registers, as only the lowest 8
@@ -1561,8 +1547,7 @@ template <IRAdaptor Adaptor,
           template <typename, typename, typename> class BaseTy,
           typename Config>
 typename CompilerA64<Adaptor, Derived, BaseTy, Config>::Jump
-    CompilerA64<Adaptor, Derived, BaseTy, Config>::invert_jump(
-        Jump jmp) noexcept {
+    CompilerA64<Adaptor, Derived, BaseTy, Config>::invert_jump(Jump jmp) {
   switch (jmp.kind) {
   case Jump::Jeq: return jmp.change_kind(Jump::Jne);
   case Jump::Jne: return jmp.change_kind(Jump::Jeq);
@@ -1592,8 +1577,7 @@ template <IRAdaptor Adaptor,
           template <typename, typename, typename> typename BaseTy,
           typename Config>
 typename CompilerA64<Adaptor, Derived, BaseTy, Config>::Jump
-    CompilerA64<Adaptor, Derived, BaseTy, Config>::swap_jump(
-        Jump jmp) noexcept {
+    CompilerA64<Adaptor, Derived, BaseTy, Config>::swap_jump(Jump jmp) {
   switch (jmp.kind) {
   case Jump::Jeq: return jmp.change_kind(Jump::Jeq);
   case Jump::Jne: return jmp.change_kind(Jump::Jne);
@@ -1623,7 +1607,7 @@ template <IRAdaptor Adaptor,
           template <typename, typename, typename> typename BaseTy,
           typename Config>
 void CompilerA64<Adaptor, Derived, BaseTy, Config>::generate_raw_jump(
-    Jump jmp, Label target_label) noexcept {
+    Jump jmp, Label target_label) {
   const auto is_pending = this->text_writer.label_is_pending(target_label);
   this->text_writer.ensure_space(4);
   if (jmp.kind == Jump::jmp) {
@@ -1834,8 +1818,7 @@ template <IRAdaptor Adaptor,
           typename Derived,
           template <typename, typename, typename> class BaseTy,
           typename Config>
-Da64Cond CompilerA64<Adaptor, Derived, BaseTy, Config>::jump_to_cond(
-    Jump jmp) noexcept {
+Da64Cond CompilerA64<Adaptor, Derived, BaseTy, Config>::jump_to_cond(Jump jmp) {
   switch (jmp.kind) {
   case Jump::Jeq: return DA_EQ;
   case Jump::Jne: return DA_NE;
@@ -1861,7 +1844,7 @@ template <IRAdaptor Adaptor,
           template <typename, typename, typename> class BaseTy,
           typename Config>
 void CompilerA64<Adaptor, Derived, BaseTy, Config>::generate_raw_set(
-    Jump cc, AsmReg dst) noexcept {
+    Jump cc, AsmReg dst) {
   ASM(CSETw, dst, jump_to_cond(cc));
 }
 
@@ -1870,7 +1853,7 @@ template <IRAdaptor Adaptor,
           template <typename, typename, typename> class BaseTy,
           typename Config>
 void CompilerA64<Adaptor, Derived, BaseTy, Config>::generate_raw_mask(
-    Jump cc, AsmReg dst) noexcept {
+    Jump cc, AsmReg dst) {
   ASM(CSETMx, dst, jump_to_cond(cc));
 }
 template <IRAdaptor Adaptor,
@@ -1878,11 +1861,7 @@ template <IRAdaptor Adaptor,
           template <typename, typename, typename> class BaseTy,
           typename Config>
 void CompilerA64<Adaptor, Derived, BaseTy, Config>::generate_raw_select(
-    Jump cc,
-    AsmReg dst,
-    AsmReg true_select,
-    AsmReg false_select,
-    bool is_64) noexcept {
+    Jump cc, AsmReg dst, AsmReg true_select, AsmReg false_select, bool is_64) {
   this->text_writer.ensure_space(4);
   Da64Cond cond = jump_to_cond(cc);
   if (is_64) {
@@ -1897,7 +1876,7 @@ template <IRAdaptor Adaptor,
           template <typename, typename, typename> class BaseTy,
           typename Config>
 void CompilerA64<Adaptor, Derived, BaseTy, Config>::generate_raw_intext(
-    AsmReg dst, AsmReg src, bool sign, u32 from, u32 to) noexcept {
+    AsmReg dst, AsmReg src, bool sign, u32 from, u32 to) {
   assert(from < to && to <= 64);
   (void)to;
   if (sign) {
@@ -1940,7 +1919,7 @@ template <IRAdaptor Adaptor,
           template <typename, typename, typename> typename BaseTy,
           typename Config>
 void CompilerA64<Adaptor, Derived, BaseTy, Config>::switch_emit_cmp(
-    AsmReg cmp_reg, AsmReg tmp_reg, u64 case_value, bool width_is_32) noexcept {
+    AsmReg cmp_reg, AsmReg tmp_reg, u64 case_value, bool width_is_32) {
   if (width_is_32) {
     if (!ASMIF(CMPwi, cmp_reg, case_value)) {
       materialize_constant(case_value, Config::GP_BANK, 4, tmp_reg);
@@ -1963,7 +1942,7 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::switch_emit_cmpeq(
     AsmReg cmp_reg,
     AsmReg tmp_reg,
     u64 case_value,
-    bool width_is_32) noexcept {
+    bool width_is_32) {
   switch_emit_cmp(cmp_reg, tmp_reg, case_value, width_is_32);
   generate_raw_jump(Jump::Jeq, case_label);
 }
@@ -1979,7 +1958,7 @@ FunctionWriterBase::JumpTable *
         AsmReg tmp_reg,
         u64 low_bound,
         u64 high_bound,
-        bool width_is_32) noexcept {
+        bool width_is_32) {
   if (low_bound > 0) {
     if (width_is_32) {
       if (!ASMIF(SUBwi, cmp_reg, cmp_reg, low_bound)) {
@@ -2011,7 +1990,7 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::switch_emit_binary_step(
     AsmReg cmp_reg,
     AsmReg tmp_reg,
     u64 case_value,
-    bool width_is_32) noexcept {
+    bool width_is_32) {
   switch_emit_cmpeq(case_label, cmp_reg, tmp_reg, case_value, width_is_32);
   generate_raw_jump(Jump::Jhi, gt_label);
 }
@@ -2022,7 +2001,7 @@ template <IRAdaptor Adaptor,
           typename Config>
 CompilerA64<Adaptor, Derived, BaseTy, Config>::ScratchReg
     CompilerA64<Adaptor, Derived, BaseTy, Config>::tls_get_addr(
-        SymRef sym, TLSModel model) noexcept {
+        SymRef sym, TLSModel model) {
   switch (model) {
   default: // TODO: implement optimized access for non-gd-model
   case TLSModel::GlobalDynamic: {

@@ -13,8 +13,7 @@ namespace tpde_llvm {
 
 LLVMCompiler::~LLVMCompiler() = default;
 
-std::unique_ptr<LLVMCompiler>
-    LLVMCompiler::create(const llvm::Triple &triple) noexcept {
+std::unique_ptr<LLVMCompiler> LLVMCompiler::create(const llvm::Triple &triple) {
   switch (triple.getArch()) {
   case llvm::Triple::x86_64: return x64::create_compiler(triple);
   case llvm::Triple::aarch64: return arm64::create_compiler(triple);

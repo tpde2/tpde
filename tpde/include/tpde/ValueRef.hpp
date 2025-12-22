@@ -25,10 +25,10 @@ struct CompilerBase<Adaptor, Derived, Config>::ValueRef {
 
   CompilerBase *compiler;
 
-  ValueRef(CompilerBase *compiler) noexcept
+  ValueRef(CompilerBase *compiler)
       : state{AssignmentData()}, compiler(compiler) {}
 
-  ValueRef(CompilerBase *compiler, ValLocalIdx local_idx) noexcept
+  ValueRef(CompilerBase *compiler, ValLocalIdx local_idx)
       : state{AssignmentData{
                            .local_idx = local_idx,
                            .assignment = compiler->val_assignment(local_idx),
@@ -62,7 +62,7 @@ struct CompilerBase<Adaptor, Derived, Config>::ValueRef {
   }
 
   template <typename... T>
-  ValueRef(CompilerBase *compiler, T &&...args) noexcept
+  ValueRef(CompilerBase *compiler, T &&...args)
       : state{.s = typename Derived::ValRefSpecial(std::forward<T>(args)...)},
         compiler(compiler) {
     assert(state.a.mode >= 4);
@@ -73,16 +73,15 @@ private:
   ValueRef(const ValueRef &other) = default;
 
 public:
-  ValueRef(ValueRef &&other) noexcept
-      : state{other.state}, compiler(other.compiler) {
+  ValueRef(ValueRef &&other) : state{other.state}, compiler(other.compiler) {
     other.state.a = AssignmentData{};
   }
 
-  ~ValueRef() noexcept { reset(); }
+  ~ValueRef() { reset(); }
 
   ValueRef &operator=(const ValueRef &) = delete;
 
-  ValueRef &operator=(ValueRef &&other) noexcept {
+  ValueRef &operator=(ValueRef &&other) {
     if (this == &other) {
       return *this;
     }
@@ -93,20 +92,20 @@ public:
     return *this;
   }
 
-  bool has_assignment() const noexcept { return state.a.mode < 4; }
+  bool has_assignment() const { return state.a.mode < 4; }
 
-  [[nodiscard]] ValueAssignment *assignment() const noexcept {
+  [[nodiscard]] ValueAssignment *assignment() const {
     assert(has_assignment());
     assert(state.a.assignment != nullptr);
     return state.a.assignment;
   }
 
   /// Returns whether the value is destroyed after this use.
-  bool is_owned() noexcept { return state.a.mode == 2; }
+  bool is_owned() { return state.a.mode == 2; }
 
   /// Convert into an unowned reference; must be called before first part is
   /// accessed.
-  void disown() noexcept {
+  void disown() {
     if (has_assignment()) {
       state.a.mode = 0;
     }
@@ -114,18 +113,18 @@ public:
 
   /// Get an unowned reference to this value. Previously accessed parts might
   /// already have been destroyed if the value is in its last use.
-  ValueRef disowned() noexcept {
+  ValueRef disowned() {
     ValueRef res = *this;
     res.disown();
     return res;
   }
 
-  ValLocalIdx local_idx() const noexcept {
+  ValLocalIdx local_idx() const {
     assert(has_assignment());
     return state.a.local_idx;
   }
 
-  ValuePartRef part(unsigned part) noexcept TPDE_LIFETIMEBOUND {
+  ValuePartRef part(unsigned part) TPDE_LIFETIMEBOUND {
     if (has_assignment()) {
       return ValuePartRef{
           compiler, local_idx(), state.a.assignment, part, is_owned()};
@@ -136,7 +135,7 @@ public:
 
   /// Like part(), but the returned part is always unowned and will not release
   /// registers of the value assignment when reset.
-  ValuePartRef part_unowned(unsigned part) noexcept TPDE_LIFETIMEBOUND {
+  ValuePartRef part_unowned(unsigned part) TPDE_LIFETIMEBOUND {
     if (has_assignment()) {
       return ValuePartRef{
           compiler, local_idx(), state.a.assignment, part, false};
@@ -146,16 +145,16 @@ public:
   }
 
   /// Reset the reference to the value part
-  void reset() noexcept;
+  void reset();
 
-  bool variable_ref() const noexcept {
+  bool variable_ref() const {
     assert(has_assignment());
     return state.a.assignment->variable_ref;
   }
 };
 
 template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>
-void CompilerBase<Adaptor, Derived, Config>::ValueRef::reset() noexcept {
+void CompilerBase<Adaptor, Derived, Config>::ValueRef::reset() {
   if (state.a.mode == 1 || state.a.mode == 2) {
     state.a.mode = 0;
 

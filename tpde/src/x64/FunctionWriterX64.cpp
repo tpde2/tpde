@@ -34,7 +34,7 @@ const FunctionWriterX64::TargetCIEInfo FunctionWriterX64::CIEInfo{
     .data_alignment_factor = 120, // SLEB128 -8
 };
 
-void FunctionWriterX64::handle_fixups() noexcept {
+void FunctionWriterX64::handle_fixups() {
   for (const LabelFixup &fixup : label_fixups) {
     u32 label_off = label_offset(fixup.label);
     u32 fixup_off = fixup.off - label_skew;

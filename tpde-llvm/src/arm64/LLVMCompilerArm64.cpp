@@ -53,45 +53,44 @@ struct LLVMCompilerArm64 : tpde::a64::CompilerA64<LLVMAdaptor,
     static_assert(tpde::Compiler<LLVMCompilerArm64, tpde::a64::PlatformConfig>);
   }
 
-  void reset() noexcept {
+  void reset() {
     // TODO: move to LLVMCompilerBase
     Base::reset();
     EncodeCompiler::reset();
   }
 
-  bool arg_allow_split_reg_stack_passing(IRValueRef value) const noexcept {
+  bool arg_allow_split_reg_stack_passing(IRValueRef value) const {
     // All types except i128 and arrays can be split across registers/stack.
     llvm::Type *ty = value->getType();
     return !ty->isIntegerTy(128) && !ty->isArrayTy();
   }
 
-  void load_address_of_var_reference(AsmReg dst,
-                                     tpde::AssignmentPartRef ap) noexcept;
+  void load_address_of_var_reference(AsmReg dst, tpde::AssignmentPartRef ap);
 
   std::optional<CallBuilder>
-      create_call_builder(const llvm::CallBase * = nullptr) noexcept;
+      create_call_builder(const llvm::CallBase * = nullptr);
 
   void extract_element(ValueRef &vec_vr,
                        unsigned idx,
                        LLVMBasicValType ty,
-                       ValuePart &out) noexcept;
+                       ValuePart &out);
   void insert_element(ValueRef &vec_vr,
                       unsigned idx,
                       LLVMBasicValType ty,
-                      GenericValuePart el) noexcept;
+                      GenericValuePart el);
 
-  bool compile_br(const llvm::Instruction *, const ValInfo &, u64) noexcept;
-  bool compile_inline_asm(const llvm::CallBase *) noexcept;
-  bool compile_icmp(const llvm::Instruction *, const ValInfo &, u64) noexcept;
-  void compile_i32_cmp_zero(AsmReg reg, llvm::CmpInst::Predicate p) noexcept;
+  bool compile_br(const llvm::Instruction *, const ValInfo &, u64);
+  bool compile_inline_asm(const llvm::CallBase *);
+  bool compile_icmp(const llvm::Instruction *, const ValInfo &, u64);
+  void compile_i32_cmp_zero(AsmReg reg, llvm::CmpInst::Predicate p);
 
-  GenericValuePart create_addr_for_alloca(tpde::AssignmentPartRef ap) noexcept;
+  GenericValuePart create_addr_for_alloca(tpde::AssignmentPartRef ap);
 
   void create_helper_call(std::span<IRValueRef> args,
                           ValueRef *result,
-                          SymRef sym) noexcept;
+                          SymRef sym);
 
-  bool handle_intrin(const llvm::IntrinsicInst *) noexcept;
+  bool handle_intrin(const llvm::IntrinsicInst *);
 
   bool handle_overflow_intrin_128(OverflowOp op,
                                   GenericValuePart &&lhs_lo,
@@ -100,11 +99,11 @@ struct LLVMCompilerArm64 : tpde::a64::CompilerA64<LLVMAdaptor,
                                   GenericValuePart &&rhs_hi,
                                   ValuePart &&res_lo,
                                   ValuePart &&res_hi,
-                                  ValuePart &&res_of) noexcept;
+                                  ValuePart &&res_of);
 };
 
 void LLVMCompilerArm64::load_address_of_var_reference(
-    AsmReg dst, tpde::AssignmentPartRef ap) noexcept {
+    AsmReg dst, tpde::AssignmentPartRef ap) {
   auto *global = this->adaptor->global_list[ap.variable_ref_data()];
   const auto sym = global_sym(global);
   assert(sym.valid());
@@ -134,7 +133,7 @@ void LLVMCompilerArm64::load_address_of_var_reference(
 }
 
 std::optional<LLVMCompilerArm64::CallBuilder>
-    LLVMCompilerArm64::create_call_builder(const llvm::CallBase *cb) noexcept {
+    LLVMCompilerArm64::create_call_builder(const llvm::CallBase *cb) {
   llvm::CallingConv::ID cc = llvm::CallingConv::C;
   if (cb) {
     cc = cb->getCallingConv();
@@ -153,7 +152,7 @@ std::optional<LLVMCompilerArm64::CallBuilder>
 void LLVMCompilerArm64::extract_element(ValueRef &vec_vr,
                                         unsigned idx,
                                         LLVMBasicValType ty,
-                                        ValuePart &out) noexcept {
+                                        ValuePart &out) {
   if (!vec_vr.has_assignment()) {
     // Constant handling is target-independent.
     return LLVMCompilerBase::extract_element(vec_vr, idx, ty, out);
@@ -194,7 +193,7 @@ void LLVMCompilerArm64::extract_element(ValueRef &vec_vr,
 void LLVMCompilerArm64::insert_element(ValueRef &vec_vr,
                                        unsigned idx,
                                        LLVMBasicValType ty,
-                                       GenericValuePart el) noexcept {
+                                       GenericValuePart el) {
   tpde::ValueAssignment *va = vec_vr.assignment();
   u32 elem_sz = this->adaptor->basic_ty_part_size(ty);
   if (ty == LLVMBasicValType::i1 || elem_sz == va->max_part_size) {
@@ -236,7 +235,7 @@ void LLVMCompilerArm64::insert_element(ValueRef &vec_vr,
 
 bool LLVMCompilerArm64::compile_br(const llvm::Instruction *inst,
                                    const ValInfo &,
-                                   u64) noexcept {
+                                   u64) {
   const auto *br = llvm::cast<llvm::BranchInst>(inst);
   if (br->isUnconditional()) {
     generate_uncond_branch(adaptor->block_lookup_idx(br->getSuccessor(0)));
@@ -258,8 +257,7 @@ bool LLVMCompilerArm64::compile_br(const llvm::Instruction *inst,
   return true;
 }
 
-bool LLVMCompilerArm64::compile_inline_asm(
-    const llvm::CallBase *call) noexcept {
+bool LLVMCompilerArm64::compile_inline_asm(const llvm::CallBase *call) {
   auto inline_asm = llvm::cast<llvm::InlineAsm>(call->getCalledOperand());
   // TODO: handle inline assembly that actually does something
   if (!inline_asm->getAsmString().empty() || inline_asm->isAlignStack() ||
@@ -284,7 +282,7 @@ bool LLVMCompilerArm64::compile_inline_asm(
 
 bool LLVMCompilerArm64::compile_icmp(const llvm::Instruction *inst,
                                      const ValInfo &val_info,
-                                     u64) noexcept {
+                                     u64) {
   const auto *cmp = llvm::cast<llvm::ICmpInst>(inst);
   auto *cmp_ty = cmp->getOperand(0)->getType();
   if (cmp_ty->isVectorTy()) {
@@ -467,8 +465,8 @@ bool LLVMCompilerArm64::compile_icmp(const llvm::Instruction *inst,
   return true;
 }
 
-void LLVMCompilerArm64::compile_i32_cmp_zero(
-    AsmReg reg, llvm::CmpInst::Predicate pred) noexcept {
+void LLVMCompilerArm64::compile_i32_cmp_zero(AsmReg reg,
+                                             llvm::CmpInst::Predicate pred) {
   Da64Cond cond = DA_AL;
   switch (pred) {
   case llvm::CmpInst::ICMP_EQ: cond = DA_EQ; break;
@@ -487,14 +485,14 @@ void LLVMCompilerArm64::compile_i32_cmp_zero(
   ASM(CSETw, reg, cond);
 }
 
-LLVMCompilerArm64::GenericValuePart LLVMCompilerArm64::create_addr_for_alloca(
-    tpde::AssignmentPartRef ap) noexcept {
+LLVMCompilerArm64::GenericValuePart
+    LLVMCompilerArm64::create_addr_for_alloca(tpde::AssignmentPartRef ap) {
   return GenericValuePart::Expr{AsmReg::R29, ap.variable_stack_off()};
 }
 
 void LLVMCompilerArm64::create_helper_call(std::span<IRValueRef> args,
                                            ValueRef *result,
-                                           SymRef sym) noexcept {
+                                           SymRef sym) {
   tpde::util::SmallVector<CallArg, 8> arg_vec{};
   for (auto arg : args) {
     arg_vec.push_back(CallArg{arg});
@@ -503,8 +501,7 @@ void LLVMCompilerArm64::create_helper_call(std::span<IRValueRef> args,
   generate_call(sym, arg_vec, result);
 }
 
-bool LLVMCompilerArm64::handle_intrin(
-    const llvm::IntrinsicInst *inst) noexcept {
+bool LLVMCompilerArm64::handle_intrin(const llvm::IntrinsicInst *inst) {
   const auto intrin_id = inst->getIntrinsicID();
   switch (intrin_id) {
   case llvm::Intrinsic::vastart: {
@@ -610,15 +607,14 @@ bool LLVMCompilerArm64::handle_intrin(
   }
 }
 
-bool LLVMCompilerArm64::handle_overflow_intrin_128(
-    OverflowOp op,
-    GenericValuePart &&lhs_lo,
-    GenericValuePart &&lhs_hi,
-    GenericValuePart &&rhs_lo,
-    GenericValuePart &&rhs_hi,
-    ValuePart &&res_lo,
-    ValuePart &&res_hi,
-    ValuePart &&res_of) noexcept {
+bool LLVMCompilerArm64::handle_overflow_intrin_128(OverflowOp op,
+                                                   GenericValuePart &&lhs_lo,
+                                                   GenericValuePart &&lhs_hi,
+                                                   GenericValuePart &&rhs_lo,
+                                                   GenericValuePart &&rhs_hi,
+                                                   ValuePart &&res_lo,
+                                                   ValuePart &&res_hi,
+                                                   ValuePart &&res_of) {
   switch (op) {
   case OverflowOp::uadd: {
     AsmReg lhs_lo_reg = gval_as_reg(lhs_lo); // TODO: reuse reg
@@ -694,8 +690,7 @@ bool LLVMCompilerArm64::handle_overflow_intrin_128(
   }
 }
 
-std::unique_ptr<LLVMCompiler>
-    create_compiler(const llvm::Triple &triple) noexcept {
+std::unique_ptr<LLVMCompiler> create_compiler(const llvm::Triple &triple) {
   if (!triple.isOSBinFormatELF()) {
     return nullptr;
   }

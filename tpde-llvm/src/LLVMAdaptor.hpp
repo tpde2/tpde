@@ -28,13 +28,13 @@ namespace tpde_llvm {
 #pragma GCC diagnostic ignored "-Winvalid-offsetof"
 
 // very hacky
-inline u32 &val_idx_for_inst(llvm::Instruction *inst) noexcept {
+inline u32 &val_idx_for_inst(llvm::Instruction *inst) {
   return *reinterpret_cast<u32 *>(reinterpret_cast<u8 *>(inst) +
                                   offsetof(llvm::Instruction, DebugMarker) - 4);
   // static_assert(sizeof(llvm::Instruction) == 64);
 }
 
-inline u32 val_idx_for_inst(const llvm::Instruction *inst) noexcept {
+inline u32 val_idx_for_inst(const llvm::Instruction *inst) {
   return *reinterpret_cast<const u32 *>(
       reinterpret_cast<const u8 *>(inst) +
       offsetof(llvm::Instruction, DebugMarker) - 4);
@@ -43,13 +43,13 @@ inline u32 val_idx_for_inst(const llvm::Instruction *inst) noexcept {
 
 #if LLVM_VERSION_MAJOR < 20
 // LLVM 20+ has BasicBlock::getNumber()
-inline u32 &block_embedded_idx(llvm::BasicBlock *block) noexcept {
+inline u32 &block_embedded_idx(llvm::BasicBlock *block) {
   return *reinterpret_cast<u32 *>(
       reinterpret_cast<u8 *>(block) +
       offsetof(llvm::BasicBlock, IsNewDbgInfoFormat) + 4);
 }
 
-inline u32 block_embedded_idx(const llvm::BasicBlock *block) noexcept {
+inline u32 block_embedded_idx(const llvm::BasicBlock *block) {
   return block_embedded_idx(const_cast<llvm::BasicBlock *>(block));
 }
 #endif
@@ -232,33 +232,30 @@ struct LLVMAdaptor {
   tpde::util::SmallVector<u32, 256> block_succ_indices;
   tpde::util::SmallVector<std::pair<u32, u32>, 128> block_succ_ranges;
 
-  LLVMAdaptor(llvm::DataLayout dl) noexcept : data_layout(dl) {}
+  LLVMAdaptor(llvm::DataLayout dl) : data_layout(dl) {}
 
   static constexpr bool TPDE_PROVIDES_HIGHEST_VAL_IDX = true;
   static constexpr bool TPDE_LIVENESS_VISIT_ARGS = true;
 
-  [[nodiscard]] u32 func_count() const noexcept {
-    return mod->getFunctionList().size();
-  }
+  [[nodiscard]] u32 func_count() const { return mod->getFunctionList().size(); }
 
-  [[nodiscard]] auto funcs() const noexcept {
+  [[nodiscard]] auto funcs() const {
     return *mod | std::views::filter([](llvm::Function &fn) {
       return !fn.isIntrinsic();
     }) | std::views::transform([](llvm::Function &fn) { return &fn; });
   }
 
-  [[nodiscard]] auto funcs_to_compile() const noexcept { return funcs(); }
+  [[nodiscard]] auto funcs_to_compile() const { return funcs(); }
 
-  [[nodiscard]] static std::string_view
-      func_link_name(const IRFuncRef func) noexcept {
+  [[nodiscard]] static std::string_view func_link_name(const IRFuncRef func) {
     return func->getName();
   }
 
-  [[nodiscard]] static bool func_extern(const IRFuncRef func) noexcept {
+  [[nodiscard]] static bool func_extern(const IRFuncRef func) {
     return func->isDeclarationForLinker();
   }
 
-  [[nodiscard]] static bool func_only_local(const IRFuncRef func) noexcept {
+  [[nodiscard]] static bool func_only_local(const IRFuncRef func) {
     if (!func->hasName() && !func->hasLocalLinkage()) [[unlikely]] {
       TPDE_LOG_WARN("unnamed functions converted to internal linkage");
       return true;
@@ -266,44 +263,39 @@ struct LLVMAdaptor {
     return func->hasLocalLinkage();
   }
 
-  [[nodiscard]] static bool
-      func_has_weak_linkage(const IRFuncRef func) noexcept {
+  [[nodiscard]] static bool func_has_weak_linkage(const IRFuncRef func) {
     return func->isWeakForLinker();
   }
 
-  [[nodiscard]] bool cur_needs_unwind_info() const noexcept {
+  [[nodiscard]] bool cur_needs_unwind_info() const {
     return cur_func->needsUnwindTableEntry();
   }
 
-  [[nodiscard]] bool cur_is_vararg() const noexcept {
-    return cur_func->isVarArg();
-  }
+  [[nodiscard]] bool cur_is_vararg() const { return cur_func->isVarArg(); }
 
-  [[nodiscard]] u32 cur_highest_val_idx() const noexcept {
+  [[nodiscard]] u32 cur_highest_val_idx() const {
     return values.size() + global_list.size();
   }
 
-  [[nodiscard]] auto cur_args() const noexcept {
+  [[nodiscard]] auto cur_args() const {
     return cur_func->args() |
            std::views::transform([](llvm::Argument &arg) { return &arg; });
   }
 
-  [[nodiscard]] const auto &cur_static_allocas() const noexcept {
+  [[nodiscard]] const auto &cur_static_allocas() const {
     return initial_stack_slot_indices;
   }
 
-  [[nodiscard]] bool cur_has_dynamic_alloca() const noexcept {
+  [[nodiscard]] bool cur_has_dynamic_alloca() const {
     return func_has_dynamic_alloca;
   }
 
-  [[nodiscard]] static IRBlockRef cur_entry_block() noexcept { return 0; }
+  [[nodiscard]] static IRBlockRef cur_entry_block() { return 0; }
 
-  auto cur_blocks() const noexcept {
-    return std::views::iota(size_t{0}, blocks.size());
-  }
+  auto cur_blocks() const { return std::views::iota(size_t{0}, blocks.size()); }
 
   [[nodiscard]] IRBlockRef
-      block_lookup_idx(const llvm::BasicBlock *block) const noexcept {
+      block_lookup_idx(const llvm::BasicBlock *block) const {
 #if LLVM_VERSION_MAJOR >= 20
     return block->getNumber();
 #else
@@ -316,15 +308,13 @@ struct LLVMAdaptor {
 #endif
   }
 
-  [[nodiscard]] auto block_succs(const IRBlockRef block) const noexcept {
+  [[nodiscard]] auto block_succs(const IRBlockRef block) const {
     struct BlockRange {
       const IRBlockRef *block_start, *block_end;
 
-      [[nodiscard]] const IRBlockRef *begin() const noexcept {
-        return block_start;
-      }
+      [[nodiscard]] const IRBlockRef *begin() const { return block_start; }
 
-      [[nodiscard]] const IRBlockRef *end() const noexcept { return block_end; }
+      [[nodiscard]] const IRBlockRef *end() const { return block_end; }
     };
 
     auto &[start, end] = block_succ_ranges[block];
@@ -332,60 +322,58 @@ struct LLVMAdaptor {
                       block_succ_indices.data() + end};
   }
 
-  [[nodiscard]] auto block_insts(const IRBlockRef block) const noexcept {
+  [[nodiscard]] auto block_insts(const IRBlockRef block) const {
     const auto &aux = blocks[block].aux;
     return std::ranges::subrange(aux.phi_end, blocks[block].block->end()) |
            std::views::transform(
                [](llvm::Instruction &instr) { return &instr; });
   }
 
-  [[nodiscard]] auto block_phis(const IRBlockRef block) const noexcept {
+  [[nodiscard]] auto block_phis(const IRBlockRef block) const {
     const auto &aux = blocks[block].aux;
     return std::ranges::subrange(blocks[block].block->begin(), aux.phi_end) |
            std::views::transform(
                [](llvm::Instruction &instr) { return &instr; });
   }
 
-  [[nodiscard]] u32 block_info(const IRBlockRef block) const noexcept {
+  [[nodiscard]] u32 block_info(const IRBlockRef block) const {
     return blocks[block].aux.aux1;
   }
 
-  void block_set_info(const IRBlockRef block, const u32 aux) noexcept {
+  void block_set_info(const IRBlockRef block, const u32 aux) {
     blocks[block].aux.aux1 = aux;
   }
 
-  [[nodiscard]] u32 block_info2(const IRBlockRef block) const noexcept {
+  [[nodiscard]] u32 block_info2(const IRBlockRef block) const {
     return blocks[block].aux.aux2;
   }
 
-  void block_set_info2(const IRBlockRef block, const u32 aux) noexcept {
+  void block_set_info2(const IRBlockRef block, const u32 aux) {
     blocks[block].aux.aux2 = aux;
   }
 
-  [[nodiscard]] std::string
-      block_fmt_ref(const IRBlockRef block) const noexcept {
+  [[nodiscard]] std::string block_fmt_ref(const IRBlockRef block) const {
     std::string buf;
     llvm::raw_string_ostream os{buf};
     blocks[block].block->printAsOperand(os);
     return buf;
   }
 
-  [[nodiscard]] std::string
-      value_fmt_ref(const IRValueRef value) const noexcept {
+  [[nodiscard]] std::string value_fmt_ref(const IRValueRef value) const {
     std::string buf;
     llvm::raw_string_ostream os(buf);
     value->printAsOperand(os, /*PrintType=*/true, mod);
     return buf;
   }
 
-  [[nodiscard]] std::string inst_fmt_ref(const IRInstRef inst) const noexcept {
+  [[nodiscard]] std::string inst_fmt_ref(const IRInstRef inst) const {
     std::string buf;
     llvm::raw_string_ostream(buf) << *inst;
     return buf;
   }
 
 
-  tpde::ValLocalIdx val_local_idx(const IRValueRef v) const noexcept {
+  tpde::ValLocalIdx val_local_idx(const IRValueRef v) const {
     // Globals are handled together with constants; so only instructions and
     // arguments have local indices.
     if (auto *arg = llvm::dyn_cast<llvm::Argument>(v)) [[unlikely]] {
@@ -394,47 +382,45 @@ struct LLVMAdaptor {
     return tpde::ValLocalIdx(inst_lookup_idx(llvm::cast<llvm::Instruction>(v)));
   }
 
-  [[nodiscard]] auto inst_operands(const IRInstRef inst) const noexcept {
+  [[nodiscard]] auto inst_operands(const IRInstRef inst) const {
     return inst->operands() | std::views::transform([](const llvm::Use &use) {
              return use.get();
            });
   }
 
-  [[nodiscard]] auto inst_results(const IRInstRef inst) const noexcept {
+  [[nodiscard]] auto inst_results(const IRInstRef inst) const {
     bool is_void = inst->getType()->isVoidTy();
     return std::views::single(inst) | std::views::drop(is_void ? 1 : 0);
   }
 
   [[nodiscard]] bool
-      val_ignore_in_liveness_analysis(const IRValueRef value) const noexcept {
+      val_ignore_in_liveness_analysis(const IRValueRef value) const {
     return !llvm::isa<llvm::Instruction, llvm::Argument>(value);
   }
 
-  bool val_is_phi(IRValueRef value) const noexcept {
+  bool val_is_phi(IRValueRef value) const {
     return llvm::isa<llvm::PHINode>(value);
   }
 
-  [[nodiscard]] auto val_as_phi(const IRValueRef value) const noexcept {
+  [[nodiscard]] auto val_as_phi(const IRValueRef value) const {
     struct PHIRef {
       const llvm::PHINode *phi;
       const LLVMAdaptor *self;
 
-      [[nodiscard]] u32 incoming_count() const noexcept {
+      [[nodiscard]] u32 incoming_count() const {
         return phi->getNumIncomingValues();
       }
 
-      [[nodiscard]] IRValueRef
-          incoming_val_for_slot(const u32 slot) const noexcept {
+      [[nodiscard]] IRValueRef incoming_val_for_slot(const u32 slot) const {
         return phi->getIncomingValue(slot);
       }
 
-      [[nodiscard]] IRBlockRef
-          incoming_block_for_slot(const u32 slot) const noexcept {
+      [[nodiscard]] IRBlockRef incoming_block_for_slot(const u32 slot) const {
         return self->block_lookup_idx(phi->getIncomingBlock(slot));
       }
 
       [[nodiscard]] IRValueRef
-          incoming_val_for_block(const IRBlockRef block) const noexcept {
+          incoming_val_for_block(const IRBlockRef block) const {
         llvm::BasicBlock *bb = self->blocks[block].block;
         u32 idx;
         if (incoming_count() < PHINodeSortThreshold) [[likely]] {
@@ -457,7 +443,7 @@ struct LLVMAdaptor {
   }
 
 private:
-  static bool is_static_alloca(const llvm::AllocaInst *alloca) noexcept {
+  static bool is_static_alloca(const llvm::AllocaInst *alloca) {
     // Larger allocas need dynamic stack alignment. In future, we might
     // realign the stack at the beginning, but for now, treat them like
     // dynamic allocas.
@@ -466,7 +452,7 @@ private:
   }
 
 public:
-  [[nodiscard]] u32 val_alloca_size(const IRValueRef value) const noexcept {
+  [[nodiscard]] u32 val_alloca_size(const IRValueRef value) const {
     const auto *alloca = llvm::cast<llvm::AllocaInst>(value);
     assert(alloca->isStaticAlloca());
     const u64 size = *alloca->getAllocationSize(mod->getDataLayout());
@@ -474,17 +460,17 @@ public:
     return size;
   }
 
-  [[nodiscard]] u32 val_alloca_align(const IRValueRef value) const noexcept {
+  [[nodiscard]] u32 val_alloca_align(const IRValueRef value) const {
     const auto *alloca = llvm::cast<llvm::AllocaInst>(value);
     assert(alloca->isStaticAlloca());
     return alloca->getAlign().value();
   }
 
-  bool cur_arg_is_byval(const u32 idx) const noexcept {
+  bool cur_arg_is_byval(const u32 idx) const {
     return cur_func->hasParamAttribute(idx, llvm::Attribute::AttrKind::ByVal);
   }
 
-  u32 cur_arg_byval_align(const u32 idx) const noexcept {
+  u32 cur_arg_byval_align(const u32 idx) const {
     if (auto param_align = cur_func->getParamStackAlign(idx)) {
       return param_align->value();
     }
@@ -496,19 +482,19 @@ public:
         .value();
   }
 
-  u32 cur_arg_byval_size(const u32 idx) const noexcept {
+  u32 cur_arg_byval_size(const u32 idx) const {
     return mod->getDataLayout().getTypeAllocSize(
         cur_func->getParamByValType(idx));
   }
 
-  bool cur_arg_is_sret(const u32 idx) const noexcept {
+  bool cur_arg_is_sret(const u32 idx) const {
     return cur_func->hasParamAttribute(idx,
                                        llvm::Attribute::AttrKind::StructRet);
   }
 
-  static void start_compile() noexcept {}
+  static void start_compile() {}
 
-  static void end_compile() noexcept {}
+  static void end_compile() {}
 
 private:
   /// Replace constant expressions with instructions. Returns pair of replaced
@@ -522,11 +508,11 @@ private:
   llvm::Instruction *handle_inst_in_block(llvm::Instruction *inst);
 
 public:
-  bool switch_func(const IRFuncRef function) noexcept;
+  bool switch_func(const IRFuncRef function);
 
-  bool switch_module(llvm::Module &mod) noexcept;
+  bool switch_module(llvm::Module &mod);
 
-  void reset() noexcept;
+  void reset();
 
   struct ValueParts {
     LLVMBasicValType bvt;
@@ -565,7 +551,7 @@ public:
     return val_parts(values[u32(local_idx)]);
   }
 
-  ValueParts val_parts(const ValInfo &info) const noexcept {
+  ValueParts val_parts(const ValInfo &info) const {
     if (info.type == LLVMBasicValType::complex) {
       unsigned ty_idx = info.complex_part_tys_idx;
       return ValueParts{info.type, &complex_part_types[ty_idx]};
@@ -573,31 +559,30 @@ public:
     return ValueParts{info.type, nullptr};
   }
 
-  u32 type_part_count(LLVMBasicValType bvt, u32 complex_part_tys_idx) noexcept {
+  u32 type_part_count(LLVMBasicValType bvt, u32 complex_part_tys_idx) {
     if (bvt != LLVMBasicValType::complex) [[likely]] {
       return basic_ty_part_count(bvt);
     }
     return this->complex_part_types[complex_part_tys_idx].desc.num_parts;
   }
 
-  [[nodiscard]] bool inst_fused(const IRInstRef inst) const noexcept {
+  [[nodiscard]] bool inst_fused(const IRInstRef inst) const {
     return val_info(inst).fused;
   }
 
-  void inst_set_fused(const IRInstRef value, const bool fused) noexcept {
+  void inst_set_fused(const IRInstRef value, const bool fused) {
     values[inst_lookup_idx(value)].fused = fused;
   }
 
-  const ValInfo &val_info(const llvm::Instruction *inst) const noexcept {
+  const ValInfo &val_info(const llvm::Instruction *inst) const {
     return values[inst_lookup_idx(inst)];
   }
 
-  u32 arg_lookup_idx(const llvm::Argument *arg) const noexcept {
+  u32 arg_lookup_idx(const llvm::Argument *arg) const {
     return arg->getArgNo();
   }
 
-  [[nodiscard]] u32
-      inst_lookup_idx(const llvm::Instruction *inst) const noexcept {
+  [[nodiscard]] u32 inst_lookup_idx(const llvm::Instruction *inst) const {
     const auto idx = val_idx_for_inst(inst);
 #ifndef NDEBUG
     assert(value_lookup.find(inst) != value_lookup.end() &&
@@ -607,7 +592,7 @@ public:
   }
 
   // internal helpers
-  static unsigned basic_ty_part_size(const LLVMBasicValType ty) noexcept {
+  static unsigned basic_ty_part_size(const LLVMBasicValType ty) {
     switch (ty) {
       using enum LLVMBasicValType;
     case i1:
@@ -642,7 +627,7 @@ public:
     }
   }
 
-  static tpde::RegBank basic_ty_part_bank(const LLVMBasicValType ty) noexcept {
+  static tpde::RegBank basic_ty_part_bank(const LLVMBasicValType ty) {
     switch (ty) {
       using enum LLVMBasicValType;
     case i1:
@@ -678,19 +663,19 @@ public:
   }
 
 private:
-  static unsigned basic_ty_part_count(const LLVMBasicValType ty) noexcept {
+  static unsigned basic_ty_part_count(const LLVMBasicValType ty) {
     return ty == LLVMBasicValType::i128 ? 2 : 1;
   }
 
 public:
-  void check_type_compatibility(llvm::Type *type) noexcept {
+  void check_type_compatibility(llvm::Type *type) {
     const auto [bvt, complex_part_idx] = lower_type(type);
     check_type_compatibility(type, bvt, complex_part_idx);
   }
 
   void check_type_compatibility(llvm::Type *type,
                                 LLVMBasicValType bvt,
-                                u32 ty_idx) noexcept {
+                                u32 ty_idx) {
     switch (bvt) {
       using enum LLVMBasicValType;
     case complex:
@@ -717,23 +702,22 @@ public:
   }
 
 private:
-  [[gnu::cold]] void report_incompatible_type(llvm::Type *type) noexcept;
+  [[gnu::cold]] void report_incompatible_type(llvm::Type *type);
 
-  [[gnu::cold]] void report_unsupported_type(llvm::Type *type) noexcept;
+  [[gnu::cold]] void report_unsupported_type(llvm::Type *type);
 
   /// Append basic types of specified type to complex_part_types. desc_idx is
   /// the index in complex_part_types containing the descriptor of the
   /// outermost type. Returns the allocation size in bytes and the alignment.
   std::pair<unsigned, unsigned> complex_types_append(llvm::Type *type,
-                                                     size_t desc_idx) noexcept;
+                                                     size_t desc_idx);
 
-  static LLVMBasicValType lower_simple_type(const llvm::Type *) noexcept;
+  static LLVMBasicValType lower_simple_type(const llvm::Type *);
 
-  std::pair<LLVMBasicValType, unsigned long>
-      lower_complex_type(llvm::Type *) noexcept;
+  std::pair<LLVMBasicValType, unsigned long> lower_complex_type(llvm::Type *);
 
 public:
-  std::pair<LLVMBasicValType, u32> lower_type(llvm::Type *type) noexcept {
+  std::pair<LLVMBasicValType, u32> lower_type(llvm::Type *type) {
     if (auto ty = lower_simple_type(type); ty != LLVMBasicValType::invalid)
         [[likely]] {
       return std::make_pair(ty, ~0ul);
@@ -742,7 +726,7 @@ public:
     return std::make_pair(ty, u32(num));
   }
 
-  std::pair<LLVMBasicValType, u32> lower_type(llvm::Value *value) noexcept {
+  std::pair<LLVMBasicValType, u32> lower_type(llvm::Value *value) {
     if (!llvm::isa<llvm::Instruction, llvm::Argument>(value)) {
       return lower_type(value->getType());
     }

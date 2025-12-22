@@ -19,22 +19,22 @@ class VectorWriter {
   u8 *end;
 
 public:
-  VectorWriter() noexcept = default;
-  VectorWriter(SmallVectorBase<u8> &vector) noexcept
+  VectorWriter() = default;
+  VectorWriter(SmallVectorBase<u8> &vector)
       : vector(&vector),
         cur(vector.data() + vector.size()),
         end(vector.data() + vector.size()) {}
-  VectorWriter(SmallVectorBase<u8> &vector, size_t off) noexcept
+  VectorWriter(SmallVectorBase<u8> &vector, size_t off)
       : vector(&vector),
         cur(vector.data() + off),
         end(vector.data() + vector.size()) {}
   ~VectorWriter() { flush(); }
 
   VectorWriter(const VectorWriter &) = delete;
-  VectorWriter(VectorWriter &&other) noexcept { *this = std::move(other); }
+  VectorWriter(VectorWriter &&other) { *this = std::move(other); }
 
   VectorWriter &operator=(const VectorWriter &) = delete;
-  VectorWriter &operator=(VectorWriter &&other) noexcept {
+  VectorWriter &operator=(VectorWriter &&other) {
     flush();
     vector = other.vector;
     cur = other.cur;
@@ -57,59 +57,59 @@ public:
     }
   }
 
-  void flush() noexcept {
+  void flush() {
     if (vector && cur != end) {
       vector->resize(size());
       end = cur;
     }
   }
 
-  size_t size() const noexcept { return cur - vector->data(); }
-  size_t capacity() const noexcept { return vector->size(); }
+  size_t size() const { return cur - vector->data(); }
+  size_t capacity() const { return vector->size(); }
 
-  u8 *data() noexcept { return vector->data(); }
+  u8 *data() { return vector->data(); }
 
-  void skip_unchecked(size_t size) noexcept {
+  void skip_unchecked(size_t size) {
     assert(size_t(end - cur) >= size);
     cur += size;
   }
 
-  void skip(size_t size) noexcept {
+  void skip(size_t size) {
     reserve(size);
     skip_unchecked(size);
   }
 
-  void unskip(size_t n) noexcept {
+  void unskip(size_t n) {
     assert(n <= size());
     cur -= n;
   }
 
-  void zero_unchecked(size_t n) noexcept {
+  void zero_unchecked(size_t n) {
     assert(size_t(end - cur) >= n);
     TPDE_NOALIAS(this, cur);
     std::memset(cur, 0, n);
     cur += n;
   }
 
-  void zero(size_t n) noexcept {
+  void zero(size_t n) {
     reserve(n);
     zero_unchecked(n);
   }
 
-  void write_unchecked(std::span<const u8> data) noexcept {
+  void write_unchecked(std::span<const u8> data) {
     assert(size_t(end - cur) >= data.size());
     TPDE_NOALIAS(this, cur);
     std::memcpy(cur, data.data(), data.size());
     cur += data.size();
   }
 
-  void write(std::span<const u8> data) noexcept {
+  void write(std::span<const u8> data) {
     reserve(data.size());
     write_unchecked(data);
   }
 
   template <std::integral T>
-  void write_unchecked(T t) noexcept {
+  void write_unchecked(T t) {
     assert(size_t(end - cur) >= sizeof(T));
     TPDE_NOALIAS(this, cur);
     std::memcpy(cur, &t, sizeof(T));
@@ -117,28 +117,28 @@ public:
   }
 
   template <std::integral T>
-  void write(T t) noexcept {
+  void write(T t) {
     reserve(sizeof(T));
     write_unchecked<T>(t);
   }
 
-  void write_uleb_unchecked(uint64_t value) noexcept {
+  void write_uleb_unchecked(uint64_t value) {
     assert(size_t(end - cur) >= uleb_len(value));
     cur += uleb_write(cur, value);
   }
 
-  void write_uleb(uint64_t value) noexcept {
+  void write_uleb(uint64_t value) {
     reserve(10);
     write_uleb_unchecked(value);
   }
 
-  void write_sleb_unchecked(int64_t value) noexcept {
+  void write_sleb_unchecked(int64_t value) {
     // TODO: implement and use sleb_len
     assert(size_t(end - cur) >= 10);
     cur += sleb_write(cur, value);
   }
 
-  void write_sleb(int64_t value) noexcept {
+  void write_sleb(int64_t value) {
     reserve(10);
     write_sleb_unchecked(value);
   }

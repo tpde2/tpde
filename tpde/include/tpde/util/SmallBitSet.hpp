@@ -24,7 +24,7 @@ struct SmallBitSet {
   SmallBitSet(const SmallBitSet &other)
       : data(other.data), bit_size(other.bit_size) {}
 
-  SmallBitSet(SmallBitSet &&other) noexcept {
+  SmallBitSet(SmallBitSet &&other) {
     data = std::move(other.data);
     bit_size = other.bit_size;
   }
@@ -37,7 +37,7 @@ struct SmallBitSet {
     return *this;
   }
 
-  SmallBitSet &operator=(SmallBitSet &&other) noexcept {
+  SmallBitSet &operator=(SmallBitSet &&other) {
     if (&other != this) {
       data = std::move(data);
       bit_size = other.bit_size;
@@ -45,12 +45,12 @@ struct SmallBitSet {
     return *this;
   }
 
-  void clear() noexcept {
+  void clear() {
     data.clear();
     bit_size = 0;
   }
 
-  void resize(const u32 bit_size) noexcept {
+  void resize(const u32 bit_size) {
     const auto byte_size = align_up(bit_size, 64) / 64;
     if (bit_size > this->bit_size && this->bit_size != 0) {
       const auto last_bits = this->bit_size & 63;
@@ -68,7 +68,7 @@ struct SmallBitSet {
     }
   }
 
-  void push_back(const bool val) noexcept {
+  void push_back(const bool val) {
     if (bit_size / 64 != (bit_size - 1) / 64) {
       data.push_back(0);
       if (val) {
@@ -84,25 +84,25 @@ struct SmallBitSet {
     }
   }
 
-  [[nodiscard]] bool is_set(const u32 idx) const noexcept {
+  [[nodiscard]] bool is_set(const u32 idx) const {
     const u32 elem_idx = idx >> 6;
     const u64 bit = 1ull << (idx & 63);
     return data[elem_idx] & bit;
   }
 
-  void mark_set(const u32 idx) noexcept {
+  void mark_set(const u32 idx) {
     const u32 elem_idx = idx >> 6;
     const u64 bit = 1ull << (idx & 63);
     data[elem_idx] |= bit;
   }
 
-  void mark_unset(const u32 idx) noexcept {
+  void mark_unset(const u32 idx) {
     const u32 elem_idx = idx >> 6;
     const u64 bit = 1ull << (idx & 63);
     data[elem_idx] &= ~bit;
   }
 
-  std::optional<u32> first_set() noexcept {
+  std::optional<u32> first_set() {
     for (u32 i = 0; i < data.size(); ++i) {
       if (data[i] == 0) {
         continue;

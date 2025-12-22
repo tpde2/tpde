@@ -14,19 +14,19 @@ namespace tpde {
 struct Reg {
   u8 reg_id;
 
-  explicit constexpr Reg(const u64 id) noexcept : reg_id(static_cast<u8>(id)) {
+  explicit constexpr Reg(const u64 id) : reg_id(static_cast<u8>(id)) {
     assert(id <= 255);
   }
 
-  constexpr u8 id() const noexcept { return reg_id; }
+  constexpr u8 id() const { return reg_id; }
 
-  constexpr bool invalid() const noexcept { return reg_id == 0xFF; }
+  constexpr bool invalid() const { return reg_id == 0xFF; }
 
-  constexpr bool valid() const noexcept { return reg_id != 0xFF; }
+  constexpr bool valid() const { return reg_id != 0xFF; }
 
-  constexpr static Reg make_invalid() noexcept { return Reg{(u8)0xFF}; }
+  constexpr static Reg make_invalid() { return Reg{(u8)0xFF}; }
 
-  constexpr bool operator==(const Reg &other) const noexcept {
+  constexpr bool operator==(const Reg &other) const {
     return reg_id == other.reg_id;
   }
 };
@@ -36,13 +36,13 @@ private:
   u8 bank;
 
 public:
-  constexpr RegBank() noexcept : bank(u8(-1)) {}
+  constexpr RegBank() : bank(u8(-1)) {}
 
-  constexpr explicit RegBank(u8 bank) noexcept : bank(bank) {}
+  constexpr explicit RegBank(u8 bank) : bank(bank) {}
 
-  constexpr u8 id() const noexcept { return bank; }
+  constexpr u8 id() const { return bank; }
 
-  constexpr bool operator==(const RegBank &other) const noexcept {
+  constexpr bool operator==(const RegBank &other) const {
     return bank == other.bank;
   }
 };
@@ -79,31 +79,29 @@ public:
 
   std::array<u8, NumRegs> lock_counts{};
 
-  void reset() noexcept {
+  void reset() {
     used = {};
     clobbered = {};
     clocks = {};
     lock_counts = {};
   }
 
-  [[nodiscard]] bool is_used(const Reg reg) const noexcept {
+  [[nodiscard]] bool is_used(const Reg reg) const {
     assert(reg.id() < NumRegs);
     return (used & 1ull << reg.id()) != 0;
   }
 
-  [[nodiscard]] bool is_fixed(const Reg reg) const noexcept {
+  [[nodiscard]] bool is_fixed(const Reg reg) const {
     assert(reg.id() < NumRegs);
     return lock_counts[reg.id()] > 0;
   }
 
-  [[nodiscard]] bool is_clobbered(const Reg reg) const noexcept {
+  [[nodiscard]] bool is_clobbered(const Reg reg) const {
     assert(reg.id() < NumRegs);
     return (clobbered & 1ull << reg.id()) != 0;
   }
 
-  void mark_used(const Reg reg,
-                 const ValLocalIdx local_idx,
-                 const u32 part) noexcept {
+  void mark_used(const Reg reg, const ValLocalIdx local_idx, const u32 part) {
     assert(reg.id() < NumRegs);
     assert(!is_used(reg));
     assert(!is_fixed(reg));
@@ -114,13 +112,13 @@ public:
 
   void update_reg_assignment(const Reg reg,
                              const ValLocalIdx local_idx,
-                             const u32 part) noexcept {
+                             const u32 part) {
     assert(is_used(reg));
     assignments[reg.id()].local_idx = local_idx;
     assignments[reg.id()].part = part;
   }
 
-  void unmark_used(const Reg reg) noexcept {
+  void unmark_used(const Reg reg) {
     assert(reg.id() < NumRegs);
     assert(is_used(reg));
     assert(!is_fixed(reg));
@@ -128,14 +126,14 @@ public:
     used &= ~(1ull << reg.id());
   }
 
-  void mark_fixed(const Reg reg) noexcept {
+  void mark_fixed(const Reg reg) {
     assert(reg.id() < NumRegs);
     assert(is_used(reg));
     assert(lock_counts[reg.id()] == 0);
     lock_counts[reg.id()] = 1;
   }
 
-  void unmark_fixed(const Reg reg) noexcept {
+  void unmark_fixed(const Reg reg) {
     assert(reg.id() < NumRegs);
     assert(is_used(reg));
     assert(is_fixed(reg));
@@ -143,14 +141,14 @@ public:
     lock_counts[reg.id()] = 0;
   }
 
-  void inc_lock_count(const Reg reg) noexcept {
+  void inc_lock_count(const Reg reg) {
     assert(reg.id() < NumRegs);
     assert(is_used(reg));
     ++lock_counts[reg.id()];
   }
 
   /// Returns true if the last lock was released.
-  bool dec_lock_count(const Reg reg) noexcept {
+  bool dec_lock_count(const Reg reg) {
     assert(reg.id() < NumRegs);
     assert(is_used(reg));
     assert(lock_counts[reg.id()] > 0);
@@ -161,36 +159,34 @@ public:
   }
 
   /// Decrement lock count by sub, and assert that the register is now unlocked
-  void dec_lock_count_must_zero(const Reg reg,
-                                [[maybe_unused]] u8 sub = 1) noexcept {
+  void dec_lock_count_must_zero(const Reg reg, [[maybe_unused]] u8 sub = 1) {
     assert(reg.id() < NumRegs);
     assert(is_used(reg));
     assert(lock_counts[reg.id()] == sub);
     lock_counts[reg.id()] = 0;
   }
 
-  void mark_clobbered(const Reg reg) noexcept {
+  void mark_clobbered(const Reg reg) {
     assert(reg.id() < NumRegs);
     clobbered |= (1ull << reg.id());
   }
 
-  [[nodiscard]] ValLocalIdx reg_local_idx(const Reg reg) const noexcept {
+  [[nodiscard]] ValLocalIdx reg_local_idx(const Reg reg) const {
     assert(is_used(reg));
     return assignments[reg.id()].local_idx;
   }
 
-  [[nodiscard]] u32 reg_part(const Reg reg) const noexcept {
+  [[nodiscard]] u32 reg_part(const Reg reg) const {
     assert(is_used(reg));
     return assignments[reg.id()].part;
   }
 
-  [[nodiscard]] util::BitSetIterator<> used_regs() const noexcept {
+  [[nodiscard]] util::BitSetIterator<> used_regs() const {
     return util::BitSetIterator<>{used};
   }
 
-  [[nodiscard]] Reg
-      find_first_free_excluding(const RegBank bank,
-                                const u64 exclusion_mask) const noexcept {
+  [[nodiscard]] Reg find_first_free_excluding(const RegBank bank,
+                                              const u64 exclusion_mask) const {
     // TODO(ts): implement preferred registers
     const RegBitSet free_bank = allocatable & ~used & bank_regs(bank);
     const RegBitSet selectable = free_bank & ~exclusion_mask;
@@ -202,7 +198,7 @@ public:
 
   [[nodiscard]] Reg
       find_first_nonfixed_excluding(const RegBank bank,
-                                    const u64 exclusion_mask) const noexcept {
+                                    const u64 exclusion_mask) const {
     // TODO(ts): implement preferred registers
     for (auto reg_id : util::BitSetIterator<>{used & bank_regs(bank)}) {
       if (!is_fixed(Reg{reg_id}) && !((u64{1} << reg_id) & exclusion_mask)) {
@@ -212,11 +208,11 @@ public:
     return Reg::make_invalid();
   }
 
-  [[nodiscard]] static RegBank reg_bank(const Reg reg) noexcept {
+  [[nodiscard]] static RegBank reg_bank(const Reg reg) {
     return RegBank(reg.id() / RegsPerBank);
   }
 
-  [[nodiscard]] static RegBitSet bank_regs(const RegBank bank) noexcept {
+  [[nodiscard]] static RegBitSet bank_regs(const RegBank bank) {
     assert(bank.id() <= 1);
     return ((1ull << RegsPerBank) - 1) << (bank.id() * RegsPerBank);
   }

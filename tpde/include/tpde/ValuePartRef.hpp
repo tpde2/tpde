@@ -42,9 +42,9 @@ private:
   } state;
 
 public:
-  ValuePart() noexcept : state{ConstantData{.is_const = false}} {}
+  ValuePart() : state{ConstantData{.is_const = false}} {}
 
-  ValuePart(RegBank bank) noexcept
+  ValuePart(RegBank bank)
       : state{
             ConstantData{.is_const = false, .bank = bank}
   } {
@@ -54,7 +54,7 @@ public:
   ValuePart(ValLocalIdx local_idx,
             ValueAssignment *assignment,
             u32 part,
-            bool owned) noexcept
+            bool owned)
       : state{
             .v = ValueData{
                            .owned = owned,
@@ -68,7 +68,7 @@ public:
     assert(!owned || state.v.assignment->references_left == 1);
   }
 
-  ValuePart(const u64 *data, u32 size, RegBank bank) noexcept
+  ValuePart(const u64 *data, u32 size, RegBank bank)
       : state{
             .c = ConstantData{.is_const = true,
                               .const_inline = false,
@@ -80,7 +80,7 @@ public:
     assert(bank.id() < Config::NUM_BANKS);
   }
 
-  ValuePart(const u64 val, u32 size, RegBank bank) noexcept
+  ValuePart(const u64 val, u32 size, RegBank bank)
       : state{
             .c = ConstantData{.is_const = true,
                               .const_inline = true,
@@ -94,17 +94,17 @@ public:
 
   explicit ValuePart(const ValuePart &) = delete;
 
-  ValuePart(ValuePart &&other) noexcept : state{other.state} {
+  ValuePart(ValuePart &&other) : state{other.state} {
     other.state.c = ConstantData{.is_const = false, .bank = bank()};
   }
 
-  ~ValuePart() noexcept {
+  ~ValuePart() {
     assert(!state.c.reg.valid() && "must call reset() on ValuePart explicitly");
   }
 
   ValuePart &operator=(const ValuePart &) = delete;
 
-  ValuePart &operator=(ValuePart &&other) noexcept {
+  ValuePart &operator=(ValuePart &&other) {
     if (this == &other) {
       return *this;
     }
@@ -114,32 +114,30 @@ public:
     return *this;
   }
 
-  bool has_assignment() const noexcept { return state.v.has_assignment; }
+  bool has_assignment() const { return state.v.has_assignment; }
 
-  bool is_const() const noexcept {
-    return !state.c.has_assignment && state.c.is_const;
-  }
+  bool is_const() const { return !state.c.has_assignment && state.c.is_const; }
 
-  bool is_owned() const noexcept {
+  bool is_owned() const {
     assert(has_assignment());
     return state.c.owned;
   }
 
-  [[nodiscard]] AssignmentPartRef assignment() const noexcept {
+  [[nodiscard]] AssignmentPartRef assignment() const {
     assert(has_assignment());
     return AssignmentPartRef{state.v.assignment, state.v.part};
   }
 
   /// If it is known that the value part has a register, this function can be
   /// used to quickly access it
-  AsmReg cur_reg() const noexcept {
+  AsmReg cur_reg() const {
     assert(state.v.reg.valid());
     return state.v.reg;
   }
 
   /// Current register or none, even if the value is unlocked and could be
   /// evicted by any other operation.
-  AsmReg cur_reg_unlocked() const noexcept {
+  AsmReg cur_reg_unlocked() const {
     if (state.v.reg.valid()) {
       return state.v.reg;
     }
@@ -152,7 +150,7 @@ public:
   }
 
   /// Is the value part currently in the specified register?
-  bool is_in_reg(AsmReg reg) const noexcept {
+  bool is_in_reg(AsmReg reg) const {
     if (has_reg()) {
       return cur_reg() == reg;
     }
@@ -163,26 +161,24 @@ public:
     return false;
   }
 
-  bool has_reg() const noexcept { return state.v.reg.valid(); }
+  bool has_reg() const { return state.v.reg.valid(); }
 
 private:
   template <bool Reload>
-  void alloc_reg_impl(CompilerBase *compiler) noexcept;
-  AsmReg alloc_specific_impl(CompilerBase *compiler,
-                             AsmReg reg,
-                             bool reload) noexcept;
+  void alloc_reg_impl(CompilerBase *compiler);
+  AsmReg alloc_specific_impl(CompilerBase *compiler, AsmReg reg, bool reload);
 
 public:
   /// Allocate and lock a register for the value part, *without* reloading the
   /// value. Asserts that no register is currently allocated.
-  AsmReg alloc_reg(CompilerBase *compiler) noexcept {
+  AsmReg alloc_reg(CompilerBase *compiler) {
     alloc_reg_impl</*Reload=*/false>(compiler);
     return cur_reg();
   }
 
   /// Allocate and lock a register for the value part, *without* reloading the
   /// value. Does nothing if a register is already allocated.
-  AsmReg cur_reg_or_alloc(CompilerBase *compiler) noexcept {
+  AsmReg cur_reg_or_alloc(CompilerBase *compiler) {
     if (!has_reg()) {
       alloc_reg_impl</*Reload=*/false>(compiler);
     }
@@ -204,7 +200,7 @@ public:
   ///   } else {
   ///     ASM(LEA64rm, result_reg, FE_MEM(FE_NOREG, 1, operand_reg, 1));
   ///   }
-  AsmReg alloc_try_reuse(CompilerBase *compiler, ValuePart &ref) noexcept {
+  AsmReg alloc_try_reuse(CompilerBase *compiler, ValuePart &ref) {
     assert(ref.has_reg());
     if (!has_assignment() || !assignment().register_valid()) {
       assert(!has_assignment() || !assignment().fixed_assignment());
@@ -224,14 +220,14 @@ public:
   /// or copying the value into the new register. The value must not be locked.
   /// An existing assignment register is discarded. Value part must not be a
   /// fixed assignment.
-  void alloc_specific(CompilerBase *compiler, AsmReg reg) noexcept {
+  void alloc_specific(CompilerBase *compiler, AsmReg reg) {
     alloc_specific_impl(compiler, reg, false);
   }
 
   /// Allocate, fill, and lock a register for the value part, reloading from
   /// the stack or materializing the constant if necessary. Requires that the
   /// value is currently unlocked (i.e., has_reg() is false).
-  AsmReg load_to_reg(CompilerBase *compiler) noexcept {
+  AsmReg load_to_reg(CompilerBase *compiler) {
     alloc_reg_impl</*Reload=*/true>(compiler);
     return cur_reg();
   }
@@ -243,17 +239,17 @@ public:
   ///
   /// \warning Do not overwrite the register content as it is not saved
   /// \note The target register or the current value part may not be fixed
-  void load_to_specific(CompilerBase *compiler, AsmReg reg) noexcept {
+  void load_to_specific(CompilerBase *compiler, AsmReg reg) {
     alloc_specific_impl(compiler, reg, true);
   }
 
   /// Copy value into a different register.
   AsmReg reload_into_specific_fixed(CompilerBase *compiler,
                                     AsmReg reg,
-                                    unsigned size = 0) noexcept;
+                                    unsigned size = 0);
 
   /// For a locked value, get an unonwed ValuePart referring to the register.
-  ValuePart get_unowned() noexcept {
+  ValuePart get_unowned() {
     assert(has_reg());
     ValuePart res{bank()};
     res.state.c =
@@ -262,7 +258,7 @@ public:
   }
 
   /// Move into a temporary register, reuse an existing register if possible.
-  ValuePart into_temporary(CompilerBase *compiler) && noexcept {
+  ValuePart into_temporary(CompilerBase *compiler) && {
     if (is_const()) {
       if (state.c.const_inline) {
         ValuePart res{state.c.inline_data, state.c.size, state.c.bank};
@@ -288,7 +284,7 @@ public:
   }
 
   /// Move into a scratch register, reuse an existing register if possible.
-  ScratchReg into_scratch(CompilerBase *compiler) && noexcept {
+  ScratchReg into_scratch(CompilerBase *compiler) && {
     // TODO: implement this. This needs size information to copy the value.
     assert((has_assignment() || state.c.owned || state.c.is_const) &&
            "into_scratch from unowned ValuePart not implemented");
@@ -303,10 +299,8 @@ public:
 
   /// Extend integer value, reuse existing register if possible. Constants are
   /// extended without allocating a register.
-  ValuePart into_extended(CompilerBase *compiler,
-                          bool sign,
-                          u32 from,
-                          u32 to) && noexcept {
+  ValuePart
+      into_extended(CompilerBase *compiler, bool sign, u32 from, u32 to) && {
     assert(from < to && "invalid integer extension sizes");
     if (is_const() && to <= 64) {
       u64 val = const_data()[0];
@@ -326,10 +320,10 @@ public:
     return res;
   }
 
-  void lock(CompilerBase *compiler) noexcept;
-  void unlock(CompilerBase *compiler) noexcept;
+  void lock(CompilerBase *compiler);
+  void unlock(CompilerBase *compiler);
 
-  void set_modified() noexcept {
+  void set_modified() {
     assert(has_reg() && has_assignment());
     assignment().set_modified(true);
   }
@@ -337,19 +331,19 @@ public:
   /// Set the value to the value of a different value part, possibly taking
   /// ownership of allocated registers. If this value part has an assignment,
   /// the value part will be unlocked.
-  void set_value(CompilerBase *compiler, ValuePart &&other) noexcept;
+  void set_value(CompilerBase *compiler, ValuePart &&other);
 
   /// Set the value to the value of the scratch register, taking ownership of
   /// the register.
-  void set_value(CompilerBase *compiler, ScratchReg &&other) noexcept;
+  void set_value(CompilerBase *compiler, ScratchReg &&other);
 
   /// Set the value to the value of the specified register, possibly taking
   /// ownership of the register. Intended for filling in arguments/calls results
   /// which inherently get stored to fixed registers. There must not be a
   /// currently locked register.
-  void set_value_reg(CompilerBase *compiler, AsmReg reg) noexcept;
+  void set_value_reg(CompilerBase *compiler, AsmReg reg);
 
-  bool can_salvage() const noexcept {
+  bool can_salvage() const {
     if (!has_assignment()) {
       return state.c.owned && state.c.reg.valid();
     }
@@ -358,36 +352,36 @@ public:
   }
 
 private:
-  AsmReg salvage_keep_used(CompilerBase *compiler) noexcept;
+  AsmReg salvage_keep_used(CompilerBase *compiler);
 
 public:
   // only call when can_salvage returns true and a register is known to be
   // allocated
-  AsmReg salvage(CompilerBase *compiler) noexcept {
+  AsmReg salvage(CompilerBase *compiler) {
     AsmReg reg = salvage_keep_used(compiler);
     compiler->register_file.unmark_used(reg);
     return reg;
   }
 
-  ValLocalIdx local_idx() const noexcept {
+  ValLocalIdx local_idx() const {
     assert(has_assignment());
     return state.v.local_idx;
   }
 
-  u32 part() const noexcept {
+  u32 part() const {
     assert(has_assignment());
     return state.v.part;
   }
 
-  RegBank bank() const noexcept {
+  RegBank bank() const {
     return !has_assignment() ? state.c.bank : assignment().bank();
   }
 
-  u32 part_size() const noexcept {
+  u32 part_size() const {
     return !has_assignment() ? state.c.size : assignment().part_size();
   }
 
-  std::span<const u64> const_data() const noexcept {
+  std::span<const u64> const_data() const {
     assert(is_const());
     if (state.c.const_inline) {
       return {&state.c.inline_data, 1};
@@ -396,13 +390,13 @@ public:
   }
 
   /// Reset the reference to the value part
-  void reset(CompilerBase *compiler) noexcept;
+  void reset(CompilerBase *compiler);
 };
 
 template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>
 template <bool Reload>
 void CompilerBase<Adaptor, Derived, Config>::ValuePart::alloc_reg_impl(
-    CompilerBase *compiler) noexcept {
+    CompilerBase *compiler) {
   // The caller has no control over the selected register, so it must assume
   // that this function evicts some register. This is not permitted if the value
   // state ought to be the same.
@@ -458,7 +452,7 @@ void CompilerBase<Adaptor, Derived, Config>::ValuePart::alloc_reg_impl(
 template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>
 typename CompilerBase<Adaptor, Derived, Config>::AsmReg
     CompilerBase<Adaptor, Derived, Config>::ValuePart::alloc_specific_impl(
-        CompilerBase *compiler, AsmReg reg, const bool reload) noexcept {
+        CompilerBase *compiler, AsmReg reg, const bool reload) {
   assert(!state.c.reg.valid());
 
   if (has_assignment()) {
@@ -533,7 +527,7 @@ typename CompilerBase<Adaptor, Derived, Config>::AsmReg
     CompilerBase<Adaptor, Derived, Config>::ValuePart::
         reload_into_specific_fixed(CompilerBase *compiler,
                                    AsmReg reg,
-                                   unsigned size) noexcept {
+                                   unsigned size) {
   if (is_const()) {
     compiler->derived()->materialize_constant(
         const_data().data(), state.c.bank, state.c.size, reg);
@@ -567,7 +561,7 @@ typename CompilerBase<Adaptor, Derived, Config>::AsmReg
 
 template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>
 void CompilerBase<Adaptor, Derived, Config>::ValuePart::lock(
-    CompilerBase *compiler) noexcept {
+    CompilerBase *compiler) {
   assert(has_assignment());
   assert(!has_reg());
   auto ap = assignment();
@@ -580,7 +574,7 @@ void CompilerBase<Adaptor, Derived, Config>::ValuePart::lock(
 
 template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>
 void CompilerBase<Adaptor, Derived, Config>::ValuePart::unlock(
-    CompilerBase *compiler) noexcept {
+    CompilerBase *compiler) {
   assert(has_assignment());
   if (!state.v.reg.valid()) {
     return;
@@ -592,7 +586,7 @@ void CompilerBase<Adaptor, Derived, Config>::ValuePart::unlock(
 
 template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>
 void CompilerBase<Adaptor, Derived, Config>::ValuePart::set_value(
-    CompilerBase *compiler, ValuePart &&other) noexcept {
+    CompilerBase *compiler, ValuePart &&other) {
   assert(this != &other && "cannot assign ValuePart to itself");
   auto &reg_file = compiler->register_file;
   if (!has_assignment()) {
@@ -666,7 +660,7 @@ void CompilerBase<Adaptor, Derived, Config>::ValuePart::set_value(
 
 template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>
 void CompilerBase<Adaptor, Derived, Config>::ValuePart::set_value(
-    CompilerBase *compiler, ScratchReg &&other) noexcept {
+    CompilerBase *compiler, ScratchReg &&other) {
   assert(compiler->may_change_value_state());
 
   auto &reg_file = compiler->register_file;
@@ -723,7 +717,7 @@ void CompilerBase<Adaptor, Derived, Config>::ValuePart::set_value(
 
 template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>
 void CompilerBase<Adaptor, Derived, Config>::ValuePart::set_value_reg(
-    CompilerBase *compiler, AsmReg value_reg) noexcept {
+    CompilerBase *compiler, AsmReg value_reg) {
   assert(compiler->may_change_value_state());
 
   auto &reg_file = compiler->register_file;
@@ -774,7 +768,7 @@ void CompilerBase<Adaptor, Derived, Config>::ValuePart::set_value_reg(
 template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>
 typename CompilerBase<Adaptor, Derived, Config>::AsmReg
     CompilerBase<Adaptor, Derived, Config>::ValuePart::salvage_keep_used(
-        CompilerBase *compiler) noexcept {
+        CompilerBase *compiler) {
   assert(compiler->may_change_value_state());
   assert(can_salvage());
   if (!has_assignment()) {
@@ -802,7 +796,7 @@ typename CompilerBase<Adaptor, Derived, Config>::AsmReg
 
 template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>
 void CompilerBase<Adaptor, Derived, Config>::ValuePart::reset(
-    CompilerBase *compiler) noexcept {
+    CompilerBase *compiler) {
   AsmReg reg = state.c.reg;
   if (!reg.valid()) {
     return;
@@ -838,19 +832,19 @@ struct CompilerBase<Adaptor, Derived, Config>::ValuePartRef : ValuePart {
   CompilerBase *compiler;
 
   template <typename... Args>
-  ValuePartRef(CompilerBase *compiler, Args &&...args) noexcept
+  ValuePartRef(CompilerBase *compiler, Args &&...args)
       : ValuePart(std::forward<Args>(args)...), compiler(compiler) {}
 
   explicit ValuePartRef(const ValuePartRef &) = delete;
 
-  ValuePartRef(ValuePartRef &&other) noexcept
+  ValuePartRef(ValuePartRef &&other)
       : ValuePart(std::move(other)), compiler(other.compiler) {}
 
-  ~ValuePartRef() noexcept { reset(); }
+  ~ValuePartRef() { reset(); }
 
   ValuePartRef &operator=(const ValuePartRef &) = delete;
 
-  ValuePartRef &operator=(ValuePartRef &&other) noexcept {
+  ValuePartRef &operator=(ValuePartRef &&other) {
     if (this == &other) {
       return *this;
     }
@@ -859,80 +853,76 @@ struct CompilerBase<Adaptor, Derived, Config>::ValuePartRef : ValuePart {
     return *this;
   }
 
-  ValuePartRef &operator=(ValuePart &&other) noexcept {
+  ValuePartRef &operator=(ValuePart &&other) {
     reset();
     ValuePart::operator=(std::move(other));
     return *this;
   }
 
-  AsmReg alloc_reg() noexcept { return ValuePart::alloc_reg(compiler); }
+  AsmReg alloc_reg() { return ValuePart::alloc_reg(compiler); }
 
-  AsmReg cur_reg_or_alloc() noexcept {
-    return ValuePart::cur_reg_or_alloc(compiler);
-  }
+  AsmReg cur_reg_or_alloc() { return ValuePart::cur_reg_or_alloc(compiler); }
 
-  AsmReg alloc_try_reuse(ValuePart &ref) noexcept {
+  AsmReg alloc_try_reuse(ValuePart &ref) {
     return ValuePart::alloc_try_reuse(compiler, ref);
   }
 
-  void alloc_specific(AsmReg reg) noexcept {
-    ValuePart::alloc_specific(compiler, reg);
-  }
+  void alloc_specific(AsmReg reg) { ValuePart::alloc_specific(compiler, reg); }
 
-  AsmReg load_to_reg() noexcept { return ValuePart::load_to_reg(compiler); }
+  AsmReg load_to_reg() { return ValuePart::load_to_reg(compiler); }
 
-  void load_to_specific(AsmReg reg) noexcept {
+  void load_to_specific(AsmReg reg) {
     ValuePart::load_to_specific(compiler, reg);
   }
 
-  AsmReg reload_into_specific_fixed(AsmReg reg, unsigned size = 0) noexcept {
+  AsmReg reload_into_specific_fixed(AsmReg reg, unsigned size = 0) {
     return ValuePart::reload_into_specific_fixed(compiler, reg, size);
   }
 
   AsmReg reload_into_specific_fixed(CompilerBase *compiler,
                                     AsmReg reg,
-                                    unsigned size = 0) noexcept {
+                                    unsigned size = 0) {
     return ValuePart::reload_into_specific_fixed(compiler, reg, size);
   }
 
-  ValuePartRef get_unowned_ref() noexcept {
+  ValuePartRef get_unowned_ref() {
     return ValuePartRef{compiler, ValuePart::get_unowned()};
   }
 
-  ValuePartRef into_temporary() && noexcept {
+  ValuePartRef into_temporary() && {
     return ValuePartRef{
         compiler,
         std::move(*static_cast<ValuePart *>(this)).into_temporary(compiler)};
   }
 
-  ScratchReg into_scratch() && noexcept {
+  ScratchReg into_scratch() && {
     return std::move(*static_cast<ValuePart *>(this)).into_scratch(compiler);
   }
 
-  ValuePartRef into_extended(bool sign, u32 from, u32 to) && noexcept {
+  ValuePartRef into_extended(bool sign, u32 from, u32 to) && {
     return ValuePartRef{compiler,
                         std::move(*static_cast<ValuePart *>(this))
                             .into_extended(compiler, sign, from, to)};
   }
 
-  void lock() noexcept { ValuePart::lock(compiler); }
-  void unlock() noexcept { ValuePart::unlock(compiler); }
+  void lock() { ValuePart::lock(compiler); }
+  void unlock() { ValuePart::unlock(compiler); }
 
-  void set_value(ValuePart &&other) noexcept {
+  void set_value(ValuePart &&other) {
     ValuePart::set_value(compiler, std::move(other));
   }
 
-  void set_value(ScratchReg &&other) noexcept {
+  void set_value(ScratchReg &&other) {
     ValuePart::set_value(compiler, std::move(other));
   }
 
-  void set_value_reg(AsmReg value_reg) noexcept {
+  void set_value_reg(AsmReg value_reg) {
     ValuePart::set_value_reg(compiler, value_reg);
   }
 
-  AsmReg salvage() noexcept { return ValuePart::salvage(compiler); }
+  AsmReg salvage() { return ValuePart::salvage(compiler); }
 
-  void reset() noexcept { ValuePart::reset(compiler); }
+  void reset() { ValuePart::reset(compiler); }
 };
 
 } // namespace tpde

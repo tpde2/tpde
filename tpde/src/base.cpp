@@ -7,7 +7,7 @@
 
 namespace tpde {
 
-[[noreturn]] void fatal_error([[maybe_unused]] const char *msg) noexcept {
+[[noreturn]] void fatal_error([[maybe_unused]] const char *msg) {
   TPDE_LOG_ERR("TPDE FATAL ERROR: {}", msg);
   abort();
 }

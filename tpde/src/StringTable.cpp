@@ -7,7 +7,7 @@
 
 namespace tpde {
 
-size_t StringTable::add(std::string_view str) noexcept {
+size_t StringTable::add(std::string_view str) {
   if (str.empty()) {
     return 0;
   }
@@ -20,8 +20,7 @@ size_t StringTable::add(std::string_view str) noexcept {
   return off;
 }
 
-size_t StringTable::add_prefix(std::string_view prefix,
-                               std::string_view str) noexcept {
+size_t StringTable::add_prefix(std::string_view prefix, std::string_view str) {
   // TODO: use hash table for deduplication
   size_t off = strtab.size();
   strtab.resize_uninitialized(strtab.size() + prefix.size() + str.size() + 1);

@@ -243,7 +243,7 @@ llvm::Instruction *LLVMAdaptor::handle_inst_in_block(llvm::Instruction *inst) {
   return nullptr;
 }
 
-bool LLVMAdaptor::switch_func(const IRFuncRef function) noexcept {
+bool LLVMAdaptor::switch_func(const IRFuncRef function) {
   llvm::TimeTraceScope time_scope("TPDE_Prepass", [function]() {
     // getName is expensive, so only call it when time tracing is enabled.
     return std::string(function->getName());
@@ -383,7 +383,7 @@ bool LLVMAdaptor::switch_func(const IRFuncRef function) noexcept {
   return !func_unsupported;
 }
 
-bool LLVMAdaptor::switch_module(llvm::Module &mod) noexcept {
+bool LLVMAdaptor::switch_module(llvm::Module &mod) {
   if (this->mod) {
     reset();
   }
@@ -458,7 +458,7 @@ bool LLVMAdaptor::switch_module(llvm::Module &mod) noexcept {
   return !unsupported_global;
 }
 
-void LLVMAdaptor::reset() noexcept {
+void LLVMAdaptor::reset() {
   context = nullptr;
   mod = nullptr;
   values.clear();
@@ -479,14 +479,14 @@ void LLVMAdaptor::reset() noexcept {
   block_succ_ranges.clear();
 }
 
-void LLVMAdaptor::report_incompatible_type(llvm::Type *type) noexcept {
+void LLVMAdaptor::report_incompatible_type(llvm::Type *type) {
   std::string type_name;
   llvm::raw_string_ostream(type_name) << *type;
   TPDE_LOG_ERR("type with incompatible layout at function/call: {}", type_name);
   func_unsupported = true;
 }
 
-void LLVMAdaptor::report_unsupported_type(llvm::Type *type) noexcept {
+void LLVMAdaptor::report_unsupported_type(llvm::Type *type) {
   std::string type_name;
   llvm::raw_string_ostream(type_name) << *type;
   TPDE_LOG_ERR("unsupported type: {}", type_name);
@@ -494,7 +494,7 @@ void LLVMAdaptor::report_unsupported_type(llvm::Type *type) noexcept {
 }
 
 static std::tuple<LLVMBasicValType, u32, bool>
-    lower_vector_type(const llvm::FixedVectorType *type) noexcept {
+    lower_vector_type(const llvm::FixedVectorType *type) {
   auto *el_ty = type->getElementType();
   auto num_elts = type->getNumElements();
 
@@ -614,8 +614,7 @@ static std::tuple<LLVMBasicValType, u32, bool>
   }
 }
 
-LLVMBasicValType
-    LLVMAdaptor::lower_simple_type(const llvm::Type *type) noexcept {
+LLVMBasicValType LLVMAdaptor::lower_simple_type(const llvm::Type *type) {
   constexpr size_t LutBeginInt = llvm::Type::TargetExtTyID + 1;
   static constexpr auto type_lut = []() {
     std::array<LLVMBasicValType, LutBeginInt + 129> tys{};
@@ -648,8 +647,7 @@ LLVMBasicValType
 }
 
 std::pair<unsigned, unsigned>
-    LLVMAdaptor::complex_types_append(llvm::Type *type,
-                                      size_t desc_idx) noexcept {
+    LLVMAdaptor::complex_types_append(llvm::Type *type, size_t desc_idx) {
   auto ty = lower_simple_type(type);
   unsigned num;
   if (ty != LLVMBasicValType::invalid) {
@@ -752,7 +750,7 @@ std::pair<unsigned, unsigned>
 }
 
 [[gnu::noinline]] std::pair<LLVMBasicValType, unsigned long>
-    LLVMAdaptor::lower_complex_type(llvm::Type *type) noexcept {
+    LLVMAdaptor::lower_complex_type(llvm::Type *type) {
   auto [it, inserted] = complex_type_map.try_emplace(type);
   if (inserted) {
     // Vector types are rather uncommon and non-trivial to handle, so handle

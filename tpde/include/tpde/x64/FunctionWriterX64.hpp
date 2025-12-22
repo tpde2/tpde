@@ -19,9 +19,9 @@ class FunctionWriterX64 : public FunctionWriter<FunctionWriterX64> {
   static constexpr u32 JumpTableCodeSize = 18;
 
 public:
-  FunctionWriterX64() noexcept : FunctionWriter(CIEInfo) {}
+  FunctionWriterX64() : FunctionWriter(CIEInfo) {}
 
-  void align(size_t align) noexcept {
+  void align(size_t align) {
     u32 old_off = offset();
     FunctionWriter::align(align);
     // Pad text section with NOPs.
@@ -30,7 +30,7 @@ public:
     }
   }
 
-  JumpTable &create_jump_table(u32 size, Reg idx, Reg tmp) noexcept {
+  JumpTable &create_jump_table(u32 size, Reg idx, Reg tmp) {
     JumpTable &jt = alloc_jump_table(size, idx, tmp);
     ensure_space(JumpTableCodeSize);
     cur_ptr() += JumpTableCodeSize;
@@ -38,7 +38,7 @@ public:
   }
 
 private:
-  void handle_fixups() noexcept;
+  void handle_fixups();
 };
 
 } // namespace tpde::x64

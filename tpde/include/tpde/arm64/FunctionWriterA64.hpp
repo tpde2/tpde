@@ -19,9 +19,9 @@ class FunctionWriterA64 : public FunctionWriter<FunctionWriterA64> {
   static constexpr u32 JumpTableCodeSize = 24;
 
 public:
-  FunctionWriterA64() noexcept : FunctionWriter(CIEInfo) {}
+  FunctionWriterA64() : FunctionWriter(CIEInfo) {}
 
-  void begin_func(u32 align, u32 expected_size) noexcept {
+  void begin_func(u32 align, u32 expected_size) {
     veneers.clear();
     // Must clear unresolved count here, begin_func will call more_space.
     unresolved_cond_brs = unresolved_test_brs = 0;
@@ -29,10 +29,10 @@ public:
   }
 
 private:
-  void more_space(u32 size) noexcept;
+  void more_space(u32 size);
 
 public:
-  JumpTable &create_jump_table(u32 size, Reg idx, Reg tmp, bool is32) noexcept {
+  JumpTable &create_jump_table(u32 size, Reg idx, Reg tmp, bool is32) {
     JumpTable &jt = alloc_jump_table(size, idx, tmp);
     jt.misc = is32;
     ensure_space(JumpTableCodeSize);
@@ -40,7 +40,7 @@ public:
     return jt;
   }
 
-  void ensure_space(size_t size) noexcept {
+  void ensure_space(size_t size) {
     // Advancing by more than 32kiB is problematic: when inserting a tbz,
     // more_space might not be called within 32kiB, preventing the insertion of
     // required veneer space. However, all veneers must be reachable from every
@@ -49,7 +49,7 @@ public:
     FunctionWriter::ensure_space(size);
   }
 
-  bool try_write_inst(u32 inst) noexcept {
+  bool try_write_inst(u32 inst) {
     if (inst == 0) {
       return false;
     }
@@ -57,17 +57,17 @@ public:
     return true;
   }
 
-  void write_inst(u32 inst) noexcept {
+  void write_inst(u32 inst) {
     assert(inst != 0);
     write(inst);
   }
 
-  void write_inst_unchecked(u32 inst) noexcept {
+  void write_inst_unchecked(u32 inst) {
     assert(inst != 0);
     write_unchecked(inst);
   }
 
-  void label_ref(Label label, u32 off, LabelFixupKind kind) noexcept {
+  void label_ref(Label label, u32 off, LabelFixupKind kind) {
     FunctionWriter::label_ref(label, off, kind);
     if (kind == LabelFixupKind::AARCH64_COND_BR) {
       unresolved_cond_brs++;
@@ -76,10 +76,10 @@ public:
     }
   }
 
-  void eh_advance(u64 size) noexcept { eh_advance_raw(size / 4); }
+  void eh_advance(u64 size) { eh_advance_raw(size / 4); }
 
 private:
-  void handle_fixups() noexcept;
+  void handle_fixups();
 };
 
 } // namespace tpde::a64

@@ -24,21 +24,21 @@ struct CompilerBase<Adaptor, Derived, Config>::GenericValuePart {
     explicit Expr(ScratchReg &&base, i64 disp = 0)
         : base(std::move(base)), scale(0), disp(disp) {}
 
-    AsmReg base_reg() const noexcept {
+    AsmReg base_reg() const {
       if (std::holds_alternative<AsmReg>(base)) {
         return std::get<AsmReg>(base);
       }
       return std::get<ScratchReg>(base).cur_reg();
     }
 
-    [[nodiscard]] bool has_base() const noexcept {
+    [[nodiscard]] bool has_base() const {
       if (std::holds_alternative<AsmReg>(base)) {
         return std::get<AsmReg>(base).valid();
       }
       return true;
     }
 
-    AsmReg index_reg() const noexcept {
+    AsmReg index_reg() const {
       assert(scale != 0 && "index_reg() called on invalid index");
       assert((scale != 1 || has_base()) &&
              "Expr with unscaled index must have base");
@@ -48,7 +48,7 @@ struct CompilerBase<Adaptor, Derived, Config>::GenericValuePart {
       return std::get<ScratchReg>(index).cur_reg();
     }
 
-    [[nodiscard]] bool has_index() const noexcept { return scale != 0; }
+    [[nodiscard]] bool has_index() const { return scale != 0; }
   };
 
   // TODO(ts): evaluate the use of std::variant
@@ -60,14 +60,14 @@ struct CompilerBase<Adaptor, Derived, Config>::GenericValuePart {
 
   GenericValuePart(GenericValuePart &) = delete;
 
-  GenericValuePart(GenericValuePart &&other) noexcept {
+  GenericValuePart(GenericValuePart &&other) {
     state = std::move(other.state);
     other.state = std::monostate{};
   }
 
-  GenericValuePart &operator=(const GenericValuePart &) noexcept = delete;
+  GenericValuePart &operator=(const GenericValuePart &) = delete;
 
-  GenericValuePart &operator=(GenericValuePart &&other) noexcept {
+  GenericValuePart &operator=(GenericValuePart &&other) {
     if (this == &other) {
       return *this;
     }
@@ -77,42 +77,42 @@ struct CompilerBase<Adaptor, Derived, Config>::GenericValuePart {
   }
 
   // salvaging
-  GenericValuePart(ScratchReg &&reg) noexcept : state{std::move(reg)} {
+  GenericValuePart(ScratchReg &&reg) : state{std::move(reg)} {
     assert(std::get<ScratchReg>(state).has_reg());
   }
 
   // salvaging
-  GenericValuePart(ValuePartRef &&ref) noexcept : state{std::move(ref)} {}
+  GenericValuePart(ValuePartRef &&ref) : state{std::move(ref)} {}
 
-  GenericValuePart(Expr expr) noexcept : state{std::move(expr)} {}
+  GenericValuePart(Expr expr) : state{std::move(expr)} {}
 
-  [[nodiscard]] bool is_expr() const noexcept {
+  [[nodiscard]] bool is_expr() const {
     return std::holds_alternative<Expr>(state);
   }
 
-  [[nodiscard]] bool is_imm() const noexcept {
+  [[nodiscard]] bool is_imm() const {
     auto *ptr = std::get_if<ValuePartRef>(&state);
     return ptr && ptr->is_const();
   }
 
-  u32 imm_size() const noexcept {
+  u32 imm_size() const {
     assert(is_imm());
     return val_ref().part_size();
   }
 
-  [[nodiscard]] u64 imm64() const noexcept {
+  [[nodiscard]] u64 imm64() const {
     assert(imm_size() <= 8);
     return val_ref().const_data()[0];
   }
 
-  [[nodiscard]] const ValuePartRef &val_ref() const noexcept {
+  [[nodiscard]] const ValuePartRef &val_ref() const {
     return std::get<ValuePartRef>(state);
   }
 
-  [[nodiscard]] ValuePartRef &val_ref() noexcept {
+  [[nodiscard]] ValuePartRef &val_ref() {
     return std::get<ValuePartRef>(state);
   }
 
-  void reset() noexcept { state = std::monostate{}; }
+  void reset() { state = std::monostate{}; }
 };
 } // namespace tpde

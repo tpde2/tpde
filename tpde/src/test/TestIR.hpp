@@ -114,10 +114,10 @@ struct TestIR {
   std::vector<Block> blocks;
   std::vector<Function> functions;
 
-  [[nodiscard]] bool parse_ir(std::string_view text) noexcept;
+  [[nodiscard]] bool parse_ir(std::string_view text);
 
-  void dump_debug() const noexcept;
-  void print() const noexcept;
+  void dump_debug() const;
+  void print() const;
 };
 
 } // namespace tpde::test

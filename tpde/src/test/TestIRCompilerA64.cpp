@@ -20,24 +20,22 @@ struct TestIRCompilerA64 : a64::CompilerA64<TestIRAdaptor, TestIRCompilerA64> {
   explicit TestIRCompilerA64(TestIRAdaptor *adaptor, bool no_fixed_assignments)
       : Base{adaptor}, no_fixed_assignments(no_fixed_assignments) {}
 
-  SymRef cur_personality_func() const noexcept { return {}; }
+  SymRef cur_personality_func() const { return {}; }
 
-  bool cur_func_may_emit_calls() const noexcept {
+  bool cur_func_may_emit_calls() const {
     return this->ir()->functions[this->adaptor->cur_func].has_call;
   }
 
   struct ValueParts {
-    static u32 count() noexcept { return 1; }
-    static u32 size_bytes(u32) noexcept { return 8; }
-    static RegBank reg_bank(u32) noexcept {
-      return a64::PlatformConfig::GP_BANK;
-    }
+    static u32 count() { return 1; }
+    static u32 size_bytes(u32) { return 8; }
+    static RegBank reg_bank(u32) { return a64::PlatformConfig::GP_BANK; }
   };
 
   ValueParts val_parts(IRValueRef) { return ValueParts{}; }
 
   AsmReg select_fixed_assignment_reg(AssignmentPartRef ap,
-                                     const IRValueRef value) noexcept {
+                                     const IRValueRef value) {
     if (no_fixed_assignments && !try_force_fixed_assignment(value)) {
       return AsmReg::make_invalid();
     }
@@ -45,36 +43,34 @@ struct TestIRCompilerA64 : a64::CompilerA64<TestIRAdaptor, TestIRCompilerA64> {
     return Base::select_fixed_assignment_reg(ap, value);
   }
 
-  bool try_force_fixed_assignment(const IRValueRef value) const noexcept {
+  bool try_force_fixed_assignment(const IRValueRef value) const {
     return ir()->values[static_cast<u32>(value)].force_fixed_assignment;
   }
 
-  std::optional<ValRefSpecial> val_ref_special(IRValueRef) noexcept {
-    return {};
-  }
+  std::optional<ValRefSpecial> val_ref_special(IRValueRef) { return {}; }
 
-  ValuePart val_part_ref_special(ValRefSpecial &, u32) noexcept {
+  ValuePart val_part_ref_special(ValRefSpecial &, u32) {
     TPDE_UNREACHABLE("val_part_ref_special on IR without special values");
   }
 
-  void define_func_idx(IRFuncRef func, const u32 idx) noexcept {
+  void define_func_idx(IRFuncRef func, const u32 idx) {
     assert(static_cast<u32>(func) == idx);
     (void)func;
     (void)idx;
   }
 
-  [[nodiscard]] bool compile_inst(IRInstRef, InstRange) noexcept;
+  [[nodiscard]] bool compile_inst(IRInstRef, InstRange);
 
-  TestIR *ir() noexcept { return this->adaptor->ir; }
+  TestIR *ir() { return this->adaptor->ir; }
 
-  const TestIR *ir() const noexcept { return this->adaptor->ir; }
+  const TestIR *ir() const { return this->adaptor->ir; }
 
-  bool compile_add(IRInstRef) noexcept;
-  bool compile_sub(IRInstRef) noexcept;
-  bool compile_condselect(IRInstRef) noexcept;
+  bool compile_add(IRInstRef);
+  bool compile_sub(IRInstRef);
+  bool compile_condselect(IRInstRef);
 };
 
-bool TestIRCompilerA64::compile_inst(IRInstRef inst_idx, InstRange) noexcept {
+bool TestIRCompilerA64::compile_inst(IRInstRef inst_idx, InstRange) {
   const TestIR::Value &value =
       this->analyzer.adaptor->ir->values[static_cast<u32>(inst_idx)];
   assert(value.type == TestIR::Value::Type::normal ||
@@ -162,7 +158,7 @@ bool TestIRCompilerA64::compile_inst(IRInstRef inst_idx, InstRange) noexcept {
   return false;
 }
 
-bool TestIRCompilerA64::compile_add(IRInstRef inst_idx) noexcept {
+bool TestIRCompilerA64::compile_add(IRInstRef inst_idx) {
   const TestIR::Value &value = ir()->values[static_cast<u32>(inst_idx)];
 
   const auto lhs_idx =
@@ -183,7 +179,7 @@ bool TestIRCompilerA64::compile_add(IRInstRef inst_idx) noexcept {
   return true;
 }
 
-bool TestIRCompilerA64::compile_sub(IRInstRef inst_idx) noexcept {
+bool TestIRCompilerA64::compile_sub(IRInstRef inst_idx) {
   const TestIR::Value &value = ir()->values[static_cast<u32>(inst_idx)];
 
   const auto lhs_idx =
@@ -203,7 +199,7 @@ bool TestIRCompilerA64::compile_sub(IRInstRef inst_idx) noexcept {
   res.set_modified();
   return true;
 }
-bool TestIRCompilerA64::compile_condselect(IRInstRef inst_idx) noexcept {
+bool TestIRCompilerA64::compile_condselect(IRInstRef inst_idx) {
   const TestIR::Value &value = ir()->values[static_cast<u32>(inst_idx)];
 
   const auto lhs_comp_idx =

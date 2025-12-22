@@ -30,7 +30,7 @@ class BumpAllocator {
 
 public:
   BumpAllocator() = default;
-  ~BumpAllocator() noexcept {
+  ~BumpAllocator() {
     deallocate_slabs();
     deallocate_large_slabs();
   }
@@ -40,7 +40,7 @@ public:
   BumpAllocator &operator=(const BumpAllocator &) = delete;
 
   /// Deallocate all but the first slab and reset current pointer to beginning.
-  void reset() noexcept {
+  void reset() {
     if (!slabs.empty()) {
       deallocate_slabs(1);
       slabs.resize(1);
@@ -51,7 +51,7 @@ public:
     deallocate_large_slabs();
   }
 
-  void *allocate(size_t size, size_t align) noexcept {
+  void *allocate(size_t size, size_t align) {
     assert(size > 0 && "cannot perform zero-sized allocation");
     uintptr_t aligned = align_up(cur, align);
     uintptr_t alloc_end = aligned + size;
@@ -63,7 +63,7 @@ public:
     return allocate_slab(size, align);
   }
 
-  void *allocate_slab(size_t size, [[maybe_unused]] size_t align) noexcept {
+  void *allocate_slab(size_t size, [[maybe_unused]] size_t align) {
     assert(align <= alignof(std::max_align_t) && "alignment type unsupported");
     size_t slab_sz = slab_size(slabs.size());
     if (size > slab_sz) [[unlikely]] {
@@ -82,13 +82,13 @@ public:
   }
 
 private:
-  void *allocate_mem(size_t size, std::align_val_t align) noexcept {
+  void *allocate_mem(size_t size, std::align_val_t align) {
     return ::operator new(size, align, std::nothrow);
   }
 
   void deallocate_mem(void *ptr,
                       [[maybe_unused]] size_t size,
-                      std::align_val_t align) noexcept {
+                      std::align_val_t align) {
 #ifdef __cpp_sized_deallocation
     ::operator delete(ptr, size, align);
 #else
@@ -96,13 +96,13 @@ private:
 #endif
   }
 
-  void deallocate_slabs(size_t skip = 0) noexcept {
+  void deallocate_slabs(size_t skip = 0) {
     for (size_t i = skip; i < slabs.size(); ++i) {
       deallocate_mem(slabs[i], slab_size(i), SLAB_ALIGNMENT);
     }
   }
 
-  void deallocate_large_slabs() noexcept {
+  void deallocate_large_slabs() {
     for (auto [slab, size] : large_slabs) {
       deallocate_mem(slab, size, SLAB_ALIGNMENT);
     }
@@ -112,7 +112,7 @@ private:
 
 template <typename T>
 struct BumpAllocatorDeleter {
-  constexpr BumpAllocatorDeleter() noexcept = default;
+  constexpr BumpAllocatorDeleter() = default;
   void operator()(T *ptr) const { std::destroy_at(ptr); }
 };
 
@@ -122,19 +122,17 @@ using BumpAllocUniquePtr = std::unique_ptr<T, BumpAllocatorDeleter<T>>;
 } // namespace tpde::util
 
 template <size_t SlabSize>
-void *operator new(size_t s, tpde::util::BumpAllocator<SlabSize> &a) noexcept {
+void *operator new(size_t s, tpde::util::BumpAllocator<SlabSize> &a) {
   return a.allocate(s, std::min(s, alignof(std::max_align_t)));
 }
 
 template <size_t SlabSize>
-void *operator new[](size_t s,
-                     tpde::util::BumpAllocator<SlabSize> &a) noexcept {
+void *operator new[](size_t s, tpde::util::BumpAllocator<SlabSize> &a) {
   return a.allocate(s, std::min(s, alignof(std::max_align_t)));
 }
 
 template <size_t SlabSize>
-void operator delete(void *, tpde::util::BumpAllocator<SlabSize> &) noexcept {}
+void operator delete(void *, tpde::util::BumpAllocator<SlabSize> &) {}
 
 template <size_t SlabSize>
-void operator delete[](void *, tpde::util::BumpAllocator<SlabSize> &) noexcept {
-}
+void operator delete[](void *, tpde::util::BumpAllocator<SlabSize> &) {}

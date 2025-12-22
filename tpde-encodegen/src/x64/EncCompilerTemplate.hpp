@@ -55,40 +55,40 @@ struct EncodeCompiler {
     using ValuePart = typename CompilerX64::ValuePart;
     using GenericValuePart = typename CompilerX64::GenericValuePart;
 
-    [[nodiscard]] static std::optional<i32> encodeable_as_imm32_sext(GenericValuePart &gv) noexcept;
-    [[nodiscard]] static std::optional<FeMem> encodeable_as_mem(GenericValuePart &gv, unsigned align) noexcept;
-    [[nodiscard]] static std::optional<FeMem> encodeable_with(GenericValuePart &gv, FeMem other, bool addr32 = false) noexcept;
+    [[nodiscard]] static std::optional<i32> encodeable_as_imm32_sext(GenericValuePart &gv);
+    [[nodiscard]] static std::optional<FeMem> encodeable_as_mem(GenericValuePart &gv, unsigned align);
+    [[nodiscard]] static std::optional<FeMem> encodeable_with(GenericValuePart &gv, FeMem other, bool addr32 = false);
     void          try_salvage_or_materialize(GenericValuePart &gv,
                                              ScratchReg     &dst_scratch,
                                              u8              bank,
-                                             u32             size) noexcept;
+                                             u32             size);
     void          try_salvage_or_materialize(GenericValuePart &gv,
                                              ValuePart      &dst_scratch,
                                              u8              bank,
-                                             u32             size) noexcept;
+                                             u32             size);
 
-    CompilerX64 *derived() noexcept {
+    CompilerX64 *derived() {
         return static_cast<CompilerX64 *>(static_cast<Derived *>(this));
     }
 
-    const CompilerX64 *derived() const noexcept {
+    const CompilerX64 *derived() const {
         return static_cast<const CompilerX64 *>(
             static_cast<const Derived *>(this));
     }
 
-    static bool reg_needs_avx512(AsmReg reg) noexcept {
+    static bool reg_needs_avx512(AsmReg reg) {
         if (reg.id() > AsmReg::XMM15) {
             return true;
         }
         return false;
     }
 
-    [[nodiscard]] bool has_avx() const noexcept {
+    [[nodiscard]] bool has_avx() const {
         return derived()->has_cpu_feats(CompilerX64::CPU_AVX);
     }
 
     [[nodiscard]] static bool disp_add_encodeable(int32_t disp,
-                                                  int32_t add) noexcept {
+                                                  int32_t add) {
         const auto tmp = static_cast<int64_t>(disp) + add;
         return (static_cast<int64_t>(static_cast<int32_t>(tmp)) == tmp);
     }
@@ -103,13 +103,13 @@ struct EncodeCompiler {
     void scratch_alloc_specific(AsmReg                              reg,
                                 ScratchReg                         &scratch,
                                 std::initializer_list<GenericValuePart *> operands,
-                                FixedRegBackup &backup_reg) noexcept;
+                                FixedRegBackup &backup_reg);
 
     void scratch_check_fixed_backup(ScratchReg     &scratch,
                                     FixedRegBackup &backup_reg,
-                                    bool            is_ret_reg) noexcept;
+                                    bool            is_ret_reg);
 
-    void reset() noexcept {
+    void reset() {
         symbols.fill({});
     }
 
@@ -135,7 +135,7 @@ template <typename Adaptor,
           class BaseTy,
           typename Config>
 std::optional<i32> EncodeCompiler<Adaptor, Derived, BaseTy, Config>::
-    encodeable_as_imm32_sext(GenericValuePart &gv) noexcept {
+    encodeable_as_imm32_sext(GenericValuePart &gv) {
     if (!gv.is_imm()) {
         return std::nullopt;
     }
@@ -155,7 +155,7 @@ template <typename Adaptor,
           class BaseTy,
           typename Config>
 std::optional<FeMem> EncodeCompiler<Adaptor, Derived, BaseTy, Config>::
-    encodeable_as_mem(GenericValuePart &gv, unsigned align) noexcept {
+    encodeable_as_mem(GenericValuePart &gv, unsigned align) {
     if (!std::holds_alternative<ValuePartRef>(gv.state)) {
         return std::nullopt;
     }
@@ -179,7 +179,7 @@ template <typename Adaptor,
           class BaseTy,
           typename Config>
 std::optional<FeMem> EncodeCompiler<Adaptor, Derived, BaseTy, Config>::
-    encodeable_with(GenericValuePart &gv, FeMem other, bool addr32) noexcept {
+    encodeable_with(GenericValuePart &gv, FeMem other, bool addr32) {
     const auto disp_encodeable = [addr32](u64 a, u64 b) -> std::optional<i32> {
         auto sum = static_cast<i32>(a + b);
         if (addr32 || static_cast<i64>(sum) == static_cast<i64>(a + b))
@@ -240,7 +240,7 @@ void EncodeCompiler<Adaptor, Derived, BaseTy, Config>::
     try_salvage_or_materialize(GenericValuePart &gv,
                                ScratchReg     &dst_scratch,
                                u8              bank,
-                               u32             size) noexcept {
+                               u32             size) {
     AsmReg reg = derived()->gval_as_reg_reuse(gv, dst_scratch);
     if (!dst_scratch.has_reg()) {
         dst_scratch.alloc(RegBank(bank));
@@ -259,7 +259,7 @@ void EncodeCompiler<Adaptor, Derived, BaseTy, Config>::
     try_salvage_or_materialize(GenericValuePart &gv,
                                ValuePart      &dst_scratch,
                                u8              ,
-                               u32             size) noexcept {
+                               u32             size) {
     AsmReg reg = derived()->gval_as_reg_reuse(gv, dst_scratch);
     if (!dst_scratch.has_reg()) {
         dst_scratch.alloc_reg(derived());
@@ -278,7 +278,7 @@ void EncodeCompiler<Adaptor, Derived, BaseTy, Config>::scratch_alloc_specific(
     AsmReg                              reg,
     ScratchReg                         &scratch,
     std::initializer_list<GenericValuePart *> operands,
-    FixedRegBackup                     &backup_reg) noexcept {
+    FixedRegBackup                     &backup_reg) {
     if (!derived()->register_file.is_fixed(reg)) [[likely]] {
         scratch.alloc_specific(reg);
         return;
@@ -389,7 +389,7 @@ template <typename Adaptor,
 void EncodeCompiler<Adaptor, Derived, BaseTy, Config>::
     scratch_check_fixed_backup(ScratchReg     &scratch,
                                FixedRegBackup &backup_reg,
-                               const bool      is_ret_reg) noexcept {
+                               const bool      is_ret_reg) {
     if (!backup_reg.scratch.has_reg()) [[likely]] {
         return;
     }

@@ -54,13 +54,13 @@ struct EncodeCompiler {
     using ValuePart = typename CompilerA64::ValuePart;
     using GenericValuePart = typename CompilerA64::GenericValuePart;
 
-    std::optional<u64> encodeable_as_shiftimm(GenericValuePart &gv, unsigned size) const noexcept {
+    std::optional<u64> encodeable_as_shiftimm(GenericValuePart &gv, unsigned size) const {
         if (gv.is_imm() && gv.imm_size() <= 8) {
             return gv.imm64() & (size - 1);
         }
         return std::nullopt;
     }
-    std::optional<u64> encodeable_as_immarith(GenericValuePart &gv) const noexcept {
+    std::optional<u64> encodeable_as_immarith(GenericValuePart &gv) const {
         if (gv.is_imm() && gv.imm_size() <= 8) {
             u64 val = gv.imm64();
             val     = static_cast<i64>(val) < 0 ? -val : val;
@@ -70,7 +70,7 @@ struct EncodeCompiler {
         }
         return std::nullopt;
     }
-    std::optional<u64> encodeable_as_immlogical(GenericValuePart &gv, bool inv) const noexcept {
+    std::optional<u64> encodeable_as_immlogical(GenericValuePart &gv, bool inv) const {
         if (gv.is_imm()) {
             u64 imm = gv.imm64() ^ (inv ? ~u64{0} : 0);
             if (gv.imm_size() == 8 && de64_ANDxi(DA_GP(0), DA_GP(0), imm))
@@ -80,22 +80,22 @@ struct EncodeCompiler {
         }
         return std::nullopt;
     }
-    std::optional<std::pair<AsmReg, u64>> encodeable_with_mem_uoff12(GenericValuePart &gv, u64 off, unsigned shift) noexcept;
+    std::optional<std::pair<AsmReg, u64>> encodeable_with_mem_uoff12(GenericValuePart &gv, u64 off, unsigned shift);
 
     void   try_salvage_or_materialize(GenericValuePart &gv,
                                              ScratchReg     &dst_scratch,
                                              u8              bank,
-                                             u32             size) noexcept;
+                                             u32             size);
     void   try_salvage_or_materialize(GenericValuePart &gv,
                                              ValuePart      &dst_scratch,
                                              u8              bank,
-                                             u32             size) noexcept;
+                                             u32             size);
 
-    CompilerA64 *derived() noexcept {
+    CompilerA64 *derived() {
         return static_cast<CompilerA64 *>(static_cast<Derived *>(this));
     }
 
-    const CompilerA64 *derived() const noexcept {
+    const CompilerA64 *derived() const {
         return static_cast<const CompilerA64 *>(
             static_cast<const Derived *>(this));
     }
@@ -110,13 +110,13 @@ struct EncodeCompiler {
     void scratch_alloc_specific(AsmReg                              reg,
                                 ScratchReg                         &scratch,
                                 std::initializer_list<GenericValuePart *> operands,
-                                FixedRegBackup &backup_reg) noexcept;
+                                FixedRegBackup &backup_reg);
 
     void scratch_check_fixed_backup(ScratchReg     &scratch,
                                     FixedRegBackup &backup_reg,
-                                    bool            is_ret_reg) noexcept;
+                                    bool            is_ret_reg);
 
-    void reset() noexcept {
+    void reset() {
         symbols.fill({});
     }
 
@@ -142,7 +142,7 @@ template <typename Adaptor,
           class BaseTy,
           typename Config>
 std::optional<std::pair<typename EncodeCompiler<Adaptor, Derived, BaseTy, Config>::AsmReg, u64>> EncodeCompiler<Adaptor, Derived, BaseTy, Config>::
-    encodeable_with_mem_uoff12(GenericValuePart &gv, u64 off, unsigned shift) noexcept {
+    encodeable_with_mem_uoff12(GenericValuePart &gv, u64 off, unsigned shift) {
     auto *expr = std::get_if<typename GenericValuePart::Expr>(&gv.state);
     if (!expr || !expr->has_base()) {
         return std::nullopt;
@@ -197,7 +197,7 @@ void EncodeCompiler<Adaptor, Derived, BaseTy, Config>::
     try_salvage_or_materialize(GenericValuePart &gv,
                                ScratchReg     &dst_scratch,
                                u8              bank,
-                               u32             size) noexcept {
+                               u32             size) {
     AsmReg reg = derived()->gval_as_reg_reuse(gv, dst_scratch);
     if (!dst_scratch.has_reg()) {
         dst_scratch.alloc(RegBank(bank));
@@ -216,7 +216,7 @@ void EncodeCompiler<Adaptor, Derived, BaseTy, Config>::
     try_salvage_or_materialize(GenericValuePart &gv,
                                ValuePart      &dst_scratch,
                                u8              ,
-                               u32             size) noexcept {
+                               u32             size) {
     AsmReg reg = derived()->gval_as_reg_reuse(gv, dst_scratch);
     if (!dst_scratch.has_reg()) {
         dst_scratch.alloc_reg(derived());
@@ -235,7 +235,7 @@ void EncodeCompiler<Adaptor, Derived, BaseTy, Config>::scratch_alloc_specific(
     AsmReg                              reg,
     ScratchReg                         &scratch,
     std::initializer_list<GenericValuePart *> operands,
-    FixedRegBackup                     &backup_reg) noexcept {
+    FixedRegBackup                     &backup_reg) {
     if (!derived()->register_file.is_fixed(reg)) [[likely]] {
         scratch.alloc_specific(reg);
         return;
@@ -334,7 +334,7 @@ template <typename Adaptor,
 void EncodeCompiler<Adaptor, Derived, BaseTy, Config>::
     scratch_check_fixed_backup(ScratchReg     &scratch,
                                FixedRegBackup &backup_reg,
-                               const bool      is_ret_reg) noexcept {
+                               const bool      is_ret_reg) {
     if (!backup_reg.scratch.has_reg()) [[likely]] {
         return;
     }

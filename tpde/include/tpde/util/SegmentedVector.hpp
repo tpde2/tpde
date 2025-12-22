@@ -25,7 +25,7 @@ private:
 
 public:
   SegmentedVector() = default;
-  ~SegmentedVector() noexcept {
+  ~SegmentedVector() {
     clear();
     deallocate_segments();
   }
@@ -35,21 +35,19 @@ public:
   SegmentedVector &operator=(const SegmentedVector &) = delete;
 
   /// Get the number of elements in the vector.
-  size_t size() const noexcept {
-    return used_segments * SegmentSize - (end - cur);
-  }
+  size_t size() const { return used_segments * SegmentSize - (end - cur); }
 
-  const T &operator[](size_t idx) const noexcept {
+  const T &operator[](size_t idx) const {
     assert(idx < size());
     return segments[idx / SegmentSize][idx % SegmentSize];
   }
 
-  T &operator[](size_t idx) noexcept {
+  T &operator[](size_t idx) {
     assert(idx < size());
     return segments[idx / SegmentSize][idx % SegmentSize];
   }
 
-  void clear() noexcept {
+  void clear() {
     if (used_segments == 0) {
       assert(cur == nullptr && end == nullptr && segments.empty());
       return;
@@ -69,21 +67,17 @@ public:
     end = segments[0] + SegmentSize;
   }
 
-  void push_back(const T &value) noexcept {
-    std::construct_at(allocate(), value);
-  }
+  void push_back(const T &value) { std::construct_at(allocate(), value); }
 
-  void push_back(T &&value) noexcept {
-    std::construct_at(allocate(), std::move(value));
-  }
+  void push_back(T &&value) { std::construct_at(allocate(), std::move(value)); }
 
   template <typename... Args>
-  T &emplace_back(Args &&...args) noexcept {
+  T &emplace_back(Args &&...args) {
     return *std::construct_at(allocate(), std::forward<Args>(args)...);
   }
 
 private:
-  T *allocate() noexcept {
+  T *allocate() {
     if (cur == end) [[unlikely]] {
       next_segment();
     }
@@ -91,7 +85,7 @@ private:
     return cur++;
   }
 
-  void next_segment() noexcept {
+  void next_segment() {
     assert(cur == end);
     if (used_segments == segments.size()) {
       T *segment = allocator.allocate(SegmentSize);
@@ -102,7 +96,7 @@ private:
     end = cur + SegmentSize;
   }
 
-  void deallocate_segments() noexcept {
+  void deallocate_segments() {
     for (T *segment : segments) {
       allocator.deallocate(segment, SegmentSize);
     }

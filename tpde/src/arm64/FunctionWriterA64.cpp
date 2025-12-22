@@ -29,7 +29,7 @@ const FunctionWriterA64::TargetCIEInfo FunctionWriterA64::CIEInfo{
     .data_alignment_factor = 120, // SLEB128 -8
 };
 
-void FunctionWriterA64::more_space(u32 size) noexcept {
+void FunctionWriterA64::more_space(u32 size) {
   if (allocated_size() >= (128 * 1024 * 1024)) {
     // we do not support multiple text sections currently
     TPDE_FATAL("AArch64 doesn't support sections larger than 128 MiB");
@@ -68,7 +68,7 @@ void FunctionWriterA64::more_space(u32 size) noexcept {
   }
 }
 
-void FunctionWriterA64::handle_fixups() noexcept {
+void FunctionWriterA64::handle_fixups() {
   for (const LabelFixup &fixup : label_fixups) {
     u32 label_off = label_offset(fixup.label);
     u32 fixup_off = fixup.off - label_skew;

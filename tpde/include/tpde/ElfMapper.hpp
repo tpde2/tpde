@@ -25,7 +25,7 @@ private:
   util::SmallVector<void *, 64> sym_addrs;
 
 public:
-  ElfMapper() noexcept = default;
+  ElfMapper() = default;
   ~ElfMapper() { reset(); }
 
   ElfMapper(const ElfMapper &) = delete;
@@ -34,11 +34,11 @@ public:
   ElfMapper &operator=(const ElfMapper &) = delete;
   ElfMapper &operator=(ElfMapper &&) = delete;
 
-  void reset() noexcept;
+  void reset();
 
-  bool map(AssemblerElf &assembler, SymbolResolver resolver) noexcept;
+  bool map(AssemblerElf &assembler, SymbolResolver resolver);
 
-  void *get_sym_addr(SymRef sym) noexcept;
+  void *get_sym_addr(SymRef sym);
 };
 
 } // namespace tpde::elf

@@ -13,6 +13,6 @@ class Triple;
 
 namespace tpde_llvm::x64 {
 
-std::unique_ptr<LLVMCompiler> create_compiler(const llvm::Triple &) noexcept;
+std::unique_ptr<LLVMCompiler> create_compiler(const llvm::Triple &);
 
 } // namespace tpde_llvm::x64

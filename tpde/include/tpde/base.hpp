@@ -66,6 +66,6 @@ constexpr bool WithAsserts = false;
 #endif
 
 /// Abort program with a fatal error
-[[noreturn]] void fatal_error(const char *msg) noexcept;
+[[noreturn]] void fatal_error(const char *msg);
 
 } // namespace tpde

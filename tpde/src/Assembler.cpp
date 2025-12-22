@@ -7,14 +7,13 @@ namespace tpde {
 
 Assembler::~Assembler() = default;
 
-void Assembler::reset() noexcept {
+void Assembler::reset() {
   sections.clear();
   section_allocator.reset();
   default_sections = {};
 }
 
-SecRef
-    Assembler::create_section(const TargetInfo::SectionFlags &flags) noexcept {
+SecRef Assembler::create_section(const TargetInfo::SectionFlags &flags) {
   SecRef ref = static_cast<SecRef>(sections.size());
   auto &sec = sections.emplace_back(new (section_allocator) DataSection(ref));
   sec->type = flags.type;
@@ -33,7 +32,7 @@ SecRef
 u32 Assembler::sym_def_predef_data(SecRef sec_ref,
                                    SymRef sym,
                                    u64 size,
-                                   u32 align) noexcept {
+                                   u32 align) {
   DataSection &sec = get_section(sec_ref);
   sec.align = std::max(sec.align, align);
   size_t old_size = sec.size();
@@ -52,7 +51,7 @@ void Assembler::sym_def_predef_data(SecRef sec_ref,
                                     SymRef sym_ref,
                                     std::span<const u8> data,
                                     const u32 align,
-                                    u32 *off) noexcept {
+                                    u32 *off) {
   u32 pos = sym_def_predef_data(sec_ref, sym_ref, data.size(), align);
   std::memcpy(get_section(sec_ref).data.data() + pos, data.data(), data.size());
   if (off) {
@@ -61,7 +60,7 @@ void Assembler::sym_def_predef_data(SecRef sec_ref,
 }
 
 void Assembler::sym_def_predef_zero(
-    SecRef sec_ref, SymRef sym_ref, u32 size, u32 align, u32 *off) noexcept {
+    SecRef sec_ref, SymRef sym_ref, u32 size, u32 align, u32 *off) {
   DataSection &sec = get_section(sec_ref);
   sec.align = std::max(sec.align, align);
   size_t pos = util::align_up(sec.size(), align);

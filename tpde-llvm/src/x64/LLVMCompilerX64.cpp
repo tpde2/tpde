@@ -56,20 +56,20 @@ struct LLVMCompilerX64 : tpde::x64::CompilerX64<LLVMAdaptor,
     static_assert(tpde::Compiler<LLVMCompilerX64, tpde::x64::PlatformConfig>);
   }
 
-  void reset() noexcept {
+  void reset() {
     // TODO: move to LLVMCompilerBase
     Base::reset();
     EncodeCompiler::reset();
   }
 
-  bool arg_allow_split_reg_stack_passing(IRValueRef value) const noexcept {
+  bool arg_allow_split_reg_stack_passing(IRValueRef value) const {
     // All types except i128 can be split across registers/stack.
     return !value->getType()->isIntegerTy(128);
   }
 
   void prologue_assign_arg(tpde::CCAssigner *cc_assigner,
                            u32 arg_idx,
-                           IRValueRef arg) noexcept {
+                           IRValueRef arg) {
     if (arg->getType()->isX86_FP80Ty()) [[unlikely]] {
       fp80_assign_arg(cc_assigner, arg);
     } else {
@@ -77,24 +77,23 @@ struct LLVMCompilerX64 : tpde::x64::CompilerX64<LLVMAdaptor,
     }
   }
 
-  void load_address_of_var_reference(AsmReg dst,
-                                     tpde::AssignmentPartRef ap) noexcept;
+  void load_address_of_var_reference(AsmReg dst, tpde::AssignmentPartRef ap);
 
   std::optional<CallBuilder>
-      create_call_builder(const llvm::CallBase * = nullptr) noexcept;
+      create_call_builder(const llvm::CallBase * = nullptr);
 
-  bool compile_br(const llvm::Instruction *, const ValInfo &, u64) noexcept;
-  bool compile_inline_asm(const llvm::CallBase *) noexcept;
-  bool compile_icmp(const llvm::Instruction *, const ValInfo &, u64) noexcept;
-  void compile_i32_cmp_zero(AsmReg reg, llvm::CmpInst::Predicate p) noexcept;
+  bool compile_br(const llvm::Instruction *, const ValInfo &, u64);
+  bool compile_inline_asm(const llvm::CallBase *);
+  bool compile_icmp(const llvm::Instruction *, const ValInfo &, u64);
+  void compile_i32_cmp_zero(AsmReg reg, llvm::CmpInst::Predicate p);
 
-  GenericValuePart create_addr_for_alloca(tpde::AssignmentPartRef ap) noexcept;
+  GenericValuePart create_addr_for_alloca(tpde::AssignmentPartRef ap);
 
   void create_helper_call(std::span<IRValueRef> args,
                           ValueRef *result,
-                          SymRef sym) noexcept;
+                          SymRef sym);
 
-  bool handle_intrin(const llvm::IntrinsicInst *) noexcept;
+  bool handle_intrin(const llvm::IntrinsicInst *);
 
   bool handle_overflow_intrin_128(OverflowOp op,
                                   GenericValuePart &&lhs_lo,
@@ -103,7 +102,7 @@ struct LLVMCompilerX64 : tpde::x64::CompilerX64<LLVMAdaptor,
                                   GenericValuePart &&rhs_hi,
                                   ValuePart &&res_lo,
                                   ValuePart &&res_hi,
-                                  ValuePart &&res_of) noexcept;
+                                  ValuePart &&res_of);
 
   // x86_fp80 support.
 
@@ -120,64 +119,62 @@ struct LLVMCompilerX64 : tpde::x64::CompilerX64<LLVMAdaptor,
     return FE_MEM(FE_BP, 0, FE_NOREG, val.assignment().frame_off());
   }
 
-  void fp80_assign_arg(tpde::CCAssigner *, IRValueRef arg) noexcept;
-  void fp80_push(ValuePart &&value) noexcept;
-  void fp80_pop(ValuePart &val) noexcept {
-    ASM(FSTPm80, spill_slot_op(val, true));
-  }
-  void fp80_load(GenericValuePart &&addr, ValuePart &&res) noexcept {
+  void fp80_assign_arg(tpde::CCAssigner *, IRValueRef arg);
+  void fp80_push(ValuePart &&value);
+  void fp80_pop(ValuePart &val) { ASM(FSTPm80, spill_slot_op(val, true)); }
+  void fp80_load(GenericValuePart &&addr, ValuePart &&res) {
     // TODO: use encodeable_with? need to move that to CompilerX64.
     ASM(FLDm80, FE_MEM(gval_as_reg(addr), 0, FE_NOREG, 0));
     fp80_pop(res);
   }
-  void fp80_store(GenericValuePart &&addr, ValuePart &&val) noexcept {
+  void fp80_store(GenericValuePart &&addr, ValuePart &&val) {
     fp80_push(std::move(val));
     // TODO: use encodeable_with? need to move that to CompilerX64.
     ASM(FSTPm80, FE_MEM(gval_as_reg(addr), 0, FE_NOREG, 0));
   }
-  void fp80_ext_float(ValuePart &&src, ValuePart &&dst) noexcept {
+  void fp80_ext_float(ValuePart &&src, ValuePart &&dst) {
     ASM(FLDm32, spill_slot_op(src, false));
     fp80_pop(dst);
   }
-  void fp80_ext_double(ValuePart &&src, ValuePart &&dst) noexcept {
+  void fp80_ext_double(ValuePart &&src, ValuePart &&dst) {
     ASM(FLDm64, spill_slot_op(src, false));
     fp80_pop(dst);
   }
-  void fp80_trunc_float(ValuePart &&src, ValuePart &&dst) noexcept {
+  void fp80_trunc_float(ValuePart &&src, ValuePart &&dst) {
     fp80_push(std::move(src));
     ASM(FSTPm32, spill_slot_op(dst, true));
   }
-  void fp80_trunc_double(ValuePart &&src, ValuePart &&dst) noexcept {
+  void fp80_trunc_double(ValuePart &&src, ValuePart &&dst) {
     fp80_push(std::move(src));
     ASM(FSTPm64, spill_slot_op(dst, true));
   }
-  void fp80_from_int(bool sign, bool is64, ValuePart &&, ValuePart &&) noexcept;
-  void fp80_to_int(bool sign, bool is64, ValuePart &&, ValuePart &&) noexcept;
-  void fp80_add(ValuePart &&lhs, ValuePart &&rhs, ValuePart &&res) noexcept {
+  void fp80_from_int(bool sign, bool is64, ValuePart &&, ValuePart &&);
+  void fp80_to_int(bool sign, bool is64, ValuePart &&, ValuePart &&);
+  void fp80_add(ValuePart &&lhs, ValuePart &&rhs, ValuePart &&res) {
     fp80_push(std::move(rhs));
     fp80_push(std::move(lhs));
     ASM(FADDPrr, FE_ST(1), FE_ST(0));
     fp80_pop(res);
   }
-  void fp80_sub(ValuePart &&lhs, ValuePart &&rhs, ValuePart &&res) noexcept {
+  void fp80_sub(ValuePart &&lhs, ValuePart &&rhs, ValuePart &&res) {
     fp80_push(std::move(rhs));
     fp80_push(std::move(lhs));
     ASM(FSUBRPrr, FE_ST(1), FE_ST(0));
     fp80_pop(res);
   }
-  void fp80_mul(ValuePart &&lhs, ValuePart &&rhs, ValuePart &&res) noexcept {
+  void fp80_mul(ValuePart &&lhs, ValuePart &&rhs, ValuePart &&res) {
     fp80_push(std::move(rhs));
     fp80_push(std::move(lhs));
     ASM(FMULPrr, FE_ST(1), FE_ST(0));
     fp80_pop(res);
   }
-  void fp80_div(ValuePart &&lhs, ValuePart &&rhs, ValuePart &&res) noexcept {
+  void fp80_div(ValuePart &&lhs, ValuePart &&rhs, ValuePart &&res) {
     fp80_push(std::move(rhs));
     fp80_push(std::move(lhs));
     ASM(FDIVRPrr, FE_ST(1), FE_ST(0));
     fp80_pop(res);
   }
-  void fp80_neg(ValuePart &&val, ValuePart &&res) noexcept {
+  void fp80_neg(ValuePart &&val, ValuePart &&res) {
     fp80_push(std::move(val));
     ASM(FCHS);
     fp80_pop(res);
@@ -185,7 +182,7 @@ struct LLVMCompilerX64 : tpde::x64::CompilerX64<LLVMAdaptor,
   void fp80_muladd(ValuePart &&a,
                    ValuePart &&b,
                    ValuePart &&c,
-                   ValuePart &&res) noexcept {
+                   ValuePart &&res) {
     fp80_push(std::move(c));
     fp80_push(std::move(b));
     fp80_push(std::move(a));
@@ -196,11 +193,11 @@ struct LLVMCompilerX64 : tpde::x64::CompilerX64<LLVMAdaptor,
   void fp80_cmp(llvm::CmpInst::Predicate pred,
                 ValuePart &&lhs,
                 ValuePart &&rhs,
-                ValuePart &&res) noexcept;
+                ValuePart &&res);
 };
 
 void LLVMCompilerX64::load_address_of_var_reference(
-    AsmReg dst, tpde::AssignmentPartRef ap) noexcept {
+    AsmReg dst, tpde::AssignmentPartRef ap) {
   auto *global = this->adaptor->global_list[ap.variable_ref_data()];
   const auto sym = global_sym(global);
   assert(sym.valid());
@@ -232,7 +229,7 @@ void LLVMCompilerX64::load_address_of_var_reference(
 }
 
 std::optional<LLVMCompilerX64::CallBuilder>
-    LLVMCompilerX64::create_call_builder(const llvm::CallBase *cb) noexcept {
+    LLVMCompilerX64::create_call_builder(const llvm::CallBase *cb) {
   bool var_arg = cb ? cb->getFunctionType()->isVarArg() : false;
   llvm::CallingConv::ID cc = llvm::CallingConv::C;
   if (cb) {
@@ -251,7 +248,7 @@ std::optional<LLVMCompilerX64::CallBuilder>
 
 bool LLVMCompilerX64::compile_br(const llvm::Instruction *inst,
                                  const ValInfo &,
-                                 u64) noexcept {
+                                 u64) {
   const auto *br = llvm::cast<llvm::BranchInst>(inst);
   if (br->isUnconditional()) {
     generate_uncond_branch(adaptor->block_lookup_idx(br->getSuccessor(0)));
@@ -272,7 +269,7 @@ bool LLVMCompilerX64::compile_br(const llvm::Instruction *inst,
   return true;
 }
 
-bool LLVMCompilerX64::compile_inline_asm(const llvm::CallBase *call) noexcept {
+bool LLVMCompilerX64::compile_inline_asm(const llvm::CallBase *call) {
   auto inline_asm = llvm::cast<llvm::InlineAsm>(call->getCalledOperand());
   // TODO: handle inline assembly that actually does something
   if (!inline_asm->getAsmString().empty() || inline_asm->isAlignStack() ||
@@ -298,7 +295,7 @@ bool LLVMCompilerX64::compile_inline_asm(const llvm::CallBase *call) noexcept {
 
 bool LLVMCompilerX64::compile_icmp(const llvm::Instruction *inst,
                                    const ValInfo &val_info,
-                                   u64) noexcept {
+                                   u64) {
   const auto *cmp = llvm::cast<llvm::ICmpInst>(inst);
   auto *cmp_ty = cmp->getOperand(0)->getType();
   if (cmp_ty->isVectorTy()) {
@@ -495,8 +492,8 @@ bool LLVMCompilerX64::compile_icmp(const llvm::Instruction *inst,
   return true;
 }
 
-void LLVMCompilerX64::compile_i32_cmp_zero(
-    AsmReg reg, llvm::CmpInst::Predicate pred) noexcept {
+void LLVMCompilerX64::compile_i32_cmp_zero(AsmReg reg,
+                                           llvm::CmpInst::Predicate pred) {
   ASM(TEST64rr, reg, reg);
   switch (pred) {
   case llvm::CmpInst::ICMP_EQ: ASM(SETZ8r, reg); break;
@@ -514,14 +511,14 @@ void LLVMCompilerX64::compile_i32_cmp_zero(
   ASM(MOVZXr32r8, reg, reg);
 }
 
-LLVMCompilerX64::GenericValuePart LLVMCompilerX64::create_addr_for_alloca(
-    tpde::AssignmentPartRef ap) noexcept {
+LLVMCompilerX64::GenericValuePart
+    LLVMCompilerX64::create_addr_for_alloca(tpde::AssignmentPartRef ap) {
   return GenericValuePart::Expr{AsmReg::BP, ap.variable_stack_off()};
 }
 
 void LLVMCompilerX64::create_helper_call(std::span<IRValueRef> args,
                                          ValueRef *result,
-                                         SymRef sym) noexcept {
+                                         SymRef sym) {
   tpde::util::SmallVector<CallArg, 8> arg_vec{};
   for (auto arg : args) {
     arg_vec.push_back(CallArg{arg});
@@ -530,7 +527,7 @@ void LLVMCompilerX64::create_helper_call(std::span<IRValueRef> args,
   generate_call(sym, arg_vec, result);
 }
 
-bool LLVMCompilerX64::handle_intrin(const llvm::IntrinsicInst *inst) noexcept {
+bool LLVMCompilerX64::handle_intrin(const llvm::IntrinsicInst *inst) {
   const auto intrin_id = inst->getIntrinsicID();
   switch (intrin_id) {
   case llvm::Intrinsic::vastart: {
@@ -623,7 +620,7 @@ bool LLVMCompilerX64::handle_overflow_intrin_128(OverflowOp op,
                                                  GenericValuePart &&rhs_hi,
                                                  ValuePart &&res_lo,
                                                  ValuePart &&res_hi,
-                                                 ValuePart &&res_of) noexcept {
+                                                 ValuePart &&res_of) {
   using EncodeFnTy = bool (LLVMCompilerX64::*)(GenericValuePart &&,
                                                GenericValuePart &&,
                                                GenericValuePart &&,
@@ -664,7 +661,7 @@ bool LLVMCompilerX64::handle_overflow_intrin_128(OverflowOp op,
 }
 
 void LLVMCompilerX64::fp80_assign_arg(tpde::CCAssigner *cc_assigner,
-                                      IRValueRef arg) noexcept {
+                                      IRValueRef arg) {
   auto [vr, vpr] = result_ref_single(arg);
   assert(vr.assignment()->part_count == 1);
   tpde::CCAssignment cca{.align = 16, .bank = tpde::RegBank(-2), .size = 16};
@@ -672,7 +669,7 @@ void LLVMCompilerX64::fp80_assign_arg(tpde::CCAssigner *cc_assigner,
   prologue_assign_arg_part(std::move(vpr), cca);
 }
 
-void LLVMCompilerX64::fp80_push(ValuePart &&value) noexcept {
+void LLVMCompilerX64::fp80_push(ValuePart &&value) {
   if (value.has_assignment()) {
     spill(value.assignment());
     ASM(FLDm80, FE_MEM(FE_BP, 0, FE_NOREG, value.assignment().frame_off()));
@@ -702,7 +699,7 @@ void LLVMCompilerX64::fp80_push(ValuePart &&value) noexcept {
 void LLVMCompilerX64::fp80_cmp(llvm::CmpInst::Predicate pred,
                                ValuePart &&lhs,
                                ValuePart &&rhs,
-                               ValuePart &&res) noexcept {
+                               ValuePart &&res) {
   using enum llvm::CmpInst::Predicate;
   bool swap = false;
   switch (pred) {
@@ -745,7 +742,7 @@ void LLVMCompilerX64::fp80_cmp(llvm::CmpInst::Predicate pred,
 void LLVMCompilerX64::fp80_from_int(bool sign,
                                     bool is64,
                                     ValuePart &&src,
-                                    ValuePart &&dst) noexcept {
+                                    ValuePart &&dst) {
   FeMem dst_stack_slot = spill_slot_op(dst, true);
   FeMem src_stack_slot;
   if (!sign && !is64) {
@@ -794,7 +791,7 @@ void LLVMCompilerX64::fp80_from_int(bool sign,
 void LLVMCompilerX64::fp80_to_int(bool sign,
                                   bool is64,
                                   ValuePart &&src,
-                                  ValuePart &&dst) noexcept {
+                                  ValuePart &&dst) {
   fp80_push(std::move(src));
   if (!sign && is64) {
     ASM(FLDm32, FE_MEM(FE_IP, 0, FE_NOREG, -1));
@@ -846,8 +843,7 @@ void LLVMCompilerX64::fp80_to_int(bool sign,
   free_stack_slot(stcw_slot, 2);
 }
 
-std::unique_ptr<LLVMCompiler>
-    create_compiler(const llvm::Triple &triple) noexcept {
+std::unique_ptr<LLVMCompiler> create_compiler(const llvm::Triple &triple) {
   if (!triple.isOSBinFormatELF()) {
     return nullptr;
   }

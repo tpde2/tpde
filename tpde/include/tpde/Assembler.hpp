@@ -116,14 +116,14 @@ public:
   bool locked = false;
 #endif
 
-  DataSection(SecRef ref) noexcept : sec_ref(ref) {}
+  DataSection(SecRef ref) : sec_ref(ref) {}
 
-  SecRef get_ref() const noexcept { return sec_ref; }
+  SecRef get_ref() const { return sec_ref; }
 
   size_t size() const { return is_virtual ? vsize : data.size(); }
 
   template <typename T>
-  void write(const T &t) noexcept {
+  void write(const T &t) {
     assert(!locked);
     assert(!is_virtual);
     size_t off = data.size();
@@ -185,33 +185,32 @@ protected:
 
   std::array<SecRef, unsigned(SectionKind::Max)> default_sections;
 
-  Assembler(const TargetInfo &target_info) noexcept
-      : target_info(target_info) {}
+  Assembler(const TargetInfo &target_info) : target_info(target_info) {}
   virtual ~Assembler();
 
 public:
-  virtual void reset() noexcept;
+  virtual void reset();
 
   /// \name Sections
   /// @{
 
-  DataSection &get_section(SecRef ref) noexcept {
+  DataSection &get_section(SecRef ref) {
     assert(ref.valid());
     return *sections[ref.id()];
   }
 
-  const DataSection &get_section(SecRef ref) const noexcept {
+  const DataSection &get_section(SecRef ref) const {
     assert(ref.valid());
     return *sections[ref.id()];
   }
 
-  SecRef create_section(const TargetInfo::SectionFlags &flags) noexcept;
+  SecRef create_section(const TargetInfo::SectionFlags &flags);
 
-  SecRef create_section(SectionKind kind) noexcept {
+  SecRef create_section(SectionKind kind) {
     return create_section(target_info.section_flags[unsigned(kind)]);
   }
 
-  SecRef get_default_section(SectionKind kind) noexcept {
+  SecRef get_default_section(SectionKind kind) {
     SecRef &res = default_sections[unsigned(kind)];
     if (!res.valid()) {
       res = create_section(kind);
@@ -219,28 +218,25 @@ public:
     return res;
   }
 
-  virtual void rename_section(SecRef, std::string_view name) noexcept = 0;
+  virtual void rename_section(SecRef, std::string_view name) = 0;
 
-  virtual SymRef section_symbol(SecRef) noexcept = 0;
+  virtual SymRef section_symbol(SecRef) = 0;
 
   /// @}
 
-  virtual SymRef sym_add_undef(std::string_view, SymBinding) noexcept = 0;
-  virtual SymRef sym_predef_func(std::string_view, SymBinding) noexcept = 0;
-  virtual SymRef sym_predef_data(std::string_view, SymBinding) noexcept = 0;
-  virtual SymRef sym_predef_tls(std::string_view, SymBinding) noexcept = 0;
+  virtual SymRef sym_add_undef(std::string_view, SymBinding) = 0;
+  virtual SymRef sym_predef_func(std::string_view, SymBinding) = 0;
+  virtual SymRef sym_predef_data(std::string_view, SymBinding) = 0;
+  virtual SymRef sym_predef_tls(std::string_view, SymBinding) = 0;
   /// Define a symbol at the specified location.
-  virtual void sym_def(SymRef, SecRef, u64 pos, u64 size) noexcept = 0;
+  virtual void sym_def(SymRef, SecRef, u64 pos, u64 size) = 0;
 
   /// Define symbol and allocate space for data; returns offset into section.
-  u32 sym_def_predef_data(SecRef sec, SymRef sym, u64 size, u32 align) noexcept;
+  u32 sym_def_predef_data(SecRef sec, SymRef sym, u64 size, u32 align);
 
   /// Define predefined symbol with the specified data.
-  void sym_def_predef_data(SecRef sec,
-                           SymRef sym,
-                           std::span<const u8> data,
-                           u32 align,
-                           u32 *off) noexcept;
+  void sym_def_predef_data(
+      SecRef sec, SymRef sym, std::span<const u8> data, u32 align, u32 *off);
 
   [[nodiscard]] SymRef sym_def_data(SecRef sec,
                                     std::string_view name,
@@ -254,36 +250,32 @@ public:
   }
 
   /// Define predefined symbol with zero; also supported for BSS sections.
-  void sym_def_predef_zero(SecRef sec_ref,
-                           SymRef sym_ref,
-                           u32 size,
-                           u32 align,
-                           u32 *off = nullptr) noexcept;
+  void sym_def_predef_zero(
+      SecRef sec_ref, SymRef sym_ref, u32 size, u32 align, u32 *off = nullptr);
 
 
   /// \name Relocations
   /// @{
 
   /// Add relocation. Type is file-format and target-specific.
-  void reloc_sec(
-      SecRef sec, SymRef sym, u32 type, u32 offset, i64 addend) noexcept {
+  void reloc_sec(SecRef sec, SymRef sym, u32 type, u32 offset, i64 addend) {
     assert(i32(addend) == addend && "non-32-bit addends are unsupported");
     get_section(sec).relocs.emplace_back(offset, sym, type, addend);
   }
 
-  void reloc_pc32(SecRef sec, SymRef sym, u32 offset, i64 addend) noexcept {
+  void reloc_pc32(SecRef sec, SymRef sym, u32 offset, i64 addend) {
     reloc_sec(sec, sym, target_info.reloc_pc32, offset, addend);
   }
 
-  void reloc_abs(SecRef sec, SymRef sym, u32 offset, i64 addend) noexcept {
+  void reloc_abs(SecRef sec, SymRef sym, u32 offset, i64 addend) {
     reloc_sec(sec, sym, target_info.reloc_abs64, offset, addend);
   }
 
   /// @}
 
-  virtual void finalize() noexcept {}
+  virtual void finalize() {}
 
-  virtual std::vector<u8> build_object_file() noexcept = 0;
+  virtual std::vector<u8> build_object_file() = 0;
 };
 
 } // namespace tpde

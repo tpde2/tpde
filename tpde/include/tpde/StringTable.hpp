@@ -13,13 +13,13 @@ class StringTable {
   util::SmallVector<char, 24> strtab;
 
 public:
-  StringTable() noexcept { strtab.resize(1); }
+  StringTable() { strtab.resize(1); }
 
-  size_t size() const noexcept { return strtab.size(); }
-  const char *data() const noexcept { return strtab.data(); }
+  size_t size() const { return strtab.size(); }
+  const char *data() const { return strtab.data(); }
 
-  size_t add(std::string_view str) noexcept;
-  size_t add_prefix(std::string_view prefix, std::string_view str) noexcept;
+  size_t add(std::string_view str);
+  size_t add_prefix(std::string_view prefix, std::string_view str);
 };
 
 } // namespace tpde

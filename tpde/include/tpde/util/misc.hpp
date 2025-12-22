@@ -87,7 +87,7 @@ constexpr unsigned uleb_len(u64 value) {
   return value ? (64 - cnt_lz(value) + 6) / 7 : 1;
 }
 
-constexpr unsigned uleb_write(u8 *dst, u64 value) noexcept {
+constexpr unsigned uleb_write(u8 *dst, u64 value) {
   u8 *base = dst;
   while (true) {
     u8 write = value & 0b0111'1111;
@@ -100,7 +100,7 @@ constexpr unsigned uleb_write(u8 *dst, u64 value) noexcept {
   }
 }
 
-constexpr unsigned sleb_write(u8 *dst, i64 value) noexcept {
+constexpr unsigned sleb_write(u8 *dst, i64 value) {
   u8 *base = dst;
   while (true) {
     u8 write = value & 0b0111'1111;
@@ -120,7 +120,7 @@ struct BitSetIterator {
   struct Iter {
     u64 set;
 
-    Iter &operator++() noexcept {
+    Iter &operator++() {
       if constexpr (Reverse) {
         set = set & ~(1ull << (63 - cnt_lz(set)));
       } else {
@@ -129,7 +129,7 @@ struct BitSetIterator {
       return *this;
     }
 
-    [[nodiscard]] u64 operator*() const noexcept {
+    [[nodiscard]] u64 operator*() const {
       assert(set != 0);
       if constexpr (Reverse) {
         return 63 - cnt_lz(set);
@@ -138,16 +138,16 @@ struct BitSetIterator {
       }
     }
 
-    [[nodiscard]] bool operator!=(const Iter &rhs) const noexcept {
+    [[nodiscard]] bool operator!=(const Iter &rhs) const {
       return rhs.set != set;
     }
   };
 
   explicit BitSetIterator(const u64 set) : set(set) {}
 
-  [[nodiscard]] Iter begin() const noexcept { return Iter{.set = set}; }
+  [[nodiscard]] Iter begin() const { return Iter{.set = set}; }
 
-  [[nodiscard]] Iter end() const noexcept { return Iter{.set = 0}; }
+  [[nodiscard]] Iter end() const { return Iter{.set = 0}; }
 };
 
 } // namespace tpde::util

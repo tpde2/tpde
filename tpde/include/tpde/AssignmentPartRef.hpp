@@ -35,38 +35,36 @@ public:
   AssignmentPartRef(ValueAssignment *va, const uint32_t part)
       : va(va), part(part) {}
 
-  void reset() noexcept {
+  void reset() {
     va->parts[part] = 0;
     set_modified(true);
   }
 
-  ValueAssignment *assignment() noexcept { return va; }
+  ValueAssignment *assignment() { return va; }
 
-  [[nodiscard]] RegBank bank() const noexcept {
+  [[nodiscard]] RegBank bank() const {
     return RegBank((va->parts[part] >> 5) & 0b111);
   }
 
-  void set_bank(const RegBank bank) noexcept {
+  void set_bank(const RegBank bank) {
     assert(bank.id() <= 0b111);
     auto data = va->parts[part] & ~0b1110'0000;
     data |= bank.id() << 5;
     va->parts[part] = data;
   }
 
-  [[nodiscard]] Reg get_reg() const noexcept {
-    return Reg(va->parts[part] & 0xFF);
-  }
+  [[nodiscard]] Reg get_reg() const { return Reg(va->parts[part] & 0xFF); }
 
-  void set_reg(Reg reg) noexcept {
+  void set_reg(Reg reg) {
     assert(bank().id() == ((reg.id() >> 5) & 0b111));
     va->parts[part] = (va->parts[part] & 0xFF00) | reg.id();
   }
 
-  [[nodiscard]] bool modified() const noexcept {
+  [[nodiscard]] bool modified() const {
     return (va->parts[part] & (1u << 9)) != 0;
   }
 
-  void set_modified(const bool val) noexcept {
+  void set_modified(const bool val) {
     if (val) {
       va->parts[part] |= (1u << 9);
     } else {
@@ -74,11 +72,11 @@ public:
     }
   }
 
-  [[nodiscard]] bool fixed_assignment() const noexcept {
+  [[nodiscard]] bool fixed_assignment() const {
     return (va->parts[part] & (1u << 8)) != 0;
   }
 
-  void set_fixed_assignment(const bool val) noexcept {
+  void set_fixed_assignment(const bool val) {
     if (val) {
       va->parts[part] |= (1u << 8);
     } else {
@@ -86,17 +84,15 @@ public:
     }
   }
 
-  [[nodiscard]] bool variable_ref() const noexcept { return va->variable_ref; }
+  [[nodiscard]] bool variable_ref() const { return va->variable_ref; }
 
-  [[nodiscard]] bool is_stack_variable() const noexcept {
-    return va->stack_variable;
-  }
+  [[nodiscard]] bool is_stack_variable() const { return va->stack_variable; }
 
-  [[nodiscard]] bool register_valid() const noexcept {
+  [[nodiscard]] bool register_valid() const {
     return (va->parts[part] & (1u << 11)) != 0;
   }
 
-  void set_register_valid(const bool val) noexcept {
+  void set_register_valid(const bool val) {
     if (val) {
       va->parts[part] |= (1u << 11);
     } else {
@@ -104,17 +100,17 @@ public:
     }
   }
 
-  [[nodiscard]] bool stack_valid() const noexcept {
+  [[nodiscard]] bool stack_valid() const {
     return (va->parts[part] & (1u << 9)) == 0;
   }
 
-  void set_stack_valid() noexcept { set_modified(false); }
+  void set_stack_valid() { set_modified(false); }
 
-  [[nodiscard]] uint32_t part_size() const noexcept {
+  [[nodiscard]] uint32_t part_size() const {
     return 1u << ((va->parts[part] >> 12) & 0b111);
   }
 
-  void set_part_size(const uint32_t part_size) noexcept {
+  void set_part_size(const uint32_t part_size) {
     assert((part_size & (part_size - 1)) == 0);
     const uint32_t shift = util::cnt_tz(part_size);
     assert(shift <= 0b111);
@@ -123,27 +119,25 @@ public:
     va->parts[part] = data;
   }
 
-  [[nodiscard]] int32_t frame_off() const noexcept {
+  [[nodiscard]] int32_t frame_off() const {
     assert(!variable_ref());
     assert(va->frame_off != 0 && "attempt to access uninitialized stack slot");
     return va->frame_off + part_off();
   }
 
-  [[nodiscard]] int32_t variable_stack_off() const noexcept {
+  [[nodiscard]] int32_t variable_stack_off() const {
     assert(variable_ref() && va->stack_variable);
     assert(part == 0);
     return va->frame_off;
   }
 
-  [[nodiscard]] uint32_t variable_ref_data() const noexcept {
+  [[nodiscard]] uint32_t variable_ref_data() const {
     assert(variable_ref() && !va->stack_variable);
     assert(part == 0);
     return va->var_ref_custom_idx;
   }
 
-  [[nodiscard]] uint32_t part_off() const noexcept {
-    return va->max_part_size * part;
-  }
+  [[nodiscard]] uint32_t part_off() const { return va->max_part_size * part; }
 };
 
 } // namespace tpde

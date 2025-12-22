@@ -525,11 +525,11 @@ public:
 
 } // end anonymous namespace
 
-bool TestIR::parse_ir(std::string_view text) noexcept {
+bool TestIR::parse_ir(std::string_view text) {
   return TestIRParser{text, *this}.parse();
 }
 
-void TestIR::dump_debug() const noexcept {
+void TestIR::dump_debug() const {
   TPDE_LOG_DBG("Dumping IR");
 
   for (u32 i = 0; i < functions.size(); ++i) {
@@ -614,7 +614,7 @@ void TestIR::dump_debug() const noexcept {
   }
 }
 
-void TestIR::print() const noexcept {
+void TestIR::print() const {
   std::cout << std::format("Printing IR\n");
 
   for (u32 i = 0; i < functions.size(); ++i) {

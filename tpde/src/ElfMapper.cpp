@@ -60,7 +60,7 @@ static constexpr Arch TargetArch = Arch::AArch64;
 static constexpr Arch TargetArch = Arch::Unknown;
   #endif
 
-void ElfMapper::reset() noexcept {
+void ElfMapper::reset() {
   if (!mapped_addr) {
     return;
   }
@@ -74,7 +74,7 @@ void ElfMapper::reset() noexcept {
   sym_addrs.clear();
 }
 
-bool ElfMapper::map(AssemblerElf &assembler, SymbolResolver resolver) noexcept {
+bool ElfMapper::map(AssemblerElf &assembler, SymbolResolver resolver) {
   // Approximate number of PLT/GOT slots.
   // TODO: better approximation
   u32 got_plt_slot_count =
@@ -93,7 +93,7 @@ bool ElfMapper::map(AssemblerElf &assembler, SymbolResolver resolver) noexcept {
     SecRef section;
     u32 sort_key;
 
-    std::weak_ordering operator<=>(const AllocSection &other) const noexcept {
+    std::weak_ordering operator<=>(const AllocSection &other) const {
       return sort_key <=> other.sort_key;
     }
   };
@@ -423,7 +423,7 @@ bool ElfMapper::map(AssemblerElf &assembler, SymbolResolver resolver) noexcept {
   return true;
 }
 
-void *ElfMapper::get_sym_addr(SymRef sym) noexcept {
+void *ElfMapper::get_sym_addr(SymRef sym) {
   auto idx = AssemblerElf::sym_idx(sym);
   if (!AssemblerElf::sym_is_local(sym)) {
     idx += local_sym_count;
@@ -438,14 +438,14 @@ void *ElfMapper::get_sym_addr(SymRef sym) noexcept {
 
 // Dummy implementation for non-ELF platforms
 namespace tpde::elf {
-void ElfMapper::reset() noexcept {
+void ElfMapper::reset() {
   (void)mapped_addr;
   (void)mapped_size;
   (void)registered_frame_off;
   (void)local_sym_count;
 }
-bool ElfMapper::map(AssemblerElf &, SymbolResolver) noexcept { return false; }
-void *ElfMapper::get_sym_addr(SymRef) noexcept { return nullptr; }
+bool ElfMapper::map(AssemblerElf &, SymbolResolver) { return false; }
+void *ElfMapper::get_sym_addr(SymRef) { return nullptr; }
 } // namespace tpde::elf
 
 #endif

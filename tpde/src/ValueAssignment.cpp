@@ -14,10 +14,10 @@ struct AssignmentAllocInfo {
   u32 alloc_size;
   u32 free_list_idx;
 
-  AssignmentAllocInfo(u32 part_count) noexcept;
+  AssignmentAllocInfo(u32 part_count);
 };
 
-AssignmentAllocInfo::AssignmentAllocInfo(u32 part_count) noexcept {
+AssignmentAllocInfo::AssignmentAllocInfo(u32 part_count) {
   constexpr u32 VASize = sizeof(ValueAssignment);
   constexpr u32 PartSize = sizeof(ValueAssignment::Part);
 
@@ -38,9 +38,8 @@ AssignmentAllocInfo::AssignmentAllocInfo(u32 part_count) noexcept {
 
 } // end anonymous namespace
 
-ValueAssignment *
-    AssignmentAllocator::allocate_slow(uint32_t part_count,
-                                       bool skip_free_list) noexcept {
+ValueAssignment *AssignmentAllocator::allocate_slow(uint32_t part_count,
+                                                    bool skip_free_list) {
   AssignmentAllocInfo aai(part_count);
 
   if (!skip_free_list) {
@@ -56,8 +55,7 @@ ValueAssignment *
   return new (reinterpret_cast<ValueAssignment *>(buf)) ValueAssignment{};
 }
 
-void AssignmentAllocator::deallocate_slow(
-    ValueAssignment *assignment) noexcept {
+void AssignmentAllocator::deallocate_slow(ValueAssignment *assignment) {
   AssignmentAllocInfo aai(assignment->part_count);
   assignment->next_free_list_entry = fixed_free_lists[aai.free_list_idx];
   fixed_free_lists[aai.free_list_idx] = assignment;
