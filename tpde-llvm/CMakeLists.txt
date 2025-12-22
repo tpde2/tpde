@@ -30,6 +30,9 @@ set(TPDE_LINK_LLVM_STATIC FALSE CACHE BOOL "Should LLVM be linked statically?")
 
 target_include_directories(tpde_llvm SYSTEM PUBLIC ${LLVM_INCLUDE_DIRS})
 target_compile_definitions(tpde_llvm PUBLIC ${LLVM_DEFINITIONS})
+if (NOT LLVM_ENABLE_RTTI)
+    target_compile_options(tpde_llvm PUBLIC -fno-rtti)
+endif ()
 if (TPDE_LINK_LLVM_STATIC)
     llvm_map_components_to_libnames(TPDE_LLVM_LIBS
         analysis core irreader irprinter jitlink orcjit passes support bitreader bitstreamreader targetparser

@@ -23,16 +23,21 @@ else ()
     option(TPDE_ENABLE_ASSERTIONS "Enable assertions" ON)
 endif ()
 option(TPDE_BUILD_DOCS "Build documentation" OFF)
+option(TPDE_ENABLE_EH "Build with exception handling" OFF)
 
 # warnings
 if (MSVC)
     add_compile_options(/W4 /WX)
-    # disable RTTI and exceptions
-    add_compile_options(/GR- /EHsc /D_HAS_EXCEPTIONS=0)
+
+    # enable/disable exceptions
+    if (NOT TPDE_ENABLE_EH)
+        add_compile_options(/GR-)
+    endif ()
 else ()
     add_compile_options(-Wall -Wextra -Wpedantic)
-    # disable RTTI and exceptions
-    add_compile_options("$<$<COMPILE_LANGUAGE:CXX>:-fno-rtti;-fno-exceptions>")
+    if (NOT TPDE_ENABLE_EH)
+        add_compile_options("$<$<COMPILE_LANGUAGE:CXX>:-fno-exceptions>")
+    endif ()
 
     # this is annoying
     add_compile_options(-Wno-missing-field-initializers)

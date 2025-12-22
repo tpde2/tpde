@@ -14,6 +14,7 @@ set(TPDE_LINK_LLVM_STATIC FALSE CACHE BOOL "Should LLVM be linked statically?")
 
 target_include_directories(tpde_encodegen SYSTEM PRIVATE ${LLVM_INCLUDE_DIRS})
 target_compile_definitions(tpde_encodegen PRIVATE ${LLVM_DEFINITIONS})
+target_compile_options(tpde_encodegen PRIVATE "$<$<COMPILE_LANGUAGE:CXX>:-fno-rtti;-fno-exceptions>")
 if (TPDE_LINK_LLVM_STATIC)
     llvm_map_components_to_libnames(TPDE_ENCODEGEN_LLVM_LIBS
         core X86 AArch64 CodeGen irreader irprinter passes mc support targetparser asmparser asmprinter bitreader bitstreamreader
