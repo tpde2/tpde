@@ -11,6 +11,8 @@ include(CheckLinkerFlag)
 # TODO(ae): use target_compile_features(cxx_std_20)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_OPTIMIZE_DEPENDENCIES ON)
+set(CMAKE_ADD_CUSTOM_COMMAND_DEPENDS_EXPLICIT_ONLY ON)
 
 option(TPDE_INCLUDE_TESTS "enable test" ON)
 option(TPDE_ENABLE_ENCODEGEN "enable tpde-encodegen tool (needs LLVM)" ON)
