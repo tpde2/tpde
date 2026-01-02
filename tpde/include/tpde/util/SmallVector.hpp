@@ -24,15 +24,22 @@ protected:
   size_type cap;
 
   SmallVectorUntypedBase() = delete;
-  SmallVectorUntypedBase(size_type cap) : ptr(small_ptr()), sz(0), cap(cap) {}
+  SmallVectorUntypedBase(size_type cap);
 
-  void *small_ptr() { return static_cast<void *>(this + 1); }
-  const void *small_ptr() const { return static_cast<const void *>(this + 1); }
+  void *small_ptr(this auto &&self) {
+    static_assert(!std::same_as<decltype(self), SmallVectorUntypedBase>);
+    return static_cast<void *>(self.get_small_elements());
+  };
 
-  bool is_small() const { return ptr == small_ptr(); }
+  bool is_small() const;
 
-  void *grow_malloc(size_type min_size, size_type elem_sz, size_type &new_cap);
-  void grow_trivial(size_type min_size, size_type elem_sz);
+  void *get_small_elements() const;
+
+  void *grow_malloc(size_type min_size,
+                    size_type elem_sz,
+                    size_type &new_cap,
+                    size_type align);
+  void grow_trivial(size_type min_size, size_type elem_sz, size_type align);
 
 public:
   size_type size() const { return sz; }
@@ -129,7 +136,7 @@ private:
   void grow(size_type new_size)
     requires IsTrivial
   {
-    grow_trivial(new_size, sizeof(T));
+    grow_trivial(new_size, sizeof(T), alignof(T));
   }
 
   void grow(size_type new_size)
@@ -238,7 +245,8 @@ void SmallVectorBase<T>::grow(size_type new_size)
   requires(!IsTrivial)
 {
   size_type new_cap;
-  T *new_alloc = static_cast<T *>(grow_malloc(new_size, sizeof(T), new_cap));
+  T *new_alloc =
+      static_cast<T *>(grow_malloc(new_size, sizeof(T), new_cap, alignof(T)));
   std::uninitialized_move(begin(), end(), new_alloc);
   poison_memory_region(new_alloc + sz, (new_cap - sz) * sizeof(T));
   std::destroy(begin(), end());
@@ -256,11 +264,12 @@ constexpr size_t SmallVectorDefaultSize = sizeof(T) < 256 ? 256 / sizeof(T) : 1;
 
 template <class T, size_t N = SmallVectorDefaultSize<T>>
 class SmallVector : public SmallVectorBase<T> {
-  // This is required, is_small() checks whether the current allocation is
-  // immediately following the SmallVectorBase. For zero-sized small allocation,
-  // the heap-allocated buffer could not be distinguished otherwise.
-  // TODO: find an efficient way to avoid this.
   alignas(T) char elements[N == 0 ? 1 : N * sizeof(T)];
+
+  friend class SmallVectorUntypedBase;
+
+protected:
+  void *get_small_elements() const { return elements; }
 
 public:
   SmallVector() : SmallVectorBase<T>(N) {}
