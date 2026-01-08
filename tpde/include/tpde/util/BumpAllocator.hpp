@@ -83,7 +83,7 @@ public:
 
 private:
   void *allocate_mem(size_t size, std::align_val_t align) {
-    return ::operator new(size, align, std::nothrow);
+    return ::operator new(size, align);
   }
 
   void deallocate_mem(void *ptr,
