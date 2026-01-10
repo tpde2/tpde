@@ -52,6 +52,12 @@ else ()
         # We often add unreachable() to default cases
         add_compile_options(-Wno-covered-switch-default)
         add_compile_options(-Wsign-compare)
+    elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        # Operator new/delete overloads with templated arguments trigger this. This is likely a bug in GCC.
+        # GCC does the right thing but emits a warning.
+        # Bug report: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=123513
+        # Since we compile with -Wall -Werror we need to disable this warning for now.
+        add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wno-mismatched-new-delete>)
     endif ()
 
     check_linker_flag(CXX "LINKER:--gc-sections" HAVE_GC_SECTIONS)
