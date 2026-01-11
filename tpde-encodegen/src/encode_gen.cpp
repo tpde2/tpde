@@ -1259,7 +1259,7 @@ bool create_encode_function(llvm::MachineFunction *func,
     for (unsigned i = 0; i < state.num_ret_regs; ++i) {
       func_args_os << (func_args.empty() ? "" : ", ") << "ValuePart &result_"
                    << i;
-      func_args_rvalue_os << (func_args.empty() ? "" : ", ")
+      func_args_rvalue_os << (func_args_rvalue.empty() ? "" : ", ")
                           << "ValuePart &&result_" << i;
     }
 
