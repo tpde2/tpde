@@ -303,6 +303,8 @@ void EncodingTargetArm64::get_inst_candidates(
     handle_adrp("ADRP");
   }
 
+  case_default("MRS", "MRS");
+
   const auto case_mov_shift = [&](std::string_view mnem_llvm,
                                   std::string_view mnem_disarm) {
     if (std::string_view{Name} == mnem_llvm) {

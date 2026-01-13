@@ -5025,6 +5025,10 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_intrin(
     this->result_ref(inst).part(0).set_value(std::move(const_ref));
     return true;
   }
+  case llvm::Intrinsic::readcyclecounter: {
+    ValueRef res = this->result_ref(inst);
+    return derived()->encode_readcyclecounter(res.part(0));
+  }
   default: {
     return derived()->handle_intrin(inst);
   }
