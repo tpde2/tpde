@@ -29,6 +29,8 @@ void FunctionWriterBase::end_module() {
     *reinterpret_cast<u32 *>(eh_writer.data() + fde_start) += 4;
   }
   eh_writer.flush();
+
+  assert(data_cur == data_reserve_end);
 }
 
 void FunctionWriterBase::begin_func() {
