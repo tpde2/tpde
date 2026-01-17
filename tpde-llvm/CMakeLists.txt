@@ -22,9 +22,6 @@ set_target_properties(tpde_llvm PROPERTIES
 
 target_link_libraries(tpde_llvm PRIVATE tpde)
 
-# hopscotch-map (disable warnings)
-target_include_directories(tpde_llvm SYSTEM PRIVATE ../deps/hopscotch-map/include)
-
 # Configure LLVM
 set(TPDE_LINK_LLVM_STATIC FALSE CACHE BOOL "Should LLVM be linked statically?")
 

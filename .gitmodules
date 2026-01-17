@@ -13,10 +13,6 @@
 	path = deps/fadec
 	url = https://github.com/aengelke/fadec.git
 	branch = master
-[submodule "deps/hopscotch-map"]
-	path = deps/hopscotch-map
-	url = https://github.com/Tessil/hopscotch-map.git
-	branch = master
 [submodule "deps/disarm"]
 	path = deps/disarm
 	url = https://github.com/aengelke/disarm.git
