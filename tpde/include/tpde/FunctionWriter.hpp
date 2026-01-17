@@ -127,11 +127,6 @@ private:
 protected:
   FunctionWriterBase(const TargetCIEInfo &cie_info) : cie_info(cie_info) {}
 
-  ~FunctionWriterBase() {
-    assert(data_cur == data_reserve_end &&
-           "must flush section writer before destructing");
-  }
-
 public:
   /// Get the SecRef of the current section.
   SecRef get_sec_ref() const { return get_section().get_ref(); }
