@@ -19,6 +19,8 @@ set_target_properties(tpde_llvm PROPERTIES
     VERSION 0.1.0
     LINKER_LANGUAGE CXX
 )
+install(TARGETS tpde_llvm ARCHIVE DESTINATION lib)
+install(DIRECTORY include/ DESTINATION include)
 
 target_link_libraries(tpde_llvm PRIVATE tpde)
 

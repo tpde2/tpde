@@ -18,6 +18,8 @@ set_target_properties(tpde PROPERTIES
     VERSION 0.1.0
     LINKER_LANGUAGE CXX
 )
+install(TARGETS tpde ARCHIVE DESTINATION lib)
+install(DIRECTORY include/ DESTINATION include)
 
 # spdlog
 if (((TPDE_LOGGING STREQUAL "DebugOnly") AND (CMAKE_BUILD_TYPE STREQUAL "Debug")) OR (TPDE_LOGGING STREQUAL "ON"))
