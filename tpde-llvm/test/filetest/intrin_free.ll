@@ -22,7 +22,7 @@ define void @free_intrinsics(ptr %p) {
   call void @llvm.sideeffect()
   call void @llvm.dbg.assign(metadata ptr undef, metadata !0, metadata !DIExpression(), metadata !10, metadata ptr undef, metadata !DIExpression()), !dbg !8
   call void @llvm.dbg.declare(metadata ptr undef, metadata !0, metadata !DIExpression()), !dbg !8
-  call void @llvm.dbg.value(metadata i64 undef, i64 undef, metadata !DIExpression(), metadata !DIExpression()), !dbg !8
+  call void @llvm.dbg.value(metadata i64 undef, metadata !DIExpression(), metadata !DIExpression()), !dbg !8
   call void @llvm.dbg.label(metadata !2), !dbg !8
   %a1 = call ptr @llvm.invariant.start.p0(i64 1, ptr undef)
   call void @llvm.invariant.end.p0(ptr undef, i64 1, ptr undef)
@@ -44,7 +44,7 @@ declare void @llvm.experimental.noalias.scope.decl(metadata)
 declare void @llvm.sideeffect()
 declare void @llvm.dbg.assign(metadata, metadata, metadata, metadata, metadata, metadata)
 declare void @llvm.dbg.declare(metadata, metadata, metadata)
-declare void @llvm.dbg.value(metadata, i64, metadata, metadata)
+declare void @llvm.dbg.value(metadata, metadata, metadata)
 declare void @llvm.dbg.label(metadata)
 declare ptr @llvm.invariant.start.p0(i64, ptr)
 declare void @llvm.invariant.end.p0(ptr, i64, ptr)
