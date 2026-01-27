@@ -9,7 +9,7 @@
 declare i32 @printf(ptr, ...)
 
 @consti24 = internal constant i24 19
-@const18 = internal constant i64 mul (i64 ptrtoint (ptr getelementptr (i8, ptr null, i32 1) to i64), i64 18)
+@const18 = internal constant i64 add (i64 ptrtoint (ptr getelementptr (i8, ptr null, i32 1) to i64), i64 18)
 @const_struct_size = internal constant i64 ptrtoint (ptr getelementptr ({i64, i32, i32}, ptr null, i32 1) to i64)
 @const_ptrtoint64 = internal constant i64 ptrtoint (ptr @const_ptrtoint64 to i64)
 @const_inttoptr64 = internal constant ptr inttoptr (i64 32 to ptr)
@@ -22,7 +22,7 @@ define i32 @main() {
   %consti24_ld = load i24, ptr @consti24
   %consti24_ext = zext i24 %consti24_ld to i64
   %consti24_p = call i32 (ptr, ...) @printf(ptr @fmt_x64, i64 %consti24_ext)
-; CHECK: 0000000000000012
+; CHECK: 0000000000000013
   %const18_ld = load i64, ptr @const18
   %const18_p = call i32 (ptr, ...) @printf(ptr @fmt_x64, i64 %const18_ld)
 ; CHECK: 0000000000000010

@@ -704,8 +704,7 @@ define void @insert_many_nested() {
 ; X64-NEXT:    mov ebx, 0x9
 ; X64-NEXT:    xor esi, esi
 ; X64-NEXT:    lea rsi, [rsi + 0x4]
-; X64-NEXT:    mov edi, 0x9
-; X64-NEXT:    imul rsi, rdi
+; X64-NEXT:    lea rsi, [rsi + 0x9]
 ; X64-NEXT:    mov edi, 0x1
 ; X64-NEXT:    mov r8d, 0x9
 ; X64-NEXT:    xor r9d, r9d
@@ -742,14 +741,12 @@ define void @insert_many_nested() {
 ; X64-NEXT:    mov ebx, 0x9
 ; X64-NEXT:    xor esi, esi
 ; X64-NEXT:    lea rsi, [rsi + 0x4]
-; X64-NEXT:    mov edi, 0x9
-; X64-NEXT:    imul rsi, rdi
+; X64-NEXT:    lea rsi, [rsi + 0x9]
 ; X64-NEXT:    mov edi, 0x1
 ; X64-NEXT:    mov r8d, 0x9
 ; X64-NEXT:    xor r9d, r9d
 ; X64-NEXT:    lea r9, [r9 + 0x4]
-; X64-NEXT:    mov r10d, 0x51
-; X64-NEXT:    imul r9, r10
+; X64-NEXT:    lea r9, [r9 + 0x51]
 ; X64-NEXT:    mov r10d, 0x1
 ; X64-NEXT:    mov r11d, 0x9
 ; X64-NEXT:    xor r12d, r12d
@@ -846,9 +843,8 @@ define void @insert_many_nested() {
 ; ARM64-NEXT:    mov x3, #0x9 // =9
 ; ARM64-NEXT:    mov w4, #0x0 // =0
 ; ARM64-NEXT:    add x4, x4, #0x4
-; ARM64-NEXT:    mov x5, #0x9 // =9
-; ARM64-NEXT:    mul x5, x5, x4
-; ARM64-NEXT:    mov x4, #0x1 // =1
+; ARM64-NEXT:    add x4, x4, #0x9
+; ARM64-NEXT:    mov x5, #0x1 // =1
 ; ARM64-NEXT:    mov x6, #0x9 // =9
 ; ARM64-NEXT:    mov w7, #0x0 // =0
 ; ARM64-NEXT:    mov w8, #0x0 // =0
@@ -875,15 +871,13 @@ define void @insert_many_nested() {
 ; ARM64-NEXT:    mov x3, #0x9 // =9
 ; ARM64-NEXT:    mov w4, #0x0 // =0
 ; ARM64-NEXT:    add x4, x4, #0x4
-; ARM64-NEXT:    mov x5, #0x9 // =9
-; ARM64-NEXT:    mul x5, x5, x4
-; ARM64-NEXT:    mov x4, #0x1 // =1
+; ARM64-NEXT:    add x4, x4, #0x9
+; ARM64-NEXT:    mov x5, #0x1 // =1
 ; ARM64-NEXT:    mov x6, #0x9 // =9
 ; ARM64-NEXT:    mov w7, #0x0 // =0
 ; ARM64-NEXT:    add x7, x7, #0x4
-; ARM64-NEXT:    mov x8, #0x51 // =81
-; ARM64-NEXT:    mul x8, x8, x7
-; ARM64-NEXT:    mov x7, #0x1 // =1
+; ARM64-NEXT:    add x7, x7, #0x51
+; ARM64-NEXT:    mov x8, #0x1 // =1
 ; ARM64-NEXT:    mov x9, #0x9 // =9
 ; ARM64-NEXT:    mov w10, #0x0 // =0
 ; ARM64-NEXT:    mov w11, #0x0 // =0
@@ -918,20 +912,20 @@ define void @insert_many_nested() {
 ; ARM64-NEXT:    str x2, [x18, #0x18]
 ; ARM64-NEXT:    str x3, [x18, #0x20]
 ; ARM64-NEXT:    str x1, [x18, #0x28]
-; ARM64-NEXT:    str x4, [x18, #0x30]
+; ARM64-NEXT:    str x5, [x18, #0x30]
 ; ARM64-NEXT:    str x6, [x18, #0x38]
-; ARM64-NEXT:    str x5, [x18, #0x40]
-; ARM64-NEXT:    str x7, [x18, #0x48]
+; ARM64-NEXT:    str x4, [x18, #0x40]
+; ARM64-NEXT:    str x8, [x18, #0x48]
 ; ARM64-NEXT:    str x9, [x18, #0x50]
-; ARM64-NEXT:    str x8, [x18, #0x58]
+; ARM64-NEXT:    str x7, [x18, #0x58]
 ; ARM64-NEXT:    ldp x19, x20, [sp, #0x10]
 ; ARM64-NEXT:    ldp x21, x22, [sp, #0x20]
 ; ARM64-NEXT:    ldp x23, x24, [sp, #0x30]
 ; ARM64-NEXT:    ldp x25, x26, [sp, #0x40]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
-  %1 = insertvalue { ptr, i64, i32, i8, i8, i8, i8, [2 x [3 x i64]] } { ptr undef, i64 ptrtoint (ptr getelementptr (i32, ptr null, i32 1) to i64), i32 20180515, i8 2, i8 14, i8 0, i8 0, [2 x [3 x i64]] [[3 x i64] [i64 1, i64 9, i64 ptrtoint (ptr getelementptr (i32, ptr null, i32 1) to i64)], [3 x i64] [i64 1, i64 9, i64 mul (i64 ptrtoint (ptr getelementptr (i32, ptr null, i32 1) to i64), i64 9)]] }, ptr null, 0
-  store { ptr, i64, i32, i8, i8, i8, i8, [3 x [3 x i64]] } { ptr null, i64 ptrtoint (ptr getelementptr (i32, ptr null, i32 1) to i64), i32 20180515, i8 3, i8 9, i8 0, i8 0, [3 x [3 x i64]] [[3 x i64] [i64 1, i64 9, i64 ptrtoint (ptr getelementptr (i32, ptr null, i32 1) to i64)], [3 x i64] [i64 1, i64 9, i64 mul (i64 ptrtoint (ptr getelementptr (i32, ptr null, i32 1) to i64), i64 9)], [3 x i64] [i64 1, i64 9, i64 mul (i64 ptrtoint (ptr getelementptr (i32, ptr null, i32 1) to i64), i64 81)]] }, ptr null, align 8
+  %1 = insertvalue { ptr, i64, i32, i8, i8, i8, i8, [2 x [3 x i64]] } { ptr undef, i64 ptrtoint (ptr getelementptr (i32, ptr null, i32 1) to i64), i32 20180515, i8 2, i8 14, i8 0, i8 0, [2 x [3 x i64]] [[3 x i64] [i64 1, i64 9, i64 ptrtoint (ptr getelementptr (i32, ptr null, i32 1) to i64)], [3 x i64] [i64 1, i64 9, i64 add (i64 ptrtoint (ptr getelementptr (i32, ptr null, i32 1) to i64), i64 9)]] }, ptr null, 0
+  store { ptr, i64, i32, i8, i8, i8, i8, [3 x [3 x i64]] } { ptr null, i64 ptrtoint (ptr getelementptr (i32, ptr null, i32 1) to i64), i32 20180515, i8 3, i8 9, i8 0, i8 0, [3 x [3 x i64]] [[3 x i64] [i64 1, i64 9, i64 ptrtoint (ptr getelementptr (i32, ptr null, i32 1) to i64)], [3 x i64] [i64 1, i64 9, i64 add (i64 ptrtoint (ptr getelementptr (i32, ptr null, i32 1) to i64), i64 9)], [3 x i64] [i64 1, i64 9, i64 add (i64 ptrtoint (ptr getelementptr (i32, ptr null, i32 1) to i64), i64 81)]] }, ptr null, align 8
   ret void
 }
 

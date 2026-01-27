@@ -4,6 +4,8 @@
 
 ; RUN: tpde-llc --target=x86_64 %s | %objdump | FileCheck %s -check-prefixes=X64
 ; RUN: tpde-llc --target=aarch64 %s | %objdump | FileCheck %s -check-prefixes=ARM64
+; XFAIL: llvm19.1
+; XFAIL: llvm20.1
 
 @t1 = external thread_local global i32, align 4
 
@@ -21,7 +23,8 @@ define ptr @getaddr() {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <getaddr>:
-; ARM64:         stp x29, x30, [sp, #-0xa0]!
+; ARM64:       <L0>:
+; ARM64-NEXT:    stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    adrp x0, 0x0 <getaddr>
 ; ARM64-NEXT:     R_AARCH64_TLSDESC_ADR_PAGE21 t1

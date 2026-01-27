@@ -4,6 +4,8 @@
 
 ; RUN: tpde-llc --target=x86_64 %s | %objdump | FileCheck %s -check-prefixes=X64
 ; RUN: tpde-llc --target=aarch64 %s | %objdump | FileCheck %s -check-prefixes=ARM64
+; XFAIL: llvm19.1
+; XFAIL: llvm20.1
 
 define void @ins_v5i1_0(ptr %p, i1 %e) {
 ; X64-LABEL: <ins_v5i1_0>:
@@ -855,10 +857,11 @@ define <2 x float> @ins_v2f32_const_nosalvage(<2 x float> %v) {
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    str d8, [sp, #0x10]
 ; ARM64-NEXT:    mov v8.16b, v0.16b
+; ARM64-NEXT:  <L0>:
 ; ARM64-NEXT:    mov v0.16b, v8.16b
 ; ARM64-NEXT:    movi v1.8b, #0x0
 ; ARM64-NEXT:    mov v0.s[0], v1.s[0]
-; ARM64-NEXT:    b 0x460 <ins_v2f32_const_nosalvage+0x10>
+; ARM64-NEXT:    b <L0>
   br label %loop
 
 loop:

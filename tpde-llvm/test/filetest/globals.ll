@@ -5,6 +5,8 @@
 
 ; RUN: tpde-llc --target=x86_64 %s | %objdump | FileCheck %s -check-prefixes=X64
 ; RUN: tpde-llc --target=aarch64 %s | %objdump | FileCheck %s -check-prefixes=ARM64
+; XFAIL: llvm19.1
+; XFAIL: llvm20.1
 
 @basic_int = internal global i32 5, align 4
 @global_int = global i32 5, align 4
@@ -25,7 +27,8 @@ define i32 @load_basic_int() {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <load_basic_int>:
-; ARM64:         adrp x0, 0x0 <load_basic_int>
+; ARM64:       <L0>:
+; ARM64-NEXT:    adrp x0, 0x0 <load_basic_int>
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21 basic_int
 ; ARM64-NEXT:    add x0, x0, #0x0
 ; ARM64-NEXT:     R_AARCH64_ADD_ABS_LO12_NC basic_int

@@ -22,3 +22,6 @@ llvm_config.with_environment('PATH', config.tpde_obj_root, append_path=True)
 llvm_config.with_environment('ASAN_OPTIONS', "abort_on_error=1", append_path=True)
 config.substitutions.append(("%tpde_test", "tpde_test"))
 config.substitutions.append(('%objdump', 'llvm-objdump -d -r --no-show-raw-insn --symbolize-operands --no-addresses --x86-asm-syntax=intel -'))
+
+config.available_features.add(f'llvm{config.llvm_version}')
+config.available_features.add(f'os-{config.system_name.lower()}')

@@ -4,6 +4,8 @@
 
 ; RUN: tpde-llc --target=x86_64 %s | %objdump | FileCheck %s -check-prefixes=X64
 ; RUN: tpde-llc --target=aarch64 %s | %objdump | FileCheck %s -check-prefixes=ARM64
+; XFAIL: llvm19.1
+; XFAIL: llvm20.1
 
 @dec_glob_external = external global i32, align 4
 define ptr @ret_dec_glob_external() {
@@ -13,7 +15,8 @@ define ptr @ret_dec_glob_external() {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ret_dec_glob_external>:
-; ARM64:         adrp x0, 0x0 <ret_dec_glob_external>
+; ARM64:       <L0>:
+; ARM64-NEXT:    adrp x0, 0x0 <ret_dec_glob_external>
 ; ARM64-NEXT:     R_AARCH64_ADR_GOT_PAGE dec_glob_external
 ; ARM64-NEXT:    ldr x0, [x0]
 ; ARM64-NEXT:     R_AARCH64_LD64_GOT_LO12_NC dec_glob_external

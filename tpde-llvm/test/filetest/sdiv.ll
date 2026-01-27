@@ -5,6 +5,8 @@
 
 ; RUN: tpde-llc --target=x86_64 %s | %objdump | FileCheck %s -check-prefixes=X64
 ; RUN: tpde-llc --target=aarch64 %s | %objdump | FileCheck %s -check-prefixes=ARM64
+; XFAIL: llvm19.1
+; XFAIL: llvm20.1
 
 define i8 @sdiv_i8_1(i8 %0) {
 ; X64-LABEL: <sdiv_i8_1>:
@@ -553,7 +555,8 @@ define i128 @sdiv_i128(i128 %0, i128 %1) {
 ; ARM64-LABEL: <sdiv_i128>:
 ; ARM64:         stp x29, x30, [sp, #-0xa0]!
 ; ARM64-NEXT:    mov x29, sp
-; ARM64-NEXT:    bl 0x1e8 <sdiv_i128+0x8>
+; ARM64-NEXT:  <L0>:
+; ARM64-NEXT:    bl <L0>
 ; ARM64-NEXT:     R_AARCH64_CALL26 __divti3
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
@@ -588,7 +591,8 @@ define i128 @sdiv_i128_twice(i128 %0, i128 %1) {
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    str x0, [x29, #0xa0]
 ; ARM64-NEXT:    str x1, [x29, #0xa8]
-; ARM64-NEXT:    bl 0x210 <sdiv_i128_twice+0x10>
+; ARM64-NEXT:  <L0>:
+; ARM64-NEXT:    bl <L0>
 ; ARM64-NEXT:     R_AARCH64_CALL26 __divti3
 ; ARM64-NEXT:    str x0, [x29, #0xb0]
 ; ARM64-NEXT:    ldr x0, [x29, #0xa0]
@@ -596,7 +600,8 @@ define i128 @sdiv_i128_twice(i128 %0, i128 %1) {
 ; ARM64-NEXT:    ldr x1, [x29, #0xa8]
 ; ARM64-NEXT:    ldr x2, [x29, #0xb0]
 ; ARM64-NEXT:    ldr x3, [x29, #0xb8]
-; ARM64-NEXT:    bl 0x22c <sdiv_i128_twice+0x2c>
+; ARM64-NEXT:  <L1>:
+; ARM64-NEXT:    bl <L1>
 ; ARM64-NEXT:     R_AARCH64_CALL26 __divti3
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xc0
 ; ARM64-NEXT:    ret

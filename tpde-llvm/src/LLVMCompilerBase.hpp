@@ -4925,7 +4925,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_intrin(
     using EncodeFnTy = bool (Derived::*)(GenericValuePart &&, ValuePart &&);
     static constexpr EncodeFnTy encode_fns[4][2][2] = {
 #define F(n, op, suffix) &Derived::encode_##op##i##n##suffix
-        {  {F(8, ctlz, ), F(8, ctlz, _zp)},  {F(8, cttz, ), F(32, cttz, _zp)}},
+        {{F(8, ctlz, ), F(8, ctlz, _zp)}, {F(8, cttz, ), F(32, cttz, _zp)}},
         {{F(16, ctlz, ), F(16, ctlz, _zp)}, {F(16, cttz, ), F(32, cttz, _zp)}},
         {{F(32, ctlz, ), F(32, ctlz, _zp)}, {F(32, cttz, ), F(32, cttz, _zp)}},
         {{F(64, ctlz, ), F(64, ctlz, _zp)}, {F(64, cttz, ), F(64, cttz, _zp)}},
@@ -5164,32 +5164,31 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_overflow_intrin(
       GenericValuePart &&, GenericValuePart &&, ValuePart &&, ValuePart &&);
   std::array<std::array<EncodeFnTy, 4>, 6> encode_fns = {
       {
-       {&Derived::encode_of_add_u8,
+          {&Derived::encode_of_add_u8,
            &Derived::encode_of_add_u16,
            &Derived::encode_of_add_u32,
            &Derived::encode_of_add_u64},
-       {&Derived::encode_of_add_i8,
+          {&Derived::encode_of_add_i8,
            &Derived::encode_of_add_i16,
            &Derived::encode_of_add_i32,
            &Derived::encode_of_add_i64},
-       {&Derived::encode_of_sub_u8,
+          {&Derived::encode_of_sub_u8,
            &Derived::encode_of_sub_u16,
            &Derived::encode_of_sub_u32,
            &Derived::encode_of_sub_u64},
-       {&Derived::encode_of_sub_i8,
+          {&Derived::encode_of_sub_i8,
            &Derived::encode_of_sub_i16,
            &Derived::encode_of_sub_i32,
            &Derived::encode_of_sub_i64},
-       {&Derived::encode_of_mul_u8,
+          {&Derived::encode_of_mul_u8,
            &Derived::encode_of_mul_u16,
            &Derived::encode_of_mul_u32,
            &Derived::encode_of_mul_u64},
-       {&Derived::encode_of_mul_i8,
+          {&Derived::encode_of_mul_i8,
            &Derived::encode_of_mul_i16,
            &Derived::encode_of_mul_i32,
            &Derived::encode_of_mul_i64},
-       }
-  };
+      }};
 
   EncodeFnTy encode_fn = encode_fns[static_cast<u32>(op)][width_idx];
   (derived()->*encode_fn)(lhs.part(0), rhs.part(0), res.part(0), res.part(1));
@@ -5218,24 +5217,23 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_saturating_intrin(
       bool (Derived::*)(GenericValuePart &&, GenericValuePart &&, ValuePart &&);
   std::array<std::array<EncodeFnTy, 4>, 4> encode_fns{
       {
-       {&Derived::encode_sat_add_u8,
+          {&Derived::encode_sat_add_u8,
            &Derived::encode_sat_add_u16,
            &Derived::encode_sat_add_u32,
            &Derived::encode_sat_add_u64},
-       {&Derived::encode_sat_add_i8,
+          {&Derived::encode_sat_add_i8,
            &Derived::encode_sat_add_i16,
            &Derived::encode_sat_add_i32,
            &Derived::encode_sat_add_i64},
-       {&Derived::encode_sat_sub_u8,
+          {&Derived::encode_sat_sub_u8,
            &Derived::encode_sat_sub_u16,
            &Derived::encode_sat_sub_u32,
            &Derived::encode_sat_sub_u64},
-       {&Derived::encode_sat_sub_i8,
+          {&Derived::encode_sat_sub_i8,
            &Derived::encode_sat_sub_i16,
            &Derived::encode_sat_sub_i32,
            &Derived::encode_sat_sub_i64},
-       }
-  };
+      }};
 
   EncodeFnTy encode_fn = encode_fns[static_cast<u32>(op)][width_idx];
 

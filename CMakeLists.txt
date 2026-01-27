@@ -112,7 +112,7 @@ if (TPDE_ENABLE_ENCODEGEN OR TPDE_ENABLE_LLVM)
     # LLVM versions we currently support. The first version should be the
     # "primary" versions where all tests pass (i.e., no XFAIL due to different
     # code generation).
-    set(TPDE_LLVM_SUPPORTED_VERSIONS 20.1 19.1)
+    set(TPDE_LLVM_SUPPORTED_VERSIONS 21.1 20.1 19.1)
 
     # allow overriding the LLVM version used
     if (DEFINED LLVM_DIR)

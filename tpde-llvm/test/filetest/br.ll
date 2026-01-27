@@ -5,6 +5,8 @@
 
 ; RUN: tpde-llc --target=x86_64 %s | %objdump | FileCheck %s -check-prefixes=X64
 ; RUN: tpde-llc --target=aarch64 %s | %objdump | FileCheck %s -check-prefixes=ARM64
+; XFAIL: llvm19.1
+; XFAIL: llvm20.1
 
 define i64 @br_simple1(i64 %0) {
 ; X64-LABEL: <br_simple1>:
@@ -56,11 +58,13 @@ define i64 @condbr0(i64 %0, i1 %1) {
 ; ARM64-NEXT:    str x19, [sp, #0x10]
 ; ARM64-NEXT:    mov x19, x0
 ; ARM64-NEXT:    tst w1, #0x1
-; ARM64-NEXT:    b.eq 0x40 <condbr0+0x20>
+; ARM64-NEXT:    b.eq <L0>
 ; ARM64-NEXT:    mov x0, x19
-; ARM64-NEXT:    b 0x48 <condbr0+0x28>
+; ARM64-NEXT:    b <L1>
+; ARM64-NEXT:  <L0>:
 ; ARM64-NEXT:    add x19, x19, #0xa
 ; ARM64-NEXT:    mov x0, x19
+; ARM64-NEXT:  <L1>:
 ; ARM64-NEXT:    ldr x19, [sp, #0x10]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
@@ -96,10 +100,12 @@ define i64 @condbr1(i64 %0, i1 %1) {
 ; ARM64-NEXT:    str x19, [sp, #0x10]
 ; ARM64-NEXT:    mov x19, x0
 ; ARM64-NEXT:    tst w1, #0x1
-; ARM64-NEXT:    b.ne 0x80 <condbr1+0x20>
+; ARM64-NEXT:    b.ne <L0>
 ; ARM64-NEXT:    add x0, x19, #0xa
-; ARM64-NEXT:    b 0x84 <condbr1+0x24>
+; ARM64-NEXT:    b <L1>
+; ARM64-NEXT:  <L0>:
 ; ARM64-NEXT:    mov x0, x19
+; ARM64-NEXT:  <L1>:
 ; ARM64-NEXT:    ldr x19, [sp, #0x10]
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret

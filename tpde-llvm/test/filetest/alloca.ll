@@ -5,6 +5,8 @@
 
 ; RUN: tpde-llc --target=x86_64 %s | %objdump | FileCheck %s -check-prefixes=X64
 ; RUN: tpde-llc --target=aarch64 %s | %objdump | FileCheck %s -check-prefixes=ARM64
+; XFAIL: llvm19.1
+; XFAIL: llvm20.1
 
 
 define ptr @alloca_empty() {
@@ -806,7 +808,8 @@ define void @alloca_4k() {
 ; ARM64-NEXT:    stp x29, x30, [sp]
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    add x0, x29, #0xa0
-; ARM64-NEXT:    bl 0x480 <alloca_4k+0x10>
+; ARM64-NEXT:  <L0>:
+; ARM64-NEXT:    bl <L0>
 ; ARM64-NEXT:     R_AARCH64_CALL26 take_ptr
 ; ARM64-NEXT:    ldp x29, x30, [sp]
 ; ARM64-NEXT:    add sp, sp, #0x2, lsl #12 // =0x2000
@@ -836,7 +839,8 @@ define void @dyn_alloca_4k() {
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    sub x0, sp, #0x1, lsl #12 // =0x1000
 ; ARM64-NEXT:    mov sp, x0
-; ARM64-NEXT:    bl 0x4a0 <dyn_alloca_4k+0x10>
+; ARM64-NEXT:  <L0>:
+; ARM64-NEXT:    bl <L0>
 ; ARM64-NEXT:     R_AARCH64_CALL26 take_ptr
 ; ARM64-NEXT:    mov sp, x29
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -866,7 +870,8 @@ define void @alloca_32k() {
 ; ARM64-NEXT:    stp x29, x30, [sp]
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    add x0, x29, #0xa0
-; ARM64-NEXT:    bl 0x4c0 <alloca_32k+0x10>
+; ARM64-NEXT:  <L0>:
+; ARM64-NEXT:    bl <L0>
 ; ARM64-NEXT:     R_AARCH64_CALL26 take_ptr
 ; ARM64-NEXT:    ldp x29, x30, [sp]
 ; ARM64-NEXT:    add sp, sp, #0x9, lsl #12 // =0x9000
@@ -896,7 +901,8 @@ define void @dyn_alloca_32k() {
 ; ARM64-NEXT:    mov x29, sp
 ; ARM64-NEXT:    sub x0, sp, #0x8, lsl #12 // =0x8000
 ; ARM64-NEXT:    mov sp, x0
-; ARM64-NEXT:    bl 0x4e0 <dyn_alloca_32k+0x10>
+; ARM64-NEXT:  <L0>:
+; ARM64-NEXT:    bl <L0>
 ; ARM64-NEXT:     R_AARCH64_CALL26 take_ptr
 ; ARM64-NEXT:    mov sp, x29
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -929,7 +935,8 @@ define void @dyn_alloca_33k() {
 ; ARM64-NEXT:    sub x0, sp, #0x8, lsl #12 // =0x8000
 ; ARM64-NEXT:    sub x0, x0, #0x400
 ; ARM64-NEXT:    mov sp, x0
-; ARM64-NEXT:    bl 0x504 <dyn_alloca_33k+0x14>
+; ARM64-NEXT:  <L0>:
+; ARM64-NEXT:    bl <L0>
 ; ARM64-NEXT:     R_AARCH64_CALL26 take_ptr
 ; ARM64-NEXT:    mov sp, x29
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -960,7 +967,8 @@ define void @alloca_16M() {
 ; ARM64-NEXT:    mov x16, #0x1000000 // =16777216
 ; ARM64-NEXT:    sub x0, sp, x16
 ; ARM64-NEXT:    mov sp, x0
-; ARM64-NEXT:    bl 0x534 <alloca_16M+0x14>
+; ARM64-NEXT:  <L0>:
+; ARM64-NEXT:    bl <L0>
 ; ARM64-NEXT:     R_AARCH64_CALL26 take_ptr
 ; ARM64-NEXT:    mov sp, x29
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -991,7 +999,8 @@ define void @dyn_alloca_16M() {
 ; ARM64-NEXT:    mov x16, #0x1000000 // =16777216
 ; ARM64-NEXT:    sub x0, sp, x16
 ; ARM64-NEXT:    mov sp, x0
-; ARM64-NEXT:    bl 0x564 <dyn_alloca_16M+0x14>
+; ARM64-NEXT:  <L0>:
+; ARM64-NEXT:    bl <L0>
 ; ARM64-NEXT:     R_AARCH64_CALL26 take_ptr
 ; ARM64-NEXT:    mov sp, x29
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
@@ -1257,7 +1266,8 @@ define void @f2(ptr %0, ptr %1, ptr %2, ptr %3, ptr %4, ptr %5, ptr %6, ptr %7, 
 ; ARM64-NEXT:    str x8, [sp, #0x100]
 ; ARM64-NEXT:    str x28, [sp, #0x108]
 ; ARM64-NEXT:    str x30, [sp, #0x110]
-; ARM64-NEXT:    bl 0x750 <f2+0x1d0>
+; ARM64-NEXT:  <L0>:
+; ARM64-NEXT:    bl <L0>
 ; ARM64-NEXT:     R_AARCH64_CALL26 f1
 ; ARM64-NEXT:    add sp, sp, #0x120
 ; ARM64-NEXT:    ldp x19, x20, [sp, #0x10]
@@ -1461,6 +1471,7 @@ define void @alloca_manyregs(i32 %0, ptr %1, ptr %2, ptr %3, i64 %4, i32 %5, ptr
 ; ARM64-NEXT:    mov w8, #0x0 // =0
 ; ARM64-NEXT:    add x16, x29, #0x40, lsl #12 // =0x40000
 ; ARM64-NEXT:    str w8, [x16, #0x898]
+; ARM64-NEXT:  <L0>:
 ; ARM64-NEXT:    add x0, x29, #0x40, lsl #12 // =0x40000
 ; ARM64-NEXT:    ldr x0, [x0, #0x7f8]
 ; ARM64-NEXT:    add x1, x29, #0x40, lsl #12 // =0x40000
@@ -1553,7 +1564,7 @@ define void @alloca_manyregs(i32 %0, ptr %1, ptr %2, ptr %3, i64 %4, i32 %5, ptr
 ; ARM64-NEXT:    orr w30, w30, w0
 ; ARM64-NEXT:    add x16, x29, #0x40, lsl #12 // =0x40000
 ; ARM64-NEXT:    str w14, [x16, #0x898]
-; ARM64-NEXT:    b 0x8d4 <alloca_manyregs+0x154>
+; ARM64-NEXT:    b <L0>
   %23 = alloca [66000 x i32], align 4
   br label %24
 
