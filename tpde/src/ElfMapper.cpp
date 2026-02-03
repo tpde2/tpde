@@ -71,6 +71,7 @@ void ElfMapper::reset() {
 
   munmap(mapped_addr, mapped_size);
   mapped_addr = nullptr;
+  mapped_size = 0;
   sym_addrs.clear();
 }
 
@@ -423,13 +424,17 @@ bool ElfMapper::map(AssemblerElf &assembler, SymbolResolver resolver) {
   return true;
 }
 
-void *ElfMapper::get_sym_addr(SymRef sym) {
+void *ElfMapper::get_sym_addr(SymRef sym) const {
   auto idx = AssemblerElf::sym_idx(sym);
   if (!AssemblerElf::sym_is_local(sym)) {
     idx += local_sym_count;
   }
   assert(idx < sym_addrs.size());
   return sym_addrs[idx];
+}
+
+std::pair<void *, size_t> ElfMapper::get_mapped_range() const {
+  return {mapped_addr, mapped_size};
 }
 
 } // namespace tpde::elf
@@ -445,7 +450,10 @@ void ElfMapper::reset() {
   (void)local_sym_count;
 }
 bool ElfMapper::map(AssemblerElf &, SymbolResolver) { return false; }
-void *ElfMapper::get_sym_addr(SymRef) { return nullptr; }
+void *ElfMapper::get_sym_addr(SymRef) const { return nullptr; }
+std::pair<void *, size_t> ElfMapper::get_mapped_range() const {
+  return {nullptr, 0ull};
+}
 } // namespace tpde::elf
 
 #endif

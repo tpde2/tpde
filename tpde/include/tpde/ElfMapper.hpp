@@ -18,7 +18,7 @@ public:
 
 private:
   u8 *mapped_addr = nullptr;
-  size_t mapped_size;
+  size_t mapped_size = 0;
   u32 registered_frame_off = 0;
 
   u32 local_sym_count = 0;
@@ -38,7 +38,9 @@ public:
 
   bool map(AssemblerElf &assembler, SymbolResolver resolver);
 
-  void *get_sym_addr(SymRef sym);
+  void *get_sym_addr(SymRef sym) const;
+
+  std::pair<void *, size_t> get_mapped_range() const;
 };
 
 } // namespace tpde::elf

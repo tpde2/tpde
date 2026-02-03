@@ -38,7 +38,10 @@ public:
 
   /// Get the address for a global, which must be contained in the compiled
   /// module.
-  void *lookup_global(llvm::GlobalValue *);
+  void *lookup_global(llvm::GlobalValue *) const;
+
+  /// Get the range, mapped to memory
+  std::pair<void *, size_t> get_mapped_range() const;
 
   /// Indicate whether compilation and in-memory mapping was successful.
   operator bool() const { return impl != nullptr; }
