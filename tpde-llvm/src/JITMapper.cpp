@@ -25,8 +25,12 @@ JITMapper::~JITMapper() = default;
 JITMapper::JITMapper(JITMapper &&other) = default;
 JITMapper &JITMapper::operator=(JITMapper &&other) = default;
 
-void *JITMapper::lookup_global(llvm::GlobalValue *gv) {
+void *JITMapper::lookup_global(llvm::GlobalValue *gv) const {
   return impl ? impl->lookup_global(gv) : nullptr;
+}
+
+std::pair<void *, size_t> JITMapper::get_mapped_range() const {
+  return impl ? impl->get_mapped_range() : std::make_pair(nullptr, 0ull);
 }
 
 } // namespace tpde_llvm
