@@ -13,7 +13,8 @@ add_executable(tpde::tpde_encodegen ALIAS tpde_encodegen)
 set(TPDE_LINK_LLVM_STATIC FALSE CACHE BOOL "Should LLVM be linked statically?")
 
 target_include_directories(tpde_encodegen SYSTEM PRIVATE ${LLVM_INCLUDE_DIRS})
-target_compile_definitions(tpde_encodegen PRIVATE ${LLVM_DEFINITIONS})
+separate_arguments(LLVM_DEFINITIONS_LIST NATIVE_COMMAND ${LLVM_DEFINITIONS})
+target_compile_definitions(tpde_encodegen PRIVATE ${LLVM_DEFINITIONS_LIST})
 target_compile_options(tpde_encodegen PRIVATE "$<$<COMPILE_LANGUAGE:CXX>:-fno-rtti;-fno-exceptions>")
 if (TPDE_LINK_LLVM_STATIC)
     set(LLVM_COMPONENTS
