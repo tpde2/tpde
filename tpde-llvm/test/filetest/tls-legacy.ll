@@ -18,6 +18,7 @@ define void @legacy_store() {
 ; X64-NEXT:     R_X86_64_TLSGD t1-0x4
 ; X64-NEXT:    call <L0>
 ; X64-NEXT:     R_X86_64_PLT32 __tls_get_addr-0x4
+; X64-NEXT:  <L0>:
 ; X64-NEXT:    mov dword ptr [rax], 0x0
 ; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
@@ -54,6 +55,7 @@ define ptr @legacy_gep() {
 ; X64-NEXT:     R_X86_64_TLSGD t1-0x4
 ; X64-NEXT:    call <L0>
 ; X64-NEXT:     R_X86_64_PLT32 __tls_get_addr-0x4
+; X64-NEXT:  <L0>:
 ; X64-NEXT:    lea rax, [rax + 0x1]
 ; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
@@ -88,17 +90,19 @@ define void @legacy_use() {
 ; X64-NEXT:     R_X86_64_TLSGD t1-0x4
 ; X64-NEXT:    call <L0>
 ; X64-NEXT:     R_X86_64_PLT32 __tls_get_addr-0x4
+; X64-NEXT:  <L0>:
 ; X64-NEXT:    mov qword ptr [rbp - 0x30], rax
 ; X64-NEXT:    lea rdi, <legacy_use+0x1d>
 ; X64-NEXT:     R_X86_64_TLSGD t1-0x4
 ; X64-NEXT:    call <L1>
 ; X64-NEXT:     R_X86_64_PLT32 __tls_get_addr-0x4
+; X64-NEXT:  <L1>:
 ; X64-NEXT:    xor edi, edi
 ; X64-NEXT:    mov rsi, rax
 ; X64-NEXT:    mov rdx, qword ptr [rbp - 0x30]
-; X64-NEXT:  <L2>:
 ; X64-NEXT:    call <L2>
 ; X64-NEXT:     R_X86_64_PLT32 call_target-0x4
+; X64-NEXT:  <L2>:
 ; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret

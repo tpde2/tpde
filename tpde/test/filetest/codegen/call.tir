@@ -15,14 +15,14 @@ define @impl_func(%p) {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    sub rsp, 0x30
 ; X64-NEXT:    mov qword ptr [rbp - 0x30], rdi
-; X64-NEXT:  <L0>:
 ; X64-NEXT:    call <L0>
 ; X64-NEXT:     R_X86_64_PLT32 ext_func2-0x4
+; X64-NEXT:  <L0>:
 ; X64-NEXT:    mov rdi, rax
 ; X64-NEXT:    mov rsi, qword ptr [rbp - 0x30]
-; X64-NEXT:  <L1>:
 ; X64-NEXT:    call <L1>
 ; X64-NEXT:     R_X86_64_PLT32 ext_func-0x4
+; X64-NEXT:  <L1>:
 ; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret

@@ -1768,7 +1768,9 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::CallBuilder::call_impl(
 
   if (auto *sym = std::get_if<SymRef>(&target)) {
     this->compiler.text_writer.ensure_space(16);
-    ASMC(&this->compiler, CALL, this->compiler.text_writer.cur_ptr());
+    // Call offset should be zero for compatibility with GNU ld before 2.37 and
+    // other consumers that don't properly handle rela relocations.
+    ASMC(&this->compiler, CALL, this->compiler.text_writer.cur_ptr() + 5);
     this->compiler.reloc_text(
         *sym, elf::R_X86_64_PLT32, this->compiler.text_writer.offset() - 4, -4);
   } else {
@@ -1931,7 +1933,9 @@ CompilerX64<Adaptor, Derived, BaseTy, Config>::ScratchReg
     *this->text_writer.cur_ptr()++ = 0x66;
     *this->text_writer.cur_ptr()++ = 0x66;
     *this->text_writer.cur_ptr()++ = 0x48;
-    ASMNC(CALL, this->text_writer.cur_ptr());
+    // Call offset should be zero for compatibility with GNU ld before 2.37 and
+    // other consumers that don't properly handle rela relocations.
+    ASMNC(CALL, this->text_writer.cur_ptr() + 5);
     if (!this->sym_tls_get_addr.valid()) [[unlikely]] {
       this->sym_tls_get_addr = this->assembler.sym_add_undef(
           "__tls_get_addr", Assembler::SymBinding::GLOBAL);

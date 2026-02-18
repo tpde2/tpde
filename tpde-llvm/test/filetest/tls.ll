@@ -18,6 +18,7 @@ define ptr @getaddr() {
 ; X64-NEXT:     R_X86_64_TLSGD t1-0x4
 ; X64-NEXT:    call <L0>
 ; X64-NEXT:     R_X86_64_PLT32 __tls_get_addr-0x4
+; X64-NEXT:  <L0>:
 ; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -51,6 +52,7 @@ define i32 @load() {
 ; X64-NEXT:     R_X86_64_TLSGD t1-0x4
 ; X64-NEXT:    call <L0>
 ; X64-NEXT:     R_X86_64_PLT32 __tls_get_addr-0x4
+; X64-NEXT:  <L0>:
 ; X64-NEXT:    mov eax, dword ptr [rax]
 ; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
@@ -87,6 +89,7 @@ define void @store(i32 %v) {
 ; X64-NEXT:     R_X86_64_TLSGD t1-0x4
 ; X64-NEXT:    call <L0>
 ; X64-NEXT:     R_X86_64_PLT32 __tls_get_addr-0x4
+; X64-NEXT:  <L0>:
 ; X64-NEXT:    mov ecx, dword ptr [rbp - 0x2c]
 ; X64-NEXT:    mov dword ptr [rax], ecx
 ; X64-NEXT:    add rsp, 0x30
@@ -127,6 +130,7 @@ define void @store3(i32, i32, i32 %v) {
 ; X64-NEXT:     R_X86_64_TLSGD t1-0x4
 ; X64-NEXT:    call <L0>
 ; X64-NEXT:     R_X86_64_PLT32 __tls_get_addr-0x4
+; X64-NEXT:  <L0>:
 ; X64-NEXT:    mov ecx, dword ptr [rbp - 0x2c]
 ; X64-NEXT:    mov dword ptr [rax], ecx
 ; X64-NEXT:    add rsp, 0x30

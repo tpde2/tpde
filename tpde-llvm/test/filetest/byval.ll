@@ -40,9 +40,9 @@ define i32 @call_byval(i32 %0) {
 ; X64-NEXT:    mov qword ptr [rsp], rcx
 ; X64-NEXT:    mov rcx, qword ptr [rax + 0x8]
 ; X64-NEXT:    mov qword ptr [rsp + 0x8], rcx
-; X64-NEXT:  <L0>:
 ; X64-NEXT:    call <L0>
 ; X64-NEXT:     R_X86_64_PLT32 fn_i32_byval_ptr_i32_i32-0x4
+; X64-NEXT:  <L0>:
 ; X64-NEXT:    add rsp, 0x50
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -123,9 +123,9 @@ define void @call_byval2(ptr %a, ptr %b, ptr %c) {
 ; X64-NEXT:    mov qword ptr [rsp + 0x20], rax
 ; X64-NEXT:    mov rax, qword ptr [rdx + 0x8]
 ; X64-NEXT:    mov qword ptr [rsp + 0x28], rax
-; X64-NEXT:  <L0>:
 ; X64-NEXT:    call <L0>
 ; X64-NEXT:     R_X86_64_PLT32 fn_byval2-0x4
+; X64-NEXT:  <L0>:
 ; X64-NEXT:    add rsp, 0x60
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -201,9 +201,9 @@ define void @call_byval3(ptr %a, ptr %b, ptr %c, ptr %d) {
 ; X64-NEXT:    movzx eax, byte ptr [rdx]
 ; X64-NEXT:    mov byte ptr [rsp + 0x10], al
 ; X64-NEXT:    mov rdi, rcx
-; X64-NEXT:  <L0>:
 ; X64-NEXT:    call <L0>
 ; X64-NEXT:     R_X86_64_PLT32 fn_byval3-0x4
+; X64-NEXT:  <L0>:
 ; X64-NEXT:    add rsp, 0x40
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -280,9 +280,9 @@ define void @call_byval4(ptr %a, ptr %b) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:  <L0>:
 ; X64-NEXT:    call <L0>
 ; X64-NEXT:     R_X86_64_PLT32 fn_byval4-0x4
+; X64-NEXT:  <L0>:
 ; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -349,9 +349,9 @@ define void @call_byval6(ptr %a) {
 ; X64-NEXT:    mov word ptr [rsp + 0x4], ax
 ; X64-NEXT:    movzx eax, byte ptr [rdi + 0x6]
 ; X64-NEXT:    mov byte ptr [rsp + 0x6], al
-; X64-NEXT:  <L0>:
 ; X64-NEXT:    call <L0>
 ; X64-NEXT:     R_X86_64_PLT32 fn_byval6-0x4
+; X64-NEXT:  <L0>:
 ; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -396,9 +396,9 @@ define void @call_byval7(ptr %a) {
 ; X64-NEXT:    mov word ptr [rsp], ax
 ; X64-NEXT:    movzx eax, byte ptr [rdi + 0x2]
 ; X64-NEXT:    mov byte ptr [rsp + 0x2], al
-; X64-NEXT:  <L0>:
 ; X64-NEXT:    call <L0>
 ; X64-NEXT:     R_X86_64_PLT32 fn_byval7-0x4
+; X64-NEXT:  <L0>:
 ; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret

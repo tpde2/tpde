@@ -620,9 +620,9 @@ define i64 @sub_memory(i64 %0) {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    sub rsp, 0x30
 ; X64-NEXT:    mov qword ptr [rbp - 0x30], rdi
-; X64-NEXT:  <L0>:
 ; X64-NEXT:    call <L0>
 ; X64-NEXT:     R_X86_64_PLT32 f-0x4
+; X64-NEXT:  <L0>:
 ; X64-NEXT:    sub rax, qword ptr [rbp - 0x30]
 ; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp

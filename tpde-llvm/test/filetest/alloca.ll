@@ -796,9 +796,9 @@ define void @alloca_4k() {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    sub rsp, 0x1030
 ; X64-NEXT:    lea rdi, [rbp - 0x1030]
-; X64-NEXT:  <L0>:
 ; X64-NEXT:    call <L0>
 ; X64-NEXT:     R_X86_64_PLT32 take_ptr-0x4
+; X64-NEXT:  <L0>:
 ; X64-NEXT:    add rsp, 0x1030
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -827,9 +827,9 @@ define void @dyn_alloca_4k() {
 ; X64-NEXT:    sub rsp, 0x1000
 ; X64-NEXT:    mov rax, rsp
 ; X64-NEXT:    mov rdi, rax
-; X64-NEXT:  <L0>:
 ; X64-NEXT:    call <L0>
 ; X64-NEXT:     R_X86_64_PLT32 take_ptr-0x4
+; X64-NEXT:  <L0>:
 ; X64-NEXT:    mov rsp, rbp
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -858,9 +858,9 @@ define void @alloca_32k() {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    sub rsp, 0x8030
 ; X64-NEXT:    lea rdi, [rbp - 0x8030]
-; X64-NEXT:  <L0>:
 ; X64-NEXT:    call <L0>
 ; X64-NEXT:     R_X86_64_PLT32 take_ptr-0x4
+; X64-NEXT:  <L0>:
 ; X64-NEXT:    add rsp, 0x8030
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -889,9 +889,9 @@ define void @dyn_alloca_32k() {
 ; X64-NEXT:    sub rsp, 0x8000
 ; X64-NEXT:    mov rax, rsp
 ; X64-NEXT:    mov rdi, rax
-; X64-NEXT:  <L0>:
 ; X64-NEXT:    call <L0>
 ; X64-NEXT:     R_X86_64_PLT32 take_ptr-0x4
+; X64-NEXT:  <L0>:
 ; X64-NEXT:    mov rsp, rbp
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -922,9 +922,9 @@ define void @dyn_alloca_33k() {
 ; X64-NEXT:    sub rsp, 0x8400
 ; X64-NEXT:    mov rax, rsp
 ; X64-NEXT:    mov rdi, rax
-; X64-NEXT:  <L0>:
 ; X64-NEXT:    call <L0>
 ; X64-NEXT:     R_X86_64_PLT32 take_ptr-0x4
+; X64-NEXT:  <L0>:
 ; X64-NEXT:    mov rsp, rbp
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -954,9 +954,9 @@ define void @alloca_16M() {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    sub rsp, 0x1000030
 ; X64-NEXT:    lea rdi, [rbp - 0x1000030]
-; X64-NEXT:  <L0>:
 ; X64-NEXT:    call <L0>
 ; X64-NEXT:     R_X86_64_PLT32 take_ptr-0x4
+; X64-NEXT:  <L0>:
 ; X64-NEXT:    add rsp, 0x1000030
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -986,9 +986,9 @@ define void @dyn_alloca_16M() {
 ; X64-NEXT:    sub rsp, 0x1000000
 ; X64-NEXT:    mov rax, rsp
 ; X64-NEXT:    mov rdi, rax
-; X64-NEXT:  <L0>:
 ; X64-NEXT:    call <L0>
 ; X64-NEXT:     R_X86_64_PLT32 take_ptr-0x4
+; X64-NEXT:  <L0>:
 ; X64-NEXT:    mov rsp, rbp
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -1137,9 +1137,9 @@ define void @f2(ptr %0, ptr %1, ptr %2, ptr %3, ptr %4, ptr %5, ptr %6, ptr %7, 
 ; X64-NEXT:    mov rax, qword ptr [rbp - 0x9d00]
 ; X64-NEXT:    mov qword ptr [rsp + 0x120], rax
 ; X64-NEXT:    xor eax, eax
-; X64-NEXT:  <L0>:
 ; X64-NEXT:    call <L0>
 ; X64-NEXT:     R_X86_64_PLT32 f1-0x4
+; X64-NEXT:  <L0>:
 ; X64-NEXT:    add rsp, 0x9e08
 ; X64-NEXT:    pop r15
 ; X64-NEXT:    pop r14

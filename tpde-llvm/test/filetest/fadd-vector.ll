@@ -42,9 +42,9 @@ define <2 x float> @fadd_v2f32_f32_spill(<2 x float> %0, <2 x float> %1) {
 ; X64-NEXT:    sub rsp, 0x40
 ; X64-NEXT:    movq qword ptr [rbp - 0x30], xmm0
 ; X64-NEXT:    movq qword ptr [rbp - 0x38], xmm1
-; X64-NEXT:  <L0>:
 ; X64-NEXT:    call <L0>
 ; X64-NEXT:     R_X86_64_PLT32 fadd_v2f32_f32_spill-0x4
+; X64-NEXT:  <L0>:
 ; X64-NEXT:    movapd xmm1, xmm0
 ; X64-NEXT:    addps xmm1, xmmword ptr [rbp - 0x30]
 ; X64-NEXT:    movq xmm1, qword ptr [rbp - 0x38]

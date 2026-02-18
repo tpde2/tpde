@@ -30,17 +30,17 @@ define i32 @invoke_manyargs() personality ptr @__gxx_personality_v0 {
 ; X64-NEXT:    mov dword ptr [rsp + 0x10], eax
 ; X64-NEXT:    mov eax, 0xa
 ; X64-NEXT:    mov dword ptr [rsp + 0x18], eax
-; X64-NEXT:  <L0>:
 ; X64-NEXT:    call <L0>
 ; X64-NEXT:     R_X86_64_PLT32 mayThrow-0x4
+; X64-NEXT:  <L0>:
 ; X64-NEXT:    add rsp, 0x20
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    jmp <L2>
 ; X64-NEXT:    mov rdi, rax
 ; X64-NEXT:    mov esi, edx
-; X64-NEXT:  <L1>:
 ; X64-NEXT:    call <L1>
 ; X64-NEXT:     R_X86_64_PLT32 _Unwind_Resume-0x4
+; X64-NEXT:  <L1>:
 ; X64-NEXT:    ud2
 ; X64-NEXT:  <L2>:
 ; X64-NEXT:    mov rsp, rbp
@@ -125,9 +125,9 @@ define void @invoke_landingpad_phi() personality ptr @__gxx_personality_v0 {
 ; X64-NEXT:    setl al
 ; X64-NEXT:    xor edi, edi
 ; X64-NEXT:    xor esi, esi
-; X64-NEXT:  <L1>:
 ; X64-NEXT:    call <L1>
 ; X64-NEXT:     R_X86_64_PLT32 foo-0x4
+; X64-NEXT:  <L1>:
 ; X64-NEXT:    mov r12, rax
 ; X64-NEXT:    jmp <L2>
 ; X64-NEXT:    xor ecx, ecx
@@ -140,9 +140,9 @@ define void @invoke_landingpad_phi() personality ptr @__gxx_personality_v0 {
 ; X64-NEXT:  <L3>:
 ; X64-NEXT:    xor edi, edi
 ; X64-NEXT:    xor esi, esi
-; X64-NEXT:  <L4>:
 ; X64-NEXT:    call <L4>
 ; X64-NEXT:     R_X86_64_PLT32 _Unwind_Resume-0x4
+; X64-NEXT:  <L4>:
 ; X64-NEXT:    ud2
 ;
 ; ARM64-LABEL: <invoke_landingpad_phi>:
@@ -243,9 +243,9 @@ define i32 @invoke_catch_symbol() personality ptr @__gxx_personality_v0 {
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    sub rsp, 0x30
 ; X64-NEXT:    xor edi, edi
-; X64-NEXT:  <L0>:
 ; X64-NEXT:    call <L0>
 ; X64-NEXT:     R_X86_64_PLT32 _Znwm-0x4
+; X64-NEXT:  <L0>:
 ; X64-NEXT:    jmp <L1>
 ; X64-NEXT:  <L1>:
 ; X64-NEXT:    xor eax, eax
@@ -292,9 +292,9 @@ define i32 @main(ptr %0, i64 %1) personality ptr @__gxx_personality_v0 {
 ; X64-NEXT:    mov rbx, rdi
 ; X64-NEXT:    mov r12, rsi
 ; X64-NEXT:    xor edi, edi
-; X64-NEXT:  <L0>:
 ; X64-NEXT:    call <L0>
 ; X64-NEXT:     R_X86_64_PLT32 fn_ptr_i64-0x4
+; X64-NEXT:  <L0>:
 ; X64-NEXT:    mov qword ptr [rbp - 0x30], rax
 ; X64-NEXT:    jmp <L1>
 ; X64-NEXT:    xor eax, eax

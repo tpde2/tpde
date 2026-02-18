@@ -37,9 +37,9 @@ define i1 @fcmp_f128_oge(fp128 %0, fp128 %1) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:  <L0>:
 ; X64-NEXT:    call <L0>
 ; X64-NEXT:     R_X86_64_PLT32 __getf2-0x4
+; X64-NEXT:  <L0>:
 ; X64-NEXT:    test rax, rax
 ; X64-NEXT:    setge al
 ; X64-NEXT:    movzx eax, al
@@ -66,9 +66,9 @@ define i1 @fcmp_f128_ord(fp128 %0, fp128 %1) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:  <L0>:
 ; X64-NEXT:    call <L0>
 ; X64-NEXT:     R_X86_64_PLT32 __unordtf2-0x4
+; X64-NEXT:  <L0>:
 ; X64-NEXT:    test rax, rax
 ; X64-NEXT:    sete al
 ; X64-NEXT:    movzx eax, al
@@ -95,9 +95,9 @@ define i1 @fcmp_f128_oeq(fp128 %0, fp128 %1) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:  <L0>:
 ; X64-NEXT:    call <L0>
 ; X64-NEXT:     R_X86_64_PLT32 __eqtf2-0x4
+; X64-NEXT:  <L0>:
 ; X64-NEXT:    test rax, rax
 ; X64-NEXT:    sete al
 ; X64-NEXT:    movzx eax, al
@@ -124,9 +124,9 @@ define i1 @fcmp_f128_ogt(fp128 %0, fp128 %1) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:  <L0>:
 ; X64-NEXT:    call <L0>
 ; X64-NEXT:     R_X86_64_PLT32 __gttf2-0x4
+; X64-NEXT:  <L0>:
 ; X64-NEXT:    test rax, rax
 ; X64-NEXT:    setg al
 ; X64-NEXT:    movzx eax, al
@@ -153,9 +153,9 @@ define i1 @fcmp_f128_olt(fp128 %0, fp128 %1) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:  <L0>:
 ; X64-NEXT:    call <L0>
 ; X64-NEXT:     R_X86_64_PLT32 __lttf2-0x4
+; X64-NEXT:  <L0>:
 ; X64-NEXT:    test rax, rax
 ; X64-NEXT:    setl al
 ; X64-NEXT:    movzx eax, al
@@ -182,9 +182,9 @@ define i1 @fcmp_f128_ole(fp128 %0, fp128 %1) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:  <L0>:
 ; X64-NEXT:    call <L0>
 ; X64-NEXT:     R_X86_64_PLT32 __letf2-0x4
+; X64-NEXT:  <L0>:
 ; X64-NEXT:    test rax, rax
 ; X64-NEXT:    setle al
 ; X64-NEXT:    movzx eax, al
@@ -211,9 +211,9 @@ define i1 @fcmp_f128_uno(fp128 %0, fp128 %1) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:  <L0>:
 ; X64-NEXT:    call <L0>
 ; X64-NEXT:     R_X86_64_PLT32 __unordtf2-0x4
+; X64-NEXT:  <L0>:
 ; X64-NEXT:    test rax, rax
 ; X64-NEXT:    setne al
 ; X64-NEXT:    movzx eax, al
@@ -240,9 +240,9 @@ define i1 @fcmp_f128_ugt(fp128 %0, fp128 %1) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:  <L0>:
 ; X64-NEXT:    call <L0>
 ; X64-NEXT:     R_X86_64_PLT32 __letf2-0x4
+; X64-NEXT:  <L0>:
 ; X64-NEXT:    test rax, rax
 ; X64-NEXT:    setg al
 ; X64-NEXT:    movzx eax, al
@@ -269,9 +269,9 @@ define i1 @fcmp_f128_uge(fp128 %0, fp128 %1) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:  <L0>:
 ; X64-NEXT:    call <L0>
 ; X64-NEXT:     R_X86_64_PLT32 __lttf2-0x4
+; X64-NEXT:  <L0>:
 ; X64-NEXT:    test rax, rax
 ; X64-NEXT:    setge al
 ; X64-NEXT:    movzx eax, al
@@ -298,9 +298,9 @@ define i1 @fcmp_f128_ult(fp128 %0, fp128 %1) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:  <L0>:
 ; X64-NEXT:    call <L0>
 ; X64-NEXT:     R_X86_64_PLT32 __getf2-0x4
+; X64-NEXT:  <L0>:
 ; X64-NEXT:    test rax, rax
 ; X64-NEXT:    setl al
 ; X64-NEXT:    movzx eax, al
@@ -327,9 +327,9 @@ define i1 @fcmp_f128_ule(fp128 %0, fp128 %1) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:  <L0>:
 ; X64-NEXT:    call <L0>
 ; X64-NEXT:     R_X86_64_PLT32 __gttf2-0x4
+; X64-NEXT:  <L0>:
 ; X64-NEXT:    test rax, rax
 ; X64-NEXT:    setle al
 ; X64-NEXT:    movzx eax, al
@@ -356,9 +356,9 @@ define i1 @fcmp_f128_une(fp128 %0, fp128 %1) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:  <L0>:
 ; X64-NEXT:    call <L0>
 ; X64-NEXT:     R_X86_64_PLT32 __netf2-0x4
+; X64-NEXT:  <L0>:
 ; X64-NEXT:    test rax, rax
 ; X64-NEXT:    setne al
 ; X64-NEXT:    movzx eax, al

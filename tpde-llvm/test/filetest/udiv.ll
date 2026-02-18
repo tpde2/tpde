@@ -473,9 +473,9 @@ define i128 @udiv_i128(i128 %0, i128 %1) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:  <L0>:
 ; X64-NEXT:    call <L0>
 ; X64-NEXT:     R_X86_64_PLT32 __udivti3-0x4
+; X64-NEXT:  <L0>:
 ; X64-NEXT:    add rsp, 0x30
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
@@ -499,17 +499,17 @@ define i128 @udiv_i128_twice(i128 %0, i128 %1) {
 ; X64-NEXT:    sub rsp, 0x40
 ; X64-NEXT:    mov qword ptr [rbp - 0x40], rdi
 ; X64-NEXT:    mov qword ptr [rbp - 0x38], rsi
-; X64-NEXT:  <L0>:
 ; X64-NEXT:    call <L0>
 ; X64-NEXT:     R_X86_64_PLT32 __udivti3-0x4
+; X64-NEXT:  <L0>:
 ; X64-NEXT:    mov rdi, qword ptr [rbp - 0x40]
 ; X64-NEXT:    mov rsi, qword ptr [rbp - 0x38]
 ; X64-NEXT:    mov qword ptr [rbp - 0x38], rdx
 ; X64-NEXT:    mov rdx, rax
 ; X64-NEXT:    mov rcx, qword ptr [rbp - 0x38]
-; X64-NEXT:  <L1>:
 ; X64-NEXT:    call <L1>
 ; X64-NEXT:     R_X86_64_PLT32 __udivti3-0x4
+; X64-NEXT:  <L1>:
 ; X64-NEXT:    add rsp, 0x40
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
