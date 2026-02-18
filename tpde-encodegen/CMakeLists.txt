@@ -81,3 +81,7 @@ if (TPDE_ENABLE_PCH)
         <unordered_set>
     )
 endif ()
+
+
+# Install
+install(TARGETS tpde_encodegen RUNTIME)

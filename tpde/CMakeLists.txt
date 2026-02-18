@@ -45,23 +45,33 @@ target_sources(tpde PRIVATE
     FILES
         include/tpde/Analyzer.hpp
         include/tpde/Assembler.hpp
+        include/tpde/AssemblerElf.hpp
+        include/tpde/AssignmentPartRef.hpp
         include/tpde/base.hpp
         include/tpde/Compiler.hpp
         include/tpde/CompilerBase.hpp
-        include/tpde/AssemblerElf.hpp
+        include/tpde/CompilerConfig.hpp
         include/tpde/DWARF.hpp
         include/tpde/ELF.hpp
         include/tpde/ElfMapper.hpp
         include/tpde/FunctionWriter.hpp
+        include/tpde/GenericValuePart.hpp
         include/tpde/IRAdaptor.hpp
         include/tpde/RegisterFile.hpp
         include/tpde/ScratchReg.hpp
         include/tpde/StringTable.hpp
-        include/tpde/AssignmentPartRef.hpp
-        include/tpde/ValuePartRef.hpp
+        include/tpde/util/AddressSanitizer.hpp
+        include/tpde/util/BumpAllocator.hpp
+        include/tpde/util/function_ref.hpp
+        include/tpde/util/misc.hpp
+        include/tpde/util/SegmentedVector.hpp
         include/tpde/util/SmallBitSet.hpp
         include/tpde/util/SmallVector.hpp
-        include/tpde/util/misc.hpp
+        include/tpde/util/VectorWriter.hpp
+        include/tpde/ValLocalIdx.hpp
+        include/tpde/ValueAssignment.hpp
+        include/tpde/ValuePartRef.hpp
+        include/tpde/ValueRef.hpp
 )
 
 # fadec
@@ -134,3 +144,7 @@ if (TPDE_INCLUDE_TESTS)
     # Backwards-compatibility
     add_custom_target(tpde_filetest DEPENDS check-tpde-core)
 endif()
+
+
+# Install
+install(TARGETS tpde ARCHIVE FILE_SET HEADERS)

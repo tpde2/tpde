@@ -228,3 +228,7 @@ if (TPDE_INCLUDE_TESTS)
     # Backwards-compatibility
     add_custom_target(tpde_llvm_filetest DEPENDS check-tpde-llvm)
 endif ()
+
+
+# Install
+install(TARGETS tpde_llvm tpde-llc tpde-lli RUNTIME ARCHIVE FILE_SET HEADERS)
