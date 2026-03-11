@@ -8,7 +8,7 @@ This repository contains:
 
 - \subpage tpde-main "TPDE": the core compiler framework.
 - \ref tpde-encodegen "TPDE-Encodegen": a utility for easing the use of TPDE by deriving code generators through LLVM's Machine IR.
-- \subpage tpde-llvm-main "TPDE-LLVM": a standalone back-end for LLVM-IR, which compiles 10--20x faster than LLVM -O0 with similar code quality, usable as library (e.g., for JIT), as tool (`tpde-llc`), and integrated in Clang/Flang (with a patch).
+- \subpage tpde-llvm-main "TPDE-LLVM": a standalone back-end for LLVM-IR, which compiles 10--20x faster than LLVM -O0 with similar code quality, usable as library (e.g., for JIT), as tool (`tpde-llc`), and integrated in Clang/Flang 22+ as a plugin (`-fpass-plugin=tpde-plugin.so`).
 
 ### Getting Started
 

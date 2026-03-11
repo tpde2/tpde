@@ -23,7 +23,9 @@ Note that compilation is likely to modify the module. All constant expressions i
 
 ## Integration Into Clang/Flang
 
-We provide a patch to integrate TPDE-LLVM into Clang/Flang. Apply the patch from the root directory of the repository and add this repository under `clang/lib/CodeGen/tpde2` (e.g., via a symlink). This adds two options to the `clang` and `flang` drivers:
+For **Clang/Flang 22+**, TPDE can be used by adding the Clang/Flang command line option `-fpass-plugin=/path/to/tpde-plugin.so`. The TPDE plugin will substitute the regular LLVM back-end with the TPDE-LLVM back-end. Inputs that TPDE can't handle will cause a fall back to LLVM and emit a warning; this warning can be converted into an error using `-Werror=backend-plugin`. (Note: the LLVM version used for building TPDE *must* match the version of Clang/Flang.)
+
+For **Clang/Flang 19—21**, TPDE-LLVM can be integrated using a patch. Apply the patch from the root directory of the repository and add this repository under `clang/lib/CodeGen/tpde2` (e.g., via a symlink). This adds two options to the `clang` and `flang` drivers:
 
 - `-ftpde`: Use TPDE instead of the regular LLVM back-end. Inputs that TPDE can't handle will cause a fall back to LLVM and emit a warning.
 - `-ftpde-abort`: Abort when the input is not supported, don't fallback to LLVM.
