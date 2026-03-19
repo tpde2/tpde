@@ -306,19 +306,20 @@ void EncodingTargetArm64::get_inst_candidates(
   case_default("MRS", "MRS");
 
   const auto case_mov_shift = [&](std::string_view mnem_llvm,
-                                  std::string_view mnem_disarm) {
+                                  std::string_view mnem_disarm,
+                                  bool is_movk = false) {
     if (std::string_view{Name} == mnem_llvm) {
-      unsigned imm = mi.getOperand(1).getImm();
-      unsigned shift = mi.getOperand(2).getImm();
+      unsigned imm = mi.getOperand(1 + is_movk).getImm();
+      unsigned shift = mi.getOperand(2 + is_movk).getImm();
       handle_noimm(mnem_disarm, std::format(", {:#x}, {}", imm, shift / 16));
     }
   };
   case_mov_shift("MOVZWi", "MOVZw_shift");
   case_mov_shift("MOVZXi", "MOVZx_shift");
-  case_mov_shift("MOVKWi", "MOVKw_shift");
-  case_mov_shift("MOVKXi", "MOVKx_shift");
   case_mov_shift("MOVNWi", "MOVNw_shift");
   case_mov_shift("MOVNXi", "MOVNx_shift");
+  case_mov_shift("MOVKWi", "MOVKw_shift", true);
+  case_mov_shift("MOVKXi", "MOVKx_shift", true);
 
   const auto case_mem_unsigned = [&](std::string_view mnem_llvm,
                                      std::string_view mnem,
