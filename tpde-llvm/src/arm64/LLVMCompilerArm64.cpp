@@ -79,7 +79,7 @@ struct LLVMCompilerArm64 : tpde::a64::CompilerA64<LLVMAdaptor,
                       LLVMBasicValType ty,
                       GenericValuePart el);
 
-  bool compile_br(const llvm::Instruction *, const ValInfo &, u64);
+  bool compile_cond_br(const llvm::Instruction *, const ValInfo &, u64);
   bool compile_inline_asm(const llvm::CallBase *);
   bool compile_icmp(const llvm::Instruction *, const ValInfo &, u64);
   void compile_i32_cmp_zero(AsmReg reg, llvm::CmpInst::Predicate p);
@@ -233,15 +233,14 @@ void LLVMCompilerArm64::insert_element(ValueRef &vec_vr,
   vec_ref.set_modified();
 }
 
-bool LLVMCompilerArm64::compile_br(const llvm::Instruction *inst,
-                                   const ValInfo &,
-                                   u64) {
+bool LLVMCompilerArm64::compile_cond_br(const llvm::Instruction *inst,
+                                        const ValInfo &,
+                                        u64) {
+#if LLVM_VERSION_MAJOR >= 23
+  const auto *br = llvm::cast<llvm::CondBrInst>(inst);
+#else
   const auto *br = llvm::cast<llvm::BranchInst>(inst);
-  if (br->isUnconditional()) {
-    generate_uncond_branch(adaptor->block_lookup_idx(br->getSuccessor(0)));
-    return true;
-  }
-
+#endif
   const auto true_block = adaptor->block_lookup_idx(br->getSuccessor(0));
   const auto false_block = adaptor->block_lookup_idx(br->getSuccessor(1));
 
@@ -569,7 +568,7 @@ bool LLVMCompilerArm64::handle_intrin(const llvm::IntrinsicInst *inst) {
   case llvm::Intrinsic::frameaddress: {
     auto [_, res_vr] = this->result_ref_single(inst);
     auto op = llvm::cast<llvm::ConstantInt>(inst->getOperand(0));
-    ASM(MOVx, res_vr.alloc_reg(), op->isZeroValue() ? DA_GP(29) : DA_ZR);
+    ASM(MOVx, res_vr.alloc_reg(), op->isZero() ? DA_GP(29) : DA_ZR);
     return true;
   }
   case llvm::Intrinsic::aarch64_crc32cx: {

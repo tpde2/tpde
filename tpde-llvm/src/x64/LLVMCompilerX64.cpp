@@ -82,7 +82,7 @@ struct LLVMCompilerX64 : tpde::x64::CompilerX64<LLVMAdaptor,
   std::optional<CallBuilder>
       create_call_builder(const llvm::CallBase * = nullptr);
 
-  bool compile_br(const llvm::Instruction *, const ValInfo &, u64);
+  bool compile_cond_br(const llvm::Instruction *, const ValInfo &, u64);
   bool compile_inline_asm(const llvm::CallBase *);
   bool compile_icmp(const llvm::Instruction *, const ValInfo &, u64);
   void compile_i32_cmp_zero(AsmReg reg, llvm::CmpInst::Predicate p);
@@ -246,15 +246,14 @@ std::optional<LLVMCompilerX64::CallBuilder>
   }
 }
 
-bool LLVMCompilerX64::compile_br(const llvm::Instruction *inst,
-                                 const ValInfo &,
-                                 u64) {
+bool LLVMCompilerX64::compile_cond_br(const llvm::Instruction *inst,
+                                      const ValInfo &,
+                                      u64) {
+#if LLVM_VERSION_MAJOR >= 23
+  const auto *br = llvm::cast<llvm::CondBrInst>(inst);
+#else
   const auto *br = llvm::cast<llvm::BranchInst>(inst);
-  if (br->isUnconditional()) {
-    generate_uncond_branch(adaptor->block_lookup_idx(br->getSuccessor(0)));
-    return true;
-  }
-
+#endif
   const auto true_block = adaptor->block_lookup_idx(br->getSuccessor(0));
   const auto false_block = adaptor->block_lookup_idx(br->getSuccessor(1));
 
@@ -588,7 +587,7 @@ bool LLVMCompilerX64::handle_intrin(const llvm::IntrinsicInst *inst) {
     ValuePartRef res{this, CompilerConfig::GP_BANK};
     res.alloc_reg();
     auto op = llvm::cast<llvm::ConstantInt>(inst->getOperand(0));
-    if (op->isZeroValue()) {
+    if (op->isZero()) {
       ASM(MOV64rm, res.cur_reg(), FE_MEM(FE_BP, 0, FE_NOREG, 8));
     } else {
       ASM(XOR32rr, res.cur_reg(), res.cur_reg());
@@ -600,7 +599,7 @@ bool LLVMCompilerX64::handle_intrin(const llvm::IntrinsicInst *inst) {
     ValuePartRef res{this, CompilerConfig::GP_BANK};
     res.alloc_reg();
     auto op = llvm::cast<llvm::ConstantInt>(inst->getOperand(0));
-    if (op->isZeroValue()) {
+    if (op->isZero()) {
       ASM(MOV64rr, res.cur_reg(), FE_BP);
     } else {
       ASM(XOR32rr, res.cur_reg(), res.cur_reg());

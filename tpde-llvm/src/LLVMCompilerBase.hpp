@@ -429,6 +429,7 @@ public:
   bool compile_inst(const llvm::Instruction *, InstRange);
 
   bool compile_unreachable(const llvm::Instruction *, const ValInfo &, u64);
+  bool compile_br(const llvm::Instruction *, const ValInfo &, u64);
   bool compile_ret(const llvm::Instruction *, const ValInfo &, u64);
   bool compile_load_generic(const llvm::LoadInst *, GenericValuePart &&);
   bool compile_load(const llvm::Instruction *, const ValInfo &, u64);
@@ -484,10 +485,6 @@ public:
   bool compile_saturating_intrin(const llvm::IntrinsicInst *, OverflowOp);
   bool compile_vector_reduce(const llvm::IntrinsicInst *, const ValInfo &);
 
-
-  bool compile_br(const llvm::Instruction *, const ValInfo &, u64) {
-    return false;
-  }
 
   bool compile_inline_asm(const llvm::CallBase *) { return false; }
 
@@ -1292,7 +1289,12 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_inst(
 
     // Terminators
     res[llvm::Instruction::Ret] = {&Derived::compile_ret, 0};
+#if LLVM_VERSION_MAJOR >= 23
+    res[llvm::Instruction::UncondBr] = {&Derived::compile_br, 0};
+    res[llvm::Instruction::CondBr] = {&Derived::compile_cond_br, 0};
+#else
     res[llvm::Instruction::Br] = {&Derived::compile_br, 0};
+#endif
     res[llvm::Instruction::Switch] = {&Derived::compile_switch, 0};
     // TODO: IndirectBr
     res[llvm::Instruction::Invoke] = {&Derived::compile_invoke, 0};
@@ -1375,6 +1377,22 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_unreachable(
     const llvm::Instruction *, const ValInfo &, u64) {
   derived()->encode_trap();
   this->release_regs_after_return();
+  return true;
+}
+
+template <typename Adaptor, typename Derived, typename Config>
+bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_br(
+    const llvm::Instruction *inst, [[maybe_unused]] const ValInfo &info, u64) {
+#if LLVM_VERSION_MAJOR >= 23
+  const auto *br = llvm::cast<llvm::UncondBrInst>(inst);
+#else
+  const auto *br = llvm::cast<llvm::BranchInst>(inst);
+  if (br->isConditional()) {
+    return derived()->compile_cond_br(inst, info, 0);
+  }
+#endif
+  derived()->generate_uncond_branch(
+      this->adaptor->block_lookup_idx(br->getSuccessor(0)));
   return true;
 }
 
@@ -2950,7 +2968,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_extract_element(
     assert(this->adaptor->val_parts(src).count() == 1);
     // index 0 extract occurs so often that is it worth to have a special case.
     if (auto *ci = llvm::dyn_cast<llvm::ConstantInt>(index);
-        ci && ci->isZeroValue()) {
+        ci && ci->isZero()) {
       result.set_value(vec_vr.part(0));
     } else {
       derived()->encode_shri64(
@@ -3825,29 +3843,30 @@ template <typename Adaptor, typename Derived, typename Config>
 bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_alloca(
     const llvm::Instruction *inst, const ValInfo &, u64) {
   const auto *alloca = llvm::cast<llvm::AllocaInst>(inst);
-
-  auto [res_vr, res_ref] = this->result_ref_single(alloca);
-
   auto align = alloca->getAlign().value();
   auto &layout = this->adaptor->mod->getDataLayout();
-  if (auto size = alloca->getAllocationSize(layout)) {
-    if (size->isScalable()) {
-      return false;
-    }
-    derived()->alloca_fixed(size->getFixedValue(), align, res_ref);
-    return true;
+  auto elem_size = layout.getTypeAllocSize(alloca->getAllocatedType());
+  if (elem_size.isScalable()) {
+    return false;
   }
 
   const llvm::Value *size_val = alloca->getArraySize();
-  auto [size_vr, size_ref] = this->val_ref_single(size_val);
+  unsigned size_width = size_val->getType()->getIntegerBitWidth();
+  if (size_width > 64) {
+    return false; // Don't support alloca array sizes beyond i64...
+  }
 
-  auto elem_size = layout.getTypeAllocSize(alloca->getAllocatedType());
-  if (auto width = size_val->getType()->getIntegerBitWidth(); width != 64) {
-    if (width > 64) {
-      // Don't support alloca array sizes beyond i64...
-      return false;
-    }
-    size_ref = std::move(size_ref).into_extended(false, width, 64);
+  auto [res_vr, res_ref] = this->result_ref_single(alloca);
+  if (auto *ci = llvm::dyn_cast<llvm::ConstantInt>(size_val)) {
+    // TODO: should we care about overflow here?
+    uint64_t size_bytes = elem_size.getFixedValue() * ci->getZExtValue();
+    derived()->alloca_fixed(size_bytes, align, res_ref);
+    return true;
+  }
+
+  auto [size_vr, size_ref] = this->val_ref_single(size_val);
+  if (size_width != 64) {
+    size_ref = std::move(size_ref).into_extended(false, size_width, 64);
   }
   derived()->alloca_dynamic(elem_size, std::move(size_ref), align, res_ref);
   return true;
