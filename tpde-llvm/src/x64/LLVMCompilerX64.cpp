@@ -335,13 +335,24 @@ bool LLVMCompilerX64::compile_icmp(const llvm::Instruction *inst,
   default: TPDE_UNREACHABLE("invalid icmp predicate");
   }
 
+#if LLVM_VERSION_MAJOR >= 23
+  const llvm::CondBrInst *fuse_br = nullptr;
+#else
   const llvm::BranchInst *fuse_br = nullptr;
+#endif
   const llvm::Instruction *fuse_ext = nullptr;
 
   bool single_use = cmp->hasNUses(1);
   const llvm::Instruction *next = cmp->getNextNode();
-  if (auto *br = llvm::dyn_cast<llvm::BranchInst>(next);
-      br && br->isConditional() && br->getCondition() == cmp) {
+  if (
+#if LLVM_VERSION_MAJOR >= 23
+      auto *br = llvm::dyn_cast<llvm::CondBrInst>(next);
+      br && br->getCondition() == cmp
+#else
+      auto *br = llvm::dyn_cast<llvm::BranchInst>(next);
+      br && br->isConditional() && br->getCondition() == cmp
+#endif
+  ) {
     fuse_br = br;
   } else if (single_use && *cmp->user_begin() == next) {
     if (llvm::isa<llvm::ZExtInst, llvm::SExtInst>(next) &&
