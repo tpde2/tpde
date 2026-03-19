@@ -374,3 +374,274 @@ entry:
   %3 = extractvalue {i64, i1} %2, 1
   ret i1 %3
 }
+
+define i128 @umul_i128_0(i128 %0, i128 %1) {
+; X64-LABEL: <umul_i128_0>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    push rbx
+; X64-NEXT:    mov qword ptr [rbp - 0x40], rdx
+; X64-NEXT:    test rcx, rcx
+; X64-NEXT:    setne dl
+; X64-NEXT:    test rsi, rsi
+; X64-NEXT:    setne bl
+; X64-NEXT:    and bl, dl
+; X64-NEXT:    mov rax, rsi
+; X64-NEXT:    mul qword ptr [rbp - 0x40]
+; X64-NEXT:    mov rsi, rax
+; X64-NEXT:    seto r8b
+; X64-NEXT:    mov rax, rcx
+; X64-NEXT:    mul rdi
+; X64-NEXT:    seto cl
+; X64-NEXT:    or cl, r8b
+; X64-NEXT:    or cl, bl
+; X64-NEXT:    lea r9, [rsi + rax]
+; X64-NEXT:    mov rax, rdi
+; X64-NEXT:    mul qword ptr [rbp - 0x40]
+; X64-NEXT:    add rdx, r9
+; X64-NEXT:    setb r9b
+; X64-NEXT:    or r9b, cl
+; X64-NEXT:    pop rbx
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <umul_i128_0>:
+; ARM64:         mul x4, x3, x0
+; ARM64-NEXT:    cmp x1, #0x0
+; ARM64-NEXT:    ccmp x3, #0x0, #0x4, ne
+; ARM64-NEXT:    umulh x5, x1, x2
+; ARM64-NEXT:    umulh x3, x3, x0
+; ARM64-NEXT:    madd x4, x1, x2, x4
+; ARM64-NEXT:    ccmp xzr, x5, #0x0, eq
+; ARM64-NEXT:    umulh x1, x0, x2
+; ARM64-NEXT:    ccmp xzr, x3, #0x0, eq
+; ARM64-NEXT:    mul x0, x0, x2
+; ARM64-NEXT:    cset w5, ne
+; ARM64-NEXT:    adds x2, x1, x4
+; ARM64-NEXT:    csinc w6, w5, wzr, lo
+; ARM64-NEXT:    mov x1, x2
+; ARM64-NEXT:    ret
+entry:
+  %2 = call {i128, i1} @llvm.umul.with.overflow.i128(i128 %0, i128 %1)
+  %3 = extractvalue {i128, i1} %2, 0
+  ret i128 %3
+}
+
+define i1 @umul_i128_1(i128 %0, i128 %1) {
+; X64-LABEL: <umul_i128_1>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    push rbx
+; X64-NEXT:    mov qword ptr [rbp - 0x40], rdx
+; X64-NEXT:    test rcx, rcx
+; X64-NEXT:    setne dl
+; X64-NEXT:    test rsi, rsi
+; X64-NEXT:    setne bl
+; X64-NEXT:    and bl, dl
+; X64-NEXT:    mov rax, rsi
+; X64-NEXT:    mul qword ptr [rbp - 0x40]
+; X64-NEXT:    mov rsi, rax
+; X64-NEXT:    seto r8b
+; X64-NEXT:    mov rax, rcx
+; X64-NEXT:    mul rdi
+; X64-NEXT:    seto cl
+; X64-NEXT:    or cl, r8b
+; X64-NEXT:    or cl, bl
+; X64-NEXT:    lea r9, [rsi + rax]
+; X64-NEXT:    mov rax, rdi
+; X64-NEXT:    mul qword ptr [rbp - 0x40]
+; X64-NEXT:    add rdx, r9
+; X64-NEXT:    setb r9b
+; X64-NEXT:    or r9b, cl
+; X64-NEXT:    mov eax, r9d
+; X64-NEXT:    pop rbx
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <umul_i128_1>:
+; ARM64:         mul x4, x3, x0
+; ARM64-NEXT:    cmp x1, #0x0
+; ARM64-NEXT:    ccmp x3, #0x0, #0x4, ne
+; ARM64-NEXT:    umulh x5, x1, x2
+; ARM64-NEXT:    umulh x3, x3, x0
+; ARM64-NEXT:    madd x4, x1, x2, x4
+; ARM64-NEXT:    ccmp xzr, x5, #0x0, eq
+; ARM64-NEXT:    umulh x1, x0, x2
+; ARM64-NEXT:    ccmp xzr, x3, #0x0, eq
+; ARM64-NEXT:    mul x0, x0, x2
+; ARM64-NEXT:    cset w5, ne
+; ARM64-NEXT:    adds x2, x1, x4
+; ARM64-NEXT:    csinc w6, w5, wzr, lo
+; ARM64-NEXT:    mov w0, w6
+; ARM64-NEXT:    ret
+entry:
+  %2 = call {i128, i1} @llvm.umul.with.overflow.i128(i128 %0, i128 %1)
+  %3 = extractvalue {i128, i1} %2, 1
+  ret i1 %3
+}
+
+define i128 @smul_i128_0(i128 %0, i128 %1) {
+; X64-LABEL: <smul_i128_0>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    push rbx
+; X64-NEXT:    mov qword ptr [rbp - 0x40], rdx
+; X64-NEXT:    mov rbx, rsi
+; X64-NEXT:    sar rbx, 0x3f
+; X64-NEXT:    imul rbx, qword ptr [rbp - 0x40]
+; X64-NEXT:    mov rax, rdi
+; X64-NEXT:    mul qword ptr [rbp - 0x40]
+; X64-NEXT:    mov r8, rdx
+; X64-NEXT:    mov r9, rax
+; X64-NEXT:    mov rax, rsi
+; X64-NEXT:    mul qword ptr [rbp - 0x40]
+; X64-NEXT:    mov r10, rdx
+; X64-NEXT:    add r8, rax
+; X64-NEXT:    adc r10, rbx
+; X64-NEXT:    mov rbx, r10
+; X64-NEXT:    sar rbx, 0x3f
+; X64-NEXT:    mov r11, rcx
+; X64-NEXT:    sar r11, 0x3f
+; X64-NEXT:    imul r11, rdi
+; X64-NEXT:    mov rax, rdi
+; X64-NEXT:    mul rcx
+; X64-NEXT:    mov rdi, rdx
+; X64-NEXT:    add r8, rax
+; X64-NEXT:    adc rdi, r11
+; X64-NEXT:    mov r11, rdi
+; X64-NEXT:    sar r11, 0x3f
+; X64-NEXT:    add rdi, r10
+; X64-NEXT:    adc r11, rbx
+; X64-NEXT:    mov rax, rsi
+; X64-NEXT:    imul rcx
+; X64-NEXT:    add rax, rdi
+; X64-NEXT:    adc rdx, r11
+; X64-NEXT:    mov rcx, r8
+; X64-NEXT:    sar rcx, 0x3f
+; X64-NEXT:    xor rdx, rcx
+; X64-NEXT:    xor rcx, rax
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    setne cl
+; X64-NEXT:    mov rax, r9
+; X64-NEXT:    mov rdx, r8
+; X64-NEXT:    pop rbx
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <smul_i128_0>:
+; ARM64:         asr x4, x1, #63
+; ARM64-NEXT:    umulh x5, x0, x2
+; ARM64-NEXT:    asr x6, x3, #63
+; ARM64-NEXT:    mul x7, x1, x2
+; ARM64-NEXT:    umulh x8, x1, x2
+; ARM64-NEXT:    mul x4, x4, x2
+; ARM64-NEXT:    adds x5, x7, x5
+; ARM64-NEXT:    mul x9, x0, x3
+; ARM64-NEXT:    umulh x10, x0, x3
+; ARM64-NEXT:    adc x4, x8, x4
+; ARM64-NEXT:    mul x6, x0, x6
+; ARM64-NEXT:    adds x8, x9, x5
+; ARM64-NEXT:    mul x11, x1, x3
+; ARM64-NEXT:    smulh x5, x1, x3
+; ARM64-NEXT:    mov x1, x8
+; ARM64-NEXT:    adc x7, x10, x6
+; ARM64-NEXT:    asr x10, x4, #63
+; ARM64-NEXT:    asr x6, x7, #63
+; ARM64-NEXT:    adds x4, x4, x7
+; ARM64-NEXT:    asr x7, x8, #63
+; ARM64-NEXT:    mul x0, x0, x2
+; ARM64-NEXT:    adc x10, x10, x6
+; ARM64-NEXT:    adds x4, x11, x4
+; ARM64-NEXT:    adc x5, x5, x10
+; ARM64-NEXT:    cmp x4, x7
+; ARM64-NEXT:    ccmp x5, x7, #0x0, eq
+; ARM64-NEXT:    cset w2, ne
+; ARM64-NEXT:    ret
+entry:
+  %2 = call {i128, i1} @llvm.smul.with.overflow.i128(i128 %0, i128 %1)
+  %3 = extractvalue {i128, i1} %2, 0
+  ret i128 %3
+}
+
+define i1 @smul_i128_1(i128 %0, i128 %1) {
+; X64-LABEL: <smul_i128_1>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    push rbx
+; X64-NEXT:    mov qword ptr [rbp - 0x40], rdx
+; X64-NEXT:    mov rbx, rsi
+; X64-NEXT:    sar rbx, 0x3f
+; X64-NEXT:    imul rbx, qword ptr [rbp - 0x40]
+; X64-NEXT:    mov rax, rdi
+; X64-NEXT:    mul qword ptr [rbp - 0x40]
+; X64-NEXT:    mov r8, rdx
+; X64-NEXT:    mov r9, rax
+; X64-NEXT:    mov rax, rsi
+; X64-NEXT:    mul qword ptr [rbp - 0x40]
+; X64-NEXT:    mov r10, rdx
+; X64-NEXT:    add r8, rax
+; X64-NEXT:    adc r10, rbx
+; X64-NEXT:    mov rbx, r10
+; X64-NEXT:    sar rbx, 0x3f
+; X64-NEXT:    mov r11, rcx
+; X64-NEXT:    sar r11, 0x3f
+; X64-NEXT:    imul r11, rdi
+; X64-NEXT:    mov rax, rdi
+; X64-NEXT:    mul rcx
+; X64-NEXT:    mov rdi, rdx
+; X64-NEXT:    add r8, rax
+; X64-NEXT:    adc rdi, r11
+; X64-NEXT:    mov r11, rdi
+; X64-NEXT:    sar r11, 0x3f
+; X64-NEXT:    add rdi, r10
+; X64-NEXT:    adc r11, rbx
+; X64-NEXT:    mov rax, rsi
+; X64-NEXT:    imul rcx
+; X64-NEXT:    add rax, rdi
+; X64-NEXT:    adc rdx, r11
+; X64-NEXT:    mov rcx, r8
+; X64-NEXT:    sar rcx, 0x3f
+; X64-NEXT:    xor rdx, rcx
+; X64-NEXT:    xor rcx, rax
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    setne cl
+; X64-NEXT:    mov eax, ecx
+; X64-NEXT:    pop rbx
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <smul_i128_1>:
+; ARM64:         asr x4, x1, #63
+; ARM64-NEXT:    umulh x5, x0, x2
+; ARM64-NEXT:    asr x6, x3, #63
+; ARM64-NEXT:    mul x7, x1, x2
+; ARM64-NEXT:    umulh x8, x1, x2
+; ARM64-NEXT:    mul x4, x4, x2
+; ARM64-NEXT:    adds x5, x7, x5
+; ARM64-NEXT:    mul x9, x0, x3
+; ARM64-NEXT:    umulh x10, x0, x3
+; ARM64-NEXT:    adc x4, x8, x4
+; ARM64-NEXT:    mul x6, x0, x6
+; ARM64-NEXT:    adds x8, x9, x5
+; ARM64-NEXT:    mul x11, x1, x3
+; ARM64-NEXT:    smulh x5, x1, x3
+; ARM64-NEXT:    mov x1, x8
+; ARM64-NEXT:    adc x7, x10, x6
+; ARM64-NEXT:    asr x10, x4, #63
+; ARM64-NEXT:    asr x6, x7, #63
+; ARM64-NEXT:    adds x4, x4, x7
+; ARM64-NEXT:    asr x7, x8, #63
+; ARM64-NEXT:    mul x0, x0, x2
+; ARM64-NEXT:    adc x10, x10, x6
+; ARM64-NEXT:    adds x4, x11, x4
+; ARM64-NEXT:    adc x5, x5, x10
+; ARM64-NEXT:    cmp x4, x7
+; ARM64-NEXT:    ccmp x5, x7, #0x0, eq
+; ARM64-NEXT:    cset w2, ne
+; ARM64-NEXT:    mov w0, w2
+; ARM64-NEXT:    ret
+entry:
+  %2 = call {i128, i1} @llvm.smul.with.overflow.i128(i128 %0, i128 %1)
+  %3 = extractvalue {i128, i1} %2, 1
+  ret i1 %3
+}

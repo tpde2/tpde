@@ -95,15 +95,6 @@ struct LLVMCompilerX64 : tpde::x64::CompilerX64<LLVMAdaptor,
 
   bool handle_intrin(const llvm::IntrinsicInst *);
 
-  bool handle_overflow_intrin_128(OverflowOp op,
-                                  GenericValuePart &&lhs_lo,
-                                  GenericValuePart &&lhs_hi,
-                                  GenericValuePart &&rhs_lo,
-                                  GenericValuePart &&rhs_hi,
-                                  ValuePart &&res_lo,
-                                  ValuePart &&res_hi,
-                                  ValuePart &&res_of);
-
   // x86_fp80 support.
 
   /// Get memory operand for spill slot of a value, which must have an
@@ -701,53 +692,6 @@ bool LLVMCompilerX64::handle_intrin(const llvm::IntrinsicInst *inst) {
   case llvm::Intrinsic::x86_sse2_pause: ASM(PAUSE); return true;
   default: return false;
   }
-}
-
-bool LLVMCompilerX64::handle_overflow_intrin_128(OverflowOp op,
-                                                 GenericValuePart &&lhs_lo,
-                                                 GenericValuePart &&lhs_hi,
-                                                 GenericValuePart &&rhs_lo,
-                                                 GenericValuePart &&rhs_hi,
-                                                 ValuePart &&res_lo,
-                                                 ValuePart &&res_hi,
-                                                 ValuePart &&res_of) {
-  using EncodeFnTy = bool (LLVMCompilerX64::*)(GenericValuePart &&,
-                                               GenericValuePart &&,
-                                               GenericValuePart &&,
-                                               GenericValuePart &&,
-                                               ValuePart &,
-                                               ValuePart &,
-                                               ValuePart &);
-  EncodeFnTy encode_fn = nullptr;
-  switch (op) {
-  case OverflowOp::uadd:
-    encode_fn = &LLVMCompilerX64::encode_of_add_u128;
-    break;
-  case OverflowOp::sadd:
-    encode_fn = &LLVMCompilerX64::encode_of_add_i128;
-    break;
-  case OverflowOp::usub:
-    encode_fn = &LLVMCompilerX64::encode_of_sub_u128;
-    break;
-  case OverflowOp::ssub:
-    encode_fn = &LLVMCompilerX64::encode_of_sub_i128;
-    break;
-  case OverflowOp::umul:
-    encode_fn = &LLVMCompilerX64::encode_of_mul_u128;
-    break;
-  case OverflowOp::smul:
-    encode_fn = &LLVMCompilerX64::encode_of_mul_i128;
-    break;
-  default: TPDE_UNREACHABLE("invalid operation");
-  }
-
-  return (this->*encode_fn)(std::move(lhs_lo),
-                            std::move(lhs_hi),
-                            std::move(rhs_lo),
-                            std::move(rhs_hi),
-                            res_lo,
-                            res_hi,
-                            res_of);
 }
 
 void LLVMCompilerX64::fp80_assign_arg(tpde::CCAssigner *cc_assigner,

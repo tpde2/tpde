@@ -311,18 +311,10 @@ RES_STRUCT(i32)
 RES_STRUCT(u32)
 RES_STRUCT(i64)
 RES_STRUCT(u64)
-RES_STRUCT(i128)
-RES_STRUCT(u128)
 #undef RES_STRUCT
 
-// Use regcall on x86-64 to return 128 bit integers + overflow flag in registers
-#if defined(__x86_64__)
-    #define OF_OP_CC __regcall
-#else
-    #define OF_OP_CC
-#endif
 #define OF_OP(ty, inv_ty, op)                                                  \
-    OF_OP_CC struct res_##ty TARGET_V1 of_##op##_##ty(inv_ty a, inv_ty b) {    \
+    struct res_##ty TARGET_V1 of_##op##_##ty(inv_ty a, inv_ty b) {             \
         ty    res;                                                             \
         _Bool of = __builtin_##op##_overflow((ty)a, (ty)b, &res);              \
         return (struct res_##ty){res, of};                                     \
@@ -341,17 +333,8 @@ OF_OPS(16)
 OF_OPS(32)
 OF_OPS(64)
 
-// 128-bit mul-overflow is inlined on x86-64, but not on AArch64. Furthermore,
-// on AArch64, there is no calling convention to return more than two registers
-// (LLVM supports this, but Clang doesn't, because it follows the AAPCS ABI).
-// Therefore, code these manually for AArch64.
-#if defined(__x86_64__)
-OF_OPS(128)
-#endif
-
 #undef OF_OPS
 #undef OF_OP
-#undef OF_OP_CC
 
 // --------------------------
 // saturating arithmetic

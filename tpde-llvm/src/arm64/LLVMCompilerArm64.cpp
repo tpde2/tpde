@@ -91,15 +91,6 @@ struct LLVMCompilerArm64 : tpde::a64::CompilerA64<LLVMAdaptor,
                           SymRef sym);
 
   bool handle_intrin(const llvm::IntrinsicInst *);
-
-  bool handle_overflow_intrin_128(OverflowOp op,
-                                  GenericValuePart &&lhs_lo,
-                                  GenericValuePart &&lhs_hi,
-                                  GenericValuePart &&rhs_lo,
-                                  GenericValuePart &&rhs_hi,
-                                  ValuePart &&res_lo,
-                                  ValuePart &&res_hi,
-                                  ValuePart &&res_of);
 };
 
 void LLVMCompilerArm64::load_address_of_var_reference(
@@ -623,89 +614,6 @@ bool LLVMCompilerArm64::handle_intrin(const llvm::IntrinsicInst *inst) {
     return true;
   }
   default: return false;
-  }
-}
-
-bool LLVMCompilerArm64::handle_overflow_intrin_128(OverflowOp op,
-                                                   GenericValuePart &&lhs_lo,
-                                                   GenericValuePart &&lhs_hi,
-                                                   GenericValuePart &&rhs_lo,
-                                                   GenericValuePart &&rhs_hi,
-                                                   ValuePart &&res_lo,
-                                                   ValuePart &&res_hi,
-                                                   ValuePart &&res_of) {
-  switch (op) {
-  case OverflowOp::uadd: {
-    AsmReg lhs_lo_reg = gval_as_reg(lhs_lo); // TODO: reuse reg
-    AsmReg rhs_lo_reg = gval_as_reg(rhs_lo); // TODO: reuse reg
-    AsmReg res_lo_reg = res_lo.alloc_reg(this);
-    ASM(ADDSx, res_lo_reg, lhs_lo_reg, rhs_lo_reg);
-    AsmReg lhs_hi_reg = gval_as_reg(lhs_hi); // TODO: reuse reg
-    AsmReg rhs_hi_reg = gval_as_reg(rhs_hi); // TODO: reuse reg
-    AsmReg res_hi_reg = res_hi.alloc_reg(this);
-    ASM(ADCSx, res_hi_reg, lhs_hi_reg, rhs_hi_reg);
-    AsmReg res_of_reg = res_of.alloc_reg(this);
-    ASM(CSETw, res_of_reg, DA_CS);
-    return true;
-  }
-  case OverflowOp::sadd: {
-    AsmReg lhs_lo_reg = gval_as_reg(lhs_lo); // TODO: reuse reg
-    AsmReg rhs_lo_reg = gval_as_reg(rhs_lo); // TODO: reuse reg
-    AsmReg res_lo_reg = res_lo.alloc_reg(this);
-    ASM(ADDSx, res_lo_reg, lhs_lo_reg, rhs_lo_reg);
-    AsmReg lhs_hi_reg = gval_as_reg(lhs_hi); // TODO: reuse reg
-    AsmReg rhs_hi_reg = gval_as_reg(rhs_hi); // TODO: reuse reg
-    AsmReg res_hi_reg = res_hi.alloc_reg(this);
-    ASM(ADCSx, res_hi_reg, lhs_hi_reg, rhs_hi_reg);
-    AsmReg res_of_reg = res_of.alloc_reg(this);
-    ASM(CSETw, res_of_reg, DA_VS);
-    return true;
-  }
-
-  case OverflowOp::usub: {
-    AsmReg lhs_lo_reg = gval_as_reg(lhs_lo); // TODO: reuse reg
-    AsmReg rhs_lo_reg = gval_as_reg(rhs_lo); // TODO: reuse reg
-    AsmReg res_lo_reg = res_lo.alloc_reg(this);
-    ASM(SUBSx, res_lo_reg, lhs_lo_reg, rhs_lo_reg);
-    AsmReg lhs_hi_reg = gval_as_reg(lhs_hi); // TODO: reuse reg
-    AsmReg rhs_hi_reg = gval_as_reg(rhs_hi); // TODO: reuse reg
-    AsmReg res_hi_reg = res_hi.alloc_reg(this);
-    ASM(SBCSx, res_hi_reg, lhs_hi_reg, rhs_hi_reg);
-    AsmReg res_of_reg = res_of.alloc_reg(this);
-    ASM(CSETw, res_of_reg, DA_CC);
-    return true;
-  }
-  case OverflowOp::ssub: {
-    AsmReg lhs_lo_reg = gval_as_reg(lhs_lo); // TODO: reuse reg
-    AsmReg rhs_lo_reg = gval_as_reg(rhs_lo); // TODO: reuse reg
-    AsmReg res_lo_reg = res_lo.alloc_reg(this);
-    ASM(SUBSx, res_lo_reg, lhs_lo_reg, rhs_lo_reg);
-    AsmReg lhs_hi_reg = gval_as_reg(lhs_hi); // TODO: reuse reg
-    AsmReg rhs_hi_reg = gval_as_reg(rhs_hi); // TODO: reuse reg
-    AsmReg res_hi_reg = res_hi.alloc_reg(this);
-    ASM(SBCSx, res_hi_reg, lhs_hi_reg, rhs_hi_reg);
-    AsmReg res_of_reg = res_of.alloc_reg(this);
-    ASM(CSETw, res_of_reg, DA_VS);
-    return true;
-  }
-
-  case OverflowOp::umul:
-  case OverflowOp::smul: {
-#if 0
-        const auto frame_off = allocate_stack_slot(1);
-        ScratchReg scratch{this};
-        AsmReg tmp = scratch.alloc_gp();
-        if (!ASMIF(ADDxi, tmp, DA_GP(29), frame_off)) {
-            materialize_constant(frame_off, 0, 4, tmp);
-            ASM(ADDx, tmp, DA_GP(29), tmp);
-        }
-        // TODO: generate call
-        free_stack_slot(frame_off, 1);
-#endif
-    return false;
-  }
-
-  default: TPDE_UNREACHABLE("invalid operation");
   }
 }
 

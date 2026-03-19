@@ -5581,17 +5581,31 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_overflow_intrin(
   const auto width = ty->getIntegerBitWidth();
 
   if (width == 128) {
-    if (!derived()->handle_overflow_intrin_128(op,
-                                               lhs.part(0),
-                                               lhs.part(1),
-                                               rhs.part(0),
-                                               rhs.part(1),
-                                               res.part(0),
-                                               res.part(1),
-                                               res.part(2))) {
-      return false;
+    using EncodeFnTy = bool (Derived::*)(GenericValuePart &&,
+                                         GenericValuePart &&,
+                                         GenericValuePart &&,
+                                         GenericValuePart &&,
+                                         ValuePart &&,
+                                         ValuePart &&,
+                                         ValuePart &&);
+    EncodeFnTy encode_fn = nullptr;
+    switch (op) {
+    case OverflowOp::uadd: encode_fn = &Derived::encode_of_add_u128; break;
+    case OverflowOp::sadd: encode_fn = &Derived::encode_of_add_i128; break;
+    case OverflowOp::usub: encode_fn = &Derived::encode_of_sub_u128; break;
+    case OverflowOp::ssub: encode_fn = &Derived::encode_of_sub_i128; break;
+    case OverflowOp::umul: encode_fn = &Derived::encode_of_mul_u128; break;
+    case OverflowOp::smul: encode_fn = &Derived::encode_of_mul_i128; break;
+    default: TPDE_UNREACHABLE("invalid operation");
     }
-    return true;
+
+    return (derived()->*encode_fn)(lhs.part(0),
+                                   lhs.part(1),
+                                   rhs.part(0),
+                                   rhs.part(1),
+                                   res.part(0),
+                                   res.part(1),
+                                   res.part(2));
   }
 
   u32 width_idx = 0;

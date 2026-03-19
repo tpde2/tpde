@@ -181,17 +181,14 @@ define i128 @usub_i128_0(i128 %0, i128 %1) {
 ; X64:         sub rdi, rdx
 ; X64-NEXT:    sbb rsi, rcx
 ; X64-NEXT:    setb al
-; X64-NEXT:    movzx eax, al
 ; X64-NEXT:    mov rax, rdi
 ; X64-NEXT:    mov rdx, rsi
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <usub_i128_0>:
-; ARM64:         subs x4, x0, x2
-; ARM64-NEXT:    sbcs x5, x1, x3
-; ARM64-NEXT:    cset w6, lo
-; ARM64-NEXT:    mov x0, x4
-; ARM64-NEXT:    mov x1, x5
+; ARM64:         subs x0, x0, x2
+; ARM64-NEXT:    sbcs x1, x1, x3
+; ARM64-NEXT:    cset w2, lo
 ; ARM64-NEXT:    ret
 entry:
   %2 = call {i128, i1} @llvm.usub.with.overflow.i128(i128 %0, i128 %1)
@@ -204,14 +201,13 @@ define i1 @usub_i128_1(i128 %0, i128 %1) {
 ; X64:         sub rdi, rdx
 ; X64-NEXT:    sbb rsi, rcx
 ; X64-NEXT:    setb al
-; X64-NEXT:    movzx eax, al
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <usub_i128_1>:
-; ARM64:         subs x4, x0, x2
-; ARM64-NEXT:    sbcs x5, x1, x3
-; ARM64-NEXT:    cset w6, lo
-; ARM64-NEXT:    mov w0, w6
+; ARM64:         subs x0, x0, x2
+; ARM64-NEXT:    sbcs x1, x1, x3
+; ARM64-NEXT:    cset w2, lo
+; ARM64-NEXT:    mov w0, w2
 ; ARM64-NEXT:    ret
 entry:
   %2 = call {i128, i1} @llvm.usub.with.overflow.i128(i128 %0, i128 %1)
@@ -384,17 +380,14 @@ define i128 @ssub_i128_0(i128 %0, i128 %1) {
 ; X64:         sub rdi, rdx
 ; X64-NEXT:    sbb rsi, rcx
 ; X64-NEXT:    seto al
-; X64-NEXT:    movzx eax, al
 ; X64-NEXT:    mov rax, rdi
 ; X64-NEXT:    mov rdx, rsi
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ssub_i128_0>:
-; ARM64:         subs x4, x0, x2
-; ARM64-NEXT:    sbcs x5, x1, x3
-; ARM64-NEXT:    cset w6, vs
-; ARM64-NEXT:    mov x0, x4
-; ARM64-NEXT:    mov x1, x5
+; ARM64:         subs x0, x0, x2
+; ARM64-NEXT:    sbcs x1, x1, x3
+; ARM64-NEXT:    cset w2, vs
 ; ARM64-NEXT:    ret
 entry:
   %2 = call {i128, i1} @llvm.ssub.with.overflow.i128(i128 %0, i128 %1)
@@ -407,14 +400,13 @@ define i1 @ssub_i128_1(i128 %0, i128 %1) {
 ; X64:         sub rdi, rdx
 ; X64-NEXT:    sbb rsi, rcx
 ; X64-NEXT:    seto al
-; X64-NEXT:    movzx eax, al
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ssub_i128_1>:
-; ARM64:         subs x4, x0, x2
-; ARM64-NEXT:    sbcs x5, x1, x3
-; ARM64-NEXT:    cset w6, vs
-; ARM64-NEXT:    mov w0, w6
+; ARM64:         subs x0, x0, x2
+; ARM64-NEXT:    sbcs x1, x1, x3
+; ARM64-NEXT:    cset w2, vs
+; ARM64-NEXT:    mov w0, w2
 ; ARM64-NEXT:    ret
 entry:
   %2 = call {i128, i1} @llvm.ssub.with.overflow.i128(i128 %0, i128 %1)
