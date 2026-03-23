@@ -262,7 +262,7 @@ void EncodeCompiler<Adaptor, Derived, BaseTy, Config>::scratch_alloc_specific(
         assert(!scratch.has_reg());
         scratch.force_set_reg(reg);
 
-        ASMD(MOV64rr, bak_reg, reg);
+        ASMD(MOVx, bak_reg, reg);
     };
 
     // check if one of the operands holds the fixed register
