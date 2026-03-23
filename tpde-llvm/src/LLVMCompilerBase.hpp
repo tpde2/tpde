@@ -200,10 +200,14 @@ struct LLVMCompilerBase : public LLVMCompiler,
     cosf,
     log,
     logf,
+    log2,
+    log2f,
     log10,
     log10f,
     exp,
     expf,
+    exp2,
+    exp2f,
     trunctfsf2,
     trunctfdf2,
     extendsftf2,
@@ -1201,10 +1205,14 @@ typename LLVMCompilerBase<Adaptor, Derived, Config>::SymRef
   case LibFunc::cosf: name = "cosf"; break;
   case LibFunc::log: name = "log"; break;
   case LibFunc::logf: name = "logf"; break;
+  case LibFunc::log2: name = "log2"; break;
+  case LibFunc::log2f: name = "log2f"; break;
   case LibFunc::log10: name = "log10"; break;
   case LibFunc::log10f: name = "log10f"; break;
   case LibFunc::exp: name = "exp"; break;
   case LibFunc::expf: name = "expf"; break;
+  case LibFunc::exp2: name = "exp2"; break;
+  case LibFunc::exp2f: name = "exp2f"; break;
   case LibFunc::trunctfsf2: name = "__trunctfsf2"; break;
   case LibFunc::trunctfdf2: name = "__trunctfdf2"; break;
   case LibFunc::extendsftf2: name = "__extendsftf2"; break;
@@ -4493,7 +4501,9 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_intrin(
   case llvm::Intrinsic::cos:
   case llvm::Intrinsic::log:
   case llvm::Intrinsic::log10:
-  case llvm::Intrinsic::exp: {
+  case llvm::Intrinsic::log2:
+  case llvm::Intrinsic::exp:
+  case llvm::Intrinsic::exp2: {
     // Floating-point intrinsics that can be mapped directly to libcalls.
     const auto is_double = inst->getType()->isDoubleTy();
     if (!is_double && !inst->getType()->isFloatTy()) {
@@ -4513,8 +4523,10 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_intrin(
     case sin: func = is_double ? LibFunc::sin : LibFunc::sinf; break;
     case cos: func = is_double ? LibFunc::cos : LibFunc::cosf; break;
     case log: func = is_double ? LibFunc::log : LibFunc::logf; break;
+    case log2: func = is_double ? LibFunc::log2 : LibFunc::log2f; break;
     case log10: func = is_double ? LibFunc::log10 : LibFunc::log10f; break;
     case exp: func = is_double ? LibFunc::exp : LibFunc::expf; break;
+    case exp2: func = is_double ? LibFunc::exp2 : LibFunc::exp2f; break;
     default: TPDE_UNREACHABLE("invalid library fp intrinsic");
     }
 
