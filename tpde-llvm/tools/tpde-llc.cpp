@@ -15,9 +15,11 @@
 #include "tpde/base.hpp"
 
 #include <cstdlib>
+#include <fcntl.h>
 #include <fstream>
 #include <iostream>
 #include <memory>
+#include <unistd.h>
 
 #ifdef TPDE_LOGGING
   #include <spdlog/spdlog.h>
@@ -47,6 +49,13 @@ int main(int argc, char *argv[]) {
       "Compile twice and compare outputs (default in assert builds)",
       {"compile-twice"},
       tpde::WithAsserts);
+
+  args::ValueFlag<std::string> perf_control(
+      parser,
+      "perf-control",
+      "Control fifo paths for perf event management. Separated by comma",
+      {"perf-control"},
+      args::Options::None);
 
   args::ValueFlag<std::string> target(
       parser, "target", "Target architecture", {"target"}, args::Options::None);
@@ -98,6 +107,31 @@ int main(int argc, char *argv[]) {
   }
 #endif
 
+  int perf_control_fd = -1, perf_control_ack_fd = -1;
+
+  if (perf_control) {
+    const std::string &str = perf_control.Get();
+    auto delim_pos = str.find(',');
+    if (delim_pos == std::string::npos) {
+      std::cerr << "Invalid perf-control argument\n";
+      return EXIT_FAILURE;
+    }
+    std::string control_path = str.substr(0, delim_pos);
+    std::string ack_path = str.substr(delim_pos + 1);
+
+    perf_control_fd = open(control_path.c_str(), O_WRONLY);
+    if (perf_control_fd == -1) {
+      perror(control_path.c_str());
+      return EXIT_FAILURE;
+    }
+
+    perf_control_ack_fd = open(ack_path.c_str(), O_RDONLY);
+    if (perf_control_ack_fd == -1) {
+      perror(ack_path.c_str());
+      return EXIT_FAILURE;
+    }
+  }
+
   if (time_trace) {
     llvm::timeTraceProfilerInitialize(0, argv[0]);
   }
@@ -117,6 +151,12 @@ int main(int argc, char *argv[]) {
 
   if (print_ir) {
     mod->print(llvm::outs(), nullptr);
+  }
+
+  if (perf_control_fd != -1) {
+    char buf[16];
+    write(perf_control_fd, "enable\n", 7);
+    read(perf_control_ack_fd, buf, 5);
   }
 
 #if LLVM_VERSION_MAJOR >= 21
@@ -143,6 +183,12 @@ int main(int argc, char *argv[]) {
       std::cerr << "Failed to compile\n";
       return 1;
     }
+  }
+
+  if (perf_control_fd != -1) {
+    char buf[16];
+    write(perf_control_fd, "disable\n", 8);
+    read(perf_control_ack_fd, buf, 5);
   }
 
   unsigned exit_code = EXIT_SUCCESS;
