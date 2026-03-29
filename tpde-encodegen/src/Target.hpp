@@ -75,6 +75,8 @@ struct EncodingTarget {
 
   virtual std::string_view get_invalid_reg() = 0;
 
+  virtual bool supports_fixed_register_constraints() = 0;
+
   // Get all encoding candidates, the candidate without conditions must be
   // last
   virtual void get_inst_candidates(llvm::MachineInstr &,

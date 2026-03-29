@@ -21,6 +21,8 @@ struct EncodingTargetX64 : EncodingTarget {
 
   std::string_view get_invalid_reg() override { return "FE_NOREG"; }
 
+  bool supports_fixed_register_constraints() override { return true; }
+
   void get_inst_candidates(
       llvm::MachineInstr &inst,
       llvm::SmallVectorImpl<MICandidate> &candidates) override;

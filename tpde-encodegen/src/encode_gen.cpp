@@ -1150,6 +1150,11 @@ bool create_encode_function(llvm::MachineFunction *func,
     fixed_reg_param_names += name;
   }
 
+  if (!state.fixed_reg_conds.empty() &&
+      !state.target->supports_fixed_register_constraints()) {
+    return false;
+  }
+
   for (const auto &[reg, fix_conds] : state.fixed_reg_conds) {
     const auto reg_name_lower = state.target->reg_name_lower(reg);
     auto reg_name_upper = std::string{reg_name_lower};

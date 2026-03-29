@@ -20,6 +20,8 @@ struct EncodingTargetArm64 : EncodingTarget {
 
   std::string_view get_invalid_reg() override { return "wtf??"; }
 
+  bool supports_fixed_register_constraints() override { return false; }
+
   void get_inst_candidates(
       llvm::MachineInstr &inst,
       llvm::SmallVectorImpl<MICandidate> &candidates) override;
