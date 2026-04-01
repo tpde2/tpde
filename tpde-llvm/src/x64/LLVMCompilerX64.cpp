@@ -619,6 +619,79 @@ bool LLVMCompilerX64::handle_intrin(const llvm::IntrinsicInst *inst) {
     return true;
   }
   case llvm::Intrinsic::x86_sse2_pause: ASM(PAUSE); return true;
+  case llvm::Intrinsic::x86_sha1msg1: {
+    auto [dst_ref, dst_part] = this->val_ref_single(inst->getOperand(0));
+    auto [src_ref, src_part] = this->val_ref_single(inst->getOperand(1));
+    ASM(SHA1MSG1rr,
+        dst_part.load_to_reg(),
+        src_part.load_to_reg());
+    this->result_ref(inst).part(0).set_value(std::move(dst_part));
+    return true;
+  }
+  case llvm::Intrinsic::x86_sha1msg2: {
+    auto [dst_ref, dst_part] = this->val_ref_single(inst->getOperand(0));
+    auto [src_ref, src_part] = this->val_ref_single(inst->getOperand(1));
+    ASM(SHA1MSG2rr,
+        dst_part.load_to_reg(),
+        src_part.load_to_reg());
+    this->result_ref(inst).part(0).set_value(std::move(dst_part));
+    return true;
+  }
+  case llvm::Intrinsic::x86_sha1nexte: {
+    auto [dst_ref, dst_part] = this->val_ref_single(inst->getOperand(0));
+    auto [src_ref, src_part] = this->val_ref_single(inst->getOperand(1));
+    ASM(SHA1NEXTErr,
+        dst_part.load_to_reg(),
+        src_part.load_to_reg());
+    this->result_ref(inst).part(0).set_value(std::move(dst_part));
+    return true;
+  }
+  case llvm::Intrinsic::x86_sha1rnds4: {
+    auto immediate = llvm::cast<llvm::ConstantInt>(inst->getOperand(2));
+    auto [dst_ref, dst_part] = this->val_ref_single(inst->getOperand(0));
+    auto [src_ref, src_part] = this->val_ref_single(inst->getOperand(1));
+    ASM(SHA1RNDS4rri,
+        dst_part.load_to_reg(),
+        src_part.load_to_reg(),
+        (u8)immediate->getZExtValue());
+    this->result_ref(inst).part(0).set_value(std::move(dst_part));
+    return true;
+  }
+  case llvm::Intrinsic::x86_sha256msg1: {
+    auto [dst_ref, dst_part] = this->val_ref_single(inst->getOperand(0));
+    auto [src_ref, src_part] = this->val_ref_single(inst->getOperand(1));
+    ASM(SHA256MSG1rr,
+        dst_part.load_to_reg(),
+        src_part.load_to_reg());
+    this->result_ref(inst).part(0).set_value(std::move(dst_part));
+    return true;
+  }
+  case llvm::Intrinsic::x86_sha256msg2: {
+    auto [dst_ref, dst_part] = this->val_ref_single(inst->getOperand(0));
+    auto [src_ref, src_part] = this->val_ref_single(inst->getOperand(1));
+    ASM(SHA256MSG2rr,
+        dst_part.load_to_reg(),
+        src_part.load_to_reg());
+    this->result_ref(inst).part(0).set_value(std::move(dst_part));
+    return true;
+  }
+  case llvm::Intrinsic::x86_sha256rnds2: {
+    auto [dst_ref, dst_part] = this->val_ref_single(inst->getOperand(0));
+    auto [src_ref, src_part] = this->val_ref_single(inst->getOperand(1));
+    auto [round_constants_ref, round_constants_part] = this->val_ref_single(inst->getOperand(2));
+    auto round_constants_gval = GenericValuePart(std::move(round_constants_part));
+    ScratchReg scratch_xmm0{this};
+    FixedRegBackup reg_backup_xmm0 = {.scratch = ScratchReg{this}};
+    scratch_alloc_specific(
+        AsmReg::XMM0, scratch_xmm0, {&round_constants_gval}, reg_backup_xmm0);
+    ASM(SHA256RNDS2rrr,
+        dst_part.load_to_reg(),
+        src_part.load_to_reg(),
+        FE_XMM0);
+    this->result_ref(inst).part(0).set_value(dst_ref.part(0));
+    scratch_check_fixed_backup(scratch_xmm0, reg_backup_xmm0, false);
+    return true;
+  }
   default: return false;
   }
 }
