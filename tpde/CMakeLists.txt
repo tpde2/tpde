@@ -33,6 +33,7 @@ target_sources(tpde PRIVATE
     src/Assembler.cpp
     src/AssemblerElf.cpp
     src/base.cpp
+    src/DwarfLineWriter.cpp
     src/ElfMapper.cpp
     src/FunctionWriter.cpp
     src/StringTable.cpp
@@ -52,6 +53,7 @@ target_sources(tpde PRIVATE
         include/tpde/CompilerBase.hpp
         include/tpde/CompilerConfig.hpp
         include/tpde/DWARF.hpp
+        include/tpde/DwarfLineWriter.hpp
         include/tpde/ELF.hpp
         include/tpde/ElfMapper.hpp
         include/tpde/FunctionWriter.hpp

@@ -53,15 +53,18 @@ struct Relocation {
 
 /// Section kinds, lowered to file-format specific flags.
 enum class SectionKind : u8 {
-  Text,       ///< Text section, executable code (ELF .text)
-  ReadOnly,   ///< Read-only data section (ELF .rodata)
-  EHFrame,    ///< EH Frame section (ELF .eh_frame)
-  LSDA,       ///< LSDA section (ELF .gcc_except_table)
-  Data,       ///< Writable data section (ELF .data)
-  DataRelRO,  ///< Read-only data section with relocations (ELF .data.rel.ro)
-  BSS,        ///< Zero-initialized data section (ELF .bss)
-  ThreadData, ///< Initialized thread-local data section (ELF .tdata)
-  ThreadBSS,  ///< Zero-initialized thread-local data section (ELF .tbss)
+  Text,        ///< Text section, executable code (ELF .text)
+  ReadOnly,    ///< Read-only data section (ELF .rodata)
+  EHFrame,     ///< EH Frame section (ELF .eh_frame)
+  LSDA,        ///< LSDA section (ELF .gcc_except_table)
+  Data,        ///< Writable data section (ELF .data)
+  DataRelRO,   ///< Read-only data section with relocations (ELF .data.rel.ro)
+  BSS,         ///< Zero-initialized data section (ELF .bss)
+  ThreadData,  ///< Initialized thread-local data section (ELF .tdata)
+  ThreadBSS,   ///< Zero-initialized thread-local data section (ELF .tbss)
+  DebugInfo,   ///< DWARF debug info (ELF .debug_info)
+  DebugLine,   ///< DWARF line information (ELF .debug_line)
+  DebugAbbrev, ///< DWARF abbreviations (ELF .debug_abbrev)
 
   Max
 };
