@@ -407,6 +407,12 @@ struct CompilerA64 : BaseTy<Adaptor, Derived, Config> {
                        u32 size,
                        bool sign_extend = false);
 
+  void load_from_stack_with_base(AsmReg dst,
+                                 AsmReg base,
+                                 u32 frame_off,
+                                 u32 size,
+                                 bool sign_extend = false);
+
   void load_address_of_stack_var(AsmReg dst, AssignmentPartRef ap);
 
   void mov(AsmReg dst, AsmReg src, u32 size);
@@ -636,22 +642,33 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::CallBuilder::add_arg_stack(
   set_stack_used();
 
   auto reg = vp.has_reg() ? vp.cur_reg() : vp.load_to_reg(&this->compiler);
+  // Single-instruction STR (unsigned offset) reaches 0x1000 * size bytes.
+  // For larger outgoing-stack-arg areas, bias the base into x16 with ADDxi
+  // (12-bit + LSL #12, max 16 MiB byte offset).
+  assert(cca.stack_off < 0x1'000'000);
+  AsmReg base = AsmReg{AsmReg::SP};
+  u32 off = cca.stack_off;
+  if (off >= 0x1000 * cca.size) [[unlikely]] {
+    base = AsmReg{AsmReg::R16};
+    ASMC(&this->compiler, ADDxi, base, DA_SP, off & ~0xfffu);
+    off &= 0xfffu;
+  }
   if (this->compiler.register_file.reg_bank(reg) == Config::GP_BANK) {
     switch (cca.size) {
-    case 1: ASMC(&this->compiler, STRBu, reg, DA_SP, cca.stack_off); break;
-    case 2: ASMC(&this->compiler, STRHu, reg, DA_SP, cca.stack_off); break;
-    case 4: ASMC(&this->compiler, STRwu, reg, DA_SP, cca.stack_off); break;
-    case 8: ASMC(&this->compiler, STRxu, reg, DA_SP, cca.stack_off); break;
+    case 1: ASMC(&this->compiler, STRBu, reg, base, off); break;
+    case 2: ASMC(&this->compiler, STRHu, reg, base, off); break;
+    case 4: ASMC(&this->compiler, STRwu, reg, base, off); break;
+    case 8: ASMC(&this->compiler, STRxu, reg, base, off); break;
     default: TPDE_UNREACHABLE("invalid GP reg size");
     }
   } else {
     assert(this->compiler.register_file.reg_bank(reg) == Config::FP_BANK);
     switch (cca.size) {
-    case 1: ASMC(&this->compiler, STRbu, reg, DA_SP, cca.stack_off); break;
-    case 2: ASMC(&this->compiler, STRhu, reg, DA_SP, cca.stack_off); break;
-    case 4: ASMC(&this->compiler, STRsu, reg, DA_SP, cca.stack_off); break;
-    case 8: ASMC(&this->compiler, STRdu, reg, DA_SP, cca.stack_off); break;
-    case 16: ASMC(&this->compiler, STRqu, reg, DA_SP, cca.stack_off); break;
+    case 1: ASMC(&this->compiler, STRbu, reg, base, off); break;
+    case 2: ASMC(&this->compiler, STRhu, reg, base, off); break;
+    case 4: ASMC(&this->compiler, STRsu, reg, base, off); break;
+    case 8: ASMC(&this->compiler, STRdu, reg, base, off); break;
+    case 16: ASMC(&this->compiler, STRqu, reg, base, off); break;
     default: TPDE_UNREACHABLE("invalid FP reg size");
     }
   }
@@ -799,24 +816,8 @@ std::optional<i32>
 
   if (cca.byval) {
     ASMNC(ADDxi, dst, stack_reg, cca.stack_off);
-  } else if (cca.bank == Config::GP_BANK) {
-    switch (cca.size) {
-    case 1: ASMNC(LDRBu, dst, stack_reg, cca.stack_off); break;
-    case 2: ASMNC(LDRHu, dst, stack_reg, cca.stack_off); break;
-    case 4: ASMNC(LDRwu, dst, stack_reg, cca.stack_off); break;
-    case 8: ASMNC(LDRxu, dst, stack_reg, cca.stack_off); break;
-    default: TPDE_UNREACHABLE("invalid GP reg size");
-    }
   } else {
-    assert(cca.bank == Config::FP_BANK);
-    switch (cca.size) {
-    case 1: ASMNC(LDRbu, dst, stack_reg, cca.stack_off); break;
-    case 2: ASMNC(LDRhu, dst, stack_reg, cca.stack_off); break;
-    case 4: ASMNC(LDRsu, dst, stack_reg, cca.stack_off); break;
-    case 8: ASMNC(LDRdu, dst, stack_reg, cca.stack_off); break;
-    case 16: ASMNC(LDRqu, dst, stack_reg, cca.stack_off); break;
-    default: TPDE_UNREACHABLE("invalid FP reg size");
-    }
+    load_from_stack_with_base(dst, stack_reg, cca.stack_off, cca.size);
   }
   return {};
 }
@@ -1137,51 +1138,63 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::load_from_stack(
     const u32 size,
     const bool sign_extend) {
   assert(this->stack.frame_used);
+  assert(frame_off >= 0);
+  load_from_stack_with_base(
+      dst, AsmReg{AsmReg::FP}, frame_off, size, sign_extend);
+}
+
+template <IRAdaptor Adaptor,
+          typename Derived,
+          template <typename, typename, typename> typename BaseTy,
+          typename Config>
+void CompilerA64<Adaptor, Derived, BaseTy, Config>::load_from_stack_with_base(
+    AsmReg dst, AsmReg base, u32 frame_off, u32 size, bool sign_extend) {
   assert((size & (size - 1)) == 0);
   assert(util::align_up(frame_off, size) == frame_off);
-  // We don't support stack frames that aren't encodeable with add/sub.
-  assert(frame_off >= 0 && frame_off < 0x1'000'000);
+  // Must fit ADDxi (12-bit + LSL #12 = 16 MiB).
+  assert(frame_off < 0x1'000'000);
   this->text_writer.ensure_space(8);
 
-  u32 off = frame_off;
-  auto addr_base = AsmReg{AsmReg::FP};
-  if (off >= 0x1000 * size) [[unlikely]] {
-    // need to calculate this explicitly
-    addr_base = dst.id() <= AsmReg::R30 ? dst : permanent_scratch_reg;
-    ASMNC(ADDxi, addr_base, DA_GP(29), off & ~0xfff);
-    off &= 0xfff;
+  const bool is_fp = dst.id() > AsmReg::R30;
+  AsmReg addr_base = base;
+  if (frame_off >= 0x1000 * size) [[unlikely]] {
+    // Bias the base by the high bits, leave the low 12 bits as the LDR
+    // immediate. dst can be reused as scratch for GP loads; FP loads need a
+    // separate GP scratch.
+    addr_base = is_fp ? permanent_scratch_reg : dst;
+    ASMNC(ADDxi, addr_base, base, frame_off & ~0xfffu);
+    frame_off &= 0xfffu;
   }
 
-  if (dst.id() <= AsmReg::R30) {
+  if (!is_fp) {
     if (!sign_extend) {
       switch (size) {
-      case 1: ASMNC(LDRBu, dst, addr_base, off); break;
-      case 2: ASMNC(LDRHu, dst, addr_base, off); break;
-      case 4: ASMNC(LDRwu, dst, addr_base, off); break;
-      case 8: ASMNC(LDRxu, dst, addr_base, off); break;
-      default: TPDE_UNREACHABLE("invalid register spill size");
+      case 1: ASMNC(LDRBu, dst, addr_base, frame_off); break;
+      case 2: ASMNC(LDRHu, dst, addr_base, frame_off); break;
+      case 4: ASMNC(LDRwu, dst, addr_base, frame_off); break;
+      case 8: ASMNC(LDRxu, dst, addr_base, frame_off); break;
+      default: TPDE_UNREACHABLE("invalid GP load size");
       }
     } else {
       switch (size) {
-      case 1: ASMNC(LDRSBwu, dst, addr_base, off); break;
-      case 2: ASMNC(LDRSHwu, dst, addr_base, off); break;
-      case 4: ASMNC(LDRSWxu, dst, addr_base, off); break;
-      case 8: ASMNC(LDRxu, dst, addr_base, off); break;
-      default: TPDE_UNREACHABLE("invalid register spill size");
+      case 1: ASMNC(LDRSBwu, dst, addr_base, frame_off); break;
+      case 2: ASMNC(LDRSHwu, dst, addr_base, frame_off); break;
+      case 4: ASMNC(LDRSWxu, dst, addr_base, frame_off); break;
+      case 8: ASMNC(LDRxu, dst, addr_base, frame_off); break;
+      default: TPDE_UNREACHABLE("invalid GP load size");
       }
     }
     return;
   }
 
   assert(!sign_extend);
-
   switch (size) {
-  case 1: ASMNC(LDRbu, dst, addr_base, off); break;
-  case 2: ASMNC(LDRhu, dst, addr_base, off); break;
-  case 4: ASMNC(LDRsu, dst, addr_base, off); break;
-  case 8: ASMNC(LDRdu, dst, addr_base, off); break;
-  case 16: ASMNC(LDRqu, dst, addr_base, off); break;
-  default: TPDE_UNREACHABLE("invalid register spill size");
+  case 1: ASMNC(LDRbu, dst, addr_base, frame_off); break;
+  case 2: ASMNC(LDRhu, dst, addr_base, frame_off); break;
+  case 4: ASMNC(LDRsu, dst, addr_base, frame_off); break;
+  case 8: ASMNC(LDRdu, dst, addr_base, frame_off); break;
+  case 16: ASMNC(LDRqu, dst, addr_base, frame_off); break;
+  default: TPDE_UNREACHABLE("invalid FP load size");
   }
 }
 
