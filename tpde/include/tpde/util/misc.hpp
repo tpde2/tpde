@@ -105,7 +105,7 @@ constexpr unsigned sleb_write(u8 *dst, i64 value) {
   while (true) {
     u8 write = value & 0b0111'1111;
     value >>= 7;
-    if ((value == 0 && (value & 0x40) == 0) || (value == -1 && value & 0x40)) {
+    if ((value == 0 && (write & 0x40) == 0) || (value == -1 && (write & 0x40) != 0)) {
       *dst++ = write;
       return dst - base;
     }
