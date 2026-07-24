@@ -8,6 +8,7 @@
 #include "tpde/util/misc.hpp"
 
 #include <array>
+#include <bit>
 
 namespace tpde {
 
@@ -65,6 +66,9 @@ public:
   RegBitSet allocatable = 0;
   /// Registers that are currently in use. Requires allocatable.
   RegBitSet used = 0;
+  /// Registers that cannot currently be evicted. Mirrors lock_counts[i] > 0.
+  /// Requires used.
+  RegBitSet fixed = 0;
   /// Registers that were clobbered at some point. Used to track registers that
   /// need to be saved/restored.
   RegBitSet clobbered = 0;
@@ -81,6 +85,7 @@ public:
 
   void reset() {
     used = {};
+    fixed = {};
     clobbered = {};
     clocks = {};
     lock_counts = {};
@@ -131,6 +136,7 @@ public:
     assert(is_used(reg));
     assert(lock_counts[reg.id()] == 0);
     lock_counts[reg.id()] = 1;
+    fixed |= (1ull << reg.id());
   }
 
   void unmark_fixed(const Reg reg) {
@@ -139,6 +145,7 @@ public:
     assert(is_fixed(reg));
     assert(lock_counts[reg.id()] == 1);
     lock_counts[reg.id()] = 0;
+    fixed &= ~(1ull << reg.id());
   }
 
   void inc_lock_count(const Reg reg) {
@@ -212,9 +219,26 @@ public:
     return RegBank(reg.id() / RegsPerBank);
   }
 
-  [[nodiscard]] static RegBitSet bank_regs(const RegBank bank) {
+  [[nodiscard]] static constexpr RegBitSet bank_regs(const RegBank bank) {
     assert(bank.id() <= 1);
     return ((1ull << RegsPerBank) - 1) << (bank.id() * RegsPerBank);
+  }
+
+  /// Number of allocatable registers of the given bank on this
+  /// platform/configuration; the hard upper bound on concurrently live
+  /// registers of that bank.
+  [[nodiscard]] u32 allocatable_count(const RegBank bank) const {
+    return static_cast<u32>(std::popcount(allocatable & bank_regs(bank)));
+  }
+
+  /// Number of currently-fixed registers of the given bank.
+  [[nodiscard]] u32 fixed_count(const RegBank bank) const {
+    return static_cast<u32>(std::popcount(fixed & bank_regs(bank)));
+  }
+
+  /// Number of currently-used registers of the given bank (fixed or not).
+  [[nodiscard]] u32 used_count(const RegBank bank) const {
+    return static_cast<u32>(std::popcount(used & bank_regs(bank)));
   }
 };
 
