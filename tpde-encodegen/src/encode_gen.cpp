@@ -113,6 +113,27 @@ bool const_to_bytes(const llvm::DataLayout &dl,
   //    return true;
   //}
 
+  // ConstantInt/ConstantFP natively represent fixed-length vector splats (e.g.
+  // `<4 x float> splat (float -0.0)`), so casting to them does not imply a
+  // scalar constant. Expand the splat before the scalar cases below see it.
+  if (auto *VT = llvm::dyn_cast<llvm::FixedVectorType>(constant->getType());
+      VT && llvm::isa<llvm::ConstantInt, llvm::ConstantFP>(constant)) {
+    const auto *elem = constant->getSplatValue();
+    assert(elem && "vector ConstantInt/ConstantFP must be a splat");
+    const auto elem_size = dl.getTypeStoreSize(VT->getElementType());
+    const auto num_elements = VT->getNumElements();
+    if (elem_size * num_elements > alloc_size) {
+      std::cerr << "ERROR: unsupported vector splat in constant pool\n";
+      return false;
+    }
+    for (auto i = 0u; i < num_elements; ++i) {
+      if (!const_to_bytes(dl, elem, bytes, off + i * elem_size)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   if (auto *CI = llvm::dyn_cast<llvm::ConstantInt>(constant); CI) {
     // TODO: endianness?
     llvm::StoreIntToMemory(CI->getValue(), bytes.data() + off, alloc_size);
