@@ -5,6 +5,7 @@
 
 ; RUN: tpde-llc --target=x86_64 %s | %objdump | FileCheck %s -check-prefixes=X64
 ; RUN: tpde-llc --target=aarch64 %s | %objdump | FileCheck %s -check-prefixes=ARM64
+; XFAIL: llvm23.1
 
 define i8 @fshl_i8_3(i8 %a, i8 %b) {
 ; X64-LABEL: <fshl_i8_3>:
