@@ -634,6 +634,8 @@ bool generate_inst(std::string &buf,
               std::format("inst{}_op{}_tmp", inst_id, op_idx),
               reg_size_bytes(state.func, use.getReg()));
         }
+        allocated_regs[reg_id] = std::format(
+            "scratch_{}.cur_reg()", state.target->reg_name_lower(reg_id));
       }
     }
 
