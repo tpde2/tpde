@@ -34,6 +34,45 @@ constexpr u8 DWARF_CFI_PRIMARY_OPCODE_MASK = 0xc0;
 
 constexpr u32 EH_FDE_FUNC_START_OFF = 0x8;
 
+constexpr u8 DW_LNS_extended_op = 0;
+constexpr u8 DW_LNS_copy = 1;
+constexpr u8 DW_LNS_advance_pc = 2;
+constexpr u8 DW_LNS_advance_line = 3;
+constexpr u8 DW_LNS_set_file = 4;
+constexpr u8 DW_LNS_set_column = 5;
+constexpr u8 DW_LNS_negate_stmt = 6;
+constexpr u8 DW_LNS_set_basic_block = 7;
+constexpr u8 DW_LNS_const_add_pc = 8;
+constexpr u8 DW_LNS_fixed_advance_pc = 9;
+constexpr u8 DW_LNS_set_prologue_end = 10;
+constexpr u8 DW_LNS_set_epilogue_begin = 11;
+constexpr u8 DW_LNS_set_isa = 12;
+
+constexpr u8 DW_LNE_end_sequence = 1;
+constexpr u8 DW_LNE_set_address = 2;
+constexpr u8 DW_LNE_define_file = 3;
+constexpr u8 DW_LNE_set_discriminator = 4;
+
+constexpr u8 DW_TAG_compile_unit = 17;
+
+constexpr u8 DW_AT_stmt_list = 16;
+constexpr u8 DW_AT_low_pc = 17;
+constexpr u8 DW_AT_high_pc = 18;
+
+constexpr u8 DW_FORM_addr = 1;
+constexpr u8 DW_FORM_string = 8;
+constexpr u8 DW_FORM_udata = 0x0f;
+constexpr u8 DW_FORM_sec_offset = 23;
+
+// DWARF 5 line content type codes
+constexpr u8 DW_LNCT_path = 1;
+constexpr u8 DW_LNCT_directory_index = 2;
+
+// DWARF 5 unit type codes
+constexpr u8 DW_UT_compile = 0x01;
+
+constexpr u8 DW_CHILDREN_no = 0;
+
 namespace x64 {
 constexpr u8 DW_reg_rax = 0;
 constexpr u8 DW_reg_rdx = 1;
