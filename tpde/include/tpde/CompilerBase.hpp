@@ -1447,6 +1447,12 @@ Reg CompilerBase<Adaptor, Derived, Config>::select_reg_evict(RegBank bank) {
     }
   }
   if (candidate.invalid()) [[unlikely]] {
+    // Every allocatable register of this bank is fixed (permanent
+    // cross-block assignment or in-flight scratch register).
+    TPDE_LOG_ERR("register allocator ran out of registers in bank {}: "
+                 "{} registers allocatable, all of them fixed",
+                 bank.id(),
+                 register_file.allocatable_count(bank));
     TPDE_FATAL("ran out of registers for scratch registers");
   }
   TPDE_LOG_DBG("  selected r{}", candidate.id());
@@ -1937,6 +1943,12 @@ void CompilerBase<Adaptor, Derived, Config>::move_to_phi_nodes_impl(
         // TODO(ts): use clock here?
         reg = reg_file.find_first_nonfixed_excluding(bank, 0);
         if (reg.invalid()) {
+          // Every allocatable register of this bank is fixed (permanent
+          // cross-block assignment or in-flight scratch register).
+          TPDE_LOG_ERR("register allocator ran out of registers in bank {}: "
+                       "{} registers allocatable, all of them fixed",
+                       bank.id(),
+                       reg_file.allocatable_count(bank));
           TPDE_FATAL("ran out of registers for scratch registers");
         }
 
