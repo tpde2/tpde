@@ -294,6 +294,7 @@ struct PlatformConfig : CompilerConfigDefault {
   static constexpr bool FRAME_INDEXING_NEGATIVE = false;
   static constexpr u32 PLATFORM_POINTER_SIZE = 8;
   static constexpr u32 NUM_BANKS = 2;
+  static constexpr u8 MIN_INST_WIDTH = 4;
 };
 
 /// Compiler mixin for targeting AArch64.
@@ -1041,14 +1042,17 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::finish_func(u32 func_idx) {
   }
 
   // TODO(ts): honor cur_needs_unwind_info
+  const u32 prologue_shrink_size = func_prologue_alloc - prologue_size;
   this->text_writer.remove_prologue_bytes(func_start_off + prologue_size,
-                                          func_prologue_alloc - prologue_size);
+                                          prologue_shrink_size);
   auto func_size = this->text_writer.offset() - func_start_off;
   auto func_sym = this->func_syms[func_idx];
   auto func_sec = this->text_writer.get_sec_ref();
   this->assembler.sym_def(func_sym, func_sec, func_start_off, func_size);
   this->text_writer.eh_end_fde();
   this->text_writer.except_encode_func();
+
+  this->func_sym_id_to_skew[func_sym.id()] = prologue_shrink_size;
 }
 
 template <IRAdaptor Adaptor,

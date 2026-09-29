@@ -25,6 +25,7 @@
 
 #include "tpde/Assembler.hpp"
 #include "tpde/CompilerBase.hpp"
+#include "tpde/DwarfLineWriter.hpp"
 #include "tpde/ValLocalIdx.hpp"
 #include "tpde/ValueAssignment.hpp"
 #include "tpde/base.hpp"
@@ -168,6 +169,8 @@ struct LLVMCompilerBase : public LLVMCompiler,
   llvm::DenseMap<const llvm::Comdat *, SecRef> group_secs;
 
   tpde::util::SmallVector<std::pair<IRValueRef, SymRef>, 16> type_info_syms;
+
+  std::unique_ptr<tpde::DwarfLineWriter> dw_line_writer;
 
   enum class LibFunc {
     divti3,
@@ -363,6 +366,66 @@ private:
   }
 
 public:
+  /// Record a debug location at the current PC
+  void record_debug_location(llvm::DebugLoc debug_loc) {
+    if (!dw_line_writer || !debug_loc) {
+      return;
+    }
+
+    const u32 current_pc = this->text_writer.offset();
+    // Avoid emitting duplicate locations for the same PC, which can happen
+    // when multiple instructions share the same debug location.
+    if (dw_line_writer->offset_equals_last_offset(current_pc)) {
+      return;
+    }
+
+    const llvm::DILocation *di_loc = debug_loc.get();
+    const u32 line = di_loc->getLine();
+    // Line number 0 is used to indicate an unknown location, so skip it.
+    if (line == 0) {
+      return;
+    }
+
+    dw_line_writer->push_location(
+        current_pc,
+        tpde::DebugLocation{
+            .file_name = di_loc->getFilename(),
+            .directory = di_loc->getDirectory(),
+            .line = di_loc->getLine(),
+            .column = static_cast<u16>(di_loc->getColumn()),
+        });
+  }
+
+  void set_current_debug_location_function(const IRFuncRef func) {
+    if (!dw_line_writer) {
+      return;
+    }
+
+    const u32 current_pc = this->text_writer.offset();
+    if (const llvm::DISubprogram *sp = func->getSubprogram()) {
+      dw_line_writer->push_location(
+        current_pc,
+        tpde::DebugLocation{
+            .file_name = sp->getFilename(),
+            .directory = sp->getDirectory(),
+            .line = sp->getLine(),
+            .column = 0u,
+        });
+      dw_line_writer->set_subprogram_written();
+    }
+  }
+
+  void finish_debug_location_function(const IRFuncRef, const u32 func_idx) {
+    if (!dw_line_writer) {
+      return;
+    }
+
+    const u32 sym_id = this->func_syms[func_idx].id();
+    const auto it = this->func_sym_id_to_skew.find(sym_id);
+    const u32 skew = (it != this->func_sym_id_to_skew.end()) ? it->second : 0u;
+    dw_line_writer->end_function(skew);
+  }
+
   /// Whether to use a DSO-local access instead of going through the GOT.
   static bool use_local_access(const llvm::GlobalValue *gv) {
     // If the symbol is preemptible, don't generate a local access.
@@ -1338,6 +1401,11 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile(llvm::Module &mod) {
   group_secs.clear();
   libfunc_syms.fill({});
 
+  if (mod.getNamedMetadata("llvm.dbg.cu") != nullptr) {
+    const tpde::DwarfConfig cfg(Config::MIN_INST_WIDTH);
+    dw_line_writer = std::make_unique<tpde::DwarfLineWriter>(cfg);
+  }
+
   if (!Base::compile()) {
     return false;
   }
@@ -1356,6 +1424,12 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile(llvm::Module &mod) {
     auto from_sym = global_sym(alias_target);
 
     this->assembler.sym_copy(dst_sym, from_sym);
+  }
+
+  // Write DWARF 5 line information if enabled and the module has debug info.
+  if (dw_line_writer) {
+    llvm::TimeTraceScope time_scope("TPDE_DebugLine_Write");
+    dw_line_writer->finalize(this->assembler);
   }
 
   return true;
@@ -1456,6 +1530,9 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_inst(
     // clang-format on
     return res;
   }();
+
+  // Record debug location before instruction
+  record_debug_location(i->getDebugLoc());
 
   const ValInfo &val_info = this->adaptor->val_info(i);
   assert(i->getOpcode() < fns.size());

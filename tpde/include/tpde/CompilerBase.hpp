@@ -194,6 +194,8 @@ public:
   // allocations
   util::SmallVector<Label> block_labels;
 
+  std::unordered_map<u32, u32> func_sym_id_to_skew; // Map SymRef.id() to address skew
+
   util::SmallVector<std::pair<SymRef, SymRef>, 4> personality_syms = {};
 
   struct ScratchReg;
@@ -577,6 +579,10 @@ public:
   void analysis_start() {}
 
   void analysis_end() {}
+
+  void set_current_debug_location_function(const IRFuncRef) {}
+
+  void finish_debug_location_function(const IRFuncRef, const u32) {}
 
   void reloc_text(SymRef sym, u32 type, u64 offset, i64 addend = 0) {
     this->assembler.reloc_sec(
@@ -2314,6 +2320,8 @@ bool CompilerBase<Adaptor, Derived, Config>::compile_func(const IRFuncRef func,
 
   derived()->start_func(func_idx);
 
+  derived()->set_current_debug_location_function(func);
+
   block_labels.clear();
   block_labels.resize_uninitialized(analyzer.block_layout.size());
   for (u32 i = 0; i < analyzer.block_layout.size(); ++i) {
@@ -2402,6 +2410,7 @@ bool CompilerBase<Adaptor, Derived, Config>::compile_func(const IRFuncRef func,
          "found non-freed ValueAssignment, maybe missing ref-count?");
 
   derived()->finish_func(func_idx);
+  derived()->finish_debug_location_function(func, func_idx);
   this->text_writer.finish_func();
 
   return true;
