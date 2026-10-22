@@ -1055,6 +1055,38 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::hook_post_func_sym_init() {
     }
   }
 
+  if (!llvm_mod.getModuleInlineAsm().empty()) {
+    auto handle_asm = [this](std::string_view asm_str) {
+      asm_str = llvm::StringRef(asm_str).trim();
+      if (asm_str == "") {
+        return true;
+      } else if (asm_str == ".globl _ZSt21ios_base_library_initv") {
+        // libstdc++ compatibility workaround for backwards compatibility.
+        // https://github.com/gcc-mirror/gcc/commit/9a41d2cdbcd2af77a3a91a840a3a
+        (void)this->assembler.sym_add_undef(
+            "_ZSt21ios_base_library_initv",
+            tpde::Assembler::SymBinding::GLOBAL);
+        return true;
+      } else {
+        TPDE_LOG_ERR("module-scope inline asm unsupported: {}", asm_str);
+        return false;
+      }
+    };
+#if LLVM_VERSION_MAJOR >= 23
+    bool success = true;
+    for (const auto &fragment : llvm_mod.getModuleInlineAsm()) {
+      success &= handle_asm(fragment.Asm);
+    }
+    if (!success) {
+      return false;
+    }
+#else
+    if (!handle_asm(llvm_mod.getModuleInlineAsm())) {
+      return false;
+    }
+#endif
+  }
+
   return true;
 }
 
