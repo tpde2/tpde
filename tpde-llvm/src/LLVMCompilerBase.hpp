@@ -2400,11 +2400,12 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_float_binary_op(
     case FloatBinaryOp::rem: return false;
     default: TPDE_UNREACHABLE("invalid FloatBinaryOp");
     }
-    auto cb = derived()->create_call_builder();
-    cb->add_arg(lhs.part(0), tpde::CCAssignment{});
-    cb->add_arg(rhs.part(0), tpde::CCAssignment{});
-    cb->call(get_libfunc_sym(lf));
-    cb->add_ret(res);
+    auto *cca = derived()->get_ccassigner(llvm::CallingConv::C, nullptr);
+    typename Derived::CallBuilder cb{*derived(), *cca};
+    cb.add_arg(lhs.part(0), tpde::CCAssignment{});
+    cb.add_arg(rhs.part(0), tpde::CCAssignment{});
+    cb.call(get_libfunc_sym(lf));
+    cb.add_ret(res);
     return true;
   }
 
@@ -2416,11 +2417,12 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_float_binary_op(
     default: return false;
     }
 
-    auto cb = derived()->create_call_builder();
-    cb->add_arg(lhs.part(0), tpde::CCAssignment{});
-    cb->add_arg(rhs.part(0), tpde::CCAssignment{});
-    cb->call(get_libfunc_sym(lf));
-    cb->add_ret(res);
+    auto *cca = derived()->get_ccassigner(llvm::CallingConv::C, nullptr);
+    typename Derived::CallBuilder cb{*derived(), *cca};
+    cb.add_arg(lhs.part(0), tpde::CCAssignment{});
+    cb.add_arg(rhs.part(0), tpde::CCAssignment{});
+    cb.call(get_libfunc_sym(lf));
+    cb.add_ret(res);
     return true;
   }
 
@@ -3803,10 +3805,12 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::handle_call(
     return false;
   }
 
-  auto cb = derived()->create_call_builder(call);
-  if (!cb) {
+  tpde::CCAssigner *cc_assigner = derived()->get_ccassigner(
+      call->getCallingConv(), call->getFunctionType());
+  if (!cc_assigner) {
     return false;
   }
+  typename Derived::CallBuilder cb{*derived(), *cc_assigner};
 
   for (u32 i = 0, num_args = call->arg_size(); i != num_args; ++i) {
     using CallArg = typename Derived::CallArg;
@@ -3862,7 +3866,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::handle_call(
       auto [vr, vpr] = this->val_ref_single(op);
       tpde::CCAssignment cca{
           .align = 16, .bank = tpde::RegBank(-2), .size = 16};
-      cb->add_arg(std::move(vpr), cca);
+      cb.add_arg(std::move(vpr), cca);
       continue;
     }
     case LLVMBasicValType::complex:
@@ -3876,18 +3880,18 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::handle_call(
     assert(!call->paramHasAttr(i, llvm::Attribute::AttrKind::Preallocated));
 
     // Explicitly pass part count to avoid duplicate type lowering.
-    cb->add_arg(arg, this->adaptor->type_part_count(ty, ty_idx));
+    cb.add_arg(arg, this->adaptor->type_part_count(ty, ty_idx));
   }
 
   if (override_sym.valid()) {
-    cb->call(override_sym);
+    cb.call(override_sym);
   } else {
     llvm::Value *target = call->getCalledOperand();
     if (auto *global = llvm::dyn_cast<llvm::GlobalValue>(target)) {
-      cb->call(global_sym(global));
+      cb.call(global_sym(global));
     } else {
       auto [_, tgt_vp] = this->val_ref_single(target);
-      cb->call(std::move(tgt_vp));
+      cb.call(std::move(tgt_vp));
     }
   }
 
@@ -3901,11 +3905,11 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::handle_call(
         return false;
       }
     } else {
-      cb->add_ret(res);
+      cb.add_ret(res);
     }
   }
 
-  return !cb->has_error();
+  return !cb.has_error();
 }
 
 template <typename Adaptor, typename Derived, typename Config>
@@ -4781,17 +4785,19 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_intrin(
     default: TPDE_UNREACHABLE("invalid library fp intrinsic");
     }
 
-    auto cb = derived()->create_call_builder(inst);
-    if (!cb) {
+    auto *cca = derived()->get_ccassigner(inst->getCallingConv(),
+                                          inst->getFunctionType());
+    if (!cca) {
       return false;
     }
+    typename Derived::CallBuilder cb{*derived(), *cca};
 
     // This is tricky. The LLVM intrinsic returns two values as struct. The C
     // function, however, returns a single value in a register and the second
     // value via an output parameter to an address. We have to allocate a stack
     // slot (we reuse the spill slot of the result) and pass the address of this
     // stack slot as parameter.
-    cb->add_arg(typename Derived::CallArg{arg});
+    cb.add_arg(typename Derived::CallArg{arg});
 
     ValueRef res = this->result_ref(inst);
     assert(res.assignment()->part_count == 2);
@@ -4806,11 +4812,11 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_intrin(
     ValuePart int_part_slot_vp;
     int_part_slot_vp.set_value(
         derived(), std::move(std::get<ScratchReg>(int_part_slot.state)));
-    cb->add_arg(std::move(int_part_slot_vp),
-                tpde::CCAssignment{.bank = Config::GP_BANK, .size = 8});
+    cb.add_arg(std::move(int_part_slot_vp),
+               tpde::CCAssignment{.bank = Config::GP_BANK, .size = 8});
 
-    cb->call(get_libfunc_sym(func));
-    cb->add_ret(res.part(0), {});
+    cb.call(get_libfunc_sym(func));
+    cb.add_ret(res.part(0), {});
     return true;
   }
   case llvm::Intrinsic::minnum:
@@ -4910,18 +4916,20 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_intrin(
     case v4f32: fn = &Derived::encode_fmuladdv4f32; break;
     case v2f64: fn = &Derived::encode_fmuladdv2f64; break;
     case f128: {
-      auto cb1 = derived()->create_call_builder();
-      cb1->add_arg(op1.part(0), tpde::CCAssignment{});
-      cb1->add_arg(op2.part(0), tpde::CCAssignment{});
-      cb1->call(get_libfunc_sym(LibFunc::multf3));
+      auto *cca = derived()->get_ccassigner(llvm::CallingConv::C, nullptr);
+      typename Derived::CallBuilder cb1{*derived(), *cca};
+      cb1.add_arg(op1.part(0), tpde::CCAssignment{});
+      cb1.add_arg(op2.part(0), tpde::CCAssignment{});
+      cb1.call(get_libfunc_sym(LibFunc::multf3));
       ValuePartRef tmp{this, Config::FP_BANK};
-      cb1->add_ret(tmp, tpde::CCAssignment{});
+      cb1.add_ret(tmp, tpde::CCAssignment{});
 
-      auto cb2 = derived()->create_call_builder();
-      cb2->add_arg(std::move(tmp), tpde::CCAssignment{});
-      cb2->add_arg(op3.part(0), tpde::CCAssignment{});
-      cb2->call(get_libfunc_sym(LibFunc::addtf3));
-      cb2->add_ret(res);
+      cca->reset();
+      typename Derived::CallBuilder cb2{*derived(), *cca};
+      cb2.add_arg(std::move(tmp), tpde::CCAssignment{});
+      cb2.add_arg(op3.part(0), tpde::CCAssignment{});
+      cb2.call(get_libfunc_sym(LibFunc::addtf3));
+      cb2.add_ret(res);
       return true;
     }
     case f80:

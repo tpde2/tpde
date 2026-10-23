@@ -79,8 +79,8 @@ struct LLVMCompilerX64 : tpde::x64::CompilerX64<LLVMAdaptor,
 
   void load_address_of_var_reference(AsmReg dst, tpde::AssignmentPartRef ap);
 
-  std::optional<CallBuilder>
-      create_call_builder(const llvm::CallBase * = nullptr);
+  tpde::CCAssigner *get_ccassigner(llvm::CallingConv::ID cc,
+                                   llvm::FunctionType *ft);
 
   bool compile_cond_br(const llvm::Instruction *, const ValInfo &, u64);
   bool compile_inline_asm(const llvm::CallBase *);
@@ -233,21 +233,16 @@ void LLVMCompilerX64::load_address_of_var_reference(
   }
 }
 
-std::optional<LLVMCompilerX64::CallBuilder>
-    LLVMCompilerX64::create_call_builder(const llvm::CallBase *cb) {
-  bool var_arg = cb ? cb->getFunctionType()->isVarArg() : false;
-  llvm::CallingConv::ID cc = llvm::CallingConv::C;
-  if (cb) {
-    cc = cb->getCallingConv();
-  }
+tpde::CCAssigner *LLVMCompilerX64::get_ccassigner(llvm::CallingConv::ID cc,
+                                                  llvm::FunctionType *ft) {
+  bool var_arg = ft ? ft->isVarArg() : false;
   switch (cc) {
   case llvm::CallingConv::C:
   case llvm::CallingConv::Fast:
     // On x86-64, fastcc behaves like the C calling convention.
     cc_assigners = tpde::x64::CCAssignerSysV(var_arg);
-    return CallBuilder{*this,
-                       std::get<tpde::x64::CCAssignerSysV>(cc_assigners)};
-  default: return std::nullopt;
+    return &std::get<tpde::x64::CCAssignerSysV>(cc_assigners);
+  default: return nullptr;
   }
 }
 
