@@ -151,16 +151,17 @@ private:
   u32 gp_cnt = 0, xmm_cnt = 0, stack = 0;
   // The next N assignments must go to the stack.
   unsigned must_assign_stack = 0;
-  bool vararg;
   u32 ret_gp_cnt = 0, ret_xmm_cnt = 0;
 
 public:
-  CCAssignerSysV(bool vararg = false) : CCAssigner(Info), vararg(vararg) {}
+  CCAssignerSysV(bool vararg = false) : CCAssigner(Info) {
+    this->vararg = vararg;
+  }
 
   void reset() override {
+    error = false;
     gp_cnt = xmm_cnt = stack = 0;
     must_assign_stack = 0;
-    vararg = false;
     ret_gp_cnt = ret_xmm_cnt = 0;
   }
 
@@ -219,8 +220,6 @@ public:
 
   u32 get_stack_size() override { return stack; }
 
-  bool is_vararg() const override { return vararg; }
-
   void assign_ret(CCAssignment &arg) override {
     assert(!arg.byval && !arg.sret);
     if (arg.bank == RegBank{0}) {
@@ -228,17 +227,17 @@ public:
         arg.reg = Reg{ret_gp_cnt == 0 ? AsmReg::AX : AsmReg::DX};
         ret_gp_cnt += 1;
       } else {
-        TPDE_UNREACHABLE("too many return values");
+        error = true;
       }
     } else if (arg.bank == RegBank{1}) {
       if (ret_xmm_cnt + arg.consecutive < 2) {
         arg.reg = Reg{ret_xmm_cnt == 0 ? AsmReg::XMM0 : AsmReg::XMM1};
         ret_xmm_cnt += 1;
       } else {
-        TPDE_UNREACHABLE("too many return values");
+        error = true;
       }
     } else {
-      TPDE_UNREACHABLE("return value must have valid register bank");
+      error = true;
     }
   }
 };

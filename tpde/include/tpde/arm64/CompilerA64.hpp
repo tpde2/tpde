@@ -216,7 +216,10 @@ class CCAssignerAAPCS : public CCAssigner {
 public:
   CCAssignerAAPCS() : CCAssigner(Info) {}
 
-  void reset() override { ngrn = nsrn = nsaa = ret_ngrn = ret_nsrn = 0; }
+  void reset() override {
+    error = false;
+    ngrn = nsrn = nsaa = ret_ngrn = ret_nsrn = 0;
+  }
 
   void assign_arg(CCAssignment &arg) override {
     if (arg.byval) [[unlikely]] {
@@ -270,14 +273,15 @@ public:
         arg.reg = Reg{AsmReg::R0 + ret_ngrn};
         ret_ngrn += 1;
       } else {
-        assert(false);
+        error = true;
       }
     } else {
+      assert(arg.bank == RegBank{1});
       if (ret_nsrn + arg.consecutive < 8) {
         arg.reg = Reg{AsmReg::V0 + ret_nsrn};
         ret_nsrn += 1;
       } else {
-        assert(false);
+        error = true;
       }
     }
   }

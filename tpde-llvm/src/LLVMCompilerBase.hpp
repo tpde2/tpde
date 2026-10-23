@@ -1531,7 +1531,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_ret(
   }
 
   rb.ret();
-  return true;
+  return !rb.has_error();
 }
 
 template <typename Adaptor, typename Derived, typename Config>
@@ -3905,7 +3905,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::handle_call(
     }
   }
 
-  return true;
+  return !cb->has_error();
 }
 
 template <typename Adaptor, typename Derived, typename Config>

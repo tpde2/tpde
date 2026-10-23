@@ -75,9 +75,12 @@ struct CCInfo {
 };
 
 class CCAssigner {
-public:
+protected:
   const CCInfo *ccinfo;
+  bool vararg = false;
+  bool error = false;
 
+public:
   CCAssigner(const CCInfo &ccinfo) : ccinfo(&ccinfo) {}
   virtual ~CCAssigner() {}
 
@@ -89,8 +92,10 @@ public:
   virtual u32 get_stack_size() = 0;
   /// Some calling conventions need different call behavior when calling a
   /// vararg function.
-  virtual bool is_vararg() const { return false; }
+  bool is_vararg() const { return vararg; }
   virtual void assign_ret(CCAssignment &cca) = 0;
+
+  bool has_error() const { return error; }
 };
 
 /// The base class for the compiler.
@@ -284,6 +289,8 @@ public:
     void add_ret(ValuePart &&vp, CCAssignment cca) { add_ret(vp, cca); }
     /// Assign return values to the IR value.
     void add_ret(ValueRef &vr);
+
+    bool has_error() const { return assigner.has_error(); }
   };
 
   class RetBuilder {
@@ -302,6 +309,8 @@ public:
     void add(IRValueRef val);
 
     void ret();
+
+    bool has_error() const { return assigner.has_error(); }
   };
 
   /// Initialize a CompilerBase, should be called by the derived classes
@@ -742,7 +751,10 @@ void CompilerBase<Adaptor, Derived, Config>::CallBuilderBase<
   cca.bank = vp.bank();
   cca.size = vp.part_size();
   assigner.assign_ret(cca);
-  assert(cca.reg.valid() && "return value must be in register");
+  if (!cca.reg.valid()) {
+    assert(assigner.has_error() && "return value must be in register");
+    return;
+  }
   vp.set_value_reg(&compiler, cca.reg);
 }
 
@@ -764,7 +776,11 @@ void CompilerBase<Adaptor, Derived, Config>::RetBuilder::add(ValuePart &&vp,
   cca.bank = vp.bank();
   u32 size = cca.size = vp.part_size();
   assigner.assign_ret(cca);
-  assert(cca.reg.valid() && "indirect return value must use sret argument");
+  if (!cca.reg.valid()) {
+    assert(assigner.has_error() &&
+           "indirect return value must use sret argument");
+    return;
+  }
 
   bool needs_ext = cca.int_ext != 0;
   bool ext_sign = cca.int_ext >> 7;
