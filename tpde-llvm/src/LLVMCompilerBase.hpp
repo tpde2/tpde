@@ -4047,6 +4047,9 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::handle_call(
     case LLVMBasicValType::i16:
     case LLVMBasicValType::i32:
     case LLVMBasicValType::i64:
+      if (op->getType()->getIntegerBitWidth() == 64) {
+        break;
+      }
       if (call->paramHasAttr(i, llvm::Attribute::AttrKind::ZExt)) {
         arg.flag = CallArg::Flag::zext;
         arg.ext_bits = op->getType()->getIntegerBitWidth();

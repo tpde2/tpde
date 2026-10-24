@@ -713,6 +713,7 @@ void CompilerBase<Adaptor, Derived, Config>::CallBuilderBase<
     u8 int_ext = 0;
     if (arg.flag == CallArg::Flag::sext || arg.flag == CallArg::Flag::zext) {
       assert(arg.ext_bits != 0 && "cannot extend zero-bit integer");
+      assert(arg.ext_bits < 64 && "int_ext holds source widths below 64");
       int_ext = arg.ext_bits | (arg.flag == CallArg::Flag::sext ? 0x80 : 0);
     }
     u32 remaining = part_count < 256 ? part_count - part_idx - 1 : 255;

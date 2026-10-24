@@ -1707,6 +1707,65 @@ define void @call_fn_v_i1z_i1s_i37z_i37s_const() {
   ret void
 }
 
+declare void @fn_v_i64z_i64s(i64 zeroext, i64 signext)
+define void @call_fn_v_i64z_i64s(i64 %a, i64 %b) {
+; X64-LABEL: <call_fn_v_i64z_i64s>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    mov qword ptr [rbp - 0x30], rdi
+; X64-NEXT:    mov rdi, rsi
+; X64-NEXT:    mov rsi, qword ptr [rbp - 0x30]
+; X64-NEXT:    call <L0>
+; X64-NEXT:     R_X86_64_PLT32 fn_v_i64z_i64s-0x4
+; X64-NEXT:  <L0>:
+; X64-NEXT:    add rsp, 0x30
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <call_fn_v_i64z_i64s>:
+; ARM64:         stp x29, x30, [sp, #-0xb0]!
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    str x0, [x29, #0xa0]
+; ARM64-NEXT:    mov x0, x1
+; ARM64-NEXT:    ldr x1, [x29, #0xa0]
+; ARM64-NEXT:  <L0>:
+; ARM64-NEXT:    bl <L0>
+; ARM64-NEXT:     R_AARCH64_CALL26 fn_v_i64z_i64s
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
+; ARM64-NEXT:    ret
+  call void @fn_v_i64z_i64s(i64 %b, i64 %a)
+  ret void
+}
+
+define void @call_fn_v_i64z_i64s_const() {
+; X64-LABEL: <call_fn_v_i64z_i64s_const>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    mov rdi, -0x2
+; X64-NEXT:    mov rsi, -0x3
+; X64-NEXT:    call <L0>
+; X64-NEXT:     R_X86_64_PLT32 fn_v_i64z_i64s-0x4
+; X64-NEXT:  <L0>:
+; X64-NEXT:    add rsp, 0x30
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <call_fn_v_i64z_i64s_const>:
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    mov x0, #-0x2 // =-2
+; ARM64-NEXT:    mov x1, #-0x3 // =-3
+; ARM64-NEXT:  <L0>:
+; ARM64-NEXT:    bl <L0>
+; ARM64-NEXT:     R_AARCH64_CALL26 fn_v_i64z_i64s
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64-NEXT:    ret
+  call void @fn_v_i64z_i64s(i64 -2, i64 -3)
+  ret void
+}
+
 declare void @fn_v_stack_i1z_i1s_i37z_i37s([8 x i64], i1 zeroext, i1 signext, i37 zeroext, i37 signext)
 define void @call_fn_v_stack_i1z_i1s_i37z_i37s(i1 %a, i1 %b, i37 %c, i37 %d) {
 ; X64-LABEL: <call_fn_v_stack_i1z_i1s_i37z_i37s>:
