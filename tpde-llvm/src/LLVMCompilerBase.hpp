@@ -2410,6 +2410,9 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_int_binary_op(
         }
         if (op.needs_rhs_ext()) {
           rhs_op = std::move(rhs_op).into_extended(sext, int_width, ext_width);
+        } else if (op.is_shift() && int_width < 5) {
+          // We shift 32-bit values and hence need at least 5 bits.
+          rhs_op = std::move(rhs_op).into_extended(false, int_width, ext_width);
         }
       }
     }
