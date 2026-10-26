@@ -672,6 +672,16 @@ void EncodingTargetX64::get_inst_candidates(
 
   handle_rm("CVTTPS2DQrr", "CVTTPS2DQrm", 1, "SSE_CVTTPS2DQrr", "SSE_CVTTPS2DQrm");
 
+  case_default("MOV64toPQIrr", -1, "SSE_MOVQ_G2Xrr");
+  case_default("MOV64toSDrr", -1, "SSE_MOVQ_G2Xrr");
+  case_default("MOVDI2PDIrm", 1, "SSE_MOVD_G2Xrm");
+  case_default("MOVDI2SSrr", -1, "SSE_MOVD_G2Xrr");
+  case_default("MOVPDI2DIrr", -1, "SSE_MOVD_X2Grr");
+  case_default("MOVPQIto64rr", -1, "SSE_MOVQ_X2Grr");
+  case_default("MOVQI2PQIrm", 1, "SSE_MOVQ_G2Xrm");
+  case_default("MOVSDto64rr", -1, "SSE_MOVQ_X2Grr");
+  case_default("MOVSS2DIrr", -1, "SSE_MOVD_X2Grr");
+
   handle_rm("PANDrr", "PANDrm", 2, "SSE_PANDrr", "SSE_PANDrm", 16);
   handle_rm("PANDNrr", "PANDNrm", 2, "SSE_PANDNrr", "SSE_PANDNrm", 16);
   handle_rm("PORrr", "PORrm", 2, "SSE_PORrr", "SSE_PORrm", 16);
@@ -760,6 +770,8 @@ void EncodingTargetX64::get_inst_candidates(
   case_default("MOVMSKPSrr", -1, "SSE_MOVMSKPSrr");
   case_default("MOVMSKPDrr", -1, "SSE_MOVMSKPDrr");
 
+  handle_rm("PSADBWrr", "PSADBWrm", 2, "SSE_PSADBWrr", "SSE_PSADBWrm", 16);
+
   case_default("RDTSC", -1, "RDTSC");
 
   case_default("MFENCE", -1, "MFENCE");
@@ -829,20 +841,6 @@ void EncodingTargetX64::get_inst_candidates(
   } else if (Name == "CVTTSS2SI64rr_Int") {
     handle_memrepl("SSE_CVTTSS2SI64rm", 1);
     handle_default("SSE_CVTTSS2SI64rr");
-  } else if (Name == "MOV64toPQIrr") {
-    handle_default("SSE_MOVQ_G2Xrr");
-  } else if (Name == "MOV64toSDrr") {
-    handle_default("SSE_MOVQ_G2Xrr");
-  } else if (Name == "MOVSS2DIrr") {
-    handle_default("SSE_MOVD_X2Grr");
-  } else if (Name == "MOVDI2PDIrm") {
-    handle_default("SSE_MOVD_G2Xrm", 1);
-  } else if (Name == "MOVQI2PQIrm") {
-    handle_default("SSE_MOVQ_G2Xrm", 1);
-  } else if (Name == "MOVDI2SSrr") {
-    handle_default("SSE_MOVD_G2Xrr");
-  } else if (Name == "MOVSDto64rr") {
-    handle_default("SSE_MOVQ_X2Grr");
   } else if (Name == "PUNPCKLDQrm") {
     handle_default("SSE_PUNPCKLDQrm", 2);
   } else if (Name == "UNPCKHPDrr") {

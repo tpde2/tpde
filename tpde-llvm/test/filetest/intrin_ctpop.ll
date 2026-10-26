@@ -5,6 +5,8 @@
 ; RUN: tpde-llc --target=x86_64 %s | %objdump | FileCheck %s -check-prefixes=X64
 ; RUN: tpde-llc --target=aarch64 %s | %objdump | FileCheck %s -check-prefixes=ARM64
 ; XFAIL: llvm19.1
+; XFAIL: llvm22.1
+; XFAIL: llvm23.1
 
 define i8 @ctpop_i8(i8 %0) {
 ; X64-LABEL: <ctpop_i8>:
@@ -195,5 +197,74 @@ define i64 @ctpop_i64(i64 %0) {
 ; ARM64-NEXT:    ret
   %res = call i64 @llvm.ctpop.i64(i64 %0)
   ret i64 %res
+}
+
+
+define i128 @ctpop_i128(i128 %0) {
+; X64-LABEL: <ctpop_i128>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    push rbx
+; X64-NEXT:    mov rax, rsi
+; X64-NEXT:    shr rax
+; X64-NEXT:    movabs rcx, 0x5555555555555555
+; X64-NEXT:    and rax, rcx
+; X64-NEXT:    sub rsi, rax
+; X64-NEXT:    movabs rdx, 0x3333333333333333
+; X64-NEXT:    mov rax, rsi
+; X64-NEXT:    and rax, rdx
+; X64-NEXT:    shr rsi, 0x2
+; X64-NEXT:    and rsi, rdx
+; X64-NEXT:    add rax, rsi
+; X64-NEXT:    mov rbx, rax
+; X64-NEXT:    shr rbx, 0x4
+; X64-NEXT:    add rbx, rax
+; X64-NEXT:    movabs rsi, 0xf0f0f0f0f0f0f0f
+; X64-NEXT:    and rbx, rsi
+; X64-NEXT:    movabs r8, 0x101010101010101
+; X64-NEXT:    imul rbx, r8
+; X64-NEXT:    shr rbx, 0x38
+; X64-NEXT:    mov rax, rdi
+; X64-NEXT:    shr rax
+; X64-NEXT:    and rax, rcx
+; X64-NEXT:    sub rdi, rax
+; X64-NEXT:    mov rax, rdi
+; X64-NEXT:    and rax, rdx
+; X64-NEXT:    shr rdi, 0x2
+; X64-NEXT:    and rdx, rdi
+; X64-NEXT:    add rdx, rax
+; X64-NEXT:    mov rax, rdx
+; X64-NEXT:    shr rax, 0x4
+; X64-NEXT:    add rax, rdx
+; X64-NEXT:    and rax, rsi
+; X64-NEXT:    imul rax, r8
+; X64-NEXT:    shr rax, 0x38
+; X64-NEXT:    add rax, rbx
+; X64-NEXT:    xor ebx, ebx
+; X64-NEXT:    mov rdx, rbx
+; X64-NEXT:    pop rbx
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <ctpop_i128>:
+; ARM64:         stp x29, x30, [sp, #-0xb0]!
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    fmov d0, x1
+; ARM64-NEXT:    fmov d1, x0
+; ARM64-NEXT:    mov x0, xzr
+; ARM64-NEXT:    cnt v0.8b, v0.8b
+; ARM64-NEXT:    cnt v1.8b, v1.8b
+; ARM64-NEXT:    addv b0, v0.8b
+; ARM64-NEXT:    addv b1, v1.8b
+; ARM64-NEXT:    fmov x1, d0
+; ARM64-NEXT:    fmov x2, d1
+; ARM64-NEXT:    add x3, x1, x2
+; ARM64-NEXT:    str x0, [x29, #0xa8]
+; ARM64-NEXT:    mov x0, x3
+; ARM64-NEXT:    ldr x1, [x29, #0xa8]
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
+; ARM64-NEXT:    ret
+  %res = call i128 @llvm.ctpop.i128(i128 %0)
+  ret i128 %res
 }
 

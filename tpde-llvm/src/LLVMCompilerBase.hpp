@@ -5233,22 +5233,26 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_intrin(
       return false;
     }
     const auto width = val->getType()->getIntegerBitWidth();
-    if (width > 64) {
+    ValueRef src = this->val_ref(val);
+    ValueRef dst = this->result_ref(inst);
+    if (width == 128) {
+      derived()->encode_ctpopi128(
+          src.part(0), src.part(1), dst.part(0), dst.part(1));
+      return true;
+    } else if (width > 64) {
       return false;
     }
 
-    ValueRef val_ref = this->val_ref(val);
-    ValuePartRef op = val_ref.part(0);
+    ValuePartRef op = src.part(0);
     if (width % 32) {
       unsigned tgt_width = tpde::util::align_up(width, 32);
       op = std::move(op).into_extended(/*sign=*/false, width, tgt_width);
     }
 
-    auto [res_vr, res_ref] = this->result_ref_single(inst);
     if (width <= 32) {
-      derived()->encode_ctpopi32(std::move(op), res_ref);
+      derived()->encode_ctpopi32(std::move(op), dst.part(0));
     } else {
-      derived()->encode_ctpopi64(std::move(op), res_ref);
+      derived()->encode_ctpopi64(std::move(op), dst.part(0));
     }
     return true;
   }
@@ -5258,12 +5262,25 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_intrin(
     if (!val->getType()->isIntegerTy()) {
       return false;
     }
+    bool is_cttz = intrin_id == llvm::Intrinsic::cttz;
     u32 width_idx = 0;
     switch (val->getType()->getIntegerBitWidth()) {
     case 8: width_idx = 0; break;
     case 16: width_idx = 1; break;
     case 32: width_idx = 2; break;
     case 64: width_idx = 3; break;
+    case 128: {
+      ValueRef src = this->val_ref(val);
+      ValueRef dst = this->result_ref(inst);
+      if (is_cttz) {
+        derived()->encode_cttzi128(
+            src.part(0), src.part(1), dst.part(0), dst.part(1));
+      } else {
+        derived()->encode_ctlzi128(
+            src.part(0), src.part(1), dst.part(0), dst.part(1));
+      }
+      return true;
+    }
     default: return false;
     }
 
@@ -5278,7 +5295,6 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_intrin(
     };
     bool zero_is_poison =
         !llvm::cast<llvm::ConstantInt>(inst->getOperand(1))->isZero();
-    bool is_cttz = intrin_id == llvm::Intrinsic::cttz;
     EncodeFnTy fn = encode_fns[width_idx][is_cttz][zero_is_poison];
     return (derived()->*fn)(this->val_ref(val).part(0),
                             this->result_ref(inst).part(0));
@@ -5289,12 +5305,17 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_intrin(
       return false;
     }
     const auto width = val->getType()->getIntegerBitWidth();
-    if (width > 64) {
+    ValueRef src = this->val_ref(val);
+    ValueRef dst = this->result_ref(inst);
+    if (width == 128) {
+      derived()->encode_bitreversei128(
+          src.part(0), src.part(1), dst.part(0), dst.part(1));
+      return true;
+    } else if (width > 64) {
       return false;
     }
 
-    ValueRef val_ref = this->val_ref(val);
-    GenericValuePart op = val_ref.part(0);
+    GenericValuePart op = src.part(0);
     if (width % 32) {
       u64 amt = (width < 32 ? 32 : 64) - width;
       ValuePartRef amt_val{this, &amt, 8, Config::GP_BANK};
@@ -5307,11 +5328,10 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_intrin(
       op = std::move(shifted);
     }
 
-    auto [res_vr, res_ref] = this->result_ref_single(inst);
     if (width <= 32) {
-      derived()->encode_bitreversei32(std::move(op), res_ref);
+      derived()->encode_bitreversei32(std::move(op), dst.part(0));
     } else {
-      derived()->encode_bitreversei64(std::move(op), res_ref);
+      derived()->encode_bitreversei64(std::move(op), dst.part(0));
     }
     return true;
   }

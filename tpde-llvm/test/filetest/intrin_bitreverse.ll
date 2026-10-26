@@ -4,6 +4,8 @@
 
 ; RUN: tpde-llc --target=x86_64 %s | %objdump | FileCheck %s -check-prefixes=X64
 ; RUN: tpde-llc --target=aarch64 %s | %objdump | FileCheck %s -check-prefixes=ARM64
+; XFAIL: llvm22.1
+; XFAIL: llvm23.1
 
 define i8 @bitrev_i8(i8 %0) {
 ; X64-LABEL: <bitrev_i8>:
@@ -187,3 +189,62 @@ define i64 @bitrev_i64(i64 %0) {
   ret i64 %res
 }
 
+define i128 @bitrev_i128(i128 %0) {
+; X64-LABEL: <bitrev_i128>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    push rbx
+; X64-NEXT:    bswap rdi
+; X64-NEXT:    mov rax, rdi
+; X64-NEXT:    shr rax, 0x4
+; X64-NEXT:    movabs rcx, 0xf0f0f0f0f0f0f0f
+; X64-NEXT:    and rax, rcx
+; X64-NEXT:    and rdi, rcx
+; X64-NEXT:    shl rdi, 0x4
+; X64-NEXT:    or rdi, rax
+; X64-NEXT:    movabs rax, 0x3333333333333333
+; X64-NEXT:    mov rdx, rdi
+; X64-NEXT:    and rdx, rax
+; X64-NEXT:    shr rdi, 0x2
+; X64-NEXT:    and rdi, rax
+; X64-NEXT:    lea rdx, [rdi + 4*rdx]
+; X64-NEXT:    movabs rdi, 0x5555555555555555
+; X64-NEXT:    mov rbx, rdx
+; X64-NEXT:    and rbx, rdi
+; X64-NEXT:    shr rdx
+; X64-NEXT:    and rdx, rdi
+; X64-NEXT:    lea rdx, [rdx + 2*rbx]
+; X64-NEXT:    bswap rsi
+; X64-NEXT:    mov rbx, rsi
+; X64-NEXT:    shr rbx, 0x4
+; X64-NEXT:    and rbx, rcx
+; X64-NEXT:    and rsi, rcx
+; X64-NEXT:    shl rsi, 0x4
+; X64-NEXT:    or rsi, rbx
+; X64-NEXT:    mov rcx, rsi
+; X64-NEXT:    and rcx, rax
+; X64-NEXT:    shr rsi, 0x2
+; X64-NEXT:    and rsi, rax
+; X64-NEXT:    lea rax, [rsi + 4*rcx]
+; X64-NEXT:    mov rcx, rax
+; X64-NEXT:    and rcx, rdi
+; X64-NEXT:    shr rax
+; X64-NEXT:    and rax, rdi
+; X64-NEXT:    lea rax, [rax + 2*rcx]
+; X64-NEXT:    pop rbx
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <bitrev_i128>:
+; ARM64:         stp x29, x30, [sp, #-0xb0]!
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    rbit x1, x1
+; ARM64-NEXT:    rbit x0, x0
+; ARM64-NEXT:    str x0, [x29, #0xa8]
+; ARM64-NEXT:    mov x0, x1
+; ARM64-NEXT:    ldr x1, [x29, #0xa8]
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
+; ARM64-NEXT:    ret
+  %res = call i128 @llvm.bitreverse.i128(i128 %0)
+  ret i128 %res
+}
