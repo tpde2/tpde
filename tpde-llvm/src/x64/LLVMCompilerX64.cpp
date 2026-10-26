@@ -239,7 +239,9 @@ tpde::CCAssigner *LLVMCompilerX64::get_ccassigner(llvm::CallingConv::ID cc,
   switch (cc) {
   case llvm::CallingConv::C:
   case llvm::CallingConv::Fast:
-    // On x86-64, fastcc behaves like the C calling convention.
+  case llvm::CallingConv::X86_64_SysV:
+    // On x86-64, fastcc behaves like the C calling convention, which is
+    // x86_64_sysvcc.
     cc_assigners = tpde::x64::CCAssignerSysV(var_arg);
     return &std::get<tpde::x64::CCAssignerSysV>(cc_assigners);
   default: return nullptr;
