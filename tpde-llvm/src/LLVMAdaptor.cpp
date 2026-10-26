@@ -26,6 +26,13 @@
 #include "tpde/base.hpp"
 #include "tpde/util/misc.hpp"
 
+#if LLVM_VERSION_MAJOR == 23 && !defined(NDEBUG)
+// LLVM mistakenly defines this function guarded by NDEBUG instead of using
+// LLVM_ENABLE_ABI_BREAKING_CHECKS. This prevents assert builds linking against
+// a release build of LLVM. Provide a weak definition here for assert builds.
+inline void llvm::BasicBlock::validateInstrOrdering() const {}
+#endif
+
 namespace tpde_llvm {
 
 static void sort_phi_entries(llvm::PHINode *phi) {
