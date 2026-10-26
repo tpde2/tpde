@@ -642,6 +642,24 @@ bool LLVMCompilerX64::handle_intrin(const llvm::IntrinsicInst *inst) {
     ASM(MOV64rr, FE_SP, val_reg);
     return true;
   }
+  case llvm::Intrinsic::x86_addcarry_64: {
+    auto cin = this->val_ref(inst->getOperand(0));
+    auto lhs = this->val_ref(inst->getOperand(1));
+    auto rhs = this->val_ref(inst->getOperand(2));
+    auto res = this->result_ref(inst);
+    this->encode_addcarry64(
+        cin.part(0), lhs.part(0), rhs.part(0), res.part(0), res.part(1));
+    return true;
+  }
+  case llvm::Intrinsic::x86_subborrow_64: {
+    auto cin = this->val_ref(inst->getOperand(0));
+    auto lhs = this->val_ref(inst->getOperand(1));
+    auto rhs = this->val_ref(inst->getOperand(2));
+    auto res = this->result_ref(inst);
+    this->encode_subborrow64(
+        cin.part(0), lhs.part(0), rhs.part(0), res.part(0), res.part(1));
+    return true;
+  }
   case llvm::Intrinsic::x86_sse42_crc32_64_64: {
     auto [rhs_vr, rhs_ref] = this->val_ref_single(inst->getOperand(1));
     auto res = this->val_ref(inst->getOperand(0)).part(0).into_temporary();

@@ -826,3 +826,9 @@ void prefetch_wl3(void* addr) { __builtin_prefetch(addr, 1, 3); }
 
 u64 TARGET_V1 readcyclecounter(void) { return __builtin_readcyclecounter(); }
 u32 TARGET_V1 getrounding(void) { return __builtin_flt_rounds(); }
+
+#ifdef __x86_64__
+typedef struct { u8 cf; u64 val; } AdcRes;
+AdcRes TARGET_V1 addcarry64(u8 cin, u64 a, u64 b) { unsigned long long res; u8 cf = __builtin_ia32_addcarryx_u64(cin, a, b, &res); return (AdcRes) {cf, res}; }
+AdcRes TARGET_V1 subborrow64(u8 cin, u64 a, u64 b) { unsigned long long res; u8 cf = __builtin_ia32_subborrow_u64(cin, a, b, &res); return (AdcRes) {cf, res}; }
+#endif
