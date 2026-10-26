@@ -711,11 +711,9 @@ template <IRAdaptor Adaptor,
           template <typename, typename, typename> typename BaseTy,
           typename Config>
 void CompilerA64<Adaptor, Derived, BaseTy, Config>::prologue_begin(
-    CCAssigner *cc_assigner) {
+    CCAssigner *) {
   func_ret_offs.clear();
   func_start_off = this->text_writer.offset();
-
-  const CCInfo &cc_info = cc_assigner->get_ccinfo();
 
   // We don't actually generate the prologue here and merely allocate space
   // for it. Right now, we don't know which callee-saved registers will be
@@ -724,7 +722,7 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::prologue_begin(
   // See finish_func.
   this->stack.frame_size = 16; // FP, LR
   {
-    auto csr = cc_info.callee_saved_regs;
+    auto csr = this->cc_info->callee_saved_regs;
     auto csr_gp = csr & this->register_file.bank_regs(Config::GP_BANK);
     auto csr_fp = csr & this->register_file.bank_regs(Config::FP_BANK);
     u32 gp_saves = std::popcount(csr_gp);
@@ -844,7 +842,7 @@ template <IRAdaptor Adaptor,
           template <typename, typename, typename> typename BaseTy,
           typename Config>
 void CompilerA64<Adaptor, Derived, BaseTy, Config>::finish_func(u32 func_idx) {
-  auto csr = derived()->cur_cc_assigner()->get_ccinfo().callee_saved_regs;
+  auto csr = this->cc_info->callee_saved_regs;
   u64 saved_regs = this->register_file.clobbered & csr;
 
   auto stack_reg = DA_SP;
@@ -1505,7 +1503,7 @@ AsmReg
   };
 
   u64 possible_regs;
-  auto csr = derived()->cur_cc_assigner()->get_ccinfo().callee_saved_regs;
+  auto csr = this->cc_info->callee_saved_regs;
   if (!this->stack.is_leaf_function) {
     // we can only allocated fixed assignments from the callee-saved regs
     possible_regs = find_possible_regs(csr);

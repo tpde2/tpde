@@ -91,7 +91,7 @@ concept Compiler = CompilerConfig<Config> && requires(T a) {
   /// an invalid SymRef otherwise.
   { a.cur_personality_func() } -> std::same_as<SymRef>;
 
-  /// Provides a calling convention assigner for the current function.
+  /// Provides a (new) calling convention assigner for the current function.
   /// Optional, if not implemented, the default C calling convention will be
   /// used.
   { a.cur_cc_assigner() } -> std::convertible_to<CCAssigner *>;

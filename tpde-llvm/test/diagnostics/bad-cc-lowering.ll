@@ -17,3 +17,8 @@ define void @bad_call_ret() {
   %x = call [10 x i32] @bad_ret()
   ret void
 }
+
+; CHECK: Failed to compile function bad_cc
+define win64cc void @bad_cc() {
+  ret void
+}

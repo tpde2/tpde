@@ -191,6 +191,8 @@ private:
   typename Config::DefaultCCAssigner default_cc_assigner;
 
 public:
+  const CCInfo *cc_info;
+
   typename Config::Assembler assembler;
   Config::FunctionWriter text_writer;
   // TODO(ts): smallvector?
@@ -2340,16 +2342,22 @@ bool CompilerBase<Adaptor, Derived, Config>::compile_func(const IRFuncRef func,
   // TODO(ts): make function labels optional?
 
   CCAssigner *cc_assigner = derived()->cur_cc_assigner();
+  if (!cc_assigner) {
+    TPDE_LOG_ERR("Failed to get CCAssigner");
+    return false;
+  }
+  // Store CCInfo from the functions' cc_assigner. cur_cc_assigner() is not
+  // required to keep state across different calls.
+  cc_info = &cc_assigner->get_ccinfo();
   assert(cc_assigner != nullptr);
 
-  register_file.allocatable = cc_assigner->get_ccinfo().allocatable_regs;
+  register_file.allocatable = cc_info->allocatable_regs;
 
   cc_assigner->reset();
   // Temporarily prevent argument registers from being assigned.
-  const CCInfo &cc_info = cc_assigner->get_ccinfo();
-  assert((cc_info.allocatable_regs & cc_info.arg_regs) == cc_info.arg_regs &&
+  assert((cc_info->allocatable_regs & cc_info->arg_regs) == cc_info->arg_regs &&
          "argument registers must also be allocatable");
-  this->register_file.allocatable &= ~cc_info.arg_regs;
+  this->register_file.allocatable &= ~cc_info->arg_regs;
 
   // Begin prologue, prepare for handling arguments.
   derived()->prologue_begin(cc_assigner);
@@ -2362,7 +2370,7 @@ bool CompilerBase<Adaptor, Derived, Config>::compile_func(const IRFuncRef func,
   // Finish prologue, storing relevant data from the argument cc_assigner.
   derived()->prologue_end(cc_assigner);
 
-  this->register_file.allocatable |= cc_info.arg_regs;
+  this->register_file.allocatable |= cc_info->arg_regs;
 
   // Small allocas get stack slot, larger allocas need dynamic allocations.
   util::SmallVector<std::tuple<IRValueRef, u32, u32>> dyn_allocas;

@@ -557,14 +557,12 @@ template <IRAdaptor Adaptor,
           template <typename, typename, typename> typename BaseTy,
           typename Config>
 void CompilerX64<Adaptor, Derived, BaseTy, Config>::prologue_begin(
-    CCAssigner *cc_assigner) {
+    CCAssigner *) {
   func_ret_offs.clear();
   func_start_off = this->text_writer.offset();
   scalar_arg_count = vec_arg_count = 0xFFFF'FFFF;
 
-  const CCInfo &cc_info = cc_assigner->get_ccinfo();
-
-  auto csr = cc_info.callee_saved_regs;
+  auto csr = this->cc_info->callee_saved_regs;
   assert(!(csr & ~this->register_file.bank_regs(Config::GP_BANK)) &&
          "non-gp callee-saved registers not implemented");
 
@@ -670,8 +668,7 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::prologue_end(
     CCAssigner *cc_assigner) {
   if (this->adaptor->cur_is_vararg()) [[unlikely]] {
     // TODO: get this from CCAssigner?
-    const CCInfo &cc_info = cc_assigner->get_ccinfo();
-    auto arg_regs = this->register_file.allocatable & cc_info.arg_regs;
+    auto arg_regs = this->register_file.allocatable & this->cc_info->arg_regs;
     u64 gp_regs = arg_regs & this->register_file.bank_regs(Config::GP_BANK);
     u64 xmm_regs = arg_regs & this->register_file.bank_regs(Config::FP_BANK);
     this->scalar_arg_count = std::popcount(gp_regs);
@@ -685,8 +682,7 @@ template <IRAdaptor Adaptor,
           template <typename, typename, typename> typename BaseTy,
           typename Config>
 void CompilerX64<Adaptor, Derived, BaseTy, Config>::finish_func(u32 func_idx) {
-  const CCInfo &ccinfo = derived()->cur_cc_assigner()->get_ccinfo();
-  auto csr = ccinfo.callee_saved_regs;
+  auto csr = this->cc_info->callee_saved_regs;
   u64 saved_regs = this->register_file.clobbered & csr;
 
   bool needs_stack_frame = this->stack.frame_used ||
@@ -765,7 +761,7 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::finish_func(u32 func_idx) {
     rsp_adjustment = final_frame_size - num_saved_regs * 8;
     bool needs_rsp_adjustment = this->stack.generated_call ||
                                 this->stack.has_dynamic_alloca ||
-                                rsp_adjustment > ccinfo.red_zone_size;
+                                rsp_adjustment > this->cc_info->red_zone_size;
 
     if (needs_rsp_adjustment) {
       write_ptr += fe64_SUB64ri(write_ptr, 0, FE_SP, rsp_adjustment);
@@ -810,7 +806,7 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::finish_func(u32 func_idx) {
       }
       // TODO: if the calling convention doesn't guarantee a red zone, we must
       // emit a CFA_restore for every single pop instruction.
-      assert(ccinfo.red_zone_size >= num_saved_regs * 8 &&
+      assert(this->cc_info->red_zone_size >= num_saved_regs * 8 &&
              "unwind info incorrect for calling conv without red zone");
       for (auto reg : util::BitSetIterator<true>{saved_regs}) {
         ASMNC(POPr, AsmReg(reg));
@@ -1318,7 +1314,7 @@ AsmReg
   };
 
   u64 possible_regs;
-  auto csr = derived()->cur_cc_assigner()->get_ccinfo().callee_saved_regs;
+  auto csr = this->cc_info->callee_saved_regs;
   if (!this->stack.is_leaf_function) {
     // we can only allocated fixed assignments from the callee-saved regs
     possible_regs = find_possible_regs(csr);

@@ -142,7 +142,7 @@ The details of this mechanism are explained further down below.
 ```cpp
 CCAssigner* cur_cc_assigner() noexcept;
 ```
-This function provides a calling convention assigner for the current function. It is optional to implement but can be used
+This function provides a (new) calling convention assigner for the current function. It is optional to implement but can be used
 if different calling conventions than the default C calling convention should be used. Note that the pointer returned
 is non-owning so you need to allocate storage that is live throughout the function for the assigner.
 

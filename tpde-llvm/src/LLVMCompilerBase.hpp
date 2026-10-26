@@ -418,6 +418,11 @@ public:
 
   void setup_var_ref_assignments() {}
 
+  tpde::CCAssigner *cur_cc_assigner() {
+    llvm::Function *f = this->adaptor->cur_func;
+    return derived()->get_ccassigner(f->getCallingConv(), f->getFunctionType());
+  }
+
   bool compile_func(IRFuncRef func, u32 idx) {
     time_entry = nullptr;
 
