@@ -5594,11 +5594,47 @@ template <typename Adaptor, typename Derived, typename Config>
 bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_vector_reduce(
     const llvm::IntrinsicInst *inst, const ValInfo &info) {
   if (inst->getType()->isIntegerTy(1)) {
-    // i1 needs special handling
-    // and/mul/umin/smax = all bits one
-    // or/umax/smin = any bit one
-    // xor/add = parity
-    return false;
+    bool all_bits;
+    switch (inst->getIntrinsicID()) {
+    case llvm::Intrinsic::vector_reduce_add:
+    case llvm::Intrinsic::vector_reduce_xor:
+      // TODO: compute parity of the bit vector.
+      return false;
+    case llvm::Intrinsic::vector_reduce_mul:
+    case llvm::Intrinsic::vector_reduce_and:
+    case llvm::Intrinsic::vector_reduce_umin:
+    case llvm::Intrinsic::vector_reduce_smax:
+      // Test whether all bits are one.
+      all_bits = true;
+      break;
+    case llvm::Intrinsic::vector_reduce_or:
+    case llvm::Intrinsic::vector_reduce_smin:
+    case llvm::Intrinsic::vector_reduce_umax:
+      // Test whether any bit is one.
+      all_bits = false;
+      break;
+    default: TPDE_UNREACHABLE("unexpected i1 vector reduce operation");
+    }
+
+    llvm::Value *src = inst->getOperand(0);
+    unsigned num_bits =
+        llvm::cast<llvm::FixedVectorType>(src->getType())->getNumElements();
+    ValueRef vr = this->val_ref(src);
+    // Sign-extend to check all bits, so we can compare against -1.
+    ValuePartRef ext = num_bits == 64
+                           ? vr.part(0).into_temporary()
+                           : vr.part(0).into_extended(all_bits, num_bits, 64);
+    if (all_bits) {
+      derived()->encode_icmp_eqi64(
+          std::move(ext),
+          ValuePartRef{this, -(u64)1, 8, Config::GP_BANK},
+          this->result_ref(inst).part(0));
+    } else {
+      derived()->encode_icmp_nei64(std::move(ext),
+                                   ValuePartRef{this, 0, 8, Config::GP_BANK},
+                                   this->result_ref(inst).part(0));
+    }
+    return true;
   }
 
   LLVMBasicValType elem_ty = info.type;
