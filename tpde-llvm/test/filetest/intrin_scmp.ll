@@ -118,3 +118,28 @@ define i32 @scmpi64_32(i64 %0, i64 %1) {
   %res = call i32 @llvm.scmp(i64 %0, i64 %1)
   ret i32 %res
 }
+
+define i64 @scmpi128_64(i128 %0, i128 %1) {
+; X64-LABEL: <scmpi128_64>:
+; X64:         cmp rdi, rdx
+; X64-NEXT:    mov rax, rsi
+; X64-NEXT:    sbb rax, rcx
+; X64-NEXT:    setl al
+; X64-NEXT:    cmp rdx, rdi
+; X64-NEXT:    sbb rcx, rsi
+; X64-NEXT:    setl cl
+; X64-NEXT:    sub cl, al
+; X64-NEXT:    movsx rax, cl
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <scmpi128_64>:
+; ARM64:         cmp x2, x0
+; ARM64-NEXT:    sbcs xzr, x3, x1
+; ARM64-NEXT:    cset x4, lt
+; ARM64-NEXT:    cmp x0, x2
+; ARM64-NEXT:    sbcs xzr, x1, x3
+; ARM64-NEXT:    csinv x0, x4, xzr, ge
+; ARM64-NEXT:    ret
+  %res = call i64 @llvm.scmp(i128 %0, i128 %1)
+  ret i64 %res
+}

@@ -76,3 +76,24 @@ define i64 @smini64(i64 %0, i64 %1) {
   %res = call i64 @llvm.smin.i64(i64 %0, i64 %1)
   ret i64 %res
 }
+
+define i128 @smini128(i128 %0, i128 %1) {
+; X64-LABEL: <smini128>:
+; X64:         cmp rdi, rdx
+; X64-NEXT:    mov rax, rsi
+; X64-NEXT:    sbb rax, rcx
+; X64-NEXT:    cmovl rdx, rdi
+; X64-NEXT:    cmovl rcx, rsi
+; X64-NEXT:    mov rax, rdx
+; X64-NEXT:    mov rdx, rcx
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <smini128>:
+; ARM64:         cmp x0, x2
+; ARM64-NEXT:    sbcs xzr, x1, x3
+; ARM64-NEXT:    csel x0, x0, x2, lt
+; ARM64-NEXT:    csel x1, x1, x3, lt
+; ARM64-NEXT:    ret
+  %res = call i128 @llvm.smin.i128(i128 %0, i128 %1)
+  ret i128 %res
+}

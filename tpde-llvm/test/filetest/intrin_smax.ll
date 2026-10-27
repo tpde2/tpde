@@ -76,3 +76,24 @@ define i64 @smaxi64(i64 %0, i64 %1) {
   %res = call i64 @llvm.smax.i64(i64 %0, i64 %1)
   ret i64 %res
 }
+
+define i128 @smaxi128(i128 %0, i128 %1) {
+; X64-LABEL: <smaxi128>:
+; X64:         cmp rdx, rdi
+; X64-NEXT:    mov rax, rcx
+; X64-NEXT:    sbb rax, rsi
+; X64-NEXT:    cmovl rdx, rdi
+; X64-NEXT:    cmovl rcx, rsi
+; X64-NEXT:    mov rax, rdx
+; X64-NEXT:    mov rdx, rcx
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <smaxi128>:
+; ARM64:         cmp x2, x0
+; ARM64-NEXT:    sbcs xzr, x3, x1
+; ARM64-NEXT:    csel x0, x0, x2, lt
+; ARM64-NEXT:    csel x1, x1, x3, lt
+; ARM64-NEXT:    ret
+  %res = call i128 @llvm.smax.i128(i128 %0, i128 %1)
+  ret i128 %res
+}

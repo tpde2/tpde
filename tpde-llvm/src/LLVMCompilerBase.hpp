@@ -5020,6 +5020,18 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_intrin(
         inst->getType()->getIntegerBitWidth() > 64) {
       return false;
     }
+    if (inst->getOperand(0)->getType()->getIntegerBitWidth() == 128) {
+      ValueRef lhs = this->val_ref(inst->getOperand(0));
+      ValueRef rhs = this->val_ref(inst->getOperand(1));
+      ValueRef res = this->result_ref(inst);
+      if (intrin_id == llvm::Intrinsic::scmp) {
+        return derived()->encode_scmpi128(
+            lhs.part(0), lhs.part(1), rhs.part(0), rhs.part(1), res.part(0));
+      } else {
+        return derived()->encode_ucmpi128(
+            lhs.part(0), lhs.part(1), rhs.part(0), rhs.part(1), res.part(0));
+      }
+    }
     [[fallthrough]];
   case llvm::Intrinsic::umin:
   case llvm::Intrinsic::umax:
@@ -5029,8 +5041,34 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_intrin(
     if (!ty->isIntegerTy()) {
       return false;
     }
+
+    ValueRef lhs_ref = this->val_ref(inst->getOperand(0));
+    ValueRef rhs_ref = this->val_ref(inst->getOperand(1));
+    ValueRef res = this->result_ref(inst);
+
     const auto width = ty->getIntegerBitWidth();
-    if (width > 64) {
+    if (width == 128) {
+      using EncodeFnTy = bool (Derived::*)(GenericValuePart &&,
+                                           GenericValuePart &&,
+                                           GenericValuePart &&,
+                                           GenericValuePart &&,
+                                           ValuePart &&,
+                                           ValuePart &&);
+      EncodeFnTy encode_fn = nullptr;
+      switch (intrin_id) {
+      case llvm::Intrinsic::umin: encode_fn = &Derived::encode_umini128; break;
+      case llvm::Intrinsic::umax: encode_fn = &Derived::encode_umaxi128; break;
+      case llvm::Intrinsic::smin: encode_fn = &Derived::encode_smini128; break;
+      case llvm::Intrinsic::smax: encode_fn = &Derived::encode_smaxi128; break;
+      default: TPDE_UNREACHABLE("invalid intrinsic");
+      }
+      return (derived()->*encode_fn)(lhs_ref.part(0),
+                                     lhs_ref.part(1),
+                                     rhs_ref.part(0),
+                                     rhs_ref.part(1),
+                                     res.part(0),
+                                     res.part(1));
+    } else if (width > 64) {
       return false;
     }
 
@@ -5038,8 +5076,6 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_intrin(
                 intrin_id == llvm::Intrinsic::smin ||
                 intrin_id == llvm::Intrinsic::smax;
 
-    ValueRef lhs_ref = this->val_ref(inst->getOperand(0));
-    ValueRef rhs_ref = this->val_ref(inst->getOperand(1));
     ValuePartRef lhs = lhs_ref.part(0);
     ValuePartRef rhs = rhs_ref.part(0);
     if (width != 32 && width != 64) {
@@ -5048,7 +5084,6 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_intrin(
       rhs = std::move(rhs).into_extended(sign, width, dst_width);
     }
 
-    ValueRef res = this->result_ref(inst);
     using EncodeFnTy = bool (Derived::*)(
         GenericValuePart &&, GenericValuePart &&, ValuePart &&);
     EncodeFnTy encode_fn = nullptr;

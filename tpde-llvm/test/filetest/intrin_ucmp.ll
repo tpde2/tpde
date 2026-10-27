@@ -92,3 +92,27 @@ define i64 @ucmpi64(i64 %0, i64 %1) {
   %res = call i64 @llvm.ucmp(i64 %0, i64 %1)
   ret i64 %res
 }
+
+define i64 @ucmpi128_64(i128 %0, i128 %1) {
+; X64-LABEL: <ucmpi128_64>:
+; X64:         cmp rdx, rdi
+; X64-NEXT:    mov rax, rcx
+; X64-NEXT:    sbb rax, rsi
+; X64-NEXT:    setb al
+; X64-NEXT:    cmp rdi, rdx
+; X64-NEXT:    sbb rsi, rcx
+; X64-NEXT:    sbb al, 0x0
+; X64-NEXT:    movsx rax, al
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <ucmpi128_64>:
+; ARM64:         cmp x2, x0
+; ARM64-NEXT:    sbcs xzr, x3, x1
+; ARM64-NEXT:    cset x4, lo
+; ARM64-NEXT:    cmp x0, x2
+; ARM64-NEXT:    sbcs xzr, x1, x3
+; ARM64-NEXT:    csinv x0, x4, xzr, hs
+; ARM64-NEXT:    ret
+  %res = call i64 @llvm.ucmp(i128 %0, i128 %1)
+  ret i64 %res
+}

@@ -74,3 +74,24 @@ define i64 @umaxi64(i64 %0, i64 %1) {
   %res = call i64 @llvm.umax.i64(i64 %0, i64 %1)
   ret i64 %res
 }
+
+define i128 @umaxi128(i128 %0, i128 %1) {
+; X64-LABEL: <umaxi128>:
+; X64:         cmp rdx, rdi
+; X64-NEXT:    mov rax, rcx
+; X64-NEXT:    sbb rax, rsi
+; X64-NEXT:    cmovb rdx, rdi
+; X64-NEXT:    cmovb rcx, rsi
+; X64-NEXT:    mov rax, rdx
+; X64-NEXT:    mov rdx, rcx
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <umaxi128>:
+; ARM64:         cmp x2, x0
+; ARM64-NEXT:    sbcs xzr, x3, x1
+; ARM64-NEXT:    csel x0, x0, x2, lo
+; ARM64-NEXT:    csel x1, x1, x3, lo
+; ARM64-NEXT:    ret
+  %res = call i128 @llvm.umax.i128(i128 %0, i128 %1)
+  ret i128 %res
+}

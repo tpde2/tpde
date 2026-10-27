@@ -246,17 +246,23 @@ u64 TARGET_V1 rori64(u64 a, u64 c) { return c ? (a >> (c&63) | a << (64 - (c&63)
 
 u32 TARGET_V1 smini32(u32 a, u32 b) { return (i32)a < (i32)b ? a : b; }
 u64 TARGET_V1 smini64(u64 a, u64 b) { return (i64)a < (i64)b ? a : b; }
+u128 TARGET_V1 smini128(u128 a, u128 b) { return (i128)a < (i128)b ? a : b; }
 u32 TARGET_V1 umini32(u32 a, u32 b) { return a < b ? a : b; }
 u64 TARGET_V1 umini64(u64 a, u64 b) { return a < b ? a : b; }
+u128 TARGET_V1 umini128(u128 a, u128 b) { return a < b ? a : b; }
 u32 TARGET_V1 smaxi32(u32 a, u32 b) { return (i32)a > (i32)b ? a : b; }
 u64 TARGET_V1 smaxi64(u64 a, u64 b) { return (i64)a > (i64)b ? a : b; }
+u128 TARGET_V1 smaxi128(u128 a, u128 b) { return (i128)a > (i128)b ? a : b; }
 u32 TARGET_V1 umaxi32(u32 a, u32 b) { return a > b ? a : b; }
 u64 TARGET_V1 umaxi64(u64 a, u64 b) { return a > b ? a : b; }
+u128 TARGET_V1 umaxi128(u128 a, u128 b) { return a > b ? a : b; }
 
 i64 TARGET_V1 scmpi32(i32 a, i32 b) { return a < b ? -1 : a > b; }
 i64 TARGET_V1 ucmpi32(u32 a, u32 b) { return a < b ? -1 : a > b; }
 i64 TARGET_V1 scmpi64(i64 a, i64 b) { return a < b ? -1 : a > b; }
 i64 TARGET_V1 ucmpi64(u64 a, u64 b) { return a < b ? -1 : a > b; }
+i64 TARGET_V1 scmpi128(i128 a, i128 b) { return a < b ? -1 : a > b; }
+i64 TARGET_V1 ucmpi128(u128 a, u128 b) { return a < b ? -1 : a > b; }
 
 u16 TARGET_V1 bswapi16(u16 a) { return __builtin_bswap16(a); }
 u32 TARGET_V1 bswapi32(u32 a) { return __builtin_bswap32(a); }
