@@ -5465,8 +5465,8 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_is_fpclass(
     IS_NAN = SIGNALING_NAN | QUIET_NAN,
     IS_INF = NEG_INF | POS_INF,
     IS_NORM = NEG_NORM | POS_NORM,
-    IS_FINITE =
-        NEG_NORM | NEG_SUBNORM | NEG_ZERO | POS_ZERO | POS_SUBNORM | POS_NORM,
+    IS_FINITE = NEG_NORM | NEG_SUBNORM | NEG_ZERO | POS_ZERO | POS_SUBNORM |
+        POS_NORM,
   };
 
   auto [res_vr, res_ref] = this->result_ref_single(inst);

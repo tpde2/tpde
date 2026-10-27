@@ -310,11 +310,11 @@ struct CompilerX64 : BaseTy<Adaptor, Derived, Config> {
     CPU_AVX512VL = (1 << 18),
 
     CPU_V2 = CPU_BASELINE | CPU_CMPXCHG16B | CPU_POPCNT | CPU_SSE3 | CPU_SSSE3 |
-             CPU_SSE4_1 | CPU_SSE4_2,
+        CPU_SSE4_1 | CPU_SSE4_2,
     CPU_V3 = CPU_V2 | CPU_AVX | CPU_AVX2 | CPU_BMI1 | CPU_BMI2 | CPU_F16C |
-             CPU_FMA | CPU_LZCNT | CPU_MOVBE,
+        CPU_FMA | CPU_LZCNT | CPU_MOVBE,
     CPU_V4 = CPU_V3 | CPU_AVX512F | CPU_AVX512BW | CPU_AVX512CD | CPU_AVX512DQ |
-             CPU_AVX512VL,
+        CPU_AVX512VL,
   };
 
   CPU_FEATURES cpu_feats = CPU_BASELINE;
