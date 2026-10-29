@@ -3481,11 +3481,11 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_icmp_vector(
     auto *vec_ty = llvm::cast<llvm::FixedVectorType>(lhs->getType());
     unsigned nelem = vec_ty->getNumElements();
     auto [elem_ty, _] = this->adaptor->lower_type(vec_ty->getElementType());
+    unsigned ext_src_width = 0;
+    bool ext_sign = icmp->isSigned();
     switch (elem_ty) {
-    case LLVMBasicValType::i8:
-    case LLVMBasicValType::i16:
-      // TODO: support i1/i8/i16 vector icmp, needs element extension.
-      return false;
+    case LLVMBasicValType::i8: ext_src_width = 8, ty_idx = 7; break;
+    case LLVMBasicValType::i16: ext_src_width = 16, ty_idx = 7; break;
     case LLVMBasicValType::i32: ty_idx = 7; break;
     case LLVMBasicValType::i64:
     case LLVMBasicValType::ptr: ty_idx = 8; break;
@@ -3506,6 +3506,10 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_icmp_vector(
     for (unsigned i = 0; i != nelem; i++) {
       derived()->extract_element(lhs_vr_disowned, i, elem_ty, e_lhs);
       derived()->extract_element(rhs_vr_disowned, i, elem_ty, e_rhs);
+      if (ext_src_width) {
+        e_lhs = std::move(e_lhs).into_extended(ext_sign, ext_src_width, 32);
+        e_rhs = std::move(e_rhs).into_extended(ext_sign, ext_src_width, 32);
+      }
       (derived()->*fn)(std::move(e_lhs), std::move(e_rhs), std::move(tmp));
       derived()->insert_element(res, i, LLVMBasicValType::i1, std::move(tmp));
     }
