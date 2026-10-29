@@ -9,8 +9,9 @@ define void @inlineasm(i32 %a, i32 %b, ptr %ptr) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
+; X64-NEXT:    lea rax, [rbp - 0x29]
 ; X64-NEXT:    int3
-; X64-NEXT:    mov dword ptr [rbp - 0x2c], esi
+; X64-NEXT:    mov dword ptr [rbp - 0x30], esi
 ; X64-NEXT:    mov qword ptr [rbp - 0x38], rdx
 ; X64-NEXT:    mov eax, edi
 ; X64-NEXT:    mov rsi, rbx
@@ -22,7 +23,7 @@ define void @inlineasm(i32 %a, i32 %b, ptr %ptr) {
 ; X64-NEXT:    mov dword ptr [rbx + 0x8], ecx
 ; X64-NEXT:    mov dword ptr [rbx + 0xc], edx
 ; X64-NEXT:    mov eax, edi
-; X64-NEXT:    mov ecx, dword ptr [rbp - 0x2c]
+; X64-NEXT:    mov ecx, dword ptr [rbp - 0x30]
 ; X64-NEXT:    mov rsi, rbx
 ; X64-NEXT:    cpuid
 ; X64-NEXT:    xchg rbx, rsi
@@ -37,11 +38,14 @@ define void @inlineasm(i32 %a, i32 %b, ptr %ptr) {
 ; X64-NEXT:    pop rbx
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
+  %alloca = alloca i8
+
   call void asm "", "~{dirflag},~{fpsr},~{flags}"()
   call void asm sideeffect "", "~{dirflag},~{fpsr},~{flags}"()
   call void asm unwind "", "~{dirflag},~{fpsr},~{flags}"()
   call void asm sideeffect "", "~{memory},~{dirflag},~{fpsr},~{flags}"()
   call void asm unwind "", "~{memory},~{dirflag},~{fpsr},~{flags}"()
+  call void asm sideeffect "", "r,~{memory}"(ptr %alloca)
   call void asm sideeffect "int3", "~{dirflag},~{fpsr},~{flags}"()
 
   %cpuid = call { i32, i32, i32, i32 } asm "movq\09%rbx, %rsi\0A\09cpuid\0A\09xchgq\09%rbx, %rsi\0A\09", "={ax},={si},={cx},={dx},{ax},~{dirflag},~{fpsr},~{flags}"(i32 %a)

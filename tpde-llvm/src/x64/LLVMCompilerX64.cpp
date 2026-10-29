@@ -316,6 +316,13 @@ bool LLVMCompilerX64::compile_inline_asm(const llvm::CallBase *call) {
     ASM(XGETBV);
     return true;
   }
+  if (inline_asm->getAsmString() == "" &&
+      inline_asm->getConstraintString() == "r,~{memory}" &&
+      call->getArgOperand(0)->getType()->isPointerTy()) {
+    // Rust black_box.
+    this->val_ref(call->getArgOperand(0)).part(0).load_to_reg();
+    return true;
+  }
 
   if (inline_asm->isAlignStack() || !call->getType()->isVoidTy() ||
       call->arg_size() != 0) {

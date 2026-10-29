@@ -6,11 +6,18 @@
 
 define void @inlineasm() {
 ; ARM64-LABEL: <inlineasm>:
-; ARM64:         ret
+; ARM64:         stp x29, x30, [sp, #-0xb0]!
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    add x0, x29, #0xa0
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
+; ARM64-NEXT:    ret
+  %alloca = alloca i8
+
   call void asm "", ""()
   call void asm sideeffect "", ""()
   call void asm unwind "", ""()
   call void asm sideeffect "", "~{memory}"()
   call void asm unwind "", "~{memory}"()
+  call void asm sideeffect "", "r,~{memory}"(ptr %alloca)
   ret void
 }

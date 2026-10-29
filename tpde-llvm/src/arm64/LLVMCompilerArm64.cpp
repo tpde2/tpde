@@ -254,6 +254,14 @@ bool LLVMCompilerArm64::compile_cond_br(const llvm::Instruction *inst,
 
 bool LLVMCompilerArm64::compile_inline_asm(const llvm::CallBase *call) {
   auto inline_asm = llvm::cast<llvm::InlineAsm>(call->getCalledOperand());
+  if (inline_asm->getAsmString() == "" &&
+      inline_asm->getConstraintString() == "r,~{memory}" &&
+      call->getArgOperand(0)->getType()->isPointerTy()) {
+    // Rust black_box.
+    this->val_ref(call->getArgOperand(0)).part(0).load_to_reg();
+    return true;
+  }
+
   // TODO: handle inline assembly that actually does something
   if (!inline_asm->getAsmString().empty() || inline_asm->isAlignStack() ||
       !call->getType()->isVoidTy() || call->arg_size() != 0) {
