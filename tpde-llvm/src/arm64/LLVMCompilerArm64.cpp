@@ -156,7 +156,7 @@ void LLVMCompilerArm64::extract_element(ValueRef &vec_vr,
 
   tpde::ValueAssignment *va = vec_vr.assignment();
   u32 elem_sz = this->adaptor->basic_ty_part_size(ty);
-  if (elem_sz == va->max_part_size) {
+  if (ty == LLVMBasicValType::i1 || elem_sz == va->max_part_size) {
     // We can't handle the scalarized case better than the generic impl.
     return LLVMCompilerBase::extract_element(vec_vr, idx, ty, out);
   }

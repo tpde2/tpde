@@ -2846,20 +2846,23 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_int_trunc(
 template <typename Adaptor, typename Derived, typename Config>
 bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_int_ext(
     const llvm::Instruction *inst, const ValInfo &, u64 sign) {
-  if (!inst->getType()->isIntegerTy()) {
-    return false;
-  }
-
   auto *src_val = inst->getOperand(0);
+  ValueRef src_ref = this->val_ref(src_val);
+  ValueRef res = this->result_ref(inst);
 
-  unsigned src_width = src_val->getType()->getIntegerBitWidth();
-  unsigned dst_width = inst->getType()->getIntegerBitWidth();
-  assert(dst_width > src_width);
+  if (inst->getType()->isIntegerTy()) {
+    unsigned src_width = src_val->getType()->getIntegerBitWidth();
+    unsigned dst_width = inst->getType()->getIntegerBitWidth();
+    assert(dst_width > src_width);
+    assert(dst_width <= 128 && "illegal type should be rejected earlier");
 
-  auto src_ref = this->val_ref(src_val);
-  auto res = this->result_ref(inst);
+    if (src_width > 64) {
+      res.part(0).set_value(src_ref.part(0));
+      res.part(1).set_value(
+          src_ref.part(1).into_extended(sign, src_width - 64, 64));
+      return true;
+    }
 
-  if (src_width <= 64) {
     ValuePartRef low = src_ref.part(0);
     if (src_width < 64) {
       unsigned ext_width = dst_width <= 64 ? dst_width : 64;
@@ -2882,14 +2885,31 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_int_ext(
     return true;
   }
 
-  if (src_width < 128 && dst_width <= 128) {
-    res.part(0).set_value(src_ref.part(0));
-    res.part(1).set_value(
-        src_ref.part(1).into_extended(sign, src_width - 64, 64));
-    return true;
+  auto *src_vty = llvm::cast<llvm::FixedVectorType>(src_val->getType());
+  auto *dst_vty = llvm::cast<llvm::FixedVectorType>(inst->getType());
+  unsigned src_width = src_vty->getElementType()->getIntegerBitWidth();
+  unsigned dst_width = dst_vty->getElementType()->getIntegerBitWidth();
+  unsigned nelem = src_vty->getNumElements();
+  assert(dst_width > src_width);
+  assert(dst_width <= 64 && "illegal type should be rejected earlier");
+
+  auto dst_elem_ty = this->adaptor->lower_type(dst_vty->getElementType()).first;
+  LLVMBasicValType src_elem_ty;
+  if (src_vty->getElementType()->isIntegerTy(1)) {
+    src_elem_ty = LLVMBasicValType::i1;
+  } else {
+    src_elem_ty = this->adaptor->lower_type(src_vty->getElementType()).first;
   }
 
-  return false;
+  ValueRef src_ref_disowned = src_ref.disowned();
+  ValuePartRef elem{this, LLVMAdaptor::basic_ty_part_bank(src_elem_ty)};
+  for (unsigned i = 0; i != nelem; i++) {
+    derived()->extract_element(src_ref_disowned, i, src_elem_ty, elem);
+    elem = std::move(elem).into_extended(sign, src_width, dst_width);
+    derived()->insert_element(res, i, dst_elem_ty, std::move(elem));
+  }
+
+  return true;
 }
 
 template <typename Adaptor, typename Derived, typename Config>
@@ -3046,6 +3066,20 @@ void LLVMCompilerBase<Adaptor, Derived, Config>::extract_element(
     assert(cst->getType()->isVectorTy());
     auto *elem = cst->getAggregateElement(idx);
     out.set_value(this, val_ref_constant(elem, 0));
+    return;
+  }
+
+  if (ty == LLVMBasicValType::i1) {
+    // i1 vectors are integers, extracting an element is just a shift.
+    assert(vec_vr.assignment()->part_count == 1);
+    assert(idx < 64);
+    // index 0 extract occurs so often that is it worth to have a special case.
+    if (idx == 0) {
+      out.set_value(this, vec_vr.part(0));
+    } else {
+      derived()->encode_shri64(
+          vec_vr.part(0), ValuePartRef{this, idx, 8, Config::GP_BANK}, out);
+    }
     return;
   }
 
