@@ -806,14 +806,26 @@ void GenerationState::handle_end_of_block(llvm::raw_ostream &os,
       auto name = target->reg_name_lower(reg);
       auto bank = target->reg_bank(reg);
       auto asm_op_ref_it = asm_operand_refs.find(reg);
-      if (asm_op_ref_it != asm_operand_refs.end()) {
+      // Single reference to AsmOperand => try to reuse.
+      if (asm_op_ref_it != asm_operand_refs.end() &&
+          operand_ref_counts[asm_op_ref_it->second] == 1) {
         auto param = asm_op_ref_it->second;
         os << "  try_salvage_or_materialize(" << param << ", scratch_" << name
            << ", " << bank << ", " << size << ");\n";
-      } else if (used_regs[reg] > 0) {
+        continue;
+      }
+      if (used_regs[reg] > 0) {
         os << "  scratch_" << name << ".cur_reg_or_alloc(derived());\n";
       } else {
         os << "  scratch_" << name << ".alloc(RegBank(" << bank << "));\n";
+      }
+      // Value still in AsmOperand => copy.
+      if (asm_op_ref_it != asm_operand_refs.end()) {
+        auto param = asm_op_ref_it->second;
+        os << "  derived()->mov(scratch_" << name
+           << ".cur_reg(), derived()->gval_as_reg(" << param << "), " << size
+           << ");\n";
+        operand_ref_counts[param] -= 1;
       }
     }
 

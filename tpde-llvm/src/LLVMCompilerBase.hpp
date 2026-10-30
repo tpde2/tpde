@@ -4893,6 +4893,8 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_intrin(
   }
   case llvm::Intrinsic::minnum:
   case llvm::Intrinsic::maxnum:
+  case llvm::Intrinsic::minimumnum:
+  case llvm::Intrinsic::maximumnum:
   case llvm::Intrinsic::copysign: {
     // Floating-point intrinsics with two operands
     using EncodeFnTy = bool (Derived::*)(
@@ -4905,6 +4907,8 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_intrin(
         using enum llvm::Intrinsic::IndependentIntrinsics;
       case minnum: fn = &Derived::encode_minnumf32; break;
       case maxnum: fn = &Derived::encode_maxnumf32; break;
+      case minimumnum: fn = &Derived::encode_minimumnumf32; break;
+      case maximumnum: fn = &Derived::encode_maximumnumf32; break;
       case copysign: fn = &Derived::encode_copysignf32; break;
       default: TPDE_UNREACHABLE("invalid binary fp intrinsic");
       }
@@ -4914,6 +4918,8 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_intrin(
         using enum llvm::Intrinsic::IndependentIntrinsics;
       case minnum: fn = &Derived::encode_minnumf64; break;
       case maxnum: fn = &Derived::encode_maxnumf64; break;
+      case minimumnum: fn = &Derived::encode_minimumnumf64; break;
+      case maximumnum: fn = &Derived::encode_maximumnumf64; break;
       case copysign: fn = &Derived::encode_copysignf64; break;
       default: TPDE_UNREACHABLE("invalid binary fp intrinsic");
       }

@@ -556,11 +556,10 @@ double TARGET_V1 maxnumf64(double a, double b) { return __builtin_fmax(a, b); }
 //double TARGET_V1 minimumf64(double a, double b) { return __builtin_fminimum(a, b); }
 //float TARGET_V1 maximumf32(float a, float b) { return __builtin_fmaximumf(a, b); }
 //double TARGET_V1 maximumf64(double a, double b) { return __builtin_fmaximum(a, b); }
-// TODO: enable in C23 mode when Clang exposes llvm.minimumnum/maximumnum
-//float TARGET_V1 minimumnumf32(float a, float b) { return __builtin_fminimum_numf(a, b); }
-//double TARGET_V1 minimumnumf64(double a, double b) { return __builtin_fminimum_num(a, b); }
-//float TARGET_V1 maximumnumf32(float a, float b) { return __builtin_fmaximum_numf(a, b); }
-//double TARGET_V1 maximumnumf64(double a, double b) { return __builtin_fmaximum_num(a, b); }
+float TARGET_V1 minimumnumf32(float a, float b) { return __builtin_fminimum_numf(a, b); }
+double TARGET_V1 minimumnumf64(double a, double b) { return __builtin_fminimum_num(a, b); }
+float TARGET_V1 maximumnumf32(float a, float b) { return __builtin_fmaximum_numf(a, b); }
+double TARGET_V1 maximumnumf64(double a, double b) { return __builtin_fmaximum_num(a, b); }
 
 // --------------------------
 // float conversions
