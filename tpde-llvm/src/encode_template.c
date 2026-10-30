@@ -378,10 +378,6 @@ i64 TARGET_V1 sat_sub_i64(i64 a, i64 b) { i64 r; return __builtin_sub_overflow(a
 // vector casts
 // --------------------------
 
-v8i8 TARGET_V1 trunc_v8i16_8(v8i16 v) { return __builtin_convertvector(v, v8i8); }
-v4i16 TARGET_V1 trunc_v4i32_16(v4i32 v) { return __builtin_convertvector(v, v4i16); }
-v2i32 TARGET_V1 trunc_v2i64_32(v2i64 v) { return __builtin_convertvector(v, v2i32); }
-
 u8 TARGET_V1 trunc_v8i8_1(v8i8 a) { return (union { v8i1 v; u8 r; }) {.v = __builtin_convertvector((a & 1) != 0, v8i1)}.r; }
 u8 TARGET_V1 trunc_v4i16_1(v4i16 a) { return (union { v4i1 v; u8 r; }) {.v = __builtin_convertvector((a & 1) != 0, v4i1)}.r; }
 u8 TARGET_V1 trunc_v2i32_1(v2i32 a) { return (union { v2i1 v; u8 r; }) {.v = __builtin_convertvector((a & 1) != 0, v2i1)}.r; }

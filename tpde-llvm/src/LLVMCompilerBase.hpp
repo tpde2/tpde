@@ -2808,32 +2808,39 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_int_trunc(
     case v8i16: encode_fn = &Derived::encode_trunc_v8i16_1; break;
     case v4i32: encode_fn = &Derived::encode_trunc_v4i32_1; break;
     case v2i64: encode_fn = &Derived::encode_trunc_v2i64_1; break;
-    default: return false;
+    default: encode_fn = nullptr; break;
     }
-    return (derived()->*encode_fn)(src_vr.part(0), res_vr.part(0));
+    if (encode_fn) {
+      return (derived()->*encode_fn)(src_vr.part(0), res_vr.part(0));
+    }
+    break;
   }
-  case v8i8:
-  case v4i16:
-  case v2i32: {
-    auto dst_width = inst->getType()->getScalarType()->getIntegerBitWidth();
-    auto src_width = src->getType()->getScalarType()->getIntegerBitWidth();
-    // With the currently legal vector types, we only support halving vectors.
-    if (dst_width * 2 != src_width) {
-      return false;
-    }
+  default: break;
+  }
 
-    using EncodeFnTy = bool (Derived::*)(GenericValuePart &&, ValuePart &&);
-    EncodeFnTy encode_fn = nullptr;
-    switch (dst_width) {
-    case 8: encode_fn = &Derived::encode_trunc_v8i16_8; break;
-    case 16: encode_fn = &Derived::encode_trunc_v4i32_16; break;
-    case 32: encode_fn = &Derived::encode_trunc_v2i64_32; break;
-    default: return false;
+  if (auto *src_ty = llvm::dyn_cast<llvm::FixedVectorType>(src->getType())) {
+    assert(src_ty->getElementType()->isIntegerTy());
+    auto [src_elem_ty, _] = this->adaptor->lower_type(src_ty->getElementType());
+    auto *dst_ty = llvm::cast<llvm::FixedVectorType>(inst->getType());
+    auto *dst_ety = dst_ty->getElementType();
+    LLVMBasicValType dst_elem_ty;
+    if (dst_ety->isIntegerTy(1)) {
+      dst_elem_ty = LLVMBasicValType::i1;
+    } else {
+      dst_elem_ty = this->adaptor->lower_type(dst_ety).first;
     }
-    return (derived()->*encode_fn)(src_vr.part(0), res_vr.part(0));
+    unsigned nelem = src_ty->getNumElements();
+
+    ValueRef src_vr_disowned = src_vr.disowned();
+    ValuePartRef elem{this, LLVMAdaptor::basic_ty_part_bank(src_elem_ty)};
+    for (unsigned i = 0; i != nelem; i++) {
+      derived()->extract_element(src_vr_disowned, i, src_elem_ty, elem);
+      derived()->insert_element(res_vr, i, dst_elem_ty, std::move(elem));
+    }
+    return true;
   }
-  default: return false;
-  }
+
+  return false;
 }
 
 template <typename Adaptor, typename Derived, typename Config>
