@@ -364,7 +364,7 @@ public:
   /// Allocate a static stack slot.
   i32 allocate_stack_slot(u32 size);
   /// Free a static stack slot.
-  void free_stack_slot(u32 slot, u32 size);
+  void free_stack_slot(i32 slot, u32 size);
 
   /// @}
 
@@ -1126,7 +1126,7 @@ i32 CompilerBase<Adaptor, Derived, Config>::allocate_stack_slot(u32 size) {
 }
 
 template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>
-void CompilerBase<Adaptor, Derived, Config>::free_stack_slot(u32 slot,
+void CompilerBase<Adaptor, Derived, Config>::free_stack_slot(i32 slot,
                                                              u32 size) {
   if (size == 0) [[unlikely]] {
     assert(slot == 0 && "unexpected slot for zero-sized stack-slot?");
