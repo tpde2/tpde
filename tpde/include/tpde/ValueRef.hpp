@@ -128,6 +128,7 @@ public:
 
   ValuePartRef part(unsigned part) TPDE_LIFETIMEBOUND {
     if (has_assignment()) {
+      assert(part < state.a.assignment->part_count);
       return ValuePartRef{
           compiler, local_idx(), state.a.assignment, part, is_owned()};
     }
