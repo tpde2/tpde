@@ -492,7 +492,7 @@ public:
   void insert_element(ValueRef &vec_vr,
                       unsigned idx,
                       LLVMBasicValType ty,
-                      GenericValuePart &&el);
+                      ValuePart &&el);
   bool compile_extract_element(const llvm::Instruction *, const ValInfo &, u64);
   bool compile_insert_element(const llvm::Instruction *, const ValInfo &, u64);
   bool compile_shuffle_vector(const llvm::Instruction *, const ValInfo &, u64);
@@ -3117,10 +3117,7 @@ void LLVMCompilerBase<Adaptor, Derived, Config>::extract_element(
 
 template <typename Adaptor, typename Derived, typename Config>
 void LLVMCompilerBase<Adaptor, Derived, Config>::insert_element(
-    ValueRef &vec_vr,
-    unsigned idx,
-    LLVMBasicValType ty,
-    GenericValuePart &&el) {
+    ValueRef &vec_vr, unsigned idx, LLVMBasicValType ty, ValuePart &&el) {
   tpde::ValueAssignment *va = vec_vr.assignment();
   u32 elem_sz = this->adaptor->basic_ty_part_size(ty);
 
@@ -3131,11 +3128,14 @@ void LLVMCompilerBase<Adaptor, Derived, Config>::insert_element(
     if (!vec_part.assignment().stack_valid() &&
         !vec_part.assignment().register_valid()) {
       AsmReg dst_reg = vec_part.alloc_reg(); // Uninitialized
-      derived()->generate_raw_bfiz(dst_reg, derived()->gval_as_reg(el), idx, 1);
+      derived()->generate_raw_bfiz(
+          dst_reg, el.cur_reg_or_load(derived()), idx, 1);
     } else {
       AsmReg dst_reg = vec_part.load_to_reg();
-      derived()->generate_raw_bfi(dst_reg, derived()->gval_as_reg(el), idx, 1);
+      derived()->generate_raw_bfi(
+          dst_reg, el.cur_reg_or_load(derived()), idx, 1);
     }
+    el.reset(this);
     return;
   }
 
@@ -3163,15 +3163,34 @@ void LLVMCompilerBase<Adaptor, Derived, Config>::insert_element(
 
   switch (ty) {
     using enum LLVMBasicValType;
-  case i8: derived()->encode_storei8(std::move(addr), std::move(el)); break;
-  case i16: derived()->encode_storei16(std::move(addr), std::move(el)); break;
-  case i32: derived()->encode_storei32(std::move(addr), std::move(el)); break;
+  case i8:
+    derived()->encode_storei8(std::move(addr),
+                              ValuePartRef{this, std::move(el)});
+    break;
+  case i16:
+    derived()->encode_storei16(std::move(addr),
+                               ValuePartRef{this, std::move(el)});
+    break;
+  case i32:
+    derived()->encode_storei32(std::move(addr),
+                               ValuePartRef{this, std::move(el)});
+    break;
   case i64:
-  case ptr: derived()->encode_storei64(std::move(addr), std::move(el)); break;
-  case f32: derived()->encode_storef32(std::move(addr), std::move(el)); break;
-  case f64: derived()->encode_storef64(std::move(addr), std::move(el)); break;
+  case ptr:
+    derived()->encode_storei64(std::move(addr),
+                               ValuePartRef{this, std::move(el)});
+    break;
+  case f32:
+    derived()->encode_storef32(std::move(addr),
+                               ValuePartRef{this, std::move(el)});
+    break;
+  case f64:
+    derived()->encode_storef64(std::move(addr),
+                               ValuePartRef{this, std::move(el)});
+    break;
   default: TPDE_UNREACHABLE("unexpected vector element type");
   }
+  el.reset(this);
 }
 
 template <typename Adaptor, typename Derived, typename Config>

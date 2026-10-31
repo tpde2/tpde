@@ -77,7 +77,7 @@ struct LLVMCompilerArm64 : tpde::a64::CompilerA64<LLVMAdaptor,
   void insert_element(ValueRef &vec_vr,
                       unsigned idx,
                       LLVMBasicValType ty,
-                      GenericValuePart el);
+                      ValuePart &&el);
 
   bool compile_cond_br(const llvm::Instruction *, const ValInfo &, u64);
   bool compile_inline_asm(const llvm::CallBase *);
@@ -180,7 +180,7 @@ void LLVMCompilerArm64::extract_element(ValueRef &vec_vr,
 void LLVMCompilerArm64::insert_element(ValueRef &vec_vr,
                                        unsigned idx,
                                        LLVMBasicValType ty,
-                                       GenericValuePart el) {
+                                       ValuePart &&el) {
   tpde::ValueAssignment *va = vec_vr.assignment();
   u32 elem_sz = this->adaptor->basic_ty_part_size(ty);
   if (ty == LLVMBasicValType::i1 || elem_sz == va->max_part_size) {
@@ -204,7 +204,7 @@ void LLVMCompilerArm64::insert_element(ValueRef &vec_vr,
     vec_ref.alloc_reg(); // Uninitialized
   }
   AsmReg vec_reg = vec_ref.cur_reg();
-  AsmReg src_reg = this->gval_as_reg(el);
+  AsmReg src_reg = el.cur_reg_or_load(this);
   switch (ty) {
     using enum LLVMBasicValType;
   case i8: ASM(INSbw, vec_reg, part_idx, src_reg); break;
@@ -218,6 +218,7 @@ void LLVMCompilerArm64::insert_element(ValueRef &vec_vr,
   }
 
   vec_ref.set_modified();
+  el.reset(this);
 }
 
 bool LLVMCompilerArm64::compile_cond_br(const llvm::Instruction *inst,
