@@ -48,15 +48,21 @@ static unsigned reg_size_bytes(llvm::MachineFunction *func,
   return target_reg_info->getRegSizeInBits(reg, mach_reg_info) / 8;
 }
 
+struct ArgParam {
+  std::string name;
+  unsigned ref_count;
+};
+
 struct GenerationState {
   llvm::MachineFunction *func;
   EncodingTarget *target;
-  std::vector<std::string> param_names{};
+  std::vector<ArgParam> arg_params{};
   /// Map from (used) register ID to result index (or none for ScratchReg).
   /// Used to reuse result ValueParts and distinguish these. Stored off-by-one.
   llvm::DenseMap<unsigned, unsigned> used_regs{};
-  llvm::DenseMap<unsigned, std::string> asm_operand_refs{};
-  std::unordered_map<std::string, unsigned> operand_ref_counts{};
+  /// Map from register id to arg_params entry, if this is currently mapped to a
+  /// parameter.
+  llvm::DenseMap<unsigned, unsigned> asm_operand_refs{};
   /// Mapping from register id to the last instruction defining the return
   /// register *iff the register is unused otherwise*. Empty for functions with
   /// multiple blocks. Used for eliminating useless moves at function end.
@@ -248,7 +254,7 @@ bool generate_inst(std::string &buf,
     auto dst_id = state.target->reg_id_from_mc_reg(dst_op.getReg());
     if (auto it = state.asm_operand_refs.find(src_id);
         it != state.asm_operand_refs.end()) {
-      state.operand_ref_counts[it->second]++;
+      state.arg_params[it->second].ref_count += 1;
       state.asm_operand_refs[dst_id] = it->second;
       if (src_op.isKill()) {
         llvm::raw_string_ostream os(buf);
@@ -323,7 +329,7 @@ bool generate_inst(std::string &buf,
           skip = true;
           break;
         }
-        const auto &op_name = value_map_it->second;
+        const auto &op_name = state.arg_params[value_map_it->second].name;
 
         std::string opt = std::format("{}({}{}{})",
                                       cond_entry.func,
@@ -486,7 +492,11 @@ bool generate_inst(std::string &buf,
         continue;
       }
 
-      auto asm_op_name = state.asm_operand_refs.lookup(reg_id);
+      ArgParam *asm_op_param = nullptr;
+      auto asm_op_ref_it = state.asm_operand_refs.find(reg_id);
+      if (asm_op_ref_it != state.asm_operand_refs.end()) {
+        asm_op_param = &state.arg_params[asm_op_ref_it->second];
+      }
 
       // TODO(ts): need to think about this
       assert(!use.isEarlyClobber());
@@ -499,7 +509,7 @@ bool generate_inst(std::string &buf,
         state.fixed_reg_conds[reg_id].emplace_back(std::format(
             "!({})&&{}", parent_conds, if_cond.empty() ? "1" : if_cond));
 
-        if (!asm_op_name.empty()) {
+        if (asm_op_param) {
           auto dst = std::format("scratch_{}.cur_reg()",
                                  state.target->reg_name_lower(reg_id));
           // TODO(ts): try to salvage the register if possible
@@ -509,7 +519,7 @@ bool generate_inst(std::string &buf,
                          8,
                          "AsmReg op{}_tmp = derived()->gval_as_reg({});",
                          use.getOperandNo(),
-                         asm_op_name);
+                         asm_op_param->name);
           state.target->generate_copy(buf,
                                       8,
                                       state.target->reg_bank(reg_id),
@@ -523,7 +533,7 @@ bool generate_inst(std::string &buf,
 
       if (!use.isTied()) {
         auto op_name = std::format("op{}", use.getOperandNo());
-        if (asm_op_name.empty()) {
+        if (!asm_op_param) {
           // TODO(ts): if this reg is also used as a def-reg
           // should we mark it as allocated here?
           state.fmt_line(buf,
@@ -558,7 +568,7 @@ bool generate_inst(std::string &buf,
                            "AsmReg {} = derived()->gval_as_reg_reuse({}, "
                            "scratch_{});",
                            op_name,
-                           asm_op_name,
+                           asm_op_param->name,
                            def_reg_name);
             handled = true;
             break;
@@ -569,7 +579,7 @@ bool generate_inst(std::string &buf,
                          8,
                          "AsmReg {} = derived()->gval_as_reg({});",
                          op_name,
-                         asm_op_name);
+                         asm_op_param->name);
         }
 
         use_ops.push_back(std::move(op_name));
@@ -581,7 +591,7 @@ bool generate_inst(std::string &buf,
       const auto &def_reg =
           inst->getOperand(inst->findTiedOperandIdx(use.getOperandNo()));
       defs_allocated[def_idx(&def_reg)].first = true;
-      if (!asm_op_name.empty()) {
+      if (asm_op_param) {
         // asm operand => allocate register and move source operand there.
         // Try to reuse the asm operand.
         // TODO(ts): if the destination is used as a fixed
@@ -593,7 +603,7 @@ bool generate_inst(std::string &buf,
                          "scratch_{}, {}, {});\n",
                          "",
                          8,
-                         asm_op_name,
+                         asm_op_param->name,
                          state.target->reg_name_lower(reg_id),
                          state.target->reg_bank(reg_id),
                          reg_size_bytes(state.func, use.getReg()));
@@ -625,7 +635,7 @@ bool generate_inst(std::string &buf,
                          8,
                          inst_id,
                          op_idx,
-                         asm_op_name);
+                         asm_op_param->name);
           state.target->generate_copy(
               buf,
               8,
@@ -738,10 +748,11 @@ void GenerationState::kill_reg(llvm::raw_ostream &os, unsigned reg_id) {
   if (asm_op_ref_it == asm_operand_refs.end()) {
     return;
   }
-  assert(operand_ref_counts[asm_op_ref_it->second] > 0);
-  operand_ref_counts[asm_op_ref_it->second] -= 1;
-  if (operand_ref_counts[asm_op_ref_it->second] == 0) {
-    os << "    " << asm_op_ref_it->second << ".reset();\n";
+  ArgParam &param = arg_params[asm_op_ref_it->second];
+  assert(param.ref_count > 0);
+  param.ref_count -= 1;
+  if (param.ref_count == 0) {
+    os << "    " << param.name << ".reset();\n";
   }
   asm_operand_refs.erase(asm_op_ref_it);
 }
@@ -754,9 +765,8 @@ bool GenerationState::can_salvage_operand(const llvm::MachineOperand &op) {
   const auto reg_id = target->reg_id_from_mc_reg(op.getReg());
   auto asm_op_ref_it = asm_operand_refs.find(reg_id);
   assert(asm_op_ref_it != asm_operand_refs.end());
-  assert(operand_ref_counts.contains(asm_op_ref_it->second));
   // can overwrite if there are no further aliases
-  return operand_ref_counts[asm_op_ref_it->second] <= 1;
+  return arg_params[asm_op_ref_it->second].ref_count <= 1;
 }
 
 void GenerationState::handle_end_of_block(llvm::raw_ostream &os,
@@ -805,13 +815,15 @@ void GenerationState::handle_end_of_block(llvm::raw_ostream &os,
     for (auto [reg, size] : func_used_regs) {
       auto name = target->reg_name_lower(reg);
       auto bank = target->reg_bank(reg);
+      ArgParam *asm_op_param = nullptr;
       auto asm_op_ref_it = asm_operand_refs.find(reg);
+      if (asm_op_ref_it != asm_operand_refs.end()) {
+        asm_op_param = &arg_params[asm_op_ref_it->second];
+      }
       // Single reference to AsmOperand => try to reuse.
-      if (asm_op_ref_it != asm_operand_refs.end() &&
-          operand_ref_counts[asm_op_ref_it->second] == 1) {
-        auto param = asm_op_ref_it->second;
-        os << "  try_salvage_or_materialize(" << param << ", scratch_" << name
-           << ", " << bank << ", " << size << ");\n";
+      if (asm_op_param && asm_op_param->ref_count == 1) {
+        os << "  try_salvage_or_materialize(" << asm_op_param->name
+           << ", scratch_" << name << ", " << bank << ", " << size << ");\n";
         continue;
       }
       if (used_regs[reg] > 0) {
@@ -820,12 +832,11 @@ void GenerationState::handle_end_of_block(llvm::raw_ostream &os,
         os << "  scratch_" << name << ".alloc(RegBank(" << bank << "));\n";
       }
       // Value still in AsmOperand => copy.
-      if (asm_op_ref_it != asm_operand_refs.end()) {
-        auto param = asm_op_ref_it->second;
+      if (asm_op_param) {
         os << "  derived()->mov(scratch_" << name
-           << ".cur_reg(), derived()->gval_as_reg(" << param << "), " << size
-           << ");\n";
-        operand_ref_counts[param] -= 1;
+           << ".cur_reg(), derived()->gval_as_reg(" << asm_op_param->name
+           << "), " << size << ");\n";
+        asm_op_param->ref_count -= 1;
       }
     }
 
@@ -1084,23 +1095,24 @@ bool create_encode_function(llvm::MachineFunction *func,
 
   // map inputs
   {
-    unsigned idx = 0;
     for (auto it = mach_reg_info.livein_begin(),
               end = mach_reg_info.livein_end();
          it != end;
          ++it) {
-      auto name = std::format("param_{}", state.param_names.size());
-      state.param_names.push_back(std::move(name));
+      auto name = std::format("param_{}", state.arg_params.size());
+      state.arg_params.push_back(ArgParam{
+          .name = std::move(name),
+          .ref_count = 1,
+      });
 
       const auto reg_id = target->reg_id_from_mc_reg(it->first);
       state.used_regs.try_emplace(reg_id, 0);
-      state.asm_operand_refs[reg_id] = state.param_names[idx++];
-      state.operand_ref_counts[state.param_names.back()] = 1;
+      state.asm_operand_refs[reg_id] = state.arg_params.size() - 1;
 
       std::format_to(std::back_inserter(write_buf),
                      "    // Mapping {} to {}\n",
                      target->reg_name_lower(reg_id),
-                     state.param_names[idx - 1]);
+                     state.arg_params.back().name);
     }
   }
 
@@ -1206,12 +1218,12 @@ bool create_encode_function(llvm::MachineFunction *func,
 
   // handle fixed registers
   std::string fixed_reg_param_names{};
-  for (const auto &name : state.param_names) {
+  for (const auto &param : state.arg_params) {
     if (!fixed_reg_param_names.empty()) {
       fixed_reg_param_names += ", ";
     }
     fixed_reg_param_names += '&';
-    fixed_reg_param_names += name;
+    fixed_reg_param_names += param.name;
   }
 
   if (!state.fixed_reg_conds.empty() &&
@@ -1295,7 +1307,8 @@ bool create_encode_function(llvm::MachineFunction *func,
 
     if (auto it = state.asm_operand_refs.find(reg);
         it != state.asm_operand_refs.end()) {
-      os << "  try_salvage_or_materialize(" << it->second << ", scratch_"
+      const auto &param = state.arg_params[it->second];
+      os << "  try_salvage_or_materialize(" << param.name << ", scratch_"
          << name << ", " << state.target->reg_bank(reg) << ", "
          << reg_size_bytes(func, reg) << ");\n";
       state.asm_operand_refs.erase(it);
@@ -1325,9 +1338,9 @@ bool create_encode_function(llvm::MachineFunction *func,
   {
     std::string func_args;
     llvm::raw_string_ostream func_args_os(func_args);
-    for (auto &param : state.param_names) {
+    for (const auto &param : state.arg_params) {
       func_args_os << (func_args.empty() ? "" : ", ") << "GenericValuePart &&"
-                   << param;
+                   << param.name;
     }
     // We generate two variants: one with lvalue ref results and one with rvalue
     // ref results. This permits callers to use call the function with rvalues.
@@ -1355,8 +1368,8 @@ bool create_encode_function(llvm::MachineFunction *func,
       decl_os << "  bool encode_" << name << "(" << func_args_rvalue << ") { ";
       decl_os << " return encode_" << name << "(";
       bool first = true;
-      for (auto &param : state.param_names) {
-        decl_os << (first ? "" : ", ") << "std::move(" << param << ")";
+      for (const auto &param : state.arg_params) {
+        decl_os << (first ? "" : ", ") << "std::move(" << param.name << ")";
         first = false;
       }
       for (unsigned i = 0; i < state.num_ret_regs; ++i) {
