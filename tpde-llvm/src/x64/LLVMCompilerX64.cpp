@@ -116,12 +116,14 @@ struct LLVMCompilerX64 : tpde::x64::CompilerX64<LLVMAdaptor,
   void fp80_load(GenericValuePart &&addr, ValuePart &&res) {
     // TODO: use encodeable_with? need to move that to CompilerX64.
     ASM(FLDm80, FE_MEM(gval_as_reg(addr), 0, FE_NOREG, 0));
+    addr.reset(this);
     fp80_pop(res);
   }
   void fp80_store(GenericValuePart &&addr, ValuePart &&val) {
     fp80_push(std::move(val));
     // TODO: use encodeable_with? need to move that to CompilerX64.
     ASM(FSTPm80, FE_MEM(gval_as_reg(addr), 0, FE_NOREG, 0));
+    addr.reset(this);
   }
   void fp80_ext_float(ValuePart &&src, ValuePart &&dst) {
     ASM(FLDm32, spill_slot_op(src, false));

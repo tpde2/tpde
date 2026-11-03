@@ -61,6 +61,11 @@ struct CompilerBase<Adaptor, Derived, Config>::GenericValuePart {
   std::variant<std::monostate, ValuePartRef, Expr> state;
 
   GenericValuePart() = default;
+  ~GenericValuePart() {
+    if (!std::holds_alternative<std::monostate>(state)) {
+      TPDE_UNREACHABLE("GenericValuePart must be reset explicitly");
+    }
+  }
 
   GenericValuePart(GenericValuePart &) = delete;
 
@@ -74,6 +79,9 @@ struct CompilerBase<Adaptor, Derived, Config>::GenericValuePart {
   GenericValuePart &operator=(GenericValuePart &&other) {
     if (this == &other) {
       return *this;
+    }
+    if (!std::holds_alternative<std::monostate>(state)) {
+      TPDE_UNREACHABLE("GenericValuePart must be reset explicitly");
     }
     state = std::move(other.state);
     other.state = std::monostate{};
@@ -114,6 +122,6 @@ struct CompilerBase<Adaptor, Derived, Config>::GenericValuePart {
     return std::get<ValuePartRef>(state);
   }
 
-  void reset() { state = std::monostate{}; }
+  void reset(CompilerBase *) { state = std::monostate{}; }
 };
 } // namespace tpde

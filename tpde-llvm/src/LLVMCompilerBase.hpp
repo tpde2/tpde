@@ -1581,10 +1581,12 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_load_generic(
       width = load->getType()->getIntegerBitWidth();
       if (width != 8 && width != 16 && width != 32 && width != 64) {
         TPDE_LOG_ERR("atomic loads not of i8/i16/i32/i64/ptr not supported");
+        ptr_op.reset(this);
         return false;
       }
     } else if (!load->getType()->isPointerTy()) {
       TPDE_LOG_ERR("atomic loads not of i8/i16/i32/i64/ptr not supported");
+      ptr_op.reset(this);
       return false;
     }
     u32 needed_align = 1;
@@ -1598,6 +1600,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_load_generic(
           "atomic load of width {} has alignment {} which is too small",
           width,
           load->getAlign().value());
+      ptr_op.reset(this);
       return false;
     }
 
@@ -1716,6 +1719,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_load_generic(
     AsmReg ptr = this->gval_as_reg(ptr_op);
     (derived()->*fn0)(typename GenericValuePart::Expr{ptr, 0}, res.part(0));
     (derived()->*fn1)(typename GenericValuePart::Expr{ptr, 8}, res.part(1));
+    ptr_op.reset(this);
     break;
   }
   case f32:
@@ -1745,6 +1749,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_load_generic(
       derived()->fp80_load(std::move(ptr_op), this->result_ref(load).part(0));
       break;
     }
+    ptr_op.reset(this);
     return false;
   case complex: {
     auto ty_idx = this->adaptor->val_info(load).complex_part_tys_idx;
@@ -1807,15 +1812,17 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_load_generic(
           derived()->fp80_load(std::move(part_addr), res.part(i));
           break;
         }
+        ptr_op.reset(this);
         return false;
-      default: return false;
+      default: ptr_op.reset(this); return false;
       }
 
       off += part_descs[i].part.size + part_descs[i].part.pad_after;
     }
+    ptr_op.reset(this);
     return true;
   }
-  default: return false;
+  default: ptr_op.reset(this); return false;
   }
 
   return true;
@@ -1847,15 +1854,18 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_store_generic(
       width = op_val->getType()->getIntegerBitWidth();
       if (width != 8 && width != 16 && width != 32 && width != 64) {
         TPDE_LOG_ERR("atomic loads not of i8/i16/i32/i64/ptr not supported");
+        ptr_op.reset(this);
         return false;
       }
     } else if (!op_val->getType()->isPointerTy()) {
       TPDE_LOG_ERR("atomic loads not of i8/i16/i32/i64/ptr not supported");
+      ptr_op.reset(this);
       return false;
     }
 
     if (auto align = store->getAlign().value(); align * 8 < width) {
       TPDE_LOG_ERR("unaligned store ({}) not implemented", align);
+      ptr_op.reset(this);
       return false;
     }
 
@@ -1957,6 +1967,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_store_generic(
     AsmReg ptr = this->gval_as_reg(ptr_op);
     (derived()->*fn0)(typename GenericValuePart::Expr{ptr, 0}, op_ref.part(0));
     (derived()->*fn1)(typename GenericValuePart::Expr{ptr, 8}, op_ref.part(1));
+    ptr_op.reset(this);
     break;
   }
   case f32:
@@ -1983,6 +1994,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_store_generic(
       derived()->fp80_store(std::move(ptr_op), op_ref.part(0));
       break;
     }
+    ptr_op.reset(this);
     return false;
   case complex: {
     const LLVMComplexPart *part_descs =
@@ -2049,15 +2061,17 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_store_generic(
           derived()->fp80_store(std::move(part_addr), std::move(part_ref));
           break;
         }
+        ptr_op.reset(this);
         return false;
-      default: return false;
+      default: ptr_op.reset(this); return false;
       }
 
       off += part_descs[i].part.size + part_descs[i].part.pad_after;
     }
+    ptr_op.reset(this);
     return true;
   }
-  default: return false;
+  default: ptr_op.reset(this); return false;
   }
 
   return true;
@@ -4903,6 +4917,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_intrin(
       } else {
         derived()->mov(int_part_slot_vp.alloc_reg(derived()), gvp_reg, 8);
       }
+      int_part_slot.reset(this);
     }
     cb.add_arg(std::move(int_part_slot_vp),
                tpde::CCAssignment{.bank = Config::GP_BANK, .size = 8});

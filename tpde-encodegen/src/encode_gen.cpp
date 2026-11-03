@@ -759,7 +759,7 @@ void GenerationState::kill_reg(llvm::raw_ostream &os, unsigned reg_id) {
   assert(param.ref_count > 0);
   param.ref_count -= 1;
   if (param.ref_count == 0) {
-    os << "    " << param.name << ".reset();\n";
+    os << "    " << param.name << ".reset(derived());\n";
   }
   asm_operand_refs.erase(asm_op_ref_it);
 }
@@ -831,6 +831,7 @@ void GenerationState::handle_end_of_block(llvm::raw_ostream &os,
       if (asm_op_param && asm_op_param->ref_count == 1) {
         os << "  try_salvage_or_materialize(" << asm_op_param->name
            << ", scratch_" << name << ", " << bank << ", " << size << ");\n";
+        os << "    " << asm_op_param->name << ".reset(derived());\n";
         continue;
       }
       if (used_regs[reg] > 0) {
