@@ -49,6 +49,7 @@ template <typename Adaptor,
           typename Config>
 struct EncodeCompiler {
     using CompilerX64  = tpde::x64::CompilerX64<Adaptor, Derived, BaseTy, Config>;
+    using RawScratchReg = typename CompilerX64::RawScratchReg;
     using ScratchReg   = typename CompilerX64::ScratchReg;
     using AsmReg       = typename CompilerX64::AsmReg;
     using ValuePartRef = typename CompilerX64::ValuePartRef;
@@ -331,10 +332,10 @@ void EncodeCompiler<Adaptor, Derived, BaseTy, Config>::scratch_alloc_specific(
         if (std::holds_alternative<typename GenericValuePart::Expr>(op)) {
             auto &expr = std::get<typename GenericValuePart::Expr>(op);
             if (expr.base_reg() == reg) {
-                if (std::holds_alternative<ScratchReg>(expr.base)) {
-                    auto &op_scratch = std::get<ScratchReg>(expr.base);
+                if (std::holds_alternative<RawScratchReg>(expr.base)) {
+                    auto &op_scratch = std::get<RawScratchReg>(expr.base);
                     scratch          = std::move(op_scratch);
-                    op_scratch.alloc(bank);
+                    op_scratch.alloc(derived(), bank);
                     ASMD(MOV64rr, op_scratch.cur_reg(), reg);
                 } else {
                     alloc_backup();
@@ -343,10 +344,10 @@ void EncodeCompiler<Adaptor, Derived, BaseTy, Config>::scratch_alloc_specific(
                 return;
             }
             if (expr.scale != 0 && expr.index_reg() == reg) {
-                if (std::holds_alternative<ScratchReg>(expr.index)) {
-                    auto &op_scratch = std::get<ScratchReg>(expr.index);
+                if (std::holds_alternative<RawScratchReg>(expr.index)) {
+                    auto &op_scratch = std::get<RawScratchReg>(expr.index);
                     scratch          = std::move(op_scratch);
-                    op_scratch.alloc(bank);
+                    op_scratch.alloc(derived(), bank);
                     ASMD(MOV64rr, op_scratch.cur_reg(), reg);
                 } else {
                     alloc_backup();

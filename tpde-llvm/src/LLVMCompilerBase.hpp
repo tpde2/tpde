@@ -47,6 +47,7 @@ struct LLVMCompilerBase : public LLVMCompiler,
   using IRValueRef = typename Base::IRValueRef;
   using IRBlockRef = typename Base::IRBlockRef;
   using IRFuncRef = typename Base::IRFuncRef;
+  using RawScratchReg = typename Base::RawScratchReg;
   using ScratchReg = typename Base::ScratchReg;
   using ValuePartRef = typename Base::ValuePartRef;
   using ValuePart = typename Base::ValuePart;
@@ -4177,7 +4178,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_gep(
     expr.base = base.load_to_reg();
     if (base.can_salvage()) {
       expr.base = ScratchReg{this};
-      std::get<ScratchReg>(expr.base).alloc_specific(base.salvage());
+      std::get<RawScratchReg>(expr.base).alloc_specific(this, base.salvage());
     }
   }
 
@@ -4192,6 +4193,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_gep(
     for (const llvm::Use &idx : gep->indices()) {
       const auto idx_width = idx->getType()->getIntegerBitWidth();
       if (idx_width > 64) {
+        expr.reset(this);
         return false;
       }
 
@@ -4253,7 +4255,8 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_gep(
         }
         if (index_vp.can_salvage()) {
           expr.index = ScratchReg{this};
-          std::get<ScratchReg>(expr.index).alloc_specific(index_vp.salvage());
+          std::get<RawScratchReg>(expr.index)
+              .alloc_specific(this, index_vp.salvage());
         } else {
           expr.index = index_vp.load_to_reg();
         }
@@ -4315,10 +4318,11 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_gep(
 
   AsmReg res_reg = derived()->gval_expr_as_reg(expr);
   if (expr.is_base_owned()) {
-    res_ref.set_value(std::move(std::get<ScratchReg>(expr.base)));
+    res_ref.set_value(std::move(std::get<RawScratchReg>(expr.base)));
   } else {
     derived()->mov(res_ref.alloc_reg(), res_reg, 8);
   }
+  expr.reset(this);
 
   return true;
 }
@@ -4913,7 +4917,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_intrin(
       if (int_part_slot.is_expr() && int_part_slot.expr().is_base_owned()) {
         int_part_slot_vp.set_value(
             derived(),
-            std::move(std::get<ScratchReg>(int_part_slot.expr().base)));
+            std::move(std::get<RawScratchReg>(int_part_slot.expr().base)));
       } else {
         derived()->mov(int_part_slot_vp.alloc_reg(derived()), gvp_reg, 8);
       }

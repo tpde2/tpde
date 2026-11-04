@@ -313,6 +313,7 @@ struct CompilerA64 : BaseTy<Adaptor, Derived, Config> {
   using IRBlockRef = typename Base::IRBlockRef;
   using IRFuncRef = typename Base::IRFuncRef;
 
+  using RawScratchReg = typename CompilerA64::RawScratchReg;
   using ScratchReg = typename Base::ScratchReg;
   using ValuePartRef = typename Base::ValuePartRef;
   using ValuePart = typename Base::ValuePart;
@@ -1264,8 +1265,8 @@ AsmReg CompilerA64<Adaptor, Derived, BaseTy, Config>::gval_expr_as_reg(
     expr.disp = 0;
   } else if (!expr.has_base() && expr.has_index()) {
     AsmReg index_reg = expr.index_reg();
-    if (std::holds_alternative<ScratchReg>(expr.index)) {
-      scratch = std::move(std::get<ScratchReg>(expr.index));
+    if (std::holds_alternative<RawScratchReg>(expr.index)) {
+      scratch = std::move(std::get<RawScratchReg>(expr.index));
     } else {
       (void)scratch.alloc_gp();
     }
@@ -1281,10 +1282,10 @@ AsmReg CompilerA64<Adaptor, Derived, BaseTy, Config>::gval_expr_as_reg(
   } else if (expr.has_base() && expr.has_index()) {
     AsmReg base_reg = expr.base_reg();
     AsmReg index_reg = expr.index_reg();
-    if (std::holds_alternative<ScratchReg>(expr.base)) {
-      scratch = std::move(std::get<ScratchReg>(expr.base));
-    } else if (std::holds_alternative<ScratchReg>(expr.index)) {
-      scratch = std::move(std::get<ScratchReg>(expr.index));
+    if (std::holds_alternative<RawScratchReg>(expr.base)) {
+      scratch = std::move(std::get<RawScratchReg>(expr.base));
+    } else if (std::holds_alternative<RawScratchReg>(expr.index)) {
+      scratch = std::move(std::get<RawScratchReg>(expr.index));
     } else {
       (void)scratch.alloc_gp();
     }
@@ -1299,8 +1300,8 @@ AsmReg CompilerA64<Adaptor, Derived, BaseTy, Config>::gval_expr_as_reg(
     }
   } else if (expr.has_base() && !expr.has_index()) {
     AsmReg base_reg = expr.base_reg();
-    if (std::holds_alternative<ScratchReg>(expr.base)) {
-      scratch = std::move(std::get<ScratchReg>(expr.base));
+    if (std::holds_alternative<RawScratchReg>(expr.base)) {
+      scratch = std::move(std::get<RawScratchReg>(expr.base));
     } else {
       (void)scratch.alloc_gp();
     }
@@ -1323,6 +1324,7 @@ AsmReg CompilerA64<Adaptor, Derived, BaseTy, Config>::gval_expr_as_reg(
     }
   }
 
+  expr.reset(this);
   expr = typename GenericValuePart::Expr(std::move(scratch));
   return dst;
 }

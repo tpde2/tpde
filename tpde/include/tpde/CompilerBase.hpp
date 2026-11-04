@@ -1364,7 +1364,7 @@ typename CompilerBase<Adaptor, Derived, Config>::AsmReg
       assert(expr->has_base() && !expr->has_index() && expr->disp == 0);
       assert(reg == expr->base_reg());
       if (expr->is_base_owned()) {
-        dst = std::move(std::get<ScratchReg>(expr->base));
+        dst = std::move(std::get<RawScratchReg>(expr->base));
       }
     } else if (auto *val_ref = std::get_if<ValuePartRef>(&gv.state)) {
       if (val_ref->can_salvage()) {
@@ -1388,7 +1388,7 @@ typename CompilerBase<Adaptor, Derived, Config>::AsmReg
       assert(expr->has_base() && !expr->has_index() && expr->disp == 0);
       assert(reg == expr->base_reg());
       if (expr->is_base_owned()) {
-        dst.set_value(this, std::move(std::get<ScratchReg>(expr->base)));
+        dst.set_value(this, std::move(std::get<RawScratchReg>(expr->base)));
         if (dst.has_assignment()) {
           dst.lock(this);
         }

@@ -48,6 +48,7 @@ template <typename Adaptor,
           typename Config>
 struct EncodeCompiler {
     using CompilerA64  = tpde::a64::CompilerA64<Adaptor, Derived, BaseTy, Config>;
+    using RawScratchReg = typename CompilerA64::RawScratchReg;
     using ScratchReg   = typename CompilerA64::ScratchReg;
     using AsmReg       = typename CompilerA64::AsmReg;
     using ValuePartRef = typename CompilerA64::ValuePartRef;
@@ -151,16 +152,17 @@ std::optional<std::pair<typename EncodeCompiler<Adaptor, Derived, BaseTy, Config
     ScratchReg scratch{derived()};
     AsmReg base_reg = expr->base_reg();
     AsmReg index_reg = expr->index_reg();
-    if (std::holds_alternative<ScratchReg>(expr->base)) {
-        scratch = std::move(std::get<ScratchReg>(expr->base));
-    } else if (std::holds_alternative<ScratchReg>(expr->index)) {
-        scratch = std::move(std::get<ScratchReg>(expr->index));
+    if (std::holds_alternative<RawScratchReg>(expr->base)) {
+        scratch = std::move(std::get<RawScratchReg>(expr->base));
+    } else if (std::holds_alternative<RawScratchReg>(expr->index)) {
+        scratch = std::move(std::get<RawScratchReg>(expr->index));
     } else {
         (void)scratch.alloc_gp();
     }
     const auto scale_shift = __builtin_ctzl(expr->scale);
     AsmReg dst = scratch.cur_reg();
     ASMD(ADDx_lsl, dst, base_reg, index_reg, scale_shift);
+    expr->reset(derived());
     *expr = typename GenericValuePart::Expr(std::move(scratch));
 
     return std::make_pair(dst, res_off);

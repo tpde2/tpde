@@ -268,6 +268,7 @@ struct CompilerX64 : BaseTy<Adaptor, Derived, Config> {
   using IRBlockRef = typename Base::IRBlockRef;
   using IRFuncRef = typename Base::IRFuncRef;
 
+  using RawScratchReg = typename Base::RawScratchReg;
   using ScratchReg = typename Base::ScratchReg;
   using ValuePartRef = typename Base::ValuePartRef;
   using ValuePart = typename Base::ValuePart;
@@ -1025,10 +1026,10 @@ AsmReg CompilerX64<Adaptor, Derived, BaseTy, Config>::gval_expr_as_reg(
   bool disp32 = i32(expr.disp) == expr.disp;
   AsmReg base = expr.has_base() ? expr.base_reg() : AsmReg::make_invalid();
   AsmReg idx = expr.has_index() ? expr.index_reg() : AsmReg::make_invalid();
-  if (std::holds_alternative<ScratchReg>(expr.base)) {
-    scratch = std::move(std::get<ScratchReg>(expr.base));
-  } else if (std::holds_alternative<ScratchReg>(expr.index)) {
-    scratch = std::move(std::get<ScratchReg>(expr.index));
+  if (std::holds_alternative<RawScratchReg>(expr.base)) {
+    scratch = std::move(std::get<RawScratchReg>(expr.base));
+  } else if (std::holds_alternative<RawScratchReg>(expr.index)) {
+    scratch = std::move(std::get<RawScratchReg>(expr.index));
   } else {
     (void)scratch.alloc_gp();
   }
@@ -1057,10 +1058,10 @@ AsmReg CompilerX64<Adaptor, Derived, BaseTy, Config>::gval_expr_as_reg(
       ScratchReg idx_scratch{derived()};
       // We need a register to compute the scaled index.
       AsmReg idx_tmp = dst;
-      if (dst == base && std::holds_alternative<ScratchReg>(expr.index)) {
+      if (dst == base && std::holds_alternative<RawScratchReg>(expr.index)) {
         // We can't use dst, it'd clobber base, so use the other
         // register we currently own.
-        idx_tmp = std::get<ScratchReg>(expr.index).cur_reg();
+        idx_tmp = std::get<RawScratchReg>(expr.index).cur_reg();
       } else if (dst == base) {
         idx_tmp = idx_scratch.alloc_gp();
       }
@@ -1113,6 +1114,7 @@ AsmReg CompilerX64<Adaptor, Derived, BaseTy, Config>::gval_expr_as_reg(
     }
   }
 
+  expr.reset(this);
   expr = typename GenericValuePart::Expr(std::move(scratch));
   return dst;
 }

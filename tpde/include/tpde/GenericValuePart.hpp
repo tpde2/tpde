@@ -11,8 +11,8 @@ namespace tpde {
 template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>
 struct CompilerBase<Adaptor, Derived, Config>::GenericValuePart {
   struct Expr {
-    std::variant<AsmReg, ScratchReg> base;
-    std::variant<AsmReg, ScratchReg> index;
+    std::variant<AsmReg, RawScratchReg> base;
+    std::variant<AsmReg, RawScratchReg> index;
     i64 scale;
     i64 disp;
 
@@ -21,18 +21,18 @@ struct CompilerBase<Adaptor, Derived, Config>::GenericValuePart {
     explicit Expr(AsmReg base, i64 disp = 0)
         : base(base), scale(0), disp(disp) {}
 
-    explicit Expr(ScratchReg &&base, i64 disp = 0)
+    explicit Expr(RawScratchReg &&base, i64 disp = 0)
         : base(std::move(base)), scale(0), disp(disp) {}
 
     AsmReg base_reg() const {
       if (std::holds_alternative<AsmReg>(base)) {
         return std::get<AsmReg>(base);
       }
-      return std::get<ScratchReg>(base).cur_reg();
+      return std::get<RawScratchReg>(base).cur_reg();
     }
 
     bool is_base_owned() const {
-      return std::holds_alternative<ScratchReg>(base);
+      return std::holds_alternative<RawScratchReg>(base);
     }
 
     [[nodiscard]] bool has_base() const {
@@ -49,10 +49,19 @@ struct CompilerBase<Adaptor, Derived, Config>::GenericValuePart {
       if (std::holds_alternative<AsmReg>(index)) {
         return std::get<AsmReg>(index);
       }
-      return std::get<ScratchReg>(index).cur_reg();
+      return std::get<RawScratchReg>(index).cur_reg();
     }
 
     [[nodiscard]] bool has_index() const { return scale != 0; }
+
+    void reset(CompilerBase *compiler) {
+      if (RawScratchReg *base_reg = std::get_if<RawScratchReg>(&base)) {
+        base_reg->reset(compiler);
+      }
+      if (RawScratchReg *index_reg = std::get_if<RawScratchReg>(&index)) {
+        index_reg->reset(compiler);
+      }
+    }
   };
 
   // TODO(ts): evaluate the use of std::variant
@@ -122,6 +131,11 @@ struct CompilerBase<Adaptor, Derived, Config>::GenericValuePart {
     return std::get<ValuePartRef>(state);
   }
 
-  void reset(CompilerBase *) { state = std::monostate{}; }
+  void reset(CompilerBase *compiler) {
+    if (Expr *expr = std::get_if<Expr>(&state)) {
+      expr->reset(compiler);
+    }
+    state = std::monostate{};
+  }
 };
 } // namespace tpde
