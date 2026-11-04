@@ -163,11 +163,7 @@ int main(int argc, char *argv[]) {
     res = read(perf_control_ack_fd, buf, 5);
   }
 
-#if LLVM_VERSION_MAJOR >= 21
   std::string triple_str = mod->getTargetTriple().str();
-#else
-  std::string triple_str = mod->getTargetTriple();
-#endif
   if (target) {
     triple_str = target.Get();
   } else if (triple_str.empty()) {

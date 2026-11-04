@@ -128,7 +128,7 @@ if (TPDE_ENABLE_ENCODEGEN OR TPDE_ENABLE_LLVM)
     # LLVM versions we currently support. The first version should be the
     # "primary" versions where all tests pass (i.e., no XFAIL due to different
     # code generation).
-    set(TPDE_LLVM_SUPPORTED_VERSIONS 23.1 22.1 21.1 20.1 19.1)
+    set(TPDE_LLVM_SUPPORTED_VERSIONS 23.1 22.1)
 
     # allow overriding the LLVM version used
     if (DEFINED LLVM_DIR)
@@ -150,11 +150,6 @@ if (TPDE_ENABLE_ENCODEGEN OR TPDE_ENABLE_LLVM)
     if (NOT "${LLVM_VERSION_MAJOR}.${LLVM_VERSION_MINOR}" IN_LIST TPDE_LLVM_SUPPORTED_VERSIONS)
         message(WARNING "Found LLVM, but version is unsupported "
                 "(supported versions: ${TPDE_LLVM_SUPPORTED_VERSIONS})")
-    endif ()
-
-    if (LLVM_VERSION_MAJOR LESS 20)
-        # See https://github.com/llvm/llvm-project/pull/123578
-        add_compile_options(-Wno-error=cpp)
     endif ()
 endif()
 

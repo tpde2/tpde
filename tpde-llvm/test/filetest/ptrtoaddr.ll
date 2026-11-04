@@ -5,9 +5,6 @@
 
 ; RUN: tpde-llc --target=x86_64 %s | %objdump | FileCheck %s -check-prefixes=X64
 ; RUN: tpde-llc --target=aarch64 %s | %objdump | FileCheck %s -check-prefixes=ARM64
-; XFAIL: llvm19.1
-; XFAIL: llvm20.1
-; XFAIL: llvm21.1
 
 ; Note: ptrtoaddr integer bit width must match pointer size.
 

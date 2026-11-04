@@ -3,16 +3,12 @@
 #include <llvm/Config/llvm-config.h>
 #include <llvm/ExecutionEngine/JITLink/EHFrameSupport.h>
 #include <llvm/ExecutionEngine/Orc/Core.h>
-#if LLVM_VERSION_MAJOR >= 20
-  #include <llvm/ExecutionEngine/Orc/EHFrameRegistrationPlugin.h>
-#endif
+#include <llvm/ExecutionEngine/Orc/EHFrameRegistrationPlugin.h>
 #include <llvm/ExecutionEngine/Orc/ExecutionUtils.h>
 #include <llvm/ExecutionEngine/Orc/ExecutorProcessControl.h>
 #include <llvm/ExecutionEngine/Orc/MapperJITLinkMemoryManager.h>
 #include <llvm/ExecutionEngine/Orc/ObjectLinkingLayer.h>
-#if LLVM_VERSION_MAJOR >= 21
-  #include <llvm/ExecutionEngine/Orc/SelfExecutorProcessControl.h>
-#endif
+#include <llvm/ExecutionEngine/Orc/SelfExecutorProcessControl.h>
 #include <llvm/ExecutionEngine/Orc/Shared/ExecutorSymbolDef.h>
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/Module.h>
@@ -140,13 +136,8 @@ int main(int argc, char *argv[]) {
   llvm::orc::ThreadSafeModule tsm(std::move(mod), std::move(context));
   exit_on_err(compile_layer.add(dylib, std::move(tsm)));
 
-#if LLVM_VERSION_MAJOR >= 21
   object_layer.addPlugin(
       exit_on_err(llvm::orc::EHFrameRegistrationPlugin::Create(es)));
-#else
-  object_layer.addPlugin(std::make_unique<llvm::orc::EHFrameRegistrationPlugin>(
-      es, std::make_unique<llvm::jitlink::InProcessEHFrameRegistrar>()));
-#endif
 
   llvm::orc::ExecutorSymbolDef sym = exit_on_err(es.lookup(&dylib, "main"));
   uintptr_t main_addr = static_cast<uintptr_t>(sym.getAddress().getValue());

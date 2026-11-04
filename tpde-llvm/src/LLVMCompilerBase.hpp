@@ -1469,9 +1469,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_inst(
     res[llvm::Instruction::FPTrunc] = {&Derived::compile_float_ext_trunc, 0};
     res[llvm::Instruction::FPExt] = {&Derived::compile_float_ext_trunc, 0};
     res[llvm::Instruction::PtrToInt] = {&Derived::compile_ptr_to_int, 0};
-#if LLVM_VERSION_MAJOR >= 22
     res[llvm::Instruction::PtrToAddr] = {&Derived::compile_ptr_to_int, 0};
-#endif
     res[llvm::Instruction::IntToPtr] = {&Derived::compile_int_to_ptr, 0};
     res[llvm::Instruction::BitCast] = {&Derived::compile_bitcast, 0};
     // TODO: AddrSpaceCast
@@ -4771,9 +4769,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_intrin(
   case llvm::Intrinsic::asin:
   case llvm::Intrinsic::acos:
   case llvm::Intrinsic::atan:
-#if LLVM_VERSION_MAJOR >= 20
   case llvm::Intrinsic::atan2:
-#endif
   case llvm::Intrinsic::sinh:
   case llvm::Intrinsic::cosh:
   case llvm::Intrinsic::tanh:
@@ -4817,9 +4813,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_intrin(
     case asin: func = is_double ? LibFunc::asin : LibFunc::asinf; break;
     case acos: func = is_double ? LibFunc::acos : LibFunc::acosf; break;
     case atan: func = is_double ? LibFunc::atan : LibFunc::atanf; break;
-#if LLVM_VERSION_MAJOR >= 20
     case atan2: func = is_double ? LibFunc::atan2 : LibFunc::atan2f; break;
-#endif
     case sinh: func = is_double ? LibFunc::sinh : LibFunc::sinhf; break;
     case cosh: func = is_double ? LibFunc::cosh : LibFunc::coshf; break;
     case tanh: func = is_double ? LibFunc::tanh : LibFunc::tanhf; break;
@@ -4847,9 +4841,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_intrin(
     LibFunc func = is_double ? LibFunc::lround : LibFunc::lroundf;
     return derived()->handle_call(inst, info, get_libfunc_sym(func));
   }
-#if LLVM_VERSION_MAJOR >= 21
   case llvm::Intrinsic::modf:
-#endif
   case llvm::Intrinsic::frexp: {
     llvm::Value *arg = inst->getArgOperand(0);
     const auto is_double = arg->getType()->isDoubleTy();
@@ -4860,9 +4852,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_intrin(
     LibFunc func;
     switch (intrin_id) {
       using enum llvm::Intrinsic::IndependentIntrinsics;
-#if LLVM_VERSION_MAJOR >= 21
     case modf: func = is_double ? LibFunc::modf : LibFunc::modff; break;
-#endif
     case frexp: func = is_double ? LibFunc::frexp : LibFunc::frexpf; break;
     default: TPDE_UNREACHABLE("invalid library fp intrinsic");
     }

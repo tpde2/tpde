@@ -5,8 +5,6 @@
 
 ; RUN: tpde-llc --target=x86_64 %s | %objdump | FileCheck %s -check-prefixes=X64
 ; RUN: tpde-llc --target=aarch64 %s | %objdump | FileCheck %s -check-prefixes=ARM64
-; XFAIL: llvm19.1
-; XFAIL: llvm20.1
 
 define i8 @icmp_eq_i8_0_br(i8 %0) {
 ; X64-LABEL: <icmp_eq_i8_0_br>:

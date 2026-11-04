@@ -5,9 +5,6 @@
 
 ; RUN: tpde-llc --target=x86_64 %s | %objdump | FileCheck %s -check-prefixes=X64
 ; RUN: tpde-llc --target=aarch64 %s | %objdump | FileCheck %s -check-prefixes=ARM64
-; XFAIL: llvm19.1
-; XFAIL: llvm20.1
-; XFAIL: llvm21.1
 
 define i32 @select_i32_reg(i1 %0, i32 %1, i32 %2) {
 ; X64-LABEL: <select_i32_reg>:

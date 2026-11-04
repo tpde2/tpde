@@ -4,8 +4,6 @@
 
 ; RUN: tpde-llc --target=x86_64 %s | %objdump | FileCheck %s -check-prefixes=X64
 ; RUN: tpde-llc --target=aarch64 %s | %objdump | FileCheck %s -check-prefixes=ARM64
-; XFAIL: llvm19.1
-; XFAIL: llvm20.1
 
 @t1 = external thread_local global i32, align 4
 

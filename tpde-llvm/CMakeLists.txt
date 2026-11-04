@@ -29,7 +29,7 @@ set(TPDE_LINK_LLVM_STATIC FALSE CACHE BOOL "Should LLVM be linked statically?")
 # ASan is not very compatible with dynamically loaded plugins. It is, in
 # principle, possible to preload libasan.so, but this requires knowledge of the
 # system-dependent path, which is not viable for tests.
-if (LLVM_VERSION_MAJOR LESS 22 OR TPDE_ENABLE_ASAN)
+if (TPDE_ENABLE_ASAN)
     set(TPDE_ENABLE_LLVM_PLUGIN FALSE)
 else ()
     set(TPDE_ENABLE_LLVM_PLUGIN TRUE CACHE BOOL "Whether to build LLVM plugin")
@@ -113,7 +113,7 @@ function(check_clang_version validator_result_var CANDIDATE)
     endif ()
 endfunction()
 find_program(TPDE_CLANG NO_CACHE REQUIRED
-             NAMES clang-${LLVM_VERSION_MAJOR} clang-20 clang-19 clang-18 clang
+             NAMES clang-${LLVM_VERSION_MAJOR} clang-23 clang-22 clang
              HINTS ${LLVM_TOOLS_BINARY_DIR}
              VALIDATOR check_clang_version)
 message(STATUS "Found Clang: " ${TPDE_CLANG})
@@ -239,9 +239,6 @@ list(APPEND TPDE_LLVM_TEST_DEPENDS tpde-lli)
 # tpde-plugin.so LLVM plugin
 
 if (TPDE_ENABLE_LLVM_PLUGIN)
-    if (LLVM_VERSION_MAJOR LESS 22)
-        message(SEND_ERROR "TPDE LLVM plugin requires LLVM 22 or newer")
-    endif ()
     add_library(tpde-plugin MODULE tools/tpde-plugin.cpp)
     target_link_libraries(tpde-plugin PRIVATE tpde_llvm_impl)
     set_target_properties(tpde-plugin PROPERTIES

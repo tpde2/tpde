@@ -4,9 +4,6 @@
 
 ; RUN: tpde-llc --target=x86_64 %s | %objdump | FileCheck %s -check-prefixes=X64
 ; RUN: tpde-llc --target=aarch64 %s | %objdump | FileCheck %s -check-prefixes=ARM64
-; XFAIL: llvm19.1
-; XFAIL: llvm20.1
-; XFAIL: llvm21.1
 ; XFAIL: llvm22.1
 
 define i8 @ctpop_i8(i8 %0) {

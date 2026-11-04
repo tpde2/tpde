@@ -4,8 +4,6 @@
 
 ; RUN: tpde-llc --target=x86_64 %s | %objdump | FileCheck %s -check-prefixes=X64
 ; RUN: tpde-llc --target=aarch64 %s | %objdump | FileCheck %s -check-prefixes=ARM64
-; XFAIL: llvm19.1
-; XFAIL: llvm20.1
 
 %struct.ptr_i32 = type { ptr, i32 }
 define i32 @fn_i32_byval_ptr_i32_i32(ptr byval(%struct.ptr_i32) align 8 %0, i32 %1) {

@@ -264,9 +264,6 @@ bool LLVMAdaptor::switch_func(const IRFuncRef function) {
 
 #ifndef NDEBUG
   value_lookup.clear();
-  #if LLVM_VERSION_MAJOR < 20
-  block_lookup.clear();
-  #endif
 #endif
   blocks.clear();
   block_succ_indices.clear();
@@ -289,11 +286,9 @@ bool LLVMAdaptor::switch_func(const IRFuncRef function) {
   // Check that the return type is layout-compatible to LLVM.
   check_type_compatibility(function->getReturnType());
 
-#if LLVM_VERSION_MAJOR >= 20
   // Renumber blocks in the order they occur in the function.
   function->renumberBlocks();
   blocks.reserve(function->getMaxBlockNumber());
-#endif
 
   for (llvm::BasicBlock &block : *function) {
 #if LLVM_VERSION_MAJOR >= 23
@@ -320,11 +315,7 @@ bool LLVMAdaptor::switch_func(const IRFuncRef function) {
           auto ins_before = block->getTerminator()->getIterator();
           if (block->begin() != ins_before) {
             // ins_before.getP
-#if LLVM_VERSION_MAJOR >= 22
             auto *prev_inst = ins_before->getPrevNode();
-#else
-            auto *prev_inst = ins_before->getPrevNonDebugInstruction();
-#endif
             if (prev_inst && llvm::isa<llvm::CmpInst>(prev_inst)) {
               // make sure fusing can still happen
               ins_before = prev_inst->getIterator();
@@ -355,14 +346,7 @@ bool LLVMAdaptor::switch_func(const IRFuncRef function) {
       it = block.end();
     }
 
-#if LLVM_VERSION_MAJOR >= 20
     assert(block.getNumber() == blocks.size());
-#else
-  #ifndef NDEBUG
-    block_lookup[&block] = blocks.size();
-  #endif
-    block_embedded_idx(&block) = blocks.size();
-#endif
 
     blocks.push_back(
         BlockInfo{.block = &block, .aux = BlockAux{.phi_end = it}});
@@ -482,9 +466,6 @@ void LLVMAdaptor::reset() {
   global_list.clear();
 #ifndef NDEBUG
   value_lookup.clear();
-  #if LLVM_VERSION_MAJOR < 20
-  block_lookup.clear();
-  #endif
 #endif
   complex_part_types.clear();
   complex_type_map.clear();

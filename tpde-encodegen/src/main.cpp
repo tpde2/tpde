@@ -97,13 +97,8 @@ int main(const int argc, char *argv[]) {
   const int opt_level{3};
 
   assert(!modules.empty());
-#if LLVM_VERSION_MAJOR >= 21
   const llvm::Triple &triple = modules[0]->getTargetTriple();
   const llvm::Triple &the_triple = triple;
-#else
-  llvm::StringRef triple = modules[0]->getTargetTriple();
-  llvm::Triple the_triple(triple);
-#endif
 
   // Required so that our target triple is actually found
 #ifdef TPDE_ARCH_X86_64
@@ -141,11 +136,7 @@ int main(const int argc, char *argv[]) {
       /*JIT=*/true)};
 
 
-#if LLVM_VERSION_MAJOR >= 20
   auto *target_machine = static_cast<llvm::TargetMachine *>(tm.get());
-#else
-  auto *target_machine = static_cast<llvm::LLVMTargetMachine *>(tm.get());
-#endif
   // If we use a unique_ptr, we get a Segfault when destructing it. So, we
   // leave it at that. (Memory leaks anyone? :eyes:)
   auto *MMIWP = new llvm::MachineModuleInfoWrapperPass{target_machine};
