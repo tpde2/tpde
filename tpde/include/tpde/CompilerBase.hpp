@@ -203,6 +203,7 @@ public:
 
   util::SmallVector<std::pair<SymRef, SymRef>, 4> personality_syms = {};
 
+  struct RawScratchReg;
   struct ScratchReg;
   class ValuePart;
   struct ValuePartRef;

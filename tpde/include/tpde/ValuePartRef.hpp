@@ -344,7 +344,7 @@ public:
 
   /// Set the value to the value of the scratch register, taking ownership of
   /// the register.
-  void set_value(CompilerBase *compiler, ScratchReg &&other);
+  void set_value(CompilerBase *compiler, RawScratchReg &&other);
 
   /// Set the value to the value of the specified register, possibly taking
   /// ownership of the register. Intended for filling in arguments/calls results
@@ -669,7 +669,7 @@ void CompilerBase<Adaptor, Derived, Config>::ValuePart::set_value(
 
 template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>
 void CompilerBase<Adaptor, Derived, Config>::ValuePart::set_value(
-    CompilerBase *compiler, ScratchReg &&other) {
+    CompilerBase *compiler, RawScratchReg &&other) {
   assert(compiler->may_change_value_state());
 
   auto &reg_file = compiler->register_file;
@@ -707,7 +707,7 @@ void CompilerBase<Adaptor, Derived, Config>::ValuePart::set_value(
            "invalid state for fixed assignment");
     assert(cur_reg != value_reg);
     compiler->derived()->mov(cur_reg, value_reg, ap.part_size());
-    other.reset();
+    other.reset(compiler);
     return;
   }
 
@@ -923,7 +923,7 @@ struct CompilerBase<Adaptor, Derived, Config>::ValuePartRef : ValuePart {
     ValuePart::set_value(compiler, std::move(other));
   }
 
-  void set_value(ScratchReg &&other) {
+  void set_value(RawScratchReg &&other) {
     ValuePart::set_value(compiler, std::move(other));
   }
 
