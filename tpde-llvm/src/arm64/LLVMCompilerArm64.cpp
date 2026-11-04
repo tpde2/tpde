@@ -84,7 +84,7 @@ struct LLVMCompilerArm64 : tpde::a64::CompilerA64<LLVMAdaptor,
   bool compile_icmp(const llvm::Instruction *, const ValInfo &, u64);
   void compile_i32_cmp_zero(AsmReg reg, llvm::CmpInst::Predicate p);
 
-  GenericValuePart create_addr_for_alloca(tpde::AssignmentPartRef ap);
+  GenericValuePart::Expr create_addr_for_alloca(tpde::AssignmentPartRef ap);
 
   void create_helper_call(std::span<IRValueRef> args,
                           ValueRef *result,
@@ -496,7 +496,7 @@ void LLVMCompilerArm64::compile_i32_cmp_zero(AsmReg reg,
   ASM(CSETw, reg, cond);
 }
 
-LLVMCompilerArm64::GenericValuePart
+LLVMCompilerArm64::GenericValuePart::Expr
     LLVMCompilerArm64::create_addr_for_alloca(tpde::AssignmentPartRef ap) {
   return GenericValuePart::Expr{AsmReg::R29, ap.variable_stack_off()};
 }
