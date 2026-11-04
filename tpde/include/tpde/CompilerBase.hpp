@@ -1335,9 +1335,6 @@ void CompilerBase<Adaptor, Derived, Config>::set_value(ValuePartRef &val_ref,
 template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>
 typename CompilerBase<Adaptor, Derived, Config>::AsmReg
     CompilerBase<Adaptor, Derived, Config>::gval_as_reg(GenericValuePart &gv) {
-  if (std::holds_alternative<ScratchReg>(gv.state)) {
-    return std::get<ScratchReg>(gv.state).cur_reg();
-  }
   if (std::holds_alternative<ValuePartRef>(gv.state)) {
     auto &vpr = std::get<ValuePartRef>(gv.state);
     if (vpr.has_reg()) {
@@ -1362,10 +1359,7 @@ typename CompilerBase<Adaptor, Derived, Config>::AsmReg
         GenericValuePart &gv, ScratchReg &dst) {
   AsmReg reg = gval_as_reg(gv);
   if (!dst.has_reg()) {
-    if (auto *scratch = std::get_if<ScratchReg>(&gv.state)) {
-      dst = std::move(*scratch);
-    } else if (auto *expr =
-                   std::get_if<typename GenericValuePart::Expr>(&gv.state)) {
+    if (auto *expr = std::get_if<typename GenericValuePart::Expr>(&gv.state)) {
       assert(expr->has_base() && !expr->has_index() && expr->disp == 0);
       assert(reg == expr->base_reg());
       if (expr->is_base_owned()) {
@@ -1389,13 +1383,7 @@ typename CompilerBase<Adaptor, Derived, Config>::AsmReg
   if (!dst.has_reg() &&
       (!dst.has_assignment() || !dst.assignment().fixed_assignment())) {
     // TODO: make this less expensive
-    if (auto *scratch = std::get_if<ScratchReg>(&gv.state)) {
-      dst.set_value(this, std::move(*scratch));
-      if (dst.has_assignment()) {
-        dst.lock(this);
-      }
-    } else if (auto *expr =
-                   std::get_if<typename GenericValuePart::Expr>(&gv.state)) {
+    if (auto *expr = std::get_if<typename GenericValuePart::Expr>(&gv.state)) {
       assert(expr->has_base() && !expr->has_index() && expr->disp == 0);
       assert(reg == expr->base_reg());
       if (expr->is_base_owned()) {

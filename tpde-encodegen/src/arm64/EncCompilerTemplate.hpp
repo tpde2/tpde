@@ -161,13 +161,7 @@ std::optional<std::pair<typename EncodeCompiler<Adaptor, Derived, BaseTy, Config
     const auto scale_shift = __builtin_ctzl(expr->scale);
     AsmReg dst = scratch.cur_reg();
     ASMD(ADDx_lsl, dst, base_reg, index_reg, scale_shift);
-    if (expr->disp != 0) {
-        expr->base = std::move(scratch);
-        expr->index = AsmReg::make_invalid();
-        expr->scale = 0;
-    } else {
-        gv.state = std::move(scratch);
-    }
+    *expr = typename GenericValuePart::Expr(std::move(scratch));
 
     return std::make_pair(dst, res_off);
 }

@@ -58,7 +58,7 @@ struct CompilerBase<Adaptor, Derived, Config>::GenericValuePart {
   // TODO(ts): evaluate the use of std::variant
   // TODO(ts): I don't like the ValuePartRefs but we also don't want to
   // force all the operands into registers at the start of the encoding...
-  std::variant<std::monostate, ValuePartRef, ScratchReg, Expr> state;
+  std::variant<std::monostate, ValuePartRef, Expr> state;
 
   GenericValuePart() = default;
 
@@ -78,11 +78,6 @@ struct CompilerBase<Adaptor, Derived, Config>::GenericValuePart {
     state = std::move(other.state);
     other.state = std::monostate{};
     return *this;
-  }
-
-  // salvaging
-  GenericValuePart(ScratchReg &&reg) : state{std::move(reg)} {
-    assert(std::get<ScratchReg>(state).has_reg());
   }
 
   // salvaging

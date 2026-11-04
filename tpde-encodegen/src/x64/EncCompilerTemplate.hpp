@@ -195,13 +195,6 @@ std::optional<FeMem> EncodeCompiler<Adaptor, Derived, BaseTy, Config>::
             return FE_MEM(other.base, other.scale, other.idx, *disp);
         return std::nullopt;
     }
-    if (const auto *reg = std::get_if<ScratchReg>(&gv.state)) {
-        if (is_noreg(other.base))
-            return FE_MEM(reg->cur_reg(), other.scale, other.idx, other.off);
-        if (is_noreg(other.idx))
-            return FE_MEM(other.base, 1, reg->cur_reg(), other.off);
-        return std::nullopt;
-    }
     if (const auto *expr = std::get_if<typename GenericValuePart::Expr>(&gv.state)) {
         // TODO: check completeness
         auto disp = disp_encodeable(expr->disp, other.off);
@@ -311,17 +304,6 @@ void EncodeCompiler<Adaptor, Derived, BaseTy, Config>::scratch_alloc_specific(
     // check if one of the operands holds the fixed register
     for (auto *op_ptr : operands) {
         auto &op = op_ptr->state;
-        if (std::holds_alternative<ScratchReg>(op)) {
-            auto &op_scratch = std::get<ScratchReg>(op);
-            if (op_scratch.cur_reg() == reg) {
-                scratch = std::move(op_scratch);
-                op_scratch.alloc(bank);
-                ASMD(MOV64rr, op_scratch.cur_reg(), reg);
-                return;
-            }
-            continue;
-        }
-
         if (std::holds_alternative<ValuePartRef>(op)) {
             auto &op_ref = std::get<ValuePartRef>(op);
             if (op_ref.has_assignment()) {
