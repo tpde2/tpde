@@ -1336,12 +1336,8 @@ void CompilerBase<Adaptor, Derived, Config>::set_value(ValuePartRef &val_ref,
 template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>
 typename CompilerBase<Adaptor, Derived, Config>::AsmReg
     CompilerBase<Adaptor, Derived, Config>::gval_as_reg(GenericValuePart &gv) {
-  if (std::holds_alternative<ValuePartRef>(gv.state)) {
-    auto &vpr = std::get<ValuePartRef>(gv.state);
-    if (vpr.has_reg()) {
-      return vpr.cur_reg();
-    }
-    return vpr.load_to_reg();
+  if (std::holds_alternative<ValuePart>(gv.state)) {
+    return std::get<ValuePart>(gv.state).cur_reg_or_load(this);
   }
   if (auto *expr = std::get_if<typename GenericValuePart::Expr>(&gv.state)) {
     if (expr->has_base() && !expr->has_index() && expr->disp == 0) {
@@ -1366,9 +1362,9 @@ typename CompilerBase<Adaptor, Derived, Config>::AsmReg
       if (expr->is_base_owned()) {
         dst = std::move(std::get<RawScratchReg>(expr->base));
       }
-    } else if (auto *val_ref = std::get_if<ValuePartRef>(&gv.state)) {
+    } else if (auto *val_ref = std::get_if<ValuePart>(&gv.state)) {
       if (val_ref->can_salvage()) {
-        dst.alloc_specific(val_ref->salvage());
+        dst.alloc_specific(val_ref->salvage(this));
         assert(dst.cur_reg() == reg && "salvaging unsuccessful");
       }
     }
@@ -1393,7 +1389,7 @@ typename CompilerBase<Adaptor, Derived, Config>::AsmReg
           dst.lock(this);
         }
       }
-    } else if (auto *val_ref = std::get_if<ValuePartRef>(&gv.state)) {
+    } else if (auto *val_ref = std::get_if<ValuePart>(&gv.state)) {
       if (val_ref->can_salvage()) {
         dst.set_value(this, std::move(*val_ref));
         if (dst.has_assignment()) {

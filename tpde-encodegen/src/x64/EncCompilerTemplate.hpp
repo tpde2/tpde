@@ -157,16 +157,16 @@ template <typename Adaptor,
           typename Config>
 std::optional<FeMem> EncodeCompiler<Adaptor, Derived, BaseTy, Config>::
     encodeable_as_mem(GenericValuePart &gv, unsigned align) {
-    if (!std::holds_alternative<ValuePartRef>(gv.state)) {
+    if (!std::holds_alternative<ValuePart>(gv.state)) {
         return std::nullopt;
     }
-    const ValuePartRef &vpr = std::get<ValuePartRef>(gv.state);
+    const ValuePart &vp = std::get<ValuePart>(gv.state);
 
-    if (!vpr.has_assignment()) {
+    if (!vp.has_assignment()) {
         return std::nullopt;
     }
 
-    const auto ap = vpr.assignment();
+    const auto ap = vp.assignment();
     if (ap.register_valid() || ap.variable_ref())
         return std::nullopt;
     if (ap.frame_off() & (align - 1))
@@ -305,8 +305,8 @@ void EncodeCompiler<Adaptor, Derived, BaseTy, Config>::scratch_alloc_specific(
     // check if one of the operands holds the fixed register
     for (auto *op_ptr : operands) {
         auto &op = op_ptr->state;
-        if (std::holds_alternative<ValuePartRef>(op)) {
-            auto &op_ref = std::get<ValuePartRef>(op);
+        if (std::holds_alternative<ValuePart>(op)) {
+            auto &op_ref = std::get<ValuePart>(op);
             if (op_ref.has_assignment()) {
                 assert(!op_ref.has_reg());
                 const auto ap = op_ref.assignment();
@@ -316,8 +316,8 @@ void EncodeCompiler<Adaptor, Derived, BaseTy, Config>::scratch_alloc_specific(
             } else if (op_ref.has_reg() && op_ref.cur_reg() == reg) {
                 if (op_ref.can_salvage()) {
                     // owned temporary: move elsewhere
-                    scratch.alloc_specific(op_ref.salvage());
-                    op_ref.alloc_reg();
+                    scratch.alloc_specific(op_ref.salvage(derived()));
+                    op_ref.alloc_reg(derived());
                     ASMD(MOV64rr, op_ref.cur_reg(), reg);
                 } else {
                     // unowned temporary: use backup

@@ -67,7 +67,7 @@ struct CompilerBase<Adaptor, Derived, Config>::GenericValuePart {
   // TODO(ts): evaluate the use of std::variant
   // TODO(ts): I don't like the ValuePartRefs but we also don't want to
   // force all the operands into registers at the start of the encoding...
-  std::variant<std::monostate, ValuePartRef, Expr> state;
+  std::variant<std::monostate, ValuePart, Expr> state;
 
   GenericValuePart() = default;
   ~GenericValuePart() {
@@ -98,7 +98,7 @@ struct CompilerBase<Adaptor, Derived, Config>::GenericValuePart {
   }
 
   // salvaging
-  GenericValuePart(ValuePartRef &&ref) : state{std::move(ref)} {}
+  GenericValuePart(ValuePart &&ref) : state{std::move(ref)} {}
 
   GenericValuePart(Expr expr) : state{std::move(expr)} {}
 
@@ -109,7 +109,7 @@ struct CompilerBase<Adaptor, Derived, Config>::GenericValuePart {
   [[nodiscard]] Expr &expr() { return std::get<Expr>(state); }
 
   [[nodiscard]] bool is_imm() const {
-    auto *ptr = std::get_if<ValuePartRef>(&state);
+    auto *ptr = std::get_if<ValuePart>(&state);
     return ptr && ptr->is_const();
   }
 
@@ -123,17 +123,17 @@ struct CompilerBase<Adaptor, Derived, Config>::GenericValuePart {
     return val_ref().const_data()[0];
   }
 
-  [[nodiscard]] const ValuePartRef &val_ref() const {
-    return std::get<ValuePartRef>(state);
+  [[nodiscard]] const ValuePart &val_ref() const {
+    return std::get<ValuePart>(state);
   }
 
-  [[nodiscard]] ValuePartRef &val_ref() {
-    return std::get<ValuePartRef>(state);
-  }
+  [[nodiscard]] ValuePart &val_ref() { return std::get<ValuePart>(state); }
 
   void reset(CompilerBase *compiler) {
     if (Expr *expr = std::get_if<Expr>(&state)) {
       expr->reset(compiler);
+    } else if (ValuePart *vp = std::get_if<ValuePart>(&state)) {
+      vp->reset(compiler);
     }
     state = std::monostate{};
   }
