@@ -252,17 +252,24 @@ bool generate_inst(std::string &buf,
     auto &dst_op = inst->getOperand(move_ops->first);
     auto src_id = state.target->reg_id_from_mc_reg(src_op.getReg());
     auto dst_id = state.target->reg_id_from_mc_reg(dst_op.getReg());
+    bool is_kill = false;
+    for (const auto &op : inst->all_uses()) {
+      if (op.isKill()) {
+        assert(src_id == state.target->reg_id_from_mc_reg(op.getReg()));
+        is_kill = true;
+      }
+    }
     if (auto it = state.asm_operand_refs.find(src_id);
         it != state.asm_operand_refs.end()) {
       state.arg_params[it->second].ref_count += 1;
       state.asm_operand_refs[dst_id] = it->second;
-      if (src_op.isKill()) {
+      if (is_kill) {
         llvm::raw_string_ostream os(buf);
         state.kill_reg(os, src_id);
       }
       return true;
     }
-    if (src_op.isKill() && state.ret_defs.lookup(dst_id) == inst) {
+    if (is_kill && state.ret_defs.lookup(dst_id) == inst) {
       state.fmt_line(buf, 4, "// move to returned register optimized out");
       llvm::raw_string_ostream os(buf);
       state.kill_reg(os, dst_id);
