@@ -5,8 +5,9 @@
 ; RUN: tpde-llc --target=x86_64 %s | %objdump | FileCheck %s -check-prefixes=X64
 ; RUN: tpde-llc --target=aarch64 %s | %objdump | FileCheck %s -check-prefixes=ARM64
 ; XFAIL: llvm19.1
+; XFAIL: llvm20.1
+; XFAIL: llvm21.1
 ; XFAIL: llvm22.1
-; XFAIL: llvm23.1
 
 define i8 @ctpop_i8(i8 %0) {
 ; X64-LABEL: <ctpop_i8>:
@@ -202,48 +203,33 @@ define i64 @ctpop_i64(i64 %0) {
 
 define i128 @ctpop_i128(i128 %0) {
 ; X64-LABEL: <ctpop_i128>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    push rbx
-; X64-NEXT:    mov rax, rsi
-; X64-NEXT:    shr rax
-; X64-NEXT:    movabs rcx, 0x5555555555555555
-; X64-NEXT:    and rax, rcx
-; X64-NEXT:    sub rsi, rax
-; X64-NEXT:    movabs rdx, 0x3333333333333333
-; X64-NEXT:    mov rax, rsi
-; X64-NEXT:    and rax, rdx
-; X64-NEXT:    shr rsi, 0x2
-; X64-NEXT:    and rsi, rdx
-; X64-NEXT:    add rax, rsi
-; X64-NEXT:    mov rbx, rax
-; X64-NEXT:    shr rbx, 0x4
-; X64-NEXT:    add rbx, rax
-; X64-NEXT:    movabs rsi, 0xf0f0f0f0f0f0f0f
-; X64-NEXT:    and rbx, rsi
-; X64-NEXT:    movabs r8, 0x101010101010101
-; X64-NEXT:    imul rbx, r8
-; X64-NEXT:    shr rbx, 0x38
-; X64-NEXT:    mov rax, rdi
-; X64-NEXT:    shr rax
-; X64-NEXT:    and rax, rcx
-; X64-NEXT:    sub rdi, rax
-; X64-NEXT:    mov rax, rdi
-; X64-NEXT:    and rax, rdx
-; X64-NEXT:    shr rdi, 0x2
-; X64-NEXT:    and rdx, rdi
-; X64-NEXT:    add rdx, rax
-; X64-NEXT:    mov rax, rdx
-; X64-NEXT:    shr rax, 0x4
-; X64-NEXT:    add rax, rdx
-; X64-NEXT:    and rax, rsi
-; X64-NEXT:    imul rax, r8
-; X64-NEXT:    shr rax, 0x38
-; X64-NEXT:    add rax, rbx
-; X64-NEXT:    xor ebx, ebx
-; X64-NEXT:    mov rdx, rbx
-; X64-NEXT:    pop rbx
-; X64-NEXT:    pop rbp
+; X64:         movq xmm0, rdi
+; X64-NEXT:    movq xmm1, rsi
+; X64-NEXT:    punpcklqdq {{.*#+}} xmm1 = xmm1[0],xmm0[0]
+; X64-NEXT:    movdqa xmm0, xmm1
+; X64-NEXT:    psrlw xmm0, 0x1
+; X64-NEXT:    pand xmm0, xmmword ptr <ctpop_i128+0x17>
+; X64-NEXT:     R_X86_64_PC32 -0x4
+; X64-NEXT:    psubb xmm1, xmm0
+; X64-NEXT:    movdqa xmm0, xmmword ptr <ctpop_i128+0x23>
+; X64-NEXT:     R_X86_64_PC32 -0x4
+; X64-NEXT:    movdqa xmm2, xmm1
+; X64-NEXT:    pand xmm2, xmm0
+; X64-NEXT:    psrlw xmm1, 0x2
+; X64-NEXT:    pand xmm1, xmm0
+; X64-NEXT:    paddb xmm1, xmm2
+; X64-NEXT:    movdqa xmm0, xmm1
+; X64-NEXT:    psrlw xmm0, 0x4
+; X64-NEXT:    paddb xmm0, xmm1
+; X64-NEXT:    pand xmm0, xmmword ptr <ctpop_i128+0x4d>
+; X64-NEXT:     R_X86_64_PC32 -0x4
+; X64-NEXT:    pxor xmm1, xmm1
+; X64-NEXT:    psadbw xmm1, xmm0
+; X64-NEXT:    pshufd {{.*#+}} xmm0 = xmm1[2,3,2,3]
+; X64-NEXT:    paddq xmm0, xmm1
+; X64-NEXT:    movd eax, xmm0
+; X64-NEXT:    xor ecx, ecx
+; X64-NEXT:    mov rdx, rcx
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ctpop_i128>:

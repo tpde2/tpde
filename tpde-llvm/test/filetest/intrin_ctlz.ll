@@ -6,7 +6,9 @@
 ; RUN: tpde-llc --target=x86_64 %s | %objdump | FileCheck %s -check-prefixes=X64
 ; RUN: tpde-llc --target=aarch64 %s | %objdump | FileCheck %s -check-prefixes=ARM64
 ; XFAIL: llvm19.1
-; XFAIL: llvm23.1
+; XFAIL: llvm20.1
+; XFAIL: llvm21.1
+; XFAIL: llvm22.1
 
 declare i8   @llvm.ctlz.i8  (i8, i1)
 declare i16   @llvm.ctlz.i16  (i16, i1)
@@ -18,12 +20,10 @@ declare i64   @llvm.ctlz.i64  (i64, i1)
 define void @ctlz_i8(i8 %0) {
 ; X64-LABEL: <ctlz_i8>:
 ; X64:         movzx edi, dil
+; X64-NEXT:    mov eax, 0x3f
 ; X64-NEXT:    bsr eax, edi
 ; X64-NEXT:    xor eax, 0x1f
 ; X64-NEXT:    add eax, -0x18
-; X64-NEXT:    test edi, edi
-; X64-NEXT:    mov edi, 0x8
-; X64-NEXT:    cmovne edi, eax
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ctlz_i8>:
@@ -57,12 +57,10 @@ define void @ctlz_i8_zero_poison(i8 %0) {
 define void @ctlz_i16(i16 %0) {
 ; X64-LABEL: <ctlz_i16>:
 ; X64:         movzx edi, di
+; X64-NEXT:    mov eax, 0x3f
 ; X64-NEXT:    bsr eax, edi
 ; X64-NEXT:    xor eax, 0x1f
 ; X64-NEXT:    add eax, -0x10
-; X64-NEXT:    test edi, edi
-; X64-NEXT:    mov edi, 0x10
-; X64-NEXT:    cmovne edi, eax
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ctlz_i16>:
@@ -194,19 +192,15 @@ define void @ctlz_i64_no_salvage(i64 %0) {
 define void @ctlz_i16_no_salvage(i16 %0) {
 ; X64-LABEL: <ctlz_i16_no_salvage>:
 ; X64:         movzx eax, di
+; X64-NEXT:    mov ecx, 0x3f
 ; X64-NEXT:    bsr ecx, eax
 ; X64-NEXT:    xor ecx, 0x1f
 ; X64-NEXT:    add ecx, -0x10
-; X64-NEXT:    test eax, eax
-; X64-NEXT:    mov eax, 0x10
-; X64-NEXT:    cmovne eax, ecx
 ; X64-NEXT:    movzx edi, di
+; X64-NEXT:    mov eax, 0x3f
 ; X64-NEXT:    bsr eax, edi
 ; X64-NEXT:    xor eax, 0x1f
 ; X64-NEXT:    add eax, -0x10
-; X64-NEXT:    test edi, edi
-; X64-NEXT:    mov edi, 0x10
-; X64-NEXT:    cmovne edi, eax
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ctlz_i16_no_salvage>:
@@ -247,7 +241,7 @@ define i128 @ctlz_i128(i128 %a) {
 ; ARM64-NEXT:    cmp x1, #0x0
 ; ARM64-NEXT:    add x0, x0, #0x40
 ; ARM64-NEXT:    mov x1, xzr
-; ARM64-NEXT:    csel x3, x0, x2, eq
+; ARM64-NEXT:    csel x3, x2, x0, ne
 ; ARM64-NEXT:    mov x0, x3
 ; ARM64-NEXT:    ret
   %r = call i128 @llvm.ctlz.i128(i128 %a, i1 0)
@@ -298,13 +292,13 @@ define i128 @ctlz_i128_no_salvage(i128 %a) {
 ; ARM64-NEXT:    cmp x1, #0x0
 ; ARM64-NEXT:    add x2, x2, #0x40
 ; ARM64-NEXT:    mov x4, xzr
-; ARM64-NEXT:    csel x5, x2, x3, eq
+; ARM64-NEXT:    csel x5, x3, x2, ne
 ; ARM64-NEXT:    clz x0, x0
 ; ARM64-NEXT:    clz x2, x1
 ; ARM64-NEXT:    cmp x1, #0x0
 ; ARM64-NEXT:    add x0, x0, #0x40
 ; ARM64-NEXT:    mov x1, xzr
-; ARM64-NEXT:    csel x3, x0, x2, eq
+; ARM64-NEXT:    csel x3, x2, x0, ne
 ; ARM64-NEXT:    mov x0, x5
 ; ARM64-NEXT:    mov x1, x4
 ; ARM64-NEXT:    ret

@@ -5,8 +5,9 @@
 
 ; RUN: tpde-llc --target=x86_64 %s | %objdump | FileCheck %s -check-prefixes=X64
 ; RUN: tpde-llc --target=aarch64 %s | %objdump | FileCheck %s -check-prefixes=ARM64
-; XFAIL: llvm22.1
-; XFAIL: llvm23.1
+; XFAIL: llvm19.1
+; XFAIL: llvm20.1
+; XFAIL: llvm21.1
 
 define i32 @select_i32_reg(i1 %0, i32 %1, i32 %2) {
 ; X64-LABEL: <select_i32_reg>:
@@ -191,11 +192,11 @@ define <2 x i64> @select_v2i64(i1 %0, <2 x i64> %1, <2 x i64> %2) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <select_v2i64>:
-; ARM64:         and w0, w0, #0x1
-; ARM64-NEXT:    fmov s2, wzr
+; ARM64:         movi v2.8b, #0x0
+; ARM64-NEXT:    and w0, w0, #0x1
 ; ARM64-NEXT:    fmov s3, w0
-; ARM64-NEXT:    cmeq v2.16b, v3.16b, v2.16b
-; ARM64-NEXT:    dup v2.16b, v2.b[0]
+; ARM64-NEXT:    cmeq v2.4s, v3.4s, v2.4s
+; ARM64-NEXT:    dup v2.4s, v2.s[0]
 ; ARM64-NEXT:    bit v0.16b, v1.16b, v2.16b
 ; ARM64-NEXT:    ret
   %r = select i1 %0, <2 x i64> %1, <2 x i64> %2

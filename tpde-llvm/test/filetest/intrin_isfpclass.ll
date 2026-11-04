@@ -6,8 +6,7 @@
 ; RUN: tpde-llc --target=aarch64 %s | %objdump | FileCheck %s -check-prefixes=ARM64
 ; XFAIL: llvm19.1
 ; XFAIL: llvm20.1
-; XFAIL: llvm22.1
-; XFAIL: llvm23.1
+; XFAIL: llvm21.1
 
 define i1 @is_snan_float(float %p) {
 ; X64-LABEL: <is_snan_float>:
@@ -194,7 +193,7 @@ define i1 @is_nnorm_float(float %p) {
 ; ARM64-NEXT:    lsr w2, w2, #24
 ; ARM64-NEXT:    cmp w2, #0x7f
 ; ARM64-NEXT:    ccmp w1, #0x0, #0x0, lo
-; ARM64-NEXT:    cset w1, lt
+; ARM64-NEXT:    cset w1, mi
 ; ARM64-NEXT:    orr w0, w0, w1
 ; ARM64-NEXT:    ret
   %r = call i1 @llvm.is.fpclass(float %p, i32 8)
@@ -233,7 +232,7 @@ define i1 @is_nnorm_double(double %p) {
 ; ARM64-NEXT:    lsr x2, x2, #53
 ; ARM64-NEXT:    cmp x2, #0x3ff
 ; ARM64-NEXT:    ccmp x1, #0x0, #0x0, lo
-; ARM64-NEXT:    cset w2, lt
+; ARM64-NEXT:    cset w2, mi
 ; ARM64-NEXT:    orr w0, w0, w2
 ; ARM64-NEXT:    ret
   %r = call i1 @llvm.is.fpclass(double %p, i32 8)
@@ -263,7 +262,7 @@ define i1 @is_nsnorm_float(float %p) {
 ; ARM64-NEXT:    sub w3, w3, #0x1
 ; ARM64-NEXT:    cmp w3, w2
 ; ARM64-NEXT:    ccmp w1, #0x0, #0x0, lo
-; ARM64-NEXT:    cset w2, lt
+; ARM64-NEXT:    cset w2, mi
 ; ARM64-NEXT:    orr w0, w0, w2
 ; ARM64-NEXT:    ret
   %r = call i1 @llvm.is.fpclass(float %p, i32 16)
@@ -300,7 +299,7 @@ define i1 @is_nsnorm_double(double %p) {
 ; ARM64-NEXT:    sub x3, x3, #0x1
 ; ARM64-NEXT:    cmp x3, x2
 ; ARM64-NEXT:    ccmp x1, #0x0, #0x0, lo
-; ARM64-NEXT:    cset w2, lt
+; ARM64-NEXT:    cset w2, mi
 ; ARM64-NEXT:    orr w0, w0, w2
 ; ARM64-NEXT:    ret
   %r = call i1 @llvm.is.fpclass(double %p, i32 16)
@@ -567,9 +566,8 @@ define i1 @is_ninf_pinf_float(float %p) {
 ;
 ; ARM64-LABEL: <is_ninf_pinf_float>:
 ; ARM64:         fmov w0, s0
-; ARM64-NEXT:    mov w1, #0x7f800000 // =2139095040
-; ARM64-NEXT:    and w0, w0, #0x7fffffff
-; ARM64-NEXT:    cmp w0, w1
+; ARM64-NEXT:    mov w1, #-0x1000000 // =-16777216
+; ARM64-NEXT:    cmp w1, w0, lsl #1
 ; ARM64-NEXT:    cset w1, eq
 ; ARM64-NEXT:    mov w2, #0x0 // =0
 ; ARM64-NEXT:    orr w2, w2, w1
@@ -591,9 +589,8 @@ define i1 @is_ninf_pinf_double(double %p) {
 ;
 ; ARM64-LABEL: <is_ninf_pinf_double>:
 ; ARM64:         fmov x0, d0
-; ARM64-NEXT:    mov x1, #0x7ff0000000000000 // =9218868437227405312
-; ARM64-NEXT:    and x0, x0, #0x7fffffffffffffff
-; ARM64-NEXT:    cmp x0, x1
+; ARM64-NEXT:    mov x1, #-0x20000000000000 // =-9007199254740992
+; ARM64-NEXT:    cmp x1, x0, lsl #1
 ; ARM64-NEXT:    cset w1, eq
 ; ARM64-NEXT:    mov w2, #0x0 // =0
 ; ARM64-NEXT:    orr w2, w2, w1

@@ -7,7 +7,8 @@
 ; RUN: tpde-llc --target=aarch64 %s | %objdump | FileCheck %s -check-prefixes=ARM64
 ; XFAIL: llvm19.1
 ; XFAIL: llvm20.1
-; XFAIL: llvm23.1
+; XFAIL: llvm21.1
+; XFAIL: llvm22.1
 
 define void @icmp_eq_v8i8(ptr %p, <8 x i8> %a, <8 x i8> %b) {
 ; X64-LABEL: <icmp_eq_v8i8>:
@@ -72,10 +73,10 @@ define void @icmp_eq_v16i8(ptr %p, <16 x i8> %a, <16 x i8> %b) {
 ; ARM64-NEXT:    ldr q1, [x1]
 ; ARM64-NEXT:     R_AARCH64_LDST128_ABS_LO12_NC
 ; ARM64-NEXT:    and v0.16b, v0.16b, v1.16b
-; ARM64-NEXT:    ext v1.16b, v0.16b, v0.16b, #0x8
-; ARM64-NEXT:    zip1 v0.16b, v0.16b, v1.16b
-; ARM64-NEXT:    addv h0, v0.8h
-; ARM64-NEXT:    fmov w2, s0
+; ARM64-NEXT:    addp v0.16b, v0.16b, v0.16b
+; ARM64-NEXT:    addp v0.16b, v0.16b, v0.16b
+; ARM64-NEXT:    addp v0.16b, v0.16b, v0.16b
+; ARM64-NEXT:    umov w2, v0.h[0]
 ; ARM64-NEXT:    strh w2, [x0]
 ; ARM64-NEXT:    ret
   %r = icmp eq <16 x i8> %a, %b
@@ -99,10 +100,10 @@ define void @icmp_eq_v16i8_0(ptr %p, <16 x i8> %a) {
 ; ARM64-NEXT:    ldr q1, [x1]
 ; ARM64-NEXT:     R_AARCH64_LDST128_ABS_LO12_NC
 ; ARM64-NEXT:    and v0.16b, v0.16b, v1.16b
-; ARM64-NEXT:    ext v1.16b, v0.16b, v0.16b, #0x8
-; ARM64-NEXT:    zip1 v0.16b, v0.16b, v1.16b
-; ARM64-NEXT:    addv h0, v0.8h
-; ARM64-NEXT:    fmov w2, s0
+; ARM64-NEXT:    addp v0.16b, v0.16b, v0.16b
+; ARM64-NEXT:    addp v0.16b, v0.16b, v0.16b
+; ARM64-NEXT:    addp v0.16b, v0.16b, v0.16b
+; ARM64-NEXT:    umov w2, v0.h[0]
 ; ARM64-NEXT:    strh w2, [x0]
 ; ARM64-NEXT:    ret
   %r = icmp eq <16 x i8> %a, zeroinitializer
@@ -219,11 +220,10 @@ define void @icmp_eq_v2i32(ptr %p, <2 x i32> %a, <2 x i32> %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_eq_v2i32>:
-; ARM64:         adrp x1, 0x0 <icmp_eq_v8i8>
-; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
+; ARM64:         mov x1, #0x1 // =1
 ; ARM64-NEXT:    cmeq v0.2s, v0.2s, v1.2s
-; ARM64-NEXT:    ldr d1, [x1]
-; ARM64-NEXT:     R_AARCH64_LDST64_ABS_LO12_NC
+; ARM64-NEXT:    movk x1, #0x2, lsl #32
+; ARM64-NEXT:    fmov d1, x1
 ; ARM64-NEXT:    and v0.8b, v0.8b, v1.8b
 ; ARM64-NEXT:    addp v0.2s, v0.2s, v0.2s
 ; ARM64-NEXT:    fmov w2, s0
@@ -244,12 +244,11 @@ define void @icmp_eq_v2i32_0(ptr %p, <2 x i32> %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_eq_v2i32_0>:
-; ARM64:         adrp x1, 0x0 <icmp_eq_v8i8>
-; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
+; ARM64:         mov x1, #0x1 // =1
 ; ARM64-NEXT:    movi v1.8b, #0x0
 ; ARM64-NEXT:    cmeq v0.2s, v0.2s, v1.2s
-; ARM64-NEXT:    ldr d1, [x1]
-; ARM64-NEXT:     R_AARCH64_LDST64_ABS_LO12_NC
+; ARM64-NEXT:    movk x1, #0x2, lsl #32
+; ARM64-NEXT:    fmov d1, x1
 ; ARM64-NEXT:    and v0.8b, v0.8b, v1.8b
 ; ARM64-NEXT:    addp v0.2s, v0.2s, v0.2s
 ; ARM64-NEXT:    fmov w2, s0
@@ -477,10 +476,10 @@ define void @icmp_ne_v16i8(ptr %p, <16 x i8> %a, <16 x i8> %b) {
 ; ARM64-NEXT:    ldr q1, [x1]
 ; ARM64-NEXT:     R_AARCH64_LDST128_ABS_LO12_NC
 ; ARM64-NEXT:    bic v0.16b, v1.16b, v0.16b
-; ARM64-NEXT:    ext v1.16b, v0.16b, v0.16b, #0x8
-; ARM64-NEXT:    zip1 v0.16b, v0.16b, v1.16b
-; ARM64-NEXT:    addv h0, v0.8h
-; ARM64-NEXT:    fmov w2, s0
+; ARM64-NEXT:    addp v0.16b, v0.16b, v0.16b
+; ARM64-NEXT:    addp v0.16b, v0.16b, v0.16b
+; ARM64-NEXT:    addp v0.16b, v0.16b, v0.16b
+; ARM64-NEXT:    umov w2, v0.h[0]
 ; ARM64-NEXT:    strh w2, [x0]
 ; ARM64-NEXT:    ret
   %r = icmp ne <16 x i8> %a, %b
@@ -505,10 +504,10 @@ define void @icmp_ne_v16i8_0(ptr %p, <16 x i8> %a) {
 ; ARM64-NEXT:    ldr q1, [x1]
 ; ARM64-NEXT:     R_AARCH64_LDST128_ABS_LO12_NC
 ; ARM64-NEXT:    bic v0.16b, v1.16b, v0.16b
-; ARM64-NEXT:    ext v1.16b, v0.16b, v0.16b, #0x8
-; ARM64-NEXT:    zip1 v0.16b, v0.16b, v1.16b
-; ARM64-NEXT:    addv h0, v0.8h
-; ARM64-NEXT:    fmov w2, s0
+; ARM64-NEXT:    addp v0.16b, v0.16b, v0.16b
+; ARM64-NEXT:    addp v0.16b, v0.16b, v0.16b
+; ARM64-NEXT:    addp v0.16b, v0.16b, v0.16b
+; ARM64-NEXT:    umov w2, v0.h[0]
 ; ARM64-NEXT:    strh w2, [x0]
 ; ARM64-NEXT:    ret
   %r = icmp ne <16 x i8> %a, zeroinitializer
@@ -630,11 +629,10 @@ define void @icmp_ne_v2i32(ptr %p, <2 x i32> %a, <2 x i32> %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_ne_v2i32>:
-; ARM64:         adrp x1, 0x0 <icmp_eq_v8i8>
-; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
+; ARM64:         mov x1, #0x1 // =1
 ; ARM64-NEXT:    cmeq v0.2s, v0.2s, v1.2s
-; ARM64-NEXT:    ldr d1, [x1]
-; ARM64-NEXT:     R_AARCH64_LDST64_ABS_LO12_NC
+; ARM64-NEXT:    movk x1, #0x2, lsl #32
+; ARM64-NEXT:    fmov d1, x1
 ; ARM64-NEXT:    bic v0.8b, v1.8b, v0.8b
 ; ARM64-NEXT:    addp v0.2s, v0.2s, v0.2s
 ; ARM64-NEXT:    fmov w2, s0
@@ -656,12 +654,11 @@ define void @icmp_ne_v2i32_0(ptr %p, <2 x i32> %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_ne_v2i32_0>:
-; ARM64:         adrp x1, 0x0 <icmp_eq_v8i8>
-; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
+; ARM64:         mov x1, #0x1 // =1
 ; ARM64-NEXT:    movi v1.8b, #0x0
 ; ARM64-NEXT:    cmeq v0.2s, v0.2s, v1.2s
-; ARM64-NEXT:    ldr d1, [x1]
-; ARM64-NEXT:     R_AARCH64_LDST64_ABS_LO12_NC
+; ARM64-NEXT:    movk x1, #0x2, lsl #32
+; ARM64-NEXT:    fmov d1, x1
 ; ARM64-NEXT:    bic v0.8b, v1.8b, v0.8b
 ; ARM64-NEXT:    addp v0.2s, v0.2s, v0.2s
 ; ARM64-NEXT:    fmov w2, s0
@@ -844,10 +841,10 @@ define void @icmp_ugt_v16i8(ptr %p, <16 x i8> %a, <16 x i8> %b) {
 ; ARM64-NEXT:    ldr q1, [x1]
 ; ARM64-NEXT:     R_AARCH64_LDST128_ABS_LO12_NC
 ; ARM64-NEXT:    and v0.16b, v0.16b, v1.16b
-; ARM64-NEXT:    ext v1.16b, v0.16b, v0.16b, #0x8
-; ARM64-NEXT:    zip1 v0.16b, v0.16b, v1.16b
-; ARM64-NEXT:    addv h0, v0.8h
-; ARM64-NEXT:    fmov w2, s0
+; ARM64-NEXT:    addp v0.16b, v0.16b, v0.16b
+; ARM64-NEXT:    addp v0.16b, v0.16b, v0.16b
+; ARM64-NEXT:    addp v0.16b, v0.16b, v0.16b
+; ARM64-NEXT:    umov w2, v0.h[0]
 ; ARM64-NEXT:    strh w2, [x0]
 ; ARM64-NEXT:    ret
   %r = icmp ugt <16 x i8> %a, %b
@@ -873,10 +870,10 @@ define void @icmp_ugt_v16i8_0(ptr %p, <16 x i8> %a) {
 ; ARM64-NEXT:    ldr q1, [x1]
 ; ARM64-NEXT:     R_AARCH64_LDST128_ABS_LO12_NC
 ; ARM64-NEXT:    and v0.16b, v0.16b, v1.16b
-; ARM64-NEXT:    ext v1.16b, v0.16b, v0.16b, #0x8
-; ARM64-NEXT:    zip1 v0.16b, v0.16b, v1.16b
-; ARM64-NEXT:    addv h0, v0.8h
-; ARM64-NEXT:    fmov w2, s0
+; ARM64-NEXT:    addp v0.16b, v0.16b, v0.16b
+; ARM64-NEXT:    addp v0.16b, v0.16b, v0.16b
+; ARM64-NEXT:    addp v0.16b, v0.16b, v0.16b
+; ARM64-NEXT:    umov w2, v0.h[0]
 ; ARM64-NEXT:    strh w2, [x0]
 ; ARM64-NEXT:    ret
   %r = icmp ugt <16 x i8> %a, zeroinitializer
@@ -1013,11 +1010,10 @@ define void @icmp_ugt_v2i32(ptr %p, <2 x i32> %a, <2 x i32> %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_ugt_v2i32>:
-; ARM64:         adrp x1, 0x0 <icmp_eq_v8i8>
-; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
+; ARM64:         mov x1, #0x1 // =1
 ; ARM64-NEXT:    cmhi v0.2s, v0.2s, v1.2s
-; ARM64-NEXT:    ldr d1, [x1]
-; ARM64-NEXT:     R_AARCH64_LDST64_ABS_LO12_NC
+; ARM64-NEXT:    movk x1, #0x2, lsl #32
+; ARM64-NEXT:    fmov d1, x1
 ; ARM64-NEXT:    and v0.8b, v0.8b, v1.8b
 ; ARM64-NEXT:    addp v0.2s, v0.2s, v0.2s
 ; ARM64-NEXT:    fmov w2, s0
@@ -1042,12 +1038,11 @@ define void @icmp_ugt_v2i32_0(ptr %p, <2 x i32> %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_ugt_v2i32_0>:
-; ARM64:         adrp x1, 0x0 <icmp_eq_v8i8>
-; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
+; ARM64:         mov x1, #0x1 // =1
 ; ARM64-NEXT:    movi v1.8b, #0x0
 ; ARM64-NEXT:    cmhi v0.2s, v0.2s, v1.2s
-; ARM64-NEXT:    ldr d1, [x1]
-; ARM64-NEXT:     R_AARCH64_LDST64_ABS_LO12_NC
+; ARM64-NEXT:    movk x1, #0x2, lsl #32
+; ARM64-NEXT:    fmov d1, x1
 ; ARM64-NEXT:    and v0.8b, v0.8b, v1.8b
 ; ARM64-NEXT:    addp v0.2s, v0.2s, v0.2s
 ; ARM64-NEXT:    fmov w2, s0
@@ -1121,10 +1116,12 @@ define void @icmp_ugt_v2i64(ptr %p, <2 x i64> %a, <2 x i64> %b) {
 ; X64-NEXT:    pxor xmm1, xmm2
 ; X64-NEXT:    pxor xmm0, xmm2
 ; X64-NEXT:    movdqa xmm2, xmm0
-; X64-NEXT:    pcmpeqd xmm2, xmm1
-; X64-NEXT:    pcmpgtd xmm0, xmm1
-; X64-NEXT:    pshufd {{.*#+}} xmm1 = xmm0[0,0,2,2]
-; X64-NEXT:    pand xmm1, xmm2
+; X64-NEXT:    pcmpgtd xmm2, xmm1
+; X64-NEXT:    pshufd {{.*#+}} xmm3 = xmm2[0,0,2,2]
+; X64-NEXT:    pcmpeqd xmm0, xmm1
+; X64-NEXT:    pshufd {{.*#+}} xmm0 = xmm0[1,1,3,3]
+; X64-NEXT:    pand xmm0, xmm3
+; X64-NEXT:    pshufd {{.*#+}} xmm1 = xmm2[1,1,3,3]
 ; X64-NEXT:    por xmm1, xmm0
 ; X64-NEXT:    movmskpd eax, xmm1
 ; X64-NEXT:    mov byte ptr [rdi], al
@@ -1154,10 +1151,12 @@ define void @icmp_ugt_v2i64_0(ptr %p, <2 x i64> %a) {
 ; X64-NEXT:    pxor xmm2, xmm1
 ; X64-NEXT:    pxor xmm0, xmm1
 ; X64-NEXT:    movdqa xmm1, xmm0
-; X64-NEXT:    pcmpeqd xmm1, xmm2
-; X64-NEXT:    pcmpgtd xmm0, xmm2
-; X64-NEXT:    pshufd {{.*#+}} xmm2 = xmm0[0,0,2,2]
-; X64-NEXT:    pand xmm2, xmm1
+; X64-NEXT:    pcmpgtd xmm1, xmm2
+; X64-NEXT:    pshufd {{.*#+}} xmm3 = xmm1[0,0,2,2]
+; X64-NEXT:    pcmpeqd xmm0, xmm2
+; X64-NEXT:    pshufd {{.*#+}} xmm0 = xmm0[1,1,3,3]
+; X64-NEXT:    pand xmm0, xmm3
+; X64-NEXT:    pshufd {{.*#+}} xmm2 = xmm1[1,1,3,3]
 ; X64-NEXT:    por xmm2, xmm0
 ; X64-NEXT:    movmskpd eax, xmm2
 ; X64-NEXT:    mov byte ptr [rdi], al
@@ -1245,10 +1244,10 @@ define void @icmp_uge_v16i8(ptr %p, <16 x i8> %a, <16 x i8> %b) {
 ; ARM64-NEXT:    ldr q1, [x1]
 ; ARM64-NEXT:     R_AARCH64_LDST128_ABS_LO12_NC
 ; ARM64-NEXT:    and v0.16b, v0.16b, v1.16b
-; ARM64-NEXT:    ext v1.16b, v0.16b, v0.16b, #0x8
-; ARM64-NEXT:    zip1 v0.16b, v0.16b, v1.16b
-; ARM64-NEXT:    addv h0, v0.8h
-; ARM64-NEXT:    fmov w2, s0
+; ARM64-NEXT:    addp v0.16b, v0.16b, v0.16b
+; ARM64-NEXT:    addp v0.16b, v0.16b, v0.16b
+; ARM64-NEXT:    addp v0.16b, v0.16b, v0.16b
+; ARM64-NEXT:    umov w2, v0.h[0]
 ; ARM64-NEXT:    strh w2, [x0]
 ; ARM64-NEXT:    ret
   %r = icmp uge <16 x i8> %a, %b
@@ -1273,10 +1272,10 @@ define void @icmp_uge_v16i8_0(ptr %p, <16 x i8> %a) {
 ; ARM64-NEXT:    ldr q1, [x1]
 ; ARM64-NEXT:     R_AARCH64_LDST128_ABS_LO12_NC
 ; ARM64-NEXT:    and v0.16b, v0.16b, v1.16b
-; ARM64-NEXT:    ext v1.16b, v0.16b, v0.16b, #0x8
-; ARM64-NEXT:    zip1 v0.16b, v0.16b, v1.16b
-; ARM64-NEXT:    addv h0, v0.8h
-; ARM64-NEXT:    fmov w2, s0
+; ARM64-NEXT:    addp v0.16b, v0.16b, v0.16b
+; ARM64-NEXT:    addp v0.16b, v0.16b, v0.16b
+; ARM64-NEXT:    addp v0.16b, v0.16b, v0.16b
+; ARM64-NEXT:    umov w2, v0.h[0]
 ; ARM64-NEXT:    strh w2, [x0]
 ; ARM64-NEXT:    ret
   %r = icmp uge <16 x i8> %a, zeroinitializer
@@ -1406,11 +1405,10 @@ define void @icmp_uge_v2i32(ptr %p, <2 x i32> %a, <2 x i32> %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_uge_v2i32>:
-; ARM64:         adrp x1, 0x0 <icmp_eq_v8i8>
-; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
+; ARM64:         mov x1, #0x1 // =1
 ; ARM64-NEXT:    cmhs v0.2s, v0.2s, v1.2s
-; ARM64-NEXT:    ldr d1, [x1]
-; ARM64-NEXT:     R_AARCH64_LDST64_ABS_LO12_NC
+; ARM64-NEXT:    movk x1, #0x2, lsl #32
+; ARM64-NEXT:    fmov d1, x1
 ; ARM64-NEXT:    and v0.8b, v0.8b, v1.8b
 ; ARM64-NEXT:    addp v0.2s, v0.2s, v0.2s
 ; ARM64-NEXT:    fmov w2, s0
@@ -1436,12 +1434,11 @@ define void @icmp_uge_v2i32_0(ptr %p, <2 x i32> %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_uge_v2i32_0>:
-; ARM64:         adrp x1, 0x0 <icmp_eq_v8i8>
-; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
+; ARM64:         mov x1, #0x1 // =1
 ; ARM64-NEXT:    movi v1.8b, #0x0
 ; ARM64-NEXT:    cmhs v0.2s, v0.2s, v1.2s
-; ARM64-NEXT:    ldr d1, [x1]
-; ARM64-NEXT:     R_AARCH64_LDST64_ABS_LO12_NC
+; ARM64-NEXT:    movk x1, #0x2, lsl #32
+; ARM64-NEXT:    fmov d1, x1
 ; ARM64-NEXT:    and v0.8b, v0.8b, v1.8b
 ; ARM64-NEXT:    addp v0.2s, v0.2s, v0.2s
 ; ARM64-NEXT:    fmov w2, s0
@@ -1517,12 +1514,14 @@ define void @icmp_uge_v2i64(ptr %p, <2 x i64> %a, <2 x i64> %b) {
 ; X64-NEXT:    pxor xmm0, xmm2
 ; X64-NEXT:    pxor xmm1, xmm2
 ; X64-NEXT:    movdqa xmm2, xmm1
-; X64-NEXT:    pcmpeqd xmm2, xmm0
-; X64-NEXT:    pcmpgtd xmm1, xmm0
-; X64-NEXT:    pshufd {{.*#+}} xmm0 = xmm1[0,0,2,2]
-; X64-NEXT:    pand xmm0, xmm2
-; X64-NEXT:    por xmm0, xmm1
-; X64-NEXT:    movmskpd eax, xmm0
+; X64-NEXT:    pcmpgtd xmm2, xmm0
+; X64-NEXT:    pshufd {{.*#+}} xmm3 = xmm2[0,0,2,2]
+; X64-NEXT:    pcmpeqd xmm1, xmm0
+; X64-NEXT:    pshufd {{.*#+}} xmm0 = xmm1[1,1,3,3]
+; X64-NEXT:    pand xmm0, xmm3
+; X64-NEXT:    pshufd {{.*#+}} xmm1 = xmm2[1,1,3,3]
+; X64-NEXT:    por xmm1, xmm0
+; X64-NEXT:    movmskpd eax, xmm1
 ; X64-NEXT:    xor eax, 0x3
 ; X64-NEXT:    mov byte ptr [rdi], al
 ; X64-NEXT:    ret
@@ -1551,12 +1550,14 @@ define void @icmp_uge_v2i64_0(ptr %p, <2 x i64> %a) {
 ; X64-NEXT:    pxor xmm2, xmm2
 ; X64-NEXT:    pxor xmm2, xmm1
 ; X64-NEXT:    movdqa xmm1, xmm2
-; X64-NEXT:    pcmpeqd xmm1, xmm0
-; X64-NEXT:    pcmpgtd xmm2, xmm0
-; X64-NEXT:    pshufd {{.*#+}} xmm0 = xmm2[0,0,2,2]
-; X64-NEXT:    pand xmm0, xmm1
-; X64-NEXT:    por xmm0, xmm2
-; X64-NEXT:    movmskpd eax, xmm0
+; X64-NEXT:    pcmpgtd xmm1, xmm0
+; X64-NEXT:    pshufd {{.*#+}} xmm3 = xmm1[0,0,2,2]
+; X64-NEXT:    pcmpeqd xmm2, xmm0
+; X64-NEXT:    pshufd {{.*#+}} xmm0 = xmm2[1,1,3,3]
+; X64-NEXT:    pand xmm0, xmm3
+; X64-NEXT:    pshufd {{.*#+}} xmm2 = xmm1[1,1,3,3]
+; X64-NEXT:    por xmm2, xmm0
+; X64-NEXT:    movmskpd eax, xmm2
 ; X64-NEXT:    xor eax, 0x3
 ; X64-NEXT:    mov byte ptr [rdi], al
 ; X64-NEXT:    ret
@@ -1646,10 +1647,10 @@ define void @icmp_ult_v16i8(ptr %p, <16 x i8> %a, <16 x i8> %b) {
 ; ARM64-NEXT:    ldr q0, [x1]
 ; ARM64-NEXT:     R_AARCH64_LDST128_ABS_LO12_NC
 ; ARM64-NEXT:    and v1.16b, v1.16b, v0.16b
-; ARM64-NEXT:    ext v0.16b, v1.16b, v1.16b, #0x8
-; ARM64-NEXT:    zip1 v1.16b, v1.16b, v0.16b
-; ARM64-NEXT:    addv h1, v1.8h
-; ARM64-NEXT:    fmov w2, s1
+; ARM64-NEXT:    addp v1.16b, v1.16b, v1.16b
+; ARM64-NEXT:    addp v1.16b, v1.16b, v1.16b
+; ARM64-NEXT:    addp v1.16b, v1.16b, v1.16b
+; ARM64-NEXT:    umov w2, v1.h[0]
 ; ARM64-NEXT:    strh w2, [x0]
 ; ARM64-NEXT:    ret
   %r = icmp ult <16 x i8> %a, %b
@@ -1675,10 +1676,10 @@ define void @icmp_ult_v16i8_0(ptr %p, <16 x i8> %a) {
 ; ARM64-NEXT:    ldr q0, [x1]
 ; ARM64-NEXT:     R_AARCH64_LDST128_ABS_LO12_NC
 ; ARM64-NEXT:    and v1.16b, v1.16b, v0.16b
-; ARM64-NEXT:    ext v0.16b, v1.16b, v1.16b, #0x8
-; ARM64-NEXT:    zip1 v1.16b, v1.16b, v0.16b
-; ARM64-NEXT:    addv h1, v1.8h
-; ARM64-NEXT:    fmov w2, s1
+; ARM64-NEXT:    addp v1.16b, v1.16b, v1.16b
+; ARM64-NEXT:    addp v1.16b, v1.16b, v1.16b
+; ARM64-NEXT:    addp v1.16b, v1.16b, v1.16b
+; ARM64-NEXT:    umov w2, v1.h[0]
 ; ARM64-NEXT:    strh w2, [x0]
 ; ARM64-NEXT:    ret
   %r = icmp ult <16 x i8> %a, zeroinitializer
@@ -1815,11 +1816,10 @@ define void @icmp_ult_v2i32(ptr %p, <2 x i32> %a, <2 x i32> %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_ult_v2i32>:
-; ARM64:         adrp x1, 0x0 <icmp_eq_v8i8>
-; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
+; ARM64:         mov x1, #0x1 // =1
 ; ARM64-NEXT:    cmhi v1.2s, v1.2s, v0.2s
-; ARM64-NEXT:    ldr d0, [x1]
-; ARM64-NEXT:     R_AARCH64_LDST64_ABS_LO12_NC
+; ARM64-NEXT:    movk x1, #0x2, lsl #32
+; ARM64-NEXT:    fmov d0, x1
 ; ARM64-NEXT:    and v1.8b, v1.8b, v0.8b
 ; ARM64-NEXT:    addp v1.2s, v1.2s, v1.2s
 ; ARM64-NEXT:    fmov w2, s1
@@ -1844,12 +1844,11 @@ define void @icmp_ult_v2i32_0(ptr %p, <2 x i32> %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_ult_v2i32_0>:
-; ARM64:         adrp x1, 0x0 <icmp_eq_v8i8>
-; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
+; ARM64:         mov x1, #0x1 // =1
 ; ARM64-NEXT:    movi v1.8b, #0x0
 ; ARM64-NEXT:    cmhi v1.2s, v1.2s, v0.2s
-; ARM64-NEXT:    ldr d0, [x1]
-; ARM64-NEXT:     R_AARCH64_LDST64_ABS_LO12_NC
+; ARM64-NEXT:    movk x1, #0x2, lsl #32
+; ARM64-NEXT:    fmov d0, x1
 ; ARM64-NEXT:    and v1.8b, v1.8b, v0.8b
 ; ARM64-NEXT:    addp v1.2s, v1.2s, v1.2s
 ; ARM64-NEXT:    fmov w2, s1
@@ -1923,12 +1922,14 @@ define void @icmp_ult_v2i64(ptr %p, <2 x i64> %a, <2 x i64> %b) {
 ; X64-NEXT:    pxor xmm0, xmm2
 ; X64-NEXT:    pxor xmm1, xmm2
 ; X64-NEXT:    movdqa xmm2, xmm1
-; X64-NEXT:    pcmpeqd xmm2, xmm0
-; X64-NEXT:    pcmpgtd xmm1, xmm0
-; X64-NEXT:    pshufd {{.*#+}} xmm0 = xmm1[0,0,2,2]
-; X64-NEXT:    pand xmm0, xmm2
-; X64-NEXT:    por xmm0, xmm1
-; X64-NEXT:    movmskpd eax, xmm0
+; X64-NEXT:    pcmpgtd xmm2, xmm0
+; X64-NEXT:    pshufd {{.*#+}} xmm3 = xmm2[0,0,2,2]
+; X64-NEXT:    pcmpeqd xmm1, xmm0
+; X64-NEXT:    pshufd {{.*#+}} xmm0 = xmm1[1,1,3,3]
+; X64-NEXT:    pand xmm0, xmm3
+; X64-NEXT:    pshufd {{.*#+}} xmm1 = xmm2[1,1,3,3]
+; X64-NEXT:    por xmm1, xmm0
+; X64-NEXT:    movmskpd eax, xmm1
 ; X64-NEXT:    mov byte ptr [rdi], al
 ; X64-NEXT:    ret
 ;
@@ -1956,12 +1957,14 @@ define void @icmp_ult_v2i64_0(ptr %p, <2 x i64> %a) {
 ; X64-NEXT:    pxor xmm2, xmm2
 ; X64-NEXT:    pxor xmm2, xmm1
 ; X64-NEXT:    movdqa xmm1, xmm2
-; X64-NEXT:    pcmpeqd xmm1, xmm0
-; X64-NEXT:    pcmpgtd xmm2, xmm0
-; X64-NEXT:    pshufd {{.*#+}} xmm0 = xmm2[0,0,2,2]
-; X64-NEXT:    pand xmm0, xmm1
-; X64-NEXT:    por xmm0, xmm2
-; X64-NEXT:    movmskpd eax, xmm0
+; X64-NEXT:    pcmpgtd xmm1, xmm0
+; X64-NEXT:    pshufd {{.*#+}} xmm3 = xmm1[0,0,2,2]
+; X64-NEXT:    pcmpeqd xmm2, xmm0
+; X64-NEXT:    pshufd {{.*#+}} xmm0 = xmm2[1,1,3,3]
+; X64-NEXT:    pand xmm0, xmm3
+; X64-NEXT:    pshufd {{.*#+}} xmm2 = xmm1[1,1,3,3]
+; X64-NEXT:    por xmm2, xmm0
+; X64-NEXT:    movmskpd eax, xmm2
 ; X64-NEXT:    mov byte ptr [rdi], al
 ; X64-NEXT:    ret
 ;
@@ -2047,10 +2050,10 @@ define void @icmp_ule_v16i8(ptr %p, <16 x i8> %a, <16 x i8> %b) {
 ; ARM64-NEXT:    ldr q0, [x1]
 ; ARM64-NEXT:     R_AARCH64_LDST128_ABS_LO12_NC
 ; ARM64-NEXT:    and v1.16b, v1.16b, v0.16b
-; ARM64-NEXT:    ext v0.16b, v1.16b, v1.16b, #0x8
-; ARM64-NEXT:    zip1 v1.16b, v1.16b, v0.16b
-; ARM64-NEXT:    addv h1, v1.8h
-; ARM64-NEXT:    fmov w2, s1
+; ARM64-NEXT:    addp v1.16b, v1.16b, v1.16b
+; ARM64-NEXT:    addp v1.16b, v1.16b, v1.16b
+; ARM64-NEXT:    addp v1.16b, v1.16b, v1.16b
+; ARM64-NEXT:    umov w2, v1.h[0]
 ; ARM64-NEXT:    strh w2, [x0]
 ; ARM64-NEXT:    ret
   %r = icmp ule <16 x i8> %a, %b
@@ -2075,10 +2078,10 @@ define void @icmp_ule_v16i8_0(ptr %p, <16 x i8> %a) {
 ; ARM64-NEXT:    ldr q0, [x1]
 ; ARM64-NEXT:     R_AARCH64_LDST128_ABS_LO12_NC
 ; ARM64-NEXT:    and v1.16b, v1.16b, v0.16b
-; ARM64-NEXT:    ext v0.16b, v1.16b, v1.16b, #0x8
-; ARM64-NEXT:    zip1 v1.16b, v1.16b, v0.16b
-; ARM64-NEXT:    addv h1, v1.8h
-; ARM64-NEXT:    fmov w2, s1
+; ARM64-NEXT:    addp v1.16b, v1.16b, v1.16b
+; ARM64-NEXT:    addp v1.16b, v1.16b, v1.16b
+; ARM64-NEXT:    addp v1.16b, v1.16b, v1.16b
+; ARM64-NEXT:    umov w2, v1.h[0]
 ; ARM64-NEXT:    strh w2, [x0]
 ; ARM64-NEXT:    ret
   %r = icmp ule <16 x i8> %a, zeroinitializer
@@ -2208,11 +2211,10 @@ define void @icmp_ule_v2i32(ptr %p, <2 x i32> %a, <2 x i32> %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_ule_v2i32>:
-; ARM64:         adrp x1, 0x0 <icmp_eq_v8i8>
-; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
+; ARM64:         mov x1, #0x1 // =1
 ; ARM64-NEXT:    cmhs v1.2s, v1.2s, v0.2s
-; ARM64-NEXT:    ldr d0, [x1]
-; ARM64-NEXT:     R_AARCH64_LDST64_ABS_LO12_NC
+; ARM64-NEXT:    movk x1, #0x2, lsl #32
+; ARM64-NEXT:    fmov d0, x1
 ; ARM64-NEXT:    and v1.8b, v1.8b, v0.8b
 ; ARM64-NEXT:    addp v1.2s, v1.2s, v1.2s
 ; ARM64-NEXT:    fmov w2, s1
@@ -2238,12 +2240,11 @@ define void @icmp_ule_v2i32_0(ptr %p, <2 x i32> %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_ule_v2i32_0>:
-; ARM64:         adrp x1, 0x0 <icmp_eq_v8i8>
-; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
+; ARM64:         mov x1, #0x1 // =1
 ; ARM64-NEXT:    movi v1.8b, #0x0
 ; ARM64-NEXT:    cmhs v1.2s, v1.2s, v0.2s
-; ARM64-NEXT:    ldr d0, [x1]
-; ARM64-NEXT:     R_AARCH64_LDST64_ABS_LO12_NC
+; ARM64-NEXT:    movk x1, #0x2, lsl #32
+; ARM64-NEXT:    fmov d0, x1
 ; ARM64-NEXT:    and v1.8b, v1.8b, v0.8b
 ; ARM64-NEXT:    addp v1.2s, v1.2s, v1.2s
 ; ARM64-NEXT:    fmov w2, s1
@@ -2319,10 +2320,12 @@ define void @icmp_ule_v2i64(ptr %p, <2 x i64> %a, <2 x i64> %b) {
 ; X64-NEXT:    pxor xmm1, xmm2
 ; X64-NEXT:    pxor xmm0, xmm2
 ; X64-NEXT:    movdqa xmm2, xmm0
-; X64-NEXT:    pcmpeqd xmm2, xmm1
-; X64-NEXT:    pcmpgtd xmm0, xmm1
-; X64-NEXT:    pshufd {{.*#+}} xmm1 = xmm0[0,0,2,2]
-; X64-NEXT:    pand xmm1, xmm2
+; X64-NEXT:    pcmpgtd xmm2, xmm1
+; X64-NEXT:    pshufd {{.*#+}} xmm3 = xmm2[0,0,2,2]
+; X64-NEXT:    pcmpeqd xmm0, xmm1
+; X64-NEXT:    pshufd {{.*#+}} xmm0 = xmm0[1,1,3,3]
+; X64-NEXT:    pand xmm0, xmm3
+; X64-NEXT:    pshufd {{.*#+}} xmm1 = xmm2[1,1,3,3]
 ; X64-NEXT:    por xmm1, xmm0
 ; X64-NEXT:    movmskpd eax, xmm1
 ; X64-NEXT:    xor eax, 0x3
@@ -2353,10 +2356,12 @@ define void @icmp_ule_v2i64_0(ptr %p, <2 x i64> %a) {
 ; X64-NEXT:    pxor xmm2, xmm1
 ; X64-NEXT:    pxor xmm0, xmm1
 ; X64-NEXT:    movdqa xmm1, xmm0
-; X64-NEXT:    pcmpeqd xmm1, xmm2
-; X64-NEXT:    pcmpgtd xmm0, xmm2
-; X64-NEXT:    pshufd {{.*#+}} xmm2 = xmm0[0,0,2,2]
-; X64-NEXT:    pand xmm2, xmm1
+; X64-NEXT:    pcmpgtd xmm1, xmm2
+; X64-NEXT:    pshufd {{.*#+}} xmm3 = xmm1[0,0,2,2]
+; X64-NEXT:    pcmpeqd xmm0, xmm2
+; X64-NEXT:    pshufd {{.*#+}} xmm0 = xmm0[1,1,3,3]
+; X64-NEXT:    pand xmm0, xmm3
+; X64-NEXT:    pshufd {{.*#+}} xmm2 = xmm1[1,1,3,3]
 ; X64-NEXT:    por xmm2, xmm0
 ; X64-NEXT:    movmskpd eax, xmm2
 ; X64-NEXT:    xor eax, 0x3
@@ -2442,10 +2447,10 @@ define void @icmp_sgt_v16i8(ptr %p, <16 x i8> %a, <16 x i8> %b) {
 ; ARM64-NEXT:    ldr q1, [x1]
 ; ARM64-NEXT:     R_AARCH64_LDST128_ABS_LO12_NC
 ; ARM64-NEXT:    and v0.16b, v0.16b, v1.16b
-; ARM64-NEXT:    ext v1.16b, v0.16b, v0.16b, #0x8
-; ARM64-NEXT:    zip1 v0.16b, v0.16b, v1.16b
-; ARM64-NEXT:    addv h0, v0.8h
-; ARM64-NEXT:    fmov w2, s0
+; ARM64-NEXT:    addp v0.16b, v0.16b, v0.16b
+; ARM64-NEXT:    addp v0.16b, v0.16b, v0.16b
+; ARM64-NEXT:    addp v0.16b, v0.16b, v0.16b
+; ARM64-NEXT:    umov w2, v0.h[0]
 ; ARM64-NEXT:    strh w2, [x0]
 ; ARM64-NEXT:    ret
   %r = icmp sgt <16 x i8> %a, %b
@@ -2469,10 +2474,10 @@ define void @icmp_sgt_v16i8_0(ptr %p, <16 x i8> %a) {
 ; ARM64-NEXT:    ldr q1, [x1]
 ; ARM64-NEXT:     R_AARCH64_LDST128_ABS_LO12_NC
 ; ARM64-NEXT:    and v0.16b, v0.16b, v1.16b
-; ARM64-NEXT:    ext v1.16b, v0.16b, v0.16b, #0x8
-; ARM64-NEXT:    zip1 v0.16b, v0.16b, v1.16b
-; ARM64-NEXT:    addv h0, v0.8h
-; ARM64-NEXT:    fmov w2, s0
+; ARM64-NEXT:    addp v0.16b, v0.16b, v0.16b
+; ARM64-NEXT:    addp v0.16b, v0.16b, v0.16b
+; ARM64-NEXT:    addp v0.16b, v0.16b, v0.16b
+; ARM64-NEXT:    umov w2, v0.h[0]
 ; ARM64-NEXT:    strh w2, [x0]
 ; ARM64-NEXT:    ret
   %r = icmp sgt <16 x i8> %a, zeroinitializer
@@ -2589,11 +2594,10 @@ define void @icmp_sgt_v2i32(ptr %p, <2 x i32> %a, <2 x i32> %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_sgt_v2i32>:
-; ARM64:         adrp x1, 0x0 <icmp_eq_v8i8>
-; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
+; ARM64:         mov x1, #0x1 // =1
 ; ARM64-NEXT:    cmgt v0.2s, v0.2s, v1.2s
-; ARM64-NEXT:    ldr d1, [x1]
-; ARM64-NEXT:     R_AARCH64_LDST64_ABS_LO12_NC
+; ARM64-NEXT:    movk x1, #0x2, lsl #32
+; ARM64-NEXT:    fmov d1, x1
 ; ARM64-NEXT:    and v0.8b, v0.8b, v1.8b
 ; ARM64-NEXT:    addp v0.2s, v0.2s, v0.2s
 ; ARM64-NEXT:    fmov w2, s0
@@ -2614,12 +2618,11 @@ define void @icmp_sgt_v2i32_0(ptr %p, <2 x i32> %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_sgt_v2i32_0>:
-; ARM64:         adrp x1, 0x0 <icmp_eq_v8i8>
-; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
+; ARM64:         mov x1, #0x1 // =1
 ; ARM64-NEXT:    movi v1.8b, #0x0
 ; ARM64-NEXT:    cmgt v0.2s, v0.2s, v1.2s
-; ARM64-NEXT:    ldr d1, [x1]
-; ARM64-NEXT:     R_AARCH64_LDST64_ABS_LO12_NC
+; ARM64-NEXT:    movk x1, #0x2, lsl #32
+; ARM64-NEXT:    fmov d1, x1
 ; ARM64-NEXT:    and v0.8b, v0.8b, v1.8b
 ; ARM64-NEXT:    addp v0.2s, v0.2s, v0.2s
 ; ARM64-NEXT:    fmov w2, s0
@@ -2662,7 +2665,8 @@ define void @icmp_sgt_v4i32_0(ptr %p, <4 x i32> %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_sgt_v4i32_0>:
-; ARM64:         adrp x1, 0x0 <icmp_eq_v8i8>
+; ARM64:       <L0>:
+; ARM64-NEXT:    adrp x1, 0x1000 <icmp_sgt_v4i32_0>
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
 ; ARM64-NEXT:    movi v1.16b, #0x0
 ; ARM64-NEXT:    cmgt v0.4s, v0.4s, v1.4s
@@ -2685,17 +2689,19 @@ define void @icmp_sgt_v2i64(ptr %p, <2 x i64> %a, <2 x i64> %b) {
 ; X64-NEXT:    pxor xmm1, xmm2
 ; X64-NEXT:    pxor xmm0, xmm2
 ; X64-NEXT:    movdqa xmm2, xmm0
-; X64-NEXT:    pcmpeqd xmm2, xmm1
-; X64-NEXT:    pcmpgtd xmm0, xmm1
-; X64-NEXT:    pshufd {{.*#+}} xmm1 = xmm0[0,0,2,2]
-; X64-NEXT:    pand xmm1, xmm2
+; X64-NEXT:    pcmpgtd xmm2, xmm1
+; X64-NEXT:    pshufd {{.*#+}} xmm3 = xmm2[0,0,2,2]
+; X64-NEXT:    pcmpeqd xmm0, xmm1
+; X64-NEXT:    pshufd {{.*#+}} xmm0 = xmm0[1,1,3,3]
+; X64-NEXT:    pand xmm0, xmm3
+; X64-NEXT:    pshufd {{.*#+}} xmm1 = xmm2[1,1,3,3]
 ; X64-NEXT:    por xmm1, xmm0
 ; X64-NEXT:    movmskpd eax, xmm1
 ; X64-NEXT:    mov byte ptr [rdi], al
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_sgt_v2i64>:
-; ARM64:         adrp x1, 0x0 <icmp_eq_v8i8>
+; ARM64:         adrp x1, 0x1000 <icmp_sgt_v4i32_0>
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
 ; ARM64-NEXT:    cmgt v0.2d, v0.2d, v1.2d
 ; ARM64-NEXT:    ldr q1, [x1]
@@ -2718,17 +2724,19 @@ define void @icmp_sgt_v2i64_0(ptr %p, <2 x i64> %a) {
 ; X64-NEXT:    pxor xmm2, xmm1
 ; X64-NEXT:    pxor xmm0, xmm1
 ; X64-NEXT:    movdqa xmm1, xmm0
-; X64-NEXT:    pcmpeqd xmm1, xmm2
-; X64-NEXT:    pcmpgtd xmm0, xmm2
-; X64-NEXT:    pshufd {{.*#+}} xmm2 = xmm0[0,0,2,2]
-; X64-NEXT:    pand xmm2, xmm1
+; X64-NEXT:    pcmpgtd xmm1, xmm2
+; X64-NEXT:    pshufd {{.*#+}} xmm3 = xmm1[0,0,2,2]
+; X64-NEXT:    pcmpeqd xmm0, xmm2
+; X64-NEXT:    pshufd {{.*#+}} xmm0 = xmm0[1,1,3,3]
+; X64-NEXT:    pand xmm0, xmm3
+; X64-NEXT:    pshufd {{.*#+}} xmm2 = xmm1[1,1,3,3]
 ; X64-NEXT:    por xmm2, xmm0
 ; X64-NEXT:    movmskpd eax, xmm2
 ; X64-NEXT:    mov byte ptr [rdi], al
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_sgt_v2i64_0>:
-; ARM64:         adrp x1, 0x0 <icmp_eq_v8i8>
+; ARM64:         adrp x1, 0x1000 <icmp_sgt_v4i32_0>
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
 ; ARM64-NEXT:    movi v1.16b, #0x0
 ; ARM64-NEXT:    cmgt v0.2d, v0.2d, v1.2d
@@ -2753,7 +2761,7 @@ define void @icmp_sge_v8i8(ptr %p, <8 x i8> %a, <8 x i8> %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_sge_v8i8>:
-; ARM64:         adrp x1, 0x1000 <icmp_sgt_v2i64_0+0x20>
+; ARM64:         adrp x1, 0x1000 <icmp_sgt_v4i32_0>
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
 ; ARM64-NEXT:    cmge v0.8b, v0.8b, v1.8b
 ; ARM64-NEXT:    ldr d1, [x1]
@@ -2778,7 +2786,7 @@ define void @icmp_sge_v8i8_0(ptr %p, <8 x i8> %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_sge_v8i8_0>:
-; ARM64:         adrp x1, 0x1000 <icmp_sgt_v2i64_0+0x20>
+; ARM64:         adrp x1, 0x1000 <icmp_sgt_v4i32_0>
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
 ; ARM64-NEXT:    movi v1.8b, #0x0
 ; ARM64-NEXT:    cmge v0.8b, v0.8b, v1.8b
@@ -2803,16 +2811,16 @@ define void @icmp_sge_v16i8(ptr %p, <16 x i8> %a, <16 x i8> %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_sge_v16i8>:
-; ARM64:         adrp x1, 0x1000 <icmp_sgt_v2i64_0+0x20>
+; ARM64:         adrp x1, 0x1000 <icmp_sgt_v4i32_0>
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
 ; ARM64-NEXT:    cmge v0.16b, v0.16b, v1.16b
 ; ARM64-NEXT:    ldr q1, [x1]
 ; ARM64-NEXT:     R_AARCH64_LDST128_ABS_LO12_NC
 ; ARM64-NEXT:    and v0.16b, v0.16b, v1.16b
-; ARM64-NEXT:    ext v1.16b, v0.16b, v0.16b, #0x8
-; ARM64-NEXT:    zip1 v0.16b, v0.16b, v1.16b
-; ARM64-NEXT:    addv h0, v0.8h
-; ARM64-NEXT:    fmov w2, s0
+; ARM64-NEXT:    addp v0.16b, v0.16b, v0.16b
+; ARM64-NEXT:    addp v0.16b, v0.16b, v0.16b
+; ARM64-NEXT:    addp v0.16b, v0.16b, v0.16b
+; ARM64-NEXT:    umov w2, v0.h[0]
 ; ARM64-NEXT:    strh w2, [x0]
 ; ARM64-NEXT:    ret
   %r = icmp sge <16 x i8> %a, %b
@@ -2830,17 +2838,17 @@ define void @icmp_sge_v16i8_0(ptr %p, <16 x i8> %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_sge_v16i8_0>:
-; ARM64:         adrp x1, 0x1000 <icmp_sgt_v2i64_0+0x20>
+; ARM64:         adrp x1, 0x1000 <icmp_sgt_v4i32_0>
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
 ; ARM64-NEXT:    movi v1.16b, #0x0
 ; ARM64-NEXT:    cmge v0.16b, v0.16b, v1.16b
 ; ARM64-NEXT:    ldr q1, [x1]
 ; ARM64-NEXT:     R_AARCH64_LDST128_ABS_LO12_NC
 ; ARM64-NEXT:    and v0.16b, v0.16b, v1.16b
-; ARM64-NEXT:    ext v1.16b, v0.16b, v0.16b, #0x8
-; ARM64-NEXT:    zip1 v0.16b, v0.16b, v1.16b
-; ARM64-NEXT:    addv h0, v0.8h
-; ARM64-NEXT:    fmov w2, s0
+; ARM64-NEXT:    addp v0.16b, v0.16b, v0.16b
+; ARM64-NEXT:    addp v0.16b, v0.16b, v0.16b
+; ARM64-NEXT:    addp v0.16b, v0.16b, v0.16b
+; ARM64-NEXT:    umov w2, v0.h[0]
 ; ARM64-NEXT:    strh w2, [x0]
 ; ARM64-NEXT:    ret
   %r = icmp sge <16 x i8> %a, zeroinitializer
@@ -2858,7 +2866,7 @@ define void @icmp_sge_v4i16(ptr %p, <4 x i16> %a, <4 x i16> %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_sge_v4i16>:
-; ARM64:         adrp x1, 0x1000 <icmp_sgt_v2i64_0+0x20>
+; ARM64:         adrp x1, 0x1000 <icmp_sgt_v4i32_0>
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
 ; ARM64-NEXT:    cmge v0.4h, v0.4h, v1.4h
 ; ARM64-NEXT:    ldr d1, [x1]
@@ -2884,7 +2892,7 @@ define void @icmp_sge_v4i16_0(ptr %p, <4 x i16> %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_sge_v4i16_0>:
-; ARM64:         adrp x1, 0x1000 <icmp_sgt_v2i64_0+0x20>
+; ARM64:         adrp x1, 0x1000 <icmp_sgt_v4i32_0>
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
 ; ARM64-NEXT:    movi v1.8b, #0x0
 ; ARM64-NEXT:    cmge v0.4h, v0.4h, v1.4h
@@ -2910,7 +2918,7 @@ define void @icmp_sge_v8i16(ptr %p, <8 x i16> %a, <8 x i16> %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_sge_v8i16>:
-; ARM64:         adrp x1, 0x1000 <icmp_sgt_v2i64_0+0x20>
+; ARM64:         adrp x1, 0x1000 <icmp_sgt_v4i32_0>
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
 ; ARM64-NEXT:    cmge v0.8h, v0.8h, v1.8h
 ; ARM64-NEXT:    ldr q1, [x1]
@@ -2936,7 +2944,7 @@ define void @icmp_sge_v8i16_0(ptr %p, <8 x i16> %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_sge_v8i16_0>:
-; ARM64:         adrp x1, 0x1000 <icmp_sgt_v2i64_0+0x20>
+; ARM64:         adrp x1, 0x1000 <icmp_sgt_v4i32_0>
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
 ; ARM64-NEXT:    movi v1.16b, #0x0
 ; ARM64-NEXT:    cmge v0.8h, v0.8h, v1.8h
@@ -2962,11 +2970,10 @@ define void @icmp_sge_v2i32(ptr %p, <2 x i32> %a, <2 x i32> %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_sge_v2i32>:
-; ARM64:         adrp x1, 0x1000 <icmp_sgt_v2i64_0+0x20>
-; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
+; ARM64:         mov x1, #0x1 // =1
 ; ARM64-NEXT:    cmge v0.2s, v0.2s, v1.2s
-; ARM64-NEXT:    ldr d1, [x1]
-; ARM64-NEXT:     R_AARCH64_LDST64_ABS_LO12_NC
+; ARM64-NEXT:    movk x1, #0x2, lsl #32
+; ARM64-NEXT:    fmov d1, x1
 ; ARM64-NEXT:    and v0.8b, v0.8b, v1.8b
 ; ARM64-NEXT:    addp v0.2s, v0.2s, v0.2s
 ; ARM64-NEXT:    fmov w2, s0
@@ -2988,12 +2995,11 @@ define void @icmp_sge_v2i32_0(ptr %p, <2 x i32> %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_sge_v2i32_0>:
-; ARM64:         adrp x1, 0x1000 <icmp_sgt_v2i64_0+0x20>
-; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
+; ARM64:         mov x1, #0x1 // =1
 ; ARM64-NEXT:    movi v1.8b, #0x0
 ; ARM64-NEXT:    cmge v0.2s, v0.2s, v1.2s
-; ARM64-NEXT:    ldr d1, [x1]
-; ARM64-NEXT:     R_AARCH64_LDST64_ABS_LO12_NC
+; ARM64-NEXT:    movk x1, #0x2, lsl #32
+; ARM64-NEXT:    fmov d1, x1
 ; ARM64-NEXT:    and v0.8b, v0.8b, v1.8b
 ; ARM64-NEXT:    addp v0.2s, v0.2s, v0.2s
 ; ARM64-NEXT:    fmov w2, s0
@@ -3013,7 +3019,7 @@ define void @icmp_sge_v4i32(ptr %p, <4 x i32> %a, <4 x i32> %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_sge_v4i32>:
-; ARM64:         adrp x1, 0x1000 <icmp_sgt_v2i64_0+0x20>
+; ARM64:         adrp x1, 0x1000 <icmp_sgt_v4i32_0>
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
 ; ARM64-NEXT:    cmge v0.4s, v0.4s, v1.4s
 ; ARM64-NEXT:    ldr q1, [x1]
@@ -3038,7 +3044,7 @@ define void @icmp_sge_v4i32_0(ptr %p, <4 x i32> %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_sge_v4i32_0>:
-; ARM64:         adrp x1, 0x1000 <icmp_sgt_v2i64_0+0x20>
+; ARM64:         adrp x1, 0x1000 <icmp_sgt_v4i32_0>
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
 ; ARM64-NEXT:    movi v1.16b, #0x0
 ; ARM64-NEXT:    cmge v0.4s, v0.4s, v1.4s
@@ -3061,18 +3067,20 @@ define void @icmp_sge_v2i64(ptr %p, <2 x i64> %a, <2 x i64> %b) {
 ; X64-NEXT:    pxor xmm0, xmm2
 ; X64-NEXT:    pxor xmm1, xmm2
 ; X64-NEXT:    movdqa xmm2, xmm1
-; X64-NEXT:    pcmpeqd xmm2, xmm0
-; X64-NEXT:    pcmpgtd xmm1, xmm0
-; X64-NEXT:    pshufd {{.*#+}} xmm0 = xmm1[0,0,2,2]
-; X64-NEXT:    pand xmm0, xmm2
-; X64-NEXT:    por xmm0, xmm1
-; X64-NEXT:    movmskpd eax, xmm0
+; X64-NEXT:    pcmpgtd xmm2, xmm0
+; X64-NEXT:    pshufd {{.*#+}} xmm3 = xmm2[0,0,2,2]
+; X64-NEXT:    pcmpeqd xmm1, xmm0
+; X64-NEXT:    pshufd {{.*#+}} xmm0 = xmm1[1,1,3,3]
+; X64-NEXT:    pand xmm0, xmm3
+; X64-NEXT:    pshufd {{.*#+}} xmm1 = xmm2[1,1,3,3]
+; X64-NEXT:    por xmm1, xmm0
+; X64-NEXT:    movmskpd eax, xmm1
 ; X64-NEXT:    xor eax, 0x3
 ; X64-NEXT:    mov byte ptr [rdi], al
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_sge_v2i64>:
-; ARM64:         adrp x1, 0x1000 <icmp_sgt_v2i64_0+0x20>
+; ARM64:         adrp x1, 0x1000 <icmp_sgt_v4i32_0>
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
 ; ARM64-NEXT:    cmge v0.2d, v0.2d, v1.2d
 ; ARM64-NEXT:    ldr q1, [x1]
@@ -3095,18 +3103,20 @@ define void @icmp_sge_v2i64_0(ptr %p, <2 x i64> %a) {
 ; X64-NEXT:    pxor xmm2, xmm2
 ; X64-NEXT:    pxor xmm2, xmm1
 ; X64-NEXT:    movdqa xmm1, xmm2
-; X64-NEXT:    pcmpeqd xmm1, xmm0
-; X64-NEXT:    pcmpgtd xmm2, xmm0
-; X64-NEXT:    pshufd {{.*#+}} xmm0 = xmm2[0,0,2,2]
-; X64-NEXT:    pand xmm0, xmm1
-; X64-NEXT:    por xmm0, xmm2
-; X64-NEXT:    movmskpd eax, xmm0
+; X64-NEXT:    pcmpgtd xmm1, xmm0
+; X64-NEXT:    pshufd {{.*#+}} xmm3 = xmm1[0,0,2,2]
+; X64-NEXT:    pcmpeqd xmm2, xmm0
+; X64-NEXT:    pshufd {{.*#+}} xmm0 = xmm2[1,1,3,3]
+; X64-NEXT:    pand xmm0, xmm3
+; X64-NEXT:    pshufd {{.*#+}} xmm2 = xmm1[1,1,3,3]
+; X64-NEXT:    por xmm2, xmm0
+; X64-NEXT:    movmskpd eax, xmm2
 ; X64-NEXT:    xor eax, 0x3
 ; X64-NEXT:    mov byte ptr [rdi], al
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_sge_v2i64_0>:
-; ARM64:         adrp x1, 0x1000 <icmp_sgt_v2i64_0+0x20>
+; ARM64:         adrp x1, 0x1000 <icmp_sgt_v4i32_0>
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
 ; ARM64-NEXT:    movi v1.16b, #0x0
 ; ARM64-NEXT:    cmge v0.2d, v0.2d, v1.2d
@@ -3130,7 +3140,7 @@ define void @icmp_slt_v8i8(ptr %p, <8 x i8> %a, <8 x i8> %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_slt_v8i8>:
-; ARM64:         adrp x1, 0x1000 <icmp_sgt_v2i64_0+0x20>
+; ARM64:         adrp x1, 0x1000 <icmp_sgt_v4i32_0>
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
 ; ARM64-NEXT:    cmgt v1.8b, v1.8b, v0.8b
 ; ARM64-NEXT:    ldr d0, [x1]
@@ -3154,7 +3164,7 @@ define void @icmp_slt_v8i8_0(ptr %p, <8 x i8> %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_slt_v8i8_0>:
-; ARM64:         adrp x1, 0x1000 <icmp_sgt_v2i64_0+0x20>
+; ARM64:         adrp x1, 0x1000 <icmp_sgt_v4i32_0>
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
 ; ARM64-NEXT:    movi v1.8b, #0x0
 ; ARM64-NEXT:    cmgt v1.8b, v1.8b, v0.8b
@@ -3178,16 +3188,16 @@ define void @icmp_slt_v16i8(ptr %p, <16 x i8> %a, <16 x i8> %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_slt_v16i8>:
-; ARM64:         adrp x1, 0x1000 <icmp_sgt_v2i64_0+0x20>
+; ARM64:         adrp x1, 0x1000 <icmp_sgt_v4i32_0>
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
 ; ARM64-NEXT:    cmgt v1.16b, v1.16b, v0.16b
 ; ARM64-NEXT:    ldr q0, [x1]
 ; ARM64-NEXT:     R_AARCH64_LDST128_ABS_LO12_NC
 ; ARM64-NEXT:    and v1.16b, v1.16b, v0.16b
-; ARM64-NEXT:    ext v0.16b, v1.16b, v1.16b, #0x8
-; ARM64-NEXT:    zip1 v1.16b, v1.16b, v0.16b
-; ARM64-NEXT:    addv h1, v1.8h
-; ARM64-NEXT:    fmov w2, s1
+; ARM64-NEXT:    addp v1.16b, v1.16b, v1.16b
+; ARM64-NEXT:    addp v1.16b, v1.16b, v1.16b
+; ARM64-NEXT:    addp v1.16b, v1.16b, v1.16b
+; ARM64-NEXT:    umov w2, v1.h[0]
 ; ARM64-NEXT:    strh w2, [x0]
 ; ARM64-NEXT:    ret
   %r = icmp slt <16 x i8> %a, %b
@@ -3204,17 +3214,17 @@ define void @icmp_slt_v16i8_0(ptr %p, <16 x i8> %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_slt_v16i8_0>:
-; ARM64:         adrp x1, 0x1000 <icmp_sgt_v2i64_0+0x20>
+; ARM64:         adrp x1, 0x1000 <icmp_sgt_v4i32_0>
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
 ; ARM64-NEXT:    movi v1.16b, #0x0
 ; ARM64-NEXT:    cmgt v1.16b, v1.16b, v0.16b
 ; ARM64-NEXT:    ldr q0, [x1]
 ; ARM64-NEXT:     R_AARCH64_LDST128_ABS_LO12_NC
 ; ARM64-NEXT:    and v1.16b, v1.16b, v0.16b
-; ARM64-NEXT:    ext v0.16b, v1.16b, v1.16b, #0x8
-; ARM64-NEXT:    zip1 v1.16b, v1.16b, v0.16b
-; ARM64-NEXT:    addv h1, v1.8h
-; ARM64-NEXT:    fmov w2, s1
+; ARM64-NEXT:    addp v1.16b, v1.16b, v1.16b
+; ARM64-NEXT:    addp v1.16b, v1.16b, v1.16b
+; ARM64-NEXT:    addp v1.16b, v1.16b, v1.16b
+; ARM64-NEXT:    umov w2, v1.h[0]
 ; ARM64-NEXT:    strh w2, [x0]
 ; ARM64-NEXT:    ret
   %r = icmp slt <16 x i8> %a, zeroinitializer
@@ -3231,7 +3241,7 @@ define void @icmp_slt_v4i16(ptr %p, <4 x i16> %a, <4 x i16> %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_slt_v4i16>:
-; ARM64:         adrp x1, 0x1000 <icmp_sgt_v2i64_0+0x20>
+; ARM64:         adrp x1, 0x1000 <icmp_sgt_v4i32_0>
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
 ; ARM64-NEXT:    cmgt v1.4h, v1.4h, v0.4h
 ; ARM64-NEXT:    ldr d0, [x1]
@@ -3256,7 +3266,7 @@ define void @icmp_slt_v4i16_0(ptr %p, <4 x i16> %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_slt_v4i16_0>:
-; ARM64:         adrp x1, 0x1000 <icmp_sgt_v2i64_0+0x20>
+; ARM64:         adrp x1, 0x1000 <icmp_sgt_v4i32_0>
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
 ; ARM64-NEXT:    movi v1.8b, #0x0
 ; ARM64-NEXT:    cmgt v1.4h, v1.4h, v0.4h
@@ -3281,7 +3291,7 @@ define void @icmp_slt_v8i16(ptr %p, <8 x i16> %a, <8 x i16> %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_slt_v8i16>:
-; ARM64:         adrp x1, 0x1000 <icmp_sgt_v2i64_0+0x20>
+; ARM64:         adrp x1, 0x1000 <icmp_sgt_v4i32_0>
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
 ; ARM64-NEXT:    cmgt v1.8h, v1.8h, v0.8h
 ; ARM64-NEXT:    ldr q0, [x1]
@@ -3306,7 +3316,7 @@ define void @icmp_slt_v8i16_0(ptr %p, <8 x i16> %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_slt_v8i16_0>:
-; ARM64:         adrp x1, 0x1000 <icmp_sgt_v2i64_0+0x20>
+; ARM64:         adrp x1, 0x1000 <icmp_sgt_v4i32_0>
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
 ; ARM64-NEXT:    movi v1.16b, #0x0
 ; ARM64-NEXT:    cmgt v1.8h, v1.8h, v0.8h
@@ -3331,11 +3341,10 @@ define void @icmp_slt_v2i32(ptr %p, <2 x i32> %a, <2 x i32> %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_slt_v2i32>:
-; ARM64:         adrp x1, 0x1000 <icmp_sgt_v2i64_0+0x20>
-; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
+; ARM64:         mov x1, #0x1 // =1
 ; ARM64-NEXT:    cmgt v1.2s, v1.2s, v0.2s
-; ARM64-NEXT:    ldr d0, [x1]
-; ARM64-NEXT:     R_AARCH64_LDST64_ABS_LO12_NC
+; ARM64-NEXT:    movk x1, #0x2, lsl #32
+; ARM64-NEXT:    fmov d0, x1
 ; ARM64-NEXT:    and v1.8b, v1.8b, v0.8b
 ; ARM64-NEXT:    addp v1.2s, v1.2s, v1.2s
 ; ARM64-NEXT:    fmov w2, s1
@@ -3356,12 +3365,11 @@ define void @icmp_slt_v2i32_0(ptr %p, <2 x i32> %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_slt_v2i32_0>:
-; ARM64:         adrp x1, 0x1000 <icmp_sgt_v2i64_0+0x20>
-; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
+; ARM64:         mov x1, #0x1 // =1
 ; ARM64-NEXT:    movi v1.8b, #0x0
 ; ARM64-NEXT:    cmgt v1.2s, v1.2s, v0.2s
-; ARM64-NEXT:    ldr d0, [x1]
-; ARM64-NEXT:     R_AARCH64_LDST64_ABS_LO12_NC
+; ARM64-NEXT:    movk x1, #0x2, lsl #32
+; ARM64-NEXT:    fmov d0, x1
 ; ARM64-NEXT:    and v1.8b, v1.8b, v0.8b
 ; ARM64-NEXT:    addp v1.2s, v1.2s, v1.2s
 ; ARM64-NEXT:    fmov w2, s1
@@ -3380,7 +3388,7 @@ define void @icmp_slt_v4i32(ptr %p, <4 x i32> %a, <4 x i32> %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_slt_v4i32>:
-; ARM64:         adrp x1, 0x1000 <icmp_sgt_v2i64_0+0x20>
+; ARM64:         adrp x1, 0x1000 <icmp_sgt_v4i32_0>
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
 ; ARM64-NEXT:    cmgt v1.4s, v1.4s, v0.4s
 ; ARM64-NEXT:    ldr q0, [x1]
@@ -3404,7 +3412,7 @@ define void @icmp_slt_v4i32_0(ptr %p, <4 x i32> %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_slt_v4i32_0>:
-; ARM64:         adrp x1, 0x1000 <icmp_sgt_v2i64_0+0x20>
+; ARM64:         adrp x1, 0x1000 <icmp_sgt_v4i32_0>
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
 ; ARM64-NEXT:    movi v1.16b, #0x0
 ; ARM64-NEXT:    cmgt v1.4s, v1.4s, v0.4s
@@ -3427,17 +3435,19 @@ define void @icmp_slt_v2i64(ptr %p, <2 x i64> %a, <2 x i64> %b) {
 ; X64-NEXT:    pxor xmm0, xmm2
 ; X64-NEXT:    pxor xmm1, xmm2
 ; X64-NEXT:    movdqa xmm2, xmm1
-; X64-NEXT:    pcmpeqd xmm2, xmm0
-; X64-NEXT:    pcmpgtd xmm1, xmm0
-; X64-NEXT:    pshufd {{.*#+}} xmm0 = xmm1[0,0,2,2]
-; X64-NEXT:    pand xmm0, xmm2
-; X64-NEXT:    por xmm0, xmm1
-; X64-NEXT:    movmskpd eax, xmm0
+; X64-NEXT:    pcmpgtd xmm2, xmm0
+; X64-NEXT:    pshufd {{.*#+}} xmm3 = xmm2[0,0,2,2]
+; X64-NEXT:    pcmpeqd xmm1, xmm0
+; X64-NEXT:    pshufd {{.*#+}} xmm0 = xmm1[1,1,3,3]
+; X64-NEXT:    pand xmm0, xmm3
+; X64-NEXT:    pshufd {{.*#+}} xmm1 = xmm2[1,1,3,3]
+; X64-NEXT:    por xmm1, xmm0
+; X64-NEXT:    movmskpd eax, xmm1
 ; X64-NEXT:    mov byte ptr [rdi], al
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_slt_v2i64>:
-; ARM64:         adrp x1, 0x1000 <icmp_sgt_v2i64_0+0x20>
+; ARM64:         adrp x1, 0x1000 <icmp_sgt_v4i32_0>
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
 ; ARM64-NEXT:    cmgt v1.2d, v1.2d, v0.2d
 ; ARM64-NEXT:    ldr q0, [x1]
@@ -3460,17 +3470,19 @@ define void @icmp_slt_v2i64_0(ptr %p, <2 x i64> %a) {
 ; X64-NEXT:    pxor xmm2, xmm2
 ; X64-NEXT:    pxor xmm2, xmm1
 ; X64-NEXT:    movdqa xmm1, xmm2
-; X64-NEXT:    pcmpeqd xmm1, xmm0
-; X64-NEXT:    pcmpgtd xmm2, xmm0
-; X64-NEXT:    pshufd {{.*#+}} xmm0 = xmm2[0,0,2,2]
-; X64-NEXT:    pand xmm0, xmm1
-; X64-NEXT:    por xmm0, xmm2
-; X64-NEXT:    movmskpd eax, xmm0
+; X64-NEXT:    pcmpgtd xmm1, xmm0
+; X64-NEXT:    pshufd {{.*#+}} xmm3 = xmm1[0,0,2,2]
+; X64-NEXT:    pcmpeqd xmm2, xmm0
+; X64-NEXT:    pshufd {{.*#+}} xmm0 = xmm2[1,1,3,3]
+; X64-NEXT:    pand xmm0, xmm3
+; X64-NEXT:    pshufd {{.*#+}} xmm2 = xmm1[1,1,3,3]
+; X64-NEXT:    por xmm2, xmm0
+; X64-NEXT:    movmskpd eax, xmm2
 ; X64-NEXT:    mov byte ptr [rdi], al
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_slt_v2i64_0>:
-; ARM64:         adrp x1, 0x1000 <icmp_sgt_v2i64_0+0x20>
+; ARM64:         adrp x1, 0x1000 <icmp_sgt_v4i32_0>
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
 ; ARM64-NEXT:    movi v1.16b, #0x0
 ; ARM64-NEXT:    cmgt v1.2d, v1.2d, v0.2d
@@ -3495,7 +3507,7 @@ define void @icmp_sle_v8i8(ptr %p, <8 x i8> %a, <8 x i8> %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_sle_v8i8>:
-; ARM64:         adrp x1, 0x1000 <icmp_sgt_v2i64_0+0x20>
+; ARM64:         adrp x1, 0x1000 <icmp_sgt_v4i32_0>
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
 ; ARM64-NEXT:    cmge v1.8b, v1.8b, v0.8b
 ; ARM64-NEXT:    ldr d0, [x1]
@@ -3520,7 +3532,7 @@ define void @icmp_sle_v8i8_0(ptr %p, <8 x i8> %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_sle_v8i8_0>:
-; ARM64:         adrp x1, 0x1000 <icmp_sgt_v2i64_0+0x20>
+; ARM64:         adrp x1, 0x1000 <icmp_sgt_v4i32_0>
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
 ; ARM64-NEXT:    movi v1.8b, #0x0
 ; ARM64-NEXT:    cmge v1.8b, v1.8b, v0.8b
@@ -3545,16 +3557,16 @@ define void @icmp_sle_v16i8(ptr %p, <16 x i8> %a, <16 x i8> %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_sle_v16i8>:
-; ARM64:         adrp x1, 0x1000 <icmp_sgt_v2i64_0+0x20>
+; ARM64:         adrp x1, 0x1000 <icmp_sgt_v4i32_0>
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
 ; ARM64-NEXT:    cmge v1.16b, v1.16b, v0.16b
 ; ARM64-NEXT:    ldr q0, [x1]
 ; ARM64-NEXT:     R_AARCH64_LDST128_ABS_LO12_NC
 ; ARM64-NEXT:    and v1.16b, v1.16b, v0.16b
-; ARM64-NEXT:    ext v0.16b, v1.16b, v1.16b, #0x8
-; ARM64-NEXT:    zip1 v1.16b, v1.16b, v0.16b
-; ARM64-NEXT:    addv h1, v1.8h
-; ARM64-NEXT:    fmov w2, s1
+; ARM64-NEXT:    addp v1.16b, v1.16b, v1.16b
+; ARM64-NEXT:    addp v1.16b, v1.16b, v1.16b
+; ARM64-NEXT:    addp v1.16b, v1.16b, v1.16b
+; ARM64-NEXT:    umov w2, v1.h[0]
 ; ARM64-NEXT:    strh w2, [x0]
 ; ARM64-NEXT:    ret
   %r = icmp sle <16 x i8> %a, %b
@@ -3572,17 +3584,17 @@ define void @icmp_sle_v16i8_0(ptr %p, <16 x i8> %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_sle_v16i8_0>:
-; ARM64:         adrp x1, 0x1000 <icmp_sgt_v2i64_0+0x20>
+; ARM64:         adrp x1, 0x1000 <icmp_sgt_v4i32_0>
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
 ; ARM64-NEXT:    movi v1.16b, #0x0
 ; ARM64-NEXT:    cmge v1.16b, v1.16b, v0.16b
 ; ARM64-NEXT:    ldr q0, [x1]
 ; ARM64-NEXT:     R_AARCH64_LDST128_ABS_LO12_NC
 ; ARM64-NEXT:    and v1.16b, v1.16b, v0.16b
-; ARM64-NEXT:    ext v0.16b, v1.16b, v1.16b, #0x8
-; ARM64-NEXT:    zip1 v1.16b, v1.16b, v0.16b
-; ARM64-NEXT:    addv h1, v1.8h
-; ARM64-NEXT:    fmov w2, s1
+; ARM64-NEXT:    addp v1.16b, v1.16b, v1.16b
+; ARM64-NEXT:    addp v1.16b, v1.16b, v1.16b
+; ARM64-NEXT:    addp v1.16b, v1.16b, v1.16b
+; ARM64-NEXT:    umov w2, v1.h[0]
 ; ARM64-NEXT:    strh w2, [x0]
 ; ARM64-NEXT:    ret
   %r = icmp sle <16 x i8> %a, zeroinitializer
@@ -3600,7 +3612,7 @@ define void @icmp_sle_v4i16(ptr %p, <4 x i16> %a, <4 x i16> %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_sle_v4i16>:
-; ARM64:         adrp x1, 0x1000 <icmp_sgt_v2i64_0+0x20>
+; ARM64:         adrp x1, 0x1000 <icmp_sgt_v4i32_0>
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
 ; ARM64-NEXT:    cmge v1.4h, v1.4h, v0.4h
 ; ARM64-NEXT:    ldr d0, [x1]
@@ -3626,7 +3638,7 @@ define void @icmp_sle_v4i16_0(ptr %p, <4 x i16> %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_sle_v4i16_0>:
-; ARM64:         adrp x1, 0x1000 <icmp_sgt_v2i64_0+0x20>
+; ARM64:         adrp x1, 0x1000 <icmp_sgt_v4i32_0>
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
 ; ARM64-NEXT:    movi v1.8b, #0x0
 ; ARM64-NEXT:    cmge v1.4h, v1.4h, v0.4h
@@ -3652,7 +3664,7 @@ define void @icmp_sle_v8i16(ptr %p, <8 x i16> %a, <8 x i16> %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_sle_v8i16>:
-; ARM64:         adrp x1, 0x1000 <icmp_sgt_v2i64_0+0x20>
+; ARM64:         adrp x1, 0x1000 <icmp_sgt_v4i32_0>
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
 ; ARM64-NEXT:    cmge v1.8h, v1.8h, v0.8h
 ; ARM64-NEXT:    ldr q0, [x1]
@@ -3678,7 +3690,7 @@ define void @icmp_sle_v8i16_0(ptr %p, <8 x i16> %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_sle_v8i16_0>:
-; ARM64:         adrp x1, 0x1000 <icmp_sgt_v2i64_0+0x20>
+; ARM64:         adrp x1, 0x1000 <icmp_sgt_v4i32_0>
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
 ; ARM64-NEXT:    movi v1.16b, #0x0
 ; ARM64-NEXT:    cmge v1.8h, v1.8h, v0.8h
@@ -3704,11 +3716,10 @@ define void @icmp_sle_v2i32(ptr %p, <2 x i32> %a, <2 x i32> %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_sle_v2i32>:
-; ARM64:         adrp x1, 0x1000 <icmp_sgt_v2i64_0+0x20>
-; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
+; ARM64:         mov x1, #0x1 // =1
 ; ARM64-NEXT:    cmge v1.2s, v1.2s, v0.2s
-; ARM64-NEXT:    ldr d0, [x1]
-; ARM64-NEXT:     R_AARCH64_LDST64_ABS_LO12_NC
+; ARM64-NEXT:    movk x1, #0x2, lsl #32
+; ARM64-NEXT:    fmov d0, x1
 ; ARM64-NEXT:    and v1.8b, v1.8b, v0.8b
 ; ARM64-NEXT:    addp v1.2s, v1.2s, v1.2s
 ; ARM64-NEXT:    fmov w2, s1
@@ -3730,12 +3741,11 @@ define void @icmp_sle_v2i32_0(ptr %p, <2 x i32> %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_sle_v2i32_0>:
-; ARM64:         adrp x1, 0x1000 <icmp_sgt_v2i64_0+0x20>
-; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
+; ARM64:         mov x1, #0x1 // =1
 ; ARM64-NEXT:    movi v1.8b, #0x0
 ; ARM64-NEXT:    cmge v1.2s, v1.2s, v0.2s
-; ARM64-NEXT:    ldr d0, [x1]
-; ARM64-NEXT:     R_AARCH64_LDST64_ABS_LO12_NC
+; ARM64-NEXT:    movk x1, #0x2, lsl #32
+; ARM64-NEXT:    fmov d0, x1
 ; ARM64-NEXT:    and v1.8b, v1.8b, v0.8b
 ; ARM64-NEXT:    addp v1.2s, v1.2s, v1.2s
 ; ARM64-NEXT:    fmov w2, s1
@@ -3755,7 +3765,7 @@ define void @icmp_sle_v4i32(ptr %p, <4 x i32> %a, <4 x i32> %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_sle_v4i32>:
-; ARM64:         adrp x1, 0x1000 <icmp_sgt_v2i64_0+0x20>
+; ARM64:         adrp x1, 0x1000 <icmp_sgt_v4i32_0>
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
 ; ARM64-NEXT:    cmge v1.4s, v1.4s, v0.4s
 ; ARM64-NEXT:    ldr q0, [x1]
@@ -3780,7 +3790,7 @@ define void @icmp_sle_v4i32_0(ptr %p, <4 x i32> %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_sle_v4i32_0>:
-; ARM64:         adrp x1, 0x1000 <icmp_sgt_v2i64_0+0x20>
+; ARM64:         adrp x1, 0x1000 <icmp_sgt_v4i32_0>
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
 ; ARM64-NEXT:    movi v1.16b, #0x0
 ; ARM64-NEXT:    cmge v1.4s, v1.4s, v0.4s
@@ -3803,10 +3813,12 @@ define void @icmp_sle_v2i64(ptr %p, <2 x i64> %a, <2 x i64> %b) {
 ; X64-NEXT:    pxor xmm1, xmm2
 ; X64-NEXT:    pxor xmm0, xmm2
 ; X64-NEXT:    movdqa xmm2, xmm0
-; X64-NEXT:    pcmpeqd xmm2, xmm1
-; X64-NEXT:    pcmpgtd xmm0, xmm1
-; X64-NEXT:    pshufd {{.*#+}} xmm1 = xmm0[0,0,2,2]
-; X64-NEXT:    pand xmm1, xmm2
+; X64-NEXT:    pcmpgtd xmm2, xmm1
+; X64-NEXT:    pshufd {{.*#+}} xmm3 = xmm2[0,0,2,2]
+; X64-NEXT:    pcmpeqd xmm0, xmm1
+; X64-NEXT:    pshufd {{.*#+}} xmm0 = xmm0[1,1,3,3]
+; X64-NEXT:    pand xmm0, xmm3
+; X64-NEXT:    pshufd {{.*#+}} xmm1 = xmm2[1,1,3,3]
 ; X64-NEXT:    por xmm1, xmm0
 ; X64-NEXT:    movmskpd eax, xmm1
 ; X64-NEXT:    xor eax, 0x3
@@ -3814,7 +3826,7 @@ define void @icmp_sle_v2i64(ptr %p, <2 x i64> %a, <2 x i64> %b) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_sle_v2i64>:
-; ARM64:         adrp x1, 0x1000 <icmp_sgt_v2i64_0+0x20>
+; ARM64:         adrp x1, 0x1000 <icmp_sgt_v4i32_0>
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
 ; ARM64-NEXT:    cmge v1.2d, v1.2d, v0.2d
 ; ARM64-NEXT:    ldr q0, [x1]
@@ -3837,10 +3849,12 @@ define void @icmp_sle_v2i64_0(ptr %p, <2 x i64> %a) {
 ; X64-NEXT:    pxor xmm2, xmm1
 ; X64-NEXT:    pxor xmm0, xmm1
 ; X64-NEXT:    movdqa xmm1, xmm0
-; X64-NEXT:    pcmpeqd xmm1, xmm2
-; X64-NEXT:    pcmpgtd xmm0, xmm2
-; X64-NEXT:    pshufd {{.*#+}} xmm2 = xmm0[0,0,2,2]
-; X64-NEXT:    pand xmm2, xmm1
+; X64-NEXT:    pcmpgtd xmm1, xmm2
+; X64-NEXT:    pshufd {{.*#+}} xmm3 = xmm1[0,0,2,2]
+; X64-NEXT:    pcmpeqd xmm0, xmm2
+; X64-NEXT:    pshufd {{.*#+}} xmm0 = xmm0[1,1,3,3]
+; X64-NEXT:    pand xmm0, xmm3
+; X64-NEXT:    pshufd {{.*#+}} xmm2 = xmm1[1,1,3,3]
 ; X64-NEXT:    por xmm2, xmm0
 ; X64-NEXT:    movmskpd eax, xmm2
 ; X64-NEXT:    xor eax, 0x3
@@ -3848,7 +3862,7 @@ define void @icmp_sle_v2i64_0(ptr %p, <2 x i64> %a) {
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <icmp_sle_v2i64_0>:
-; ARM64:         adrp x1, 0x1000 <icmp_sgt_v2i64_0+0x20>
+; ARM64:         adrp x1, 0x1000 <icmp_sgt_v4i32_0>
 ; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
 ; ARM64-NEXT:    movi v1.16b, #0x0
 ; ARM64-NEXT:    cmge v1.2d, v1.2d, v0.2d

@@ -5,8 +5,9 @@
 
 ; RUN: tpde-llc --target=x86_64 %s | %objdump | FileCheck %s -check-prefixes=X64
 ; RUN: tpde-llc --target=aarch64 %s | %objdump | FileCheck %s -check-prefixes=ARM64
-; XFAIL: llvm22.1
-; XFAIL: llvm23.1
+; XFAIL: llvm19.1
+; XFAIL: llvm20.1
+; XFAIL: llvm21.1
 
 declare i8 @llvm.abs.i8(i8, i1)
 declare i16 @llvm.abs.i16(i16, i1)
@@ -123,19 +124,14 @@ entry:
 
 define i128 @absi128(i128 %v) {
 ; X64-LABEL: <absi128>:
-; X64:         push rbp
-; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    xor eax, eax
-; X64-NEXT:    mov rcx, rdi
-; X64-NEXT:    neg rcx
-; X64-NEXT:    sbb rax, rsi
-; X64-NEXT:    test rsi, rsi
-; X64-NEXT:    cmovns rcx, rdi
-; X64-NEXT:    cmovns rax, rsi
-; X64-NEXT:    mov qword ptr [rbp - 0x38], rax
-; X64-NEXT:    mov rax, rcx
-; X64-NEXT:    mov rdx, qword ptr [rbp - 0x38]
-; X64-NEXT:    pop rbp
+; X64:         mov rax, rsi
+; X64-NEXT:    sar rax, 0x3f
+; X64-NEXT:    xor rsi, rax
+; X64-NEXT:    xor rdi, rax
+; X64-NEXT:    sub rdi, rax
+; X64-NEXT:    sbb rsi, rax
+; X64-NEXT:    mov rax, rdi
+; X64-NEXT:    mov rdx, rsi
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <absi128>:

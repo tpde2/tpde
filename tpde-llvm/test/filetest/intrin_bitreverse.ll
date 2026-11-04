@@ -4,8 +4,9 @@
 
 ; RUN: tpde-llc --target=x86_64 %s | %objdump | FileCheck %s -check-prefixes=X64
 ; RUN: tpde-llc --target=aarch64 %s | %objdump | FileCheck %s -check-prefixes=ARM64
-; XFAIL: llvm22.1
-; XFAIL: llvm23.1
+; XFAIL: llvm19.1
+; XFAIL: llvm20.1
+; XFAIL: llvm21.1
 
 define i8 @bitrev_i8(i8 %0) {
 ; X64-LABEL: <bitrev_i8>:
@@ -194,43 +195,44 @@ define i128 @bitrev_i128(i128 %0) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    push rbx
-; X64-NEXT:    bswap rdi
-; X64-NEXT:    mov rax, rdi
+; X64-NEXT:    bswap rsi
+; X64-NEXT:    mov rax, rsi
 ; X64-NEXT:    shr rax, 0x4
 ; X64-NEXT:    movabs rcx, 0xf0f0f0f0f0f0f0f
 ; X64-NEXT:    and rax, rcx
-; X64-NEXT:    and rdi, rcx
-; X64-NEXT:    shl rdi, 0x4
-; X64-NEXT:    or rdi, rax
-; X64-NEXT:    movabs rax, 0x3333333333333333
-; X64-NEXT:    mov rdx, rdi
-; X64-NEXT:    and rdx, rax
-; X64-NEXT:    shr rdi, 0x2
-; X64-NEXT:    and rdi, rax
-; X64-NEXT:    lea rdx, [rdi + 4*rdx]
-; X64-NEXT:    movabs rdi, 0x5555555555555555
-; X64-NEXT:    mov rbx, rdx
-; X64-NEXT:    and rbx, rdi
-; X64-NEXT:    shr rdx
-; X64-NEXT:    and rdx, rdi
-; X64-NEXT:    lea rdx, [rdx + 2*rbx]
-; X64-NEXT:    bswap rsi
-; X64-NEXT:    mov rbx, rsi
-; X64-NEXT:    shr rbx, 0x4
-; X64-NEXT:    and rbx, rcx
 ; X64-NEXT:    and rsi, rcx
 ; X64-NEXT:    shl rsi, 0x4
-; X64-NEXT:    or rsi, rbx
-; X64-NEXT:    mov rcx, rsi
-; X64-NEXT:    and rcx, rax
+; X64-NEXT:    or rsi, rax
+; X64-NEXT:    movabs rdx, 0x3333333333333333
+; X64-NEXT:    mov rax, rsi
+; X64-NEXT:    and rax, rdx
 ; X64-NEXT:    shr rsi, 0x2
-; X64-NEXT:    and rsi, rax
-; X64-NEXT:    lea rax, [rsi + 4*rcx]
-; X64-NEXT:    mov rcx, rax
-; X64-NEXT:    and rcx, rdi
+; X64-NEXT:    and rsi, rdx
+; X64-NEXT:    lea rax, [rsi + 4*rax]
+; X64-NEXT:    movabs rsi, 0x5555555555555555
+; X64-NEXT:    mov rbx, rax
+; X64-NEXT:    and rbx, rsi
 ; X64-NEXT:    shr rax
-; X64-NEXT:    and rax, rdi
-; X64-NEXT:    lea rax, [rax + 2*rcx]
+; X64-NEXT:    and rax, rsi
+; X64-NEXT:    lea rax, [rax + 2*rbx]
+; X64-NEXT:    bswap rdi
+; X64-NEXT:    mov rbx, rdi
+; X64-NEXT:    shr rbx, 0x4
+; X64-NEXT:    and rbx, rcx
+; X64-NEXT:    and rdi, rcx
+; X64-NEXT:    shl rdi, 0x4
+; X64-NEXT:    or rdi, rbx
+; X64-NEXT:    mov rcx, rdi
+; X64-NEXT:    and rcx, rdx
+; X64-NEXT:    shr rdi, 0x2
+; X64-NEXT:    and rdi, rdx
+; X64-NEXT:    lea rdx, [rdi + 4*rcx]
+; X64-NEXT:    mov rcx, rdx
+; X64-NEXT:    and rcx, rsi
+; X64-NEXT:    shr rdx
+; X64-NEXT:    and rdx, rsi
+; X64-NEXT:    lea rcx, [rdx + 2*rcx]
+; X64-NEXT:    mov rdx, rcx
 ; X64-NEXT:    pop rbx
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret

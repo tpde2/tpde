@@ -6,7 +6,9 @@
 ; RUN: tpde-llc --target=x86_64 %s | %objdump | FileCheck %s -check-prefixes=X64
 ; RUN: tpde-llc --target=aarch64 %s | %objdump | FileCheck %s -check-prefixes=ARM64
 ; XFAIL: llvm19.1
-; XFAIL: llvm23.1
+; XFAIL: llvm20.1
+; XFAIL: llvm21.1
+; XFAIL: llvm22.1
 
 declare i8   @llvm.cttz.i8  (i8, i1)
 declare i16   @llvm.cttz.i16  (i16, i1)
@@ -221,7 +223,7 @@ define i128 @cttz_i128(i128 %a) {
 ; ARM64-NEXT:    clz x1, x1
 ; ARM64-NEXT:    clz x2, x2
 ; ARM64-NEXT:    add x1, x1, #0x40
-; ARM64-NEXT:    csel x3, x1, x2, eq
+; ARM64-NEXT:    csel x3, x2, x1, ne
 ; ARM64-NEXT:    str x0, [x29, #0xa8]
 ; ARM64-NEXT:    mov x0, x3
 ; ARM64-NEXT:    ldr x1, [x29, #0xa8]
@@ -273,7 +275,7 @@ define i128 @cttz_i128_no_salvage(i128 %a) {
 ; ARM64-NEXT:    clz x2, x2
 ; ARM64-NEXT:    clz x3, x3
 ; ARM64-NEXT:    add x2, x2, #0x40
-; ARM64-NEXT:    csel x5, x2, x3, eq
+; ARM64-NEXT:    csel x5, x3, x2, ne
 ; ARM64-NEXT:    rbit x1, x1
 ; ARM64-NEXT:    rbit x2, x0
 ; ARM64-NEXT:    cmp x0, #0x0
@@ -281,7 +283,7 @@ define i128 @cttz_i128_no_salvage(i128 %a) {
 ; ARM64-NEXT:    clz x1, x1
 ; ARM64-NEXT:    clz x2, x2
 ; ARM64-NEXT:    add x1, x1, #0x40
-; ARM64-NEXT:    csel x3, x1, x2, eq
+; ARM64-NEXT:    csel x3, x2, x1, ne
 ; ARM64-NEXT:    mov x0, x5
 ; ARM64-NEXT:    mov x1, x4
 ; ARM64-NEXT:    ret

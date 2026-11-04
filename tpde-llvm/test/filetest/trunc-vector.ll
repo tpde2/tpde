@@ -5,8 +5,9 @@
 ; RUN: tpde-llc --target=x86_64 %s | %objdump | FileCheck %s -check-prefixes=X64
 ; RUN: tpde-llc --target=aarch64 %s | %objdump | FileCheck %s -check-prefixes=ARM64
 ; XFAIL: llvm19.1
+; XFAIL: llvm20.1
+; XFAIL: llvm21.1
 ; XFAIL: llvm22.1
-; XFAIL: llvm23.1
 
 define <8 x i8> @trunc_v8i16_8(<8 x i16> %v) {
 ; X64-LABEL: <trunc_v8i16_8>:
@@ -300,10 +301,10 @@ define void @trunc_v16i8_1(ptr %p, <16 x i8> %a) {
 ; ARM64-NEXT:     R_AARCH64_LDST128_ABS_LO12_NC
 ; ARM64-NEXT:    cmlt v0.16b, v0.16b, #0
 ; ARM64-NEXT:    and v0.16b, v0.16b, v1.16b
-; ARM64-NEXT:    ext v1.16b, v0.16b, v0.16b, #0x8
-; ARM64-NEXT:    zip1 v0.16b, v0.16b, v1.16b
-; ARM64-NEXT:    addv h0, v0.8h
-; ARM64-NEXT:    fmov w2, s0
+; ARM64-NEXT:    addp v0.16b, v0.16b, v0.16b
+; ARM64-NEXT:    addp v0.16b, v0.16b, v0.16b
+; ARM64-NEXT:    addp v0.16b, v0.16b, v0.16b
+; ARM64-NEXT:    umov w2, v0.h[0]
 ; ARM64-NEXT:    strh w2, [x0]
 ; ARM64-NEXT:    ret
   %r = trunc <16 x i8> %a to <16 x i1>
@@ -314,8 +315,6 @@ define void @trunc_v16i8_1(ptr %p, <16 x i8> %a) {
 define void @trunc_v4i16_1(ptr %p, <4 x i16> %a) {
 ; X64-LABEL: <trunc_v4i16_1>:
 ; X64:         psllw xmm0, 0xf
-; X64-NEXT:    pand xmm0, xmmword ptr <trunc_v4i16_1+0x5>
-; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    packsswb xmm0, xmm0
 ; X64-NEXT:    pmovmskb eax, xmm0
 ; X64-NEXT:    mov byte ptr [rdi], al
@@ -378,10 +377,9 @@ define void @trunc_v2i32_1(ptr %p, <2 x i32> %a) {
 ;
 ; ARM64-LABEL: <trunc_v2i32_1>:
 ; ARM64:         shl v0.2s, v0.2s, #0x1f
-; ARM64-NEXT:    adrp x1, 0x0 <trunc_v8i16_8>
-; ARM64-NEXT:     R_AARCH64_ADR_PREL_PG_HI21
-; ARM64-NEXT:    ldr d1, [x1]
-; ARM64-NEXT:     R_AARCH64_LDST64_ABS_LO12_NC
+; ARM64-NEXT:    mov x1, #0x1 // =1
+; ARM64-NEXT:    movk x1, #0x2, lsl #32
+; ARM64-NEXT:    fmov d1, x1
 ; ARM64-NEXT:    cmlt v0.2s, v0.2s, #0
 ; ARM64-NEXT:    and v0.8b, v0.8b, v1.8b
 ; ARM64-NEXT:    addp v0.2s, v0.2s, v0.2s

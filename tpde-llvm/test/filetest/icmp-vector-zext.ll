@@ -5,7 +5,10 @@
 
 ; RUN: tpde-llc --target=x86_64 %s | %objdump | FileCheck %s -check-prefixes=X64
 ; RUN: tpde-llc --target=aarch64 %s | %objdump | FileCheck %s -check-prefixes=ARM64
-; XFAIL: llvm23.1
+; XFAIL: llvm19.1
+; XFAIL: llvm20.1
+; XFAIL: llvm21.1
+; XFAIL: llvm22.1
 
 define <8 x i8> @icmp_eq_v8i8(<8 x i8> %a, <8 x i8> %b) {
 ; X64-LABEL: <icmp_eq_v8i8>:
@@ -767,12 +770,13 @@ define <2 x i64> @icmp_ugt_v2i64(<2 x i64> %a, <2 x i64> %b) {
 ; X64-NEXT:    pxor xmm0, xmm2
 ; X64-NEXT:    movdqa xmm2, xmm0
 ; X64-NEXT:    pcmpgtd xmm2, xmm1
+; X64-NEXT:    pshufd {{.*#+}} xmm3 = xmm2[0,0,2,2]
 ; X64-NEXT:    pcmpeqd xmm0, xmm1
 ; X64-NEXT:    pshufd {{.*#+}} xmm1 = xmm0[1,1,3,3]
-; X64-NEXT:    pand xmm1, xmm2
+; X64-NEXT:    pand xmm1, xmm3
 ; X64-NEXT:    pshufd {{.*#+}} xmm0 = xmm2[1,1,3,3]
 ; X64-NEXT:    por xmm0, xmm1
-; X64-NEXT:    pand xmm0, xmmword ptr <icmp_ugt_v2i64+0x2e>
+; X64-NEXT:    pand xmm0, xmmword ptr <icmp_ugt_v2i64+0x33>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    ret
 ;
@@ -796,12 +800,13 @@ define <2 x i64> @icmp_ugt_v2i64_0(<2 x i64> %a) {
 ; X64-NEXT:    pxor xmm0, xmm1
 ; X64-NEXT:    movdqa xmm1, xmm0
 ; X64-NEXT:    pcmpgtd xmm1, xmm2
+; X64-NEXT:    pshufd {{.*#+}} xmm3 = xmm1[0,0,2,2]
 ; X64-NEXT:    pcmpeqd xmm0, xmm2
 ; X64-NEXT:    pshufd {{.*#+}} xmm2 = xmm0[1,1,3,3]
-; X64-NEXT:    pand xmm2, xmm1
+; X64-NEXT:    pand xmm2, xmm3
 ; X64-NEXT:    pshufd {{.*#+}} xmm0 = xmm1[1,1,3,3]
 ; X64-NEXT:    por xmm0, xmm2
-; X64-NEXT:    pand xmm0, xmmword ptr <icmp_ugt_v2i64_0+0x32>
+; X64-NEXT:    pand xmm0, xmmword ptr <icmp_ugt_v2i64_0+0x37>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    ret
 ;
@@ -1069,12 +1074,13 @@ define <2 x i64> @icmp_uge_v2i64(<2 x i64> %a, <2 x i64> %b) {
 ; X64-NEXT:    pxor xmm1, xmm2
 ; X64-NEXT:    movdqa xmm2, xmm1
 ; X64-NEXT:    pcmpgtd xmm2, xmm0
+; X64-NEXT:    pshufd {{.*#+}} xmm3 = xmm2[0,0,2,2]
 ; X64-NEXT:    pcmpeqd xmm1, xmm0
 ; X64-NEXT:    pshufd {{.*#+}} xmm1 = xmm1[1,1,3,3]
-; X64-NEXT:    pand xmm1, xmm2
+; X64-NEXT:    pand xmm1, xmm3
 ; X64-NEXT:    pshufd {{.*#+}} xmm0 = xmm2[1,1,3,3]
 ; X64-NEXT:    por xmm0, xmm1
-; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_uge_v2i64+0x2e>
+; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_uge_v2i64+0x33>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    ret
 ;
@@ -1098,12 +1104,13 @@ define <2 x i64> @icmp_uge_v2i64_0(<2 x i64> %a) {
 ; X64-NEXT:    pxor xmm2, xmm1
 ; X64-NEXT:    movdqa xmm1, xmm2
 ; X64-NEXT:    pcmpgtd xmm1, xmm0
+; X64-NEXT:    pshufd {{.*#+}} xmm3 = xmm1[0,0,2,2]
 ; X64-NEXT:    pcmpeqd xmm2, xmm0
 ; X64-NEXT:    pshufd {{.*#+}} xmm2 = xmm2[1,1,3,3]
-; X64-NEXT:    pand xmm2, xmm1
+; X64-NEXT:    pand xmm2, xmm3
 ; X64-NEXT:    pshufd {{.*#+}} xmm0 = xmm1[1,1,3,3]
 ; X64-NEXT:    por xmm0, xmm2
-; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_uge_v2i64_0+0x32>
+; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_uge_v2i64_0+0x37>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    ret
 ;
@@ -1391,12 +1398,13 @@ define <2 x i64> @icmp_ult_v2i64(<2 x i64> %a, <2 x i64> %b) {
 ; X64-NEXT:    pxor xmm1, xmm2
 ; X64-NEXT:    movdqa xmm2, xmm1
 ; X64-NEXT:    pcmpgtd xmm2, xmm0
+; X64-NEXT:    pshufd {{.*#+}} xmm3 = xmm2[0,0,2,2]
 ; X64-NEXT:    pcmpeqd xmm1, xmm0
 ; X64-NEXT:    pshufd {{.*#+}} xmm1 = xmm1[1,1,3,3]
-; X64-NEXT:    pand xmm1, xmm2
+; X64-NEXT:    pand xmm1, xmm3
 ; X64-NEXT:    pshufd {{.*#+}} xmm0 = xmm2[1,1,3,3]
 ; X64-NEXT:    por xmm0, xmm1
-; X64-NEXT:    pand xmm0, xmmword ptr <icmp_ult_v2i64+0x2e>
+; X64-NEXT:    pand xmm0, xmmword ptr <icmp_ult_v2i64+0x33>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    ret
 ;
@@ -1421,12 +1429,13 @@ define <2 x i64> @icmp_ult_v2i64_0(<2 x i64> %a) {
 ; X64-NEXT:    pxor xmm2, xmm1
 ; X64-NEXT:    movdqa xmm1, xmm2
 ; X64-NEXT:    pcmpgtd xmm1, xmm0
+; X64-NEXT:    pshufd {{.*#+}} xmm3 = xmm1[0,0,2,2]
 ; X64-NEXT:    pcmpeqd xmm2, xmm0
 ; X64-NEXT:    pshufd {{.*#+}} xmm2 = xmm2[1,1,3,3]
-; X64-NEXT:    pand xmm2, xmm1
+; X64-NEXT:    pand xmm2, xmm3
 ; X64-NEXT:    pshufd {{.*#+}} xmm0 = xmm1[1,1,3,3]
 ; X64-NEXT:    por xmm0, xmm2
-; X64-NEXT:    pand xmm0, xmmword ptr <icmp_ult_v2i64_0+0x32>
+; X64-NEXT:    pand xmm0, xmmword ptr <icmp_ult_v2i64_0+0x37>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    ret
 ;
@@ -1703,12 +1712,13 @@ define <2 x i64> @icmp_ule_v2i64(<2 x i64> %a, <2 x i64> %b) {
 ; X64-NEXT:    pxor xmm0, xmm2
 ; X64-NEXT:    movdqa xmm2, xmm0
 ; X64-NEXT:    pcmpgtd xmm2, xmm1
+; X64-NEXT:    pshufd {{.*#+}} xmm3 = xmm2[0,0,2,2]
 ; X64-NEXT:    pcmpeqd xmm0, xmm1
 ; X64-NEXT:    pshufd {{.*#+}} xmm1 = xmm0[1,1,3,3]
-; X64-NEXT:    pand xmm1, xmm2
+; X64-NEXT:    pand xmm1, xmm3
 ; X64-NEXT:    pshufd {{.*#+}} xmm0 = xmm2[1,1,3,3]
 ; X64-NEXT:    por xmm0, xmm1
-; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_ule_v2i64+0x2e>
+; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_ule_v2i64+0x33>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    ret
 ;
@@ -1733,12 +1743,13 @@ define <2 x i64> @icmp_ule_v2i64_0(<2 x i64> %a) {
 ; X64-NEXT:    pxor xmm0, xmm1
 ; X64-NEXT:    movdqa xmm1, xmm0
 ; X64-NEXT:    pcmpgtd xmm1, xmm2
+; X64-NEXT:    pshufd {{.*#+}} xmm3 = xmm1[0,0,2,2]
 ; X64-NEXT:    pcmpeqd xmm0, xmm2
 ; X64-NEXT:    pshufd {{.*#+}} xmm2 = xmm0[1,1,3,3]
-; X64-NEXT:    pand xmm2, xmm1
+; X64-NEXT:    pand xmm2, xmm3
 ; X64-NEXT:    pshufd {{.*#+}} xmm0 = xmm1[1,1,3,3]
 ; X64-NEXT:    por xmm0, xmm2
-; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_ule_v2i64_0+0x32>
+; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_ule_v2i64_0+0x37>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    ret
 ;
@@ -1971,12 +1982,13 @@ define <2 x i64> @icmp_sgt_v2i64(<2 x i64> %a, <2 x i64> %b) {
 ; X64-NEXT:    pxor xmm0, xmm2
 ; X64-NEXT:    movdqa xmm2, xmm0
 ; X64-NEXT:    pcmpgtd xmm2, xmm1
+; X64-NEXT:    pshufd {{.*#+}} xmm3 = xmm2[0,0,2,2]
 ; X64-NEXT:    pcmpeqd xmm0, xmm1
 ; X64-NEXT:    pshufd {{.*#+}} xmm1 = xmm0[1,1,3,3]
-; X64-NEXT:    pand xmm1, xmm2
+; X64-NEXT:    pand xmm1, xmm3
 ; X64-NEXT:    pshufd {{.*#+}} xmm0 = xmm2[1,1,3,3]
 ; X64-NEXT:    por xmm0, xmm1
-; X64-NEXT:    pand xmm0, xmmword ptr <icmp_sgt_v2i64+0x2e>
+; X64-NEXT:    pand xmm0, xmmword ptr <icmp_sgt_v2i64+0x33>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    ret
 ;
@@ -2000,12 +2012,13 @@ define <2 x i64> @icmp_sgt_v2i64_0(<2 x i64> %a) {
 ; X64-NEXT:    pxor xmm0, xmm1
 ; X64-NEXT:    movdqa xmm1, xmm0
 ; X64-NEXT:    pcmpgtd xmm1, xmm2
+; X64-NEXT:    pshufd {{.*#+}} xmm3 = xmm1[0,0,2,2]
 ; X64-NEXT:    pcmpeqd xmm0, xmm2
 ; X64-NEXT:    pshufd {{.*#+}} xmm2 = xmm0[1,1,3,3]
-; X64-NEXT:    pand xmm2, xmm1
+; X64-NEXT:    pand xmm2, xmm3
 ; X64-NEXT:    pshufd {{.*#+}} xmm0 = xmm1[1,1,3,3]
 ; X64-NEXT:    por xmm0, xmm2
-; X64-NEXT:    pand xmm0, xmmword ptr <icmp_sgt_v2i64_0+0x32>
+; X64-NEXT:    pand xmm0, xmmword ptr <icmp_sgt_v2i64_0+0x37>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    ret
 ;
@@ -2257,12 +2270,13 @@ define <2 x i64> @icmp_sge_v2i64(<2 x i64> %a, <2 x i64> %b) {
 ; X64-NEXT:    pxor xmm1, xmm2
 ; X64-NEXT:    movdqa xmm2, xmm1
 ; X64-NEXT:    pcmpgtd xmm2, xmm0
+; X64-NEXT:    pshufd {{.*#+}} xmm3 = xmm2[0,0,2,2]
 ; X64-NEXT:    pcmpeqd xmm1, xmm0
 ; X64-NEXT:    pshufd {{.*#+}} xmm1 = xmm1[1,1,3,3]
-; X64-NEXT:    pand xmm1, xmm2
+; X64-NEXT:    pand xmm1, xmm3
 ; X64-NEXT:    pshufd {{.*#+}} xmm0 = xmm2[1,1,3,3]
 ; X64-NEXT:    por xmm0, xmm1
-; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_sge_v2i64+0x2e>
+; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_sge_v2i64+0x33>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    ret
 ;
@@ -2286,12 +2300,13 @@ define <2 x i64> @icmp_sge_v2i64_0(<2 x i64> %a) {
 ; X64-NEXT:    pxor xmm2, xmm1
 ; X64-NEXT:    movdqa xmm1, xmm2
 ; X64-NEXT:    pcmpgtd xmm1, xmm0
+; X64-NEXT:    pshufd {{.*#+}} xmm3 = xmm1[0,0,2,2]
 ; X64-NEXT:    pcmpeqd xmm2, xmm0
 ; X64-NEXT:    pshufd {{.*#+}} xmm2 = xmm2[1,1,3,3]
-; X64-NEXT:    pand xmm2, xmm1
+; X64-NEXT:    pand xmm2, xmm3
 ; X64-NEXT:    pshufd {{.*#+}} xmm0 = xmm1[1,1,3,3]
 ; X64-NEXT:    por xmm0, xmm2
-; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_sge_v2i64_0+0x32>
+; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_sge_v2i64_0+0x37>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    ret
 ;
@@ -2547,12 +2562,13 @@ define <2 x i64> @icmp_slt_v2i64(<2 x i64> %a, <2 x i64> %b) {
 ; X64-NEXT:    pxor xmm1, xmm2
 ; X64-NEXT:    movdqa xmm2, xmm1
 ; X64-NEXT:    pcmpgtd xmm2, xmm0
+; X64-NEXT:    pshufd {{.*#+}} xmm3 = xmm2[0,0,2,2]
 ; X64-NEXT:    pcmpeqd xmm1, xmm0
 ; X64-NEXT:    pshufd {{.*#+}} xmm1 = xmm1[1,1,3,3]
-; X64-NEXT:    pand xmm1, xmm2
+; X64-NEXT:    pand xmm1, xmm3
 ; X64-NEXT:    pshufd {{.*#+}} xmm0 = xmm2[1,1,3,3]
 ; X64-NEXT:    por xmm0, xmm1
-; X64-NEXT:    pand xmm0, xmmword ptr <icmp_slt_v2i64+0x2e>
+; X64-NEXT:    pand xmm0, xmmword ptr <icmp_slt_v2i64+0x33>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    ret
 ;
@@ -2577,12 +2593,13 @@ define <2 x i64> @icmp_slt_v2i64_0(<2 x i64> %a) {
 ; X64-NEXT:    pxor xmm2, xmm1
 ; X64-NEXT:    movdqa xmm1, xmm2
 ; X64-NEXT:    pcmpgtd xmm1, xmm0
+; X64-NEXT:    pshufd {{.*#+}} xmm3 = xmm1[0,0,2,2]
 ; X64-NEXT:    pcmpeqd xmm2, xmm0
 ; X64-NEXT:    pshufd {{.*#+}} xmm2 = xmm2[1,1,3,3]
-; X64-NEXT:    pand xmm2, xmm1
+; X64-NEXT:    pand xmm2, xmm3
 ; X64-NEXT:    pshufd {{.*#+}} xmm0 = xmm1[1,1,3,3]
 ; X64-NEXT:    por xmm0, xmm2
-; X64-NEXT:    pand xmm0, xmmword ptr <icmp_slt_v2i64_0+0x32>
+; X64-NEXT:    pand xmm0, xmmword ptr <icmp_slt_v2i64_0+0x37>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    ret
 ;
@@ -2835,12 +2852,13 @@ define <2 x i64> @icmp_sle_v2i64(<2 x i64> %a, <2 x i64> %b) {
 ; X64-NEXT:    pxor xmm0, xmm2
 ; X64-NEXT:    movdqa xmm2, xmm0
 ; X64-NEXT:    pcmpgtd xmm2, xmm1
+; X64-NEXT:    pshufd {{.*#+}} xmm3 = xmm2[0,0,2,2]
 ; X64-NEXT:    pcmpeqd xmm0, xmm1
 ; X64-NEXT:    pshufd {{.*#+}} xmm1 = xmm0[1,1,3,3]
-; X64-NEXT:    pand xmm1, xmm2
+; X64-NEXT:    pand xmm1, xmm3
 ; X64-NEXT:    pshufd {{.*#+}} xmm0 = xmm2[1,1,3,3]
 ; X64-NEXT:    por xmm0, xmm1
-; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_sle_v2i64+0x2e>
+; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_sle_v2i64+0x33>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    ret
 ;
@@ -2865,12 +2883,13 @@ define <2 x i64> @icmp_sle_v2i64_0(<2 x i64> %a) {
 ; X64-NEXT:    pxor xmm0, xmm1
 ; X64-NEXT:    movdqa xmm1, xmm0
 ; X64-NEXT:    pcmpgtd xmm1, xmm2
+; X64-NEXT:    pshufd {{.*#+}} xmm3 = xmm1[0,0,2,2]
 ; X64-NEXT:    pcmpeqd xmm0, xmm2
 ; X64-NEXT:    pshufd {{.*#+}} xmm2 = xmm0[1,1,3,3]
-; X64-NEXT:    pand xmm2, xmm1
+; X64-NEXT:    pand xmm2, xmm3
 ; X64-NEXT:    pshufd {{.*#+}} xmm0 = xmm1[1,1,3,3]
 ; X64-NEXT:    por xmm0, xmm2
-; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_sle_v2i64_0+0x32>
+; X64-NEXT:    pandn xmm0, xmmword ptr <icmp_sle_v2i64_0+0x37>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    ret
 ;
