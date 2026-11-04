@@ -74,7 +74,7 @@ concept Compiler = CompilerConfig<Config> && requires(T a) {
 
   // (value); might allocate register
   {
-    a.gval_expr_as_reg(ARG(typename T::GenericValuePart &))
+    a.gval_expr_as_reg(ARG(typename T::GenericValuePart::Expr &))
   } -> std::same_as<typename Config::AsmReg>;
 
   {

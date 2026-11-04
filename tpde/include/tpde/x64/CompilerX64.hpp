@@ -425,7 +425,7 @@ struct CompilerX64 : BaseTy<Adaptor, Derived, Config> {
     return typename GenericValuePart::Expr(AsmReg::BP, ap.frame_off());
   }
 
-  AsmReg gval_expr_as_reg(GenericValuePart &gv);
+  AsmReg gval_expr_as_reg(typename GenericValuePart::Expr &expr);
 
   /// Dynamic alloca of a fixed-size region.
   void alloca_fixed(u64 size, u32 align, ValuePart &res);
@@ -1016,8 +1016,10 @@ template <IRAdaptor Adaptor,
           template <typename, typename, typename> typename BaseTy,
           typename Config>
 AsmReg CompilerX64<Adaptor, Derived, BaseTy, Config>::gval_expr_as_reg(
-    GenericValuePart &gv) {
-  auto &expr = std::get<typename GenericValuePart::Expr>(gv.state);
+    typename GenericValuePart::Expr &expr) {
+  if (expr.has_base() && !expr.has_index() && expr.disp == 0) {
+    return expr.base_reg();
+  }
 
   ScratchReg scratch{derived()};
   bool disp32 = i32(expr.disp) == expr.disp;
@@ -1110,7 +1112,8 @@ AsmReg CompilerX64<Adaptor, Derived, BaseTy, Config>::gval_expr_as_reg(
       ASM(LEA64rm, dst, FE_MEM(dst, 1, tmp2, 0));
     }
   }
-  gv.state = std::move(scratch);
+
+  expr = typename GenericValuePart::Expr(std::move(scratch));
   return dst;
 }
 

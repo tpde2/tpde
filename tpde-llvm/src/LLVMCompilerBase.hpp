@@ -4146,8 +4146,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_gep(
 
   ValueRef index_vr{this};
   ValuePartRef index_vp{this};
-  GenericValuePart addr = typename GenericValuePart::Expr{};
-  auto &expr = std::get<typename GenericValuePart::Expr>(addr.state);
+  typename GenericValuePart::Expr expr{};
 
   // Kept separate, we don't want to fold the displacement whenever we add an
   // index. GEP components are sign-extended, but we must use an unsigned
@@ -4218,23 +4217,18 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_gep(
         }
 
         if (base_is_stack_var) {
-          addr = derived()->create_addr_for_alloca(base.assignment());
-          assert(addr.is_expr());
+          expr = derived()->create_addr_for_alloca(base.assignment());
           displacement += expr.disp;
           expr.disp = 0;
           base_is_stack_var = false;
         }
 
         if (expr.scale) {
-          derived()->gval_expr_as_reg(addr);
+          derived()->gval_expr_as_reg(expr);
           index_vp.reset();
           index_vr.reset();
           base.reset();
           ptr_ref.reset();
-
-          ScratchReg new_base = std::move(std::get<ScratchReg>(addr.state));
-          addr = typename GenericValuePart::Expr{};
-          expr.base = std::move(new_base);
         }
 
         index_vr = this->val_ref(idx);
@@ -4286,7 +4280,7 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_gep(
       return true;
     }
 
-    addr = derived()->create_addr_for_alloca(base.assignment());
+    expr = derived()->create_addr_for_alloca(base.assignment());
     expr.disp += displacement;
   } else {
     expr.disp = displacement;
@@ -4295,19 +4289,19 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_gep(
   if (auto *store = llvm::dyn_cast_if_present<llvm::StoreInst>(next_val);
       store && store->getPointerOperand() == gep) {
     this->adaptor->inst_set_fused(next_val, true);
-    return compile_store_generic(store, std::move(addr));
+    return compile_store_generic(store, std::move(expr));
   }
   if (auto *load = llvm::dyn_cast_if_present<llvm::LoadInst>(next_val)) {
     assert(load->getPointerOperand() == gep);
     this->adaptor->inst_set_fused(next_val, true);
-    return compile_load_generic(load, std::move(addr));
+    return compile_load_generic(load, std::move(expr));
   }
 
   auto [res_vr, res_ref] = this->result_ref_single(gep);
 
-  AsmReg res_reg = derived()->gval_expr_as_reg(addr);
-  if (auto *op_reg = std::get_if<ScratchReg>(&addr.state)) {
-    res_ref.set_value(std::move(*op_reg));
+  AsmReg res_reg = derived()->gval_expr_as_reg(expr);
+  if (expr.is_base_owned()) {
+    res_ref.set_value(std::move(std::get<ScratchReg>(expr.base)));
   } else {
     derived()->mov(res_ref.alloc_reg(), res_reg, 8);
   }
@@ -4898,11 +4892,18 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_intrin(
 
     // Compute address and store this into a ValuePart.
     // TODO: this is rather ugly, is there a better way?
-    GenericValuePart int_part_slot = derived()->val_spill_slot(int_part);
-    (void)derived()->gval_expr_as_reg(int_part_slot);
-    ValuePart int_part_slot_vp;
-    int_part_slot_vp.set_value(
-        derived(), std::move(std::get<ScratchReg>(int_part_slot.state)));
+    ValuePart int_part_slot_vp{Config::GP_BANK};
+    {
+      GenericValuePart int_part_slot = derived()->val_spill_slot(int_part);
+      AsmReg gvp_reg = derived()->gval_as_reg(int_part_slot);
+      if (int_part_slot.is_expr() && int_part_slot.expr().is_base_owned()) {
+        int_part_slot_vp.set_value(
+            derived(),
+            std::move(std::get<ScratchReg>(int_part_slot.expr().base)));
+      } else {
+        derived()->mov(int_part_slot_vp.alloc_reg(derived()), gvp_reg, 8);
+      }
+    }
     cb.add_arg(std::move(int_part_slot_vp),
                tpde::CCAssignment{.bank = Config::GP_BANK, .size = 8});
 

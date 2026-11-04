@@ -31,6 +31,10 @@ struct CompilerBase<Adaptor, Derived, Config>::GenericValuePart {
       return std::get<ScratchReg>(base).cur_reg();
     }
 
+    bool is_base_owned() const {
+      return std::holds_alternative<ScratchReg>(base);
+    }
+
     [[nodiscard]] bool has_base() const {
       if (std::holds_alternative<AsmReg>(base)) {
         return std::get<AsmReg>(base).valid();
@@ -89,6 +93,8 @@ struct CompilerBase<Adaptor, Derived, Config>::GenericValuePart {
   [[nodiscard]] bool is_expr() const {
     return std::holds_alternative<Expr>(state);
   }
+
+  [[nodiscard]] Expr &expr() { return std::get<Expr>(state); }
 
   [[nodiscard]] bool is_imm() const {
     auto *ptr = std::get_if<ValuePartRef>(&state);

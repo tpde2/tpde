@@ -1349,7 +1349,9 @@ typename CompilerBase<Adaptor, Derived, Config>::AsmReg
     if (expr->has_base() && !expr->has_index() && expr->disp == 0) {
       return expr->base_reg();
     }
-    return derived()->gval_expr_as_reg(gv);
+    AsmReg res = derived()->gval_expr_as_reg(*expr);
+    assert(expr->has_base() && !expr->has_index() && expr->disp == 0);
+    return res;
   }
   TPDE_UNREACHABLE("gval_as_reg on empty GenericValuePart");
 }
@@ -1362,6 +1364,13 @@ typename CompilerBase<Adaptor, Derived, Config>::AsmReg
   if (!dst.has_reg()) {
     if (auto *scratch = std::get_if<ScratchReg>(&gv.state)) {
       dst = std::move(*scratch);
+    } else if (auto *expr =
+                   std::get_if<typename GenericValuePart::Expr>(&gv.state)) {
+      assert(expr->has_base() && !expr->has_index() && expr->disp == 0);
+      assert(reg == expr->base_reg());
+      if (expr->is_base_owned()) {
+        dst = std::move(std::get<ScratchReg>(expr->base));
+      }
     } else if (auto *val_ref = std::get_if<ValuePartRef>(&gv.state)) {
       if (val_ref->can_salvage()) {
         dst.alloc_specific(val_ref->salvage());
@@ -1384,6 +1393,16 @@ typename CompilerBase<Adaptor, Derived, Config>::AsmReg
       dst.set_value(this, std::move(*scratch));
       if (dst.has_assignment()) {
         dst.lock(this);
+      }
+    } else if (auto *expr =
+                   std::get_if<typename GenericValuePart::Expr>(&gv.state)) {
+      assert(expr->has_base() && !expr->has_index() && expr->disp == 0);
+      assert(reg == expr->base_reg());
+      if (expr->is_base_owned()) {
+        dst.set_value(this, std::move(std::get<ScratchReg>(expr->base)));
+        if (dst.has_assignment()) {
+          dst.lock(this);
+        }
       }
     } else if (auto *val_ref = std::get_if<ValuePartRef>(&gv.state)) {
       if (val_ref->can_salvage()) {
