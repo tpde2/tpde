@@ -1581,7 +1581,7 @@ template <IRAdaptor Adaptor,
           typename Config>
 void CompilerX64<Adaptor, Derived, BaseTy, Config>::generate_raw_bfi(
     AsmReg dst, AsmReg src, u32 lsb, u32 width) {
-  assert(lsb < 63 && width < 64 && lsb + width <= 64 && width != 0);
+  assert(lsb < 64 && width < 64 && lsb + width <= 64 && width != 0);
   assert(may_clobber_flags());
   ScratchReg tmp1{this};
   AsmReg tmp1_reg = tmp1.alloc_gp();
@@ -1627,7 +1627,7 @@ template <IRAdaptor Adaptor,
           typename Config>
 void CompilerX64<Adaptor, Derived, BaseTy, Config>::generate_raw_bfiz(
     AsmReg dst, AsmReg src, u32 lsb, u32 width) {
-  assert(lsb < 63 && width < 64 && lsb + width <= 64 && width != 0);
+  assert(lsb < 64 && width < 64 && lsb + width <= 64 && width != 0);
   assert(dst != src);
   assert(may_clobber_flags());
   // Clear irrelevant bits in src and move to dst.

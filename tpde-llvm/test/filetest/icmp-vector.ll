@@ -4464,3 +4464,1020 @@ define void @icmp_uge_v3i16_0(ptr %p, ptr %pa, ptr %pb) {
   store <3 x i1> %r, ptr %p
   ret void
 }
+
+define void @icmp_eq_v64i32(ptr %p, ptr %pa, ptr %pb) {
+; X64-LABEL: <icmp_eq_v64i32>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    sub rsp, 0x230
+; X64-NEXT:    movups xmm0, xmmword ptr [rsi]
+; X64-NEXT:    movups xmm1, xmmword ptr [rsi + 0x10]
+; X64-NEXT:    movups xmm2, xmmword ptr [rsi + 0x20]
+; X64-NEXT:    movups xmm3, xmmword ptr [rsi + 0x30]
+; X64-NEXT:    movups xmm4, xmmword ptr [rsi + 0x40]
+; X64-NEXT:    movups xmm5, xmmword ptr [rsi + 0x50]
+; X64-NEXT:    movups xmm6, xmmword ptr [rsi + 0x60]
+; X64-NEXT:    movups xmm7, xmmword ptr [rsi + 0x70]
+; X64-NEXT:    movups xmm8, xmmword ptr [rsi + 0x80]
+; X64-NEXT:    movups xmm9, xmmword ptr [rsi + 0x90]
+; X64-NEXT:    movups xmm10, xmmword ptr [rsi + 0xa0]
+; X64-NEXT:    movups xmm11, xmmword ptr [rsi + 0xb0]
+; X64-NEXT:    movups xmm12, xmmword ptr [rsi + 0xc0]
+; X64-NEXT:    movups xmm13, xmmword ptr [rsi + 0xd0]
+; X64-NEXT:    movups xmm14, xmmword ptr [rsi + 0xe0]
+; X64-NEXT:    movups xmm15, xmmword ptr [rsi + 0xf0]
+; X64-NEXT:    movapd xmmword ptr [rbp - 0x130], xmm0
+; X64-NEXT:    movups xmm0, xmmword ptr [rdx]
+; X64-NEXT:    movapd xmmword ptr [rbp - 0x120], xmm1
+; X64-NEXT:    movups xmm1, xmmword ptr [rdx + 0x10]
+; X64-NEXT:    movapd xmmword ptr [rbp - 0x110], xmm2
+; X64-NEXT:    movups xmm2, xmmword ptr [rdx + 0x20]
+; X64-NEXT:    movapd xmmword ptr [rbp - 0x100], xmm3
+; X64-NEXT:    movups xmm3, xmmword ptr [rdx + 0x30]
+; X64-NEXT:    movapd xmmword ptr [rbp - 0xf0], xmm4
+; X64-NEXT:    movups xmm4, xmmword ptr [rdx + 0x40]
+; X64-NEXT:    movapd xmmword ptr [rbp - 0xe0], xmm5
+; X64-NEXT:    movups xmm5, xmmword ptr [rdx + 0x50]
+; X64-NEXT:    movapd xmmword ptr [rbp - 0xd0], xmm6
+; X64-NEXT:    movups xmm6, xmmword ptr [rdx + 0x60]
+; X64-NEXT:    movapd xmmword ptr [rbp - 0xc0], xmm7
+; X64-NEXT:    movups xmm7, xmmword ptr [rdx + 0x70]
+; X64-NEXT:    movapd xmmword ptr [rbp - 0xb0], xmm8
+; X64-NEXT:    movups xmm8, xmmword ptr [rdx + 0x80]
+; X64-NEXT:    movapd xmmword ptr [rbp - 0xa0], xmm9
+; X64-NEXT:    movups xmm9, xmmword ptr [rdx + 0x90]
+; X64-NEXT:    movapd xmmword ptr [rbp - 0x90], xmm10
+; X64-NEXT:    movups xmm10, xmmword ptr [rdx + 0xa0]
+; X64-NEXT:    movapd xmmword ptr [rbp - 0x80], xmm11
+; X64-NEXT:    movups xmm11, xmmword ptr [rdx + 0xb0]
+; X64-NEXT:    movapd xmmword ptr [rbp - 0x70], xmm12
+; X64-NEXT:    movups xmm12, xmmword ptr [rdx + 0xc0]
+; X64-NEXT:    movapd xmmword ptr [rbp - 0x60], xmm13
+; X64-NEXT:    movups xmm13, xmmword ptr [rdx + 0xd0]
+; X64-NEXT:    movapd xmmword ptr [rbp - 0x50], xmm14
+; X64-NEXT:    movups xmm14, xmmword ptr [rdx + 0xe0]
+; X64-NEXT:    movapd xmmword ptr [rbp - 0x40], xmm15
+; X64-NEXT:    movups xmm15, xmmword ptr [rdx + 0xf0]
+; X64-NEXT:    mov eax, dword ptr [rbp - 0x130]
+; X64-NEXT:    movapd xmmword ptr [rbp - 0x230], xmm0
+; X64-NEXT:    mov ecx, dword ptr [rbp - 0x230]
+; X64-NEXT:    cmp eax, ecx
+; X64-NEXT:    setae al
+; X64-NEXT:    mov ecx, eax
+; X64-NEXT:    and ecx, 0x1
+; X64-NEXT:    mov eax, dword ptr [rbp - 0x12c]
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x22c]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0x1
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    lea rcx, [rcx + 2*rdx]
+; X64-NEXT:    mov eax, dword ptr [rbp - 0x128]
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x228]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0x2
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    lea rcx, [rcx + 4*rdx]
+; X64-NEXT:    mov eax, dword ptr [rbp - 0x124]
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x224]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0x3
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    lea rcx, [rcx + 8*rdx]
+; X64-NEXT:    mov eax, dword ptr [rbp - 0x120]
+; X64-NEXT:    movapd xmmword ptr [rbp - 0x220], xmm1
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x220]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0x4
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    shl edx, 0x4
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0x11c]
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x21c]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0x5
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    shl edx, 0x5
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0x118]
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x218]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0x6
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    shl edx, 0x6
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0x114]
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x214]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0x7
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    shl edx, 0x7
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0x110]
+; X64-NEXT:    movapd xmmword ptr [rbp - 0x210], xmm2
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x210]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0x8
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    shl edx, 0x8
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0x10c]
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x20c]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0x9
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    shl edx, 0x9
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0x108]
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x208]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0xa
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    shl edx, 0xa
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0x104]
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x204]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0xb
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    shl edx, 0xb
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0x100]
+; X64-NEXT:    movapd xmmword ptr [rbp - 0x200], xmm3
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x200]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0xc
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    shl edx, 0xc
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0xfc]
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x1fc]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0xd
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    shl edx, 0xd
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0xf8]
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x1f8]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0xe
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    shl edx, 0xe
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0xf4]
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x1f4]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0xf
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    shl edx, 0xf
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0xf0]
+; X64-NEXT:    movapd xmmword ptr [rbp - 0x1f0], xmm4
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x1f0]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0x10
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    shl edx, 0x10
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0xec]
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x1ec]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0x11
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    shl edx, 0x11
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0xe8]
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x1e8]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0x12
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    shl edx, 0x12
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0xe4]
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x1e4]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0x13
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    shl edx, 0x13
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0xe0]
+; X64-NEXT:    movapd xmmword ptr [rbp - 0x1e0], xmm5
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x1e0]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0x14
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    shl edx, 0x14
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0xdc]
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x1dc]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0x15
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    shl edx, 0x15
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0xd8]
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x1d8]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0x16
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    shl edx, 0x16
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0xd4]
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x1d4]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0x17
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    shl edx, 0x17
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0xd0]
+; X64-NEXT:    movapd xmmword ptr [rbp - 0x1d0], xmm6
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x1d0]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0x18
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    shl edx, 0x18
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0xcc]
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x1cc]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0x19
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    shl edx, 0x19
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0xc8]
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x1c8]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0x1a
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    shl edx, 0x1a
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0xc4]
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x1c4]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0x1b
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    shl edx, 0x1b
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0xc0]
+; X64-NEXT:    movapd xmmword ptr [rbp - 0x1c0], xmm7
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x1c0]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0x1c
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    shl edx, 0x1c
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0xbc]
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x1bc]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0x1d
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    shl edx, 0x1d
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0xb8]
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x1b8]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0x1e
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    shl edx, 0x1e
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0xb4]
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x1b4]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0x1f
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    shl edx, 0x1f
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0xb0]
+; X64-NEXT:    movapd xmmword ptr [rbp - 0x1b0], xmm8
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x1b0]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0x20
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    shl rdx, 0x20
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0xac]
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x1ac]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0x21
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    shl rdx, 0x21
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0xa8]
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x1a8]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0x22
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    shl rdx, 0x22
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0xa4]
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x1a4]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0x23
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    shl rdx, 0x23
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0xa0]
+; X64-NEXT:    movapd xmmword ptr [rbp - 0x1a0], xmm9
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x1a0]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0x24
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    shl rdx, 0x24
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0x9c]
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x19c]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0x25
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    shl rdx, 0x25
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0x98]
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x198]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0x26
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    shl rdx, 0x26
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0x94]
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x194]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0x27
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    shl rdx, 0x27
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0x90]
+; X64-NEXT:    movapd xmmword ptr [rbp - 0x190], xmm10
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x190]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0x28
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    shl rdx, 0x28
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0x8c]
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x18c]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0x29
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    shl rdx, 0x29
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0x88]
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x188]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0x2a
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    shl rdx, 0x2a
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0x84]
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x184]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0x2b
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    shl rdx, 0x2b
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0x80]
+; X64-NEXT:    movapd xmmword ptr [rbp - 0x180], xmm11
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x180]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0x2c
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    shl rdx, 0x2c
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0x7c]
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x17c]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0x2d
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    shl rdx, 0x2d
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0x78]
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x178]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0x2e
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    shl rdx, 0x2e
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0x74]
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x174]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0x2f
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    shl rdx, 0x2f
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0x70]
+; X64-NEXT:    movapd xmmword ptr [rbp - 0x170], xmm12
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x170]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0x30
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    shl rdx, 0x30
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0x6c]
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x16c]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0x31
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    shl rdx, 0x31
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0x68]
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x168]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0x32
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    shl rdx, 0x32
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0x64]
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x164]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0x33
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    shl rdx, 0x33
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0x60]
+; X64-NEXT:    movapd xmmword ptr [rbp - 0x160], xmm13
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x160]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0x34
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    shl rdx, 0x34
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0x5c]
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x15c]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0x35
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    shl rdx, 0x35
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0x58]
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x158]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0x36
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    shl rdx, 0x36
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0x54]
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x154]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0x37
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    shl rdx, 0x37
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0x50]
+; X64-NEXT:    movapd xmmword ptr [rbp - 0x150], xmm14
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x150]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0x38
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    shl rdx, 0x38
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0x4c]
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x14c]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0x39
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    shl rdx, 0x39
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0x48]
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x148]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0x3a
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    shl rdx, 0x3a
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0x44]
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x144]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0x3b
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    shl rdx, 0x3b
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0x40]
+; X64-NEXT:    movapd xmmword ptr [rbp - 0x140], xmm15
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x140]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0x3c
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    shl rdx, 0x3c
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0x3c]
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x13c]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0x3d
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    shl rdx, 0x3d
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0x38]
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x138]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0x3e
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    shl rdx, 0x3e
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    mov eax, dword ptr [rbp - 0x34]
+; X64-NEXT:    mov edx, dword ptr [rbp - 0x134]
+; X64-NEXT:    cmp eax, edx
+; X64-NEXT:    setae al
+; X64-NEXT:    btr rcx, 0x3f
+; X64-NEXT:    mov edx, eax
+; X64-NEXT:    and edx, 0x1
+; X64-NEXT:    shl rdx, 0x3f
+; X64-NEXT:    or rcx, rdx
+; X64-NEXT:    mov qword ptr [rdi], rcx
+; X64-NEXT:    add rsp, 0x230
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <icmp_eq_v64i32>:
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    stp d8, d9, [sp, #0x10]
+; ARM64-NEXT:    stp d10, d11, [sp, #0x20]
+; ARM64-NEXT:    stp d12, d13, [sp, #0x30]
+; ARM64-NEXT:    stp d14, d15, [sp, #0x40]
+; ARM64-NEXT:    ldr q0, [x1]
+; ARM64-NEXT:    ldr q1, [x1, #0x10]
+; ARM64-NEXT:    ldr q2, [x1, #0x20]
+; ARM64-NEXT:    ldr q3, [x1, #0x30]
+; ARM64-NEXT:    ldr q4, [x1, #0x40]
+; ARM64-NEXT:    ldr q5, [x1, #0x50]
+; ARM64-NEXT:    ldr q6, [x1, #0x60]
+; ARM64-NEXT:    ldr q7, [x1, #0x70]
+; ARM64-NEXT:    ldr q8, [x1, #0x80]
+; ARM64-NEXT:    ldr q9, [x1, #0x90]
+; ARM64-NEXT:    ldr q10, [x1, #0xa0]
+; ARM64-NEXT:    ldr q11, [x1, #0xb0]
+; ARM64-NEXT:    ldr q12, [x1, #0xc0]
+; ARM64-NEXT:    ldr q13, [x1, #0xd0]
+; ARM64-NEXT:    ldr q14, [x1, #0xe0]
+; ARM64-NEXT:    ldr q15, [x1, #0xf0]
+; ARM64-NEXT:    ldr q16, [x2]
+; ARM64-NEXT:    ldr q17, [x2, #0x10]
+; ARM64-NEXT:    ldr q18, [x2, #0x20]
+; ARM64-NEXT:    ldr q19, [x2, #0x30]
+; ARM64-NEXT:    ldr q20, [x2, #0x40]
+; ARM64-NEXT:    ldr q21, [x2, #0x50]
+; ARM64-NEXT:    ldr q22, [x2, #0x60]
+; ARM64-NEXT:    ldr q23, [x2, #0x70]
+; ARM64-NEXT:    ldr q24, [x2, #0x80]
+; ARM64-NEXT:    ldr q25, [x2, #0x90]
+; ARM64-NEXT:    ldr q26, [x2, #0xa0]
+; ARM64-NEXT:    ldr q27, [x2, #0xb0]
+; ARM64-NEXT:    ldr q28, [x2, #0xc0]
+; ARM64-NEXT:    ldr q29, [x2, #0xd0]
+; ARM64-NEXT:    ldr q30, [x2, #0xe0]
+; ARM64-NEXT:    ldr q31, [x2, #0xf0]
+; ARM64-NEXT:    mov w1, v0.s[0]
+; ARM64-NEXT:    mov w2, v16.s[0]
+; ARM64-NEXT:    cmp w1, w2
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    ubfx x2, x1, #0, #1
+; ARM64-NEXT:    mov w1, v0.s[1]
+; ARM64-NEXT:    mov w3, v16.s[1]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #1, #1
+; ARM64-NEXT:    mov w1, v0.s[2]
+; ARM64-NEXT:    mov w3, v16.s[2]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #2, #1
+; ARM64-NEXT:    mov w1, v0.s[3]
+; ARM64-NEXT:    mov w3, v16.s[3]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #3, #1
+; ARM64-NEXT:    mov w1, v1.s[0]
+; ARM64-NEXT:    mov w3, v17.s[0]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #4, #1
+; ARM64-NEXT:    mov w1, v1.s[1]
+; ARM64-NEXT:    mov w3, v17.s[1]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #5, #1
+; ARM64-NEXT:    mov w1, v1.s[2]
+; ARM64-NEXT:    mov w3, v17.s[2]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #6, #1
+; ARM64-NEXT:    mov w1, v1.s[3]
+; ARM64-NEXT:    mov w3, v17.s[3]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #7, #1
+; ARM64-NEXT:    mov w1, v2.s[0]
+; ARM64-NEXT:    mov w3, v18.s[0]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #8, #1
+; ARM64-NEXT:    mov w1, v2.s[1]
+; ARM64-NEXT:    mov w3, v18.s[1]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #9, #1
+; ARM64-NEXT:    mov w1, v2.s[2]
+; ARM64-NEXT:    mov w3, v18.s[2]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #10, #1
+; ARM64-NEXT:    mov w1, v2.s[3]
+; ARM64-NEXT:    mov w3, v18.s[3]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #11, #1
+; ARM64-NEXT:    mov w1, v3.s[0]
+; ARM64-NEXT:    mov w3, v19.s[0]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #12, #1
+; ARM64-NEXT:    mov w1, v3.s[1]
+; ARM64-NEXT:    mov w3, v19.s[1]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #13, #1
+; ARM64-NEXT:    mov w1, v3.s[2]
+; ARM64-NEXT:    mov w3, v19.s[2]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #14, #1
+; ARM64-NEXT:    mov w1, v3.s[3]
+; ARM64-NEXT:    mov w3, v19.s[3]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #15, #1
+; ARM64-NEXT:    mov w1, v4.s[0]
+; ARM64-NEXT:    mov w3, v20.s[0]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #16, #1
+; ARM64-NEXT:    mov w1, v4.s[1]
+; ARM64-NEXT:    mov w3, v20.s[1]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #17, #1
+; ARM64-NEXT:    mov w1, v4.s[2]
+; ARM64-NEXT:    mov w3, v20.s[2]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #18, #1
+; ARM64-NEXT:    mov w1, v4.s[3]
+; ARM64-NEXT:    mov w3, v20.s[3]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #19, #1
+; ARM64-NEXT:    mov w1, v5.s[0]
+; ARM64-NEXT:    mov w3, v21.s[0]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #20, #1
+; ARM64-NEXT:    mov w1, v5.s[1]
+; ARM64-NEXT:    mov w3, v21.s[1]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #21, #1
+; ARM64-NEXT:    mov w1, v5.s[2]
+; ARM64-NEXT:    mov w3, v21.s[2]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #22, #1
+; ARM64-NEXT:    mov w1, v5.s[3]
+; ARM64-NEXT:    mov w3, v21.s[3]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #23, #1
+; ARM64-NEXT:    mov w1, v6.s[0]
+; ARM64-NEXT:    mov w3, v22.s[0]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #24, #1
+; ARM64-NEXT:    mov w1, v6.s[1]
+; ARM64-NEXT:    mov w3, v22.s[1]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #25, #1
+; ARM64-NEXT:    mov w1, v6.s[2]
+; ARM64-NEXT:    mov w3, v22.s[2]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #26, #1
+; ARM64-NEXT:    mov w1, v6.s[3]
+; ARM64-NEXT:    mov w3, v22.s[3]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #27, #1
+; ARM64-NEXT:    mov w1, v7.s[0]
+; ARM64-NEXT:    mov w3, v23.s[0]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #28, #1
+; ARM64-NEXT:    mov w1, v7.s[1]
+; ARM64-NEXT:    mov w3, v23.s[1]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #29, #1
+; ARM64-NEXT:    mov w1, v7.s[2]
+; ARM64-NEXT:    mov w3, v23.s[2]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #30, #1
+; ARM64-NEXT:    mov w1, v7.s[3]
+; ARM64-NEXT:    mov w3, v23.s[3]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #31, #1
+; ARM64-NEXT:    mov w1, v8.s[0]
+; ARM64-NEXT:    mov w3, v24.s[0]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #32, #1
+; ARM64-NEXT:    mov w1, v8.s[1]
+; ARM64-NEXT:    mov w3, v24.s[1]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #33, #1
+; ARM64-NEXT:    mov w1, v8.s[2]
+; ARM64-NEXT:    mov w3, v24.s[2]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #34, #1
+; ARM64-NEXT:    mov w1, v8.s[3]
+; ARM64-NEXT:    mov w3, v24.s[3]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #35, #1
+; ARM64-NEXT:    mov w1, v9.s[0]
+; ARM64-NEXT:    mov w3, v25.s[0]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #36, #1
+; ARM64-NEXT:    mov w1, v9.s[1]
+; ARM64-NEXT:    mov w3, v25.s[1]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #37, #1
+; ARM64-NEXT:    mov w1, v9.s[2]
+; ARM64-NEXT:    mov w3, v25.s[2]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #38, #1
+; ARM64-NEXT:    mov w1, v9.s[3]
+; ARM64-NEXT:    mov w3, v25.s[3]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #39, #1
+; ARM64-NEXT:    mov w1, v10.s[0]
+; ARM64-NEXT:    mov w3, v26.s[0]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #40, #1
+; ARM64-NEXT:    mov w1, v10.s[1]
+; ARM64-NEXT:    mov w3, v26.s[1]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #41, #1
+; ARM64-NEXT:    mov w1, v10.s[2]
+; ARM64-NEXT:    mov w3, v26.s[2]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #42, #1
+; ARM64-NEXT:    mov w1, v10.s[3]
+; ARM64-NEXT:    mov w3, v26.s[3]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #43, #1
+; ARM64-NEXT:    mov w1, v11.s[0]
+; ARM64-NEXT:    mov w3, v27.s[0]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #44, #1
+; ARM64-NEXT:    mov w1, v11.s[1]
+; ARM64-NEXT:    mov w3, v27.s[1]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #45, #1
+; ARM64-NEXT:    mov w1, v11.s[2]
+; ARM64-NEXT:    mov w3, v27.s[2]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #46, #1
+; ARM64-NEXT:    mov w1, v11.s[3]
+; ARM64-NEXT:    mov w3, v27.s[3]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #47, #1
+; ARM64-NEXT:    mov w1, v12.s[0]
+; ARM64-NEXT:    mov w3, v28.s[0]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #48, #1
+; ARM64-NEXT:    mov w1, v12.s[1]
+; ARM64-NEXT:    mov w3, v28.s[1]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #49, #1
+; ARM64-NEXT:    mov w1, v12.s[2]
+; ARM64-NEXT:    mov w3, v28.s[2]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #50, #1
+; ARM64-NEXT:    mov w1, v12.s[3]
+; ARM64-NEXT:    mov w3, v28.s[3]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #51, #1
+; ARM64-NEXT:    mov w1, v13.s[0]
+; ARM64-NEXT:    mov w3, v29.s[0]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #52, #1
+; ARM64-NEXT:    mov w1, v13.s[1]
+; ARM64-NEXT:    mov w3, v29.s[1]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #53, #1
+; ARM64-NEXT:    mov w1, v13.s[2]
+; ARM64-NEXT:    mov w3, v29.s[2]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #54, #1
+; ARM64-NEXT:    mov w1, v13.s[3]
+; ARM64-NEXT:    mov w3, v29.s[3]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #55, #1
+; ARM64-NEXT:    mov w1, v14.s[0]
+; ARM64-NEXT:    mov w3, v30.s[0]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #56, #1
+; ARM64-NEXT:    mov w1, v14.s[1]
+; ARM64-NEXT:    mov w3, v30.s[1]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #57, #1
+; ARM64-NEXT:    mov w1, v14.s[2]
+; ARM64-NEXT:    mov w3, v30.s[2]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #58, #1
+; ARM64-NEXT:    mov w1, v14.s[3]
+; ARM64-NEXT:    mov w3, v30.s[3]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #59, #1
+; ARM64-NEXT:    mov w1, v15.s[0]
+; ARM64-NEXT:    mov w3, v31.s[0]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #60, #1
+; ARM64-NEXT:    mov w1, v15.s[1]
+; ARM64-NEXT:    mov w3, v31.s[1]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #61, #1
+; ARM64-NEXT:    mov w1, v15.s[2]
+; ARM64-NEXT:    mov w3, v31.s[2]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #62, #1
+; ARM64-NEXT:    mov w1, v15.s[3]
+; ARM64-NEXT:    mov w3, v31.s[3]
+; ARM64-NEXT:    cmp w1, w3
+; ARM64-NEXT:    cset w1, hs
+; ARM64-NEXT:    bfi x2, x1, #63, #1
+; ARM64-NEXT:    str x2, [x0]
+; ARM64-NEXT:    ldp d8, d9, [sp, #0x10]
+; ARM64-NEXT:    ldp d10, d11, [sp, #0x20]
+; ARM64-NEXT:    ldp d12, d13, [sp, #0x30]
+; ARM64-NEXT:    ldp d14, d15, [sp, #0x40]
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64-NEXT:    ret
+  %a = load <64 x i32>, ptr %pa
+  %b = load <64 x i32>, ptr %pb
+  %r = icmp uge <64 x i32> %a, %b
+  store <64 x i1> %r, ptr %p
+  ret void
+}
