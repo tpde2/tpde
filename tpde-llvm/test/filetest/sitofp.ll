@@ -94,6 +94,58 @@ entry:
   ret float %1
 }
 
+define float @i123tof32(i123 %p) {
+; X64-LABEL: <i123tof32>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    shl rsi, 0x5
+; X64-NEXT:    sar rsi, 0x5
+; X64-NEXT:    call <L0>
+; X64-NEXT:     R_X86_64_PLT32 __floattisf-0x4
+; X64-NEXT:  <L0>:
+; X64-NEXT:    add rsp, 0x30
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <i123tof32>:
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    sbfx x1, x1, #0, #59
+; ARM64-NEXT:  <L0>:
+; ARM64-NEXT:    bl <L0>
+; ARM64-NEXT:     R_AARCH64_CALL26 __floattisf
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64-NEXT:    ret
+entry:
+  %r = sitofp i123 %p to float
+  ret float %r
+}
+
+define float @i128tof32(i128 %p) {
+; X64-LABEL: <i128tof32>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    call <L0>
+; X64-NEXT:     R_X86_64_PLT32 __floattisf-0x4
+; X64-NEXT:  <L0>:
+; X64-NEXT:    add rsp, 0x30
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <i128tof32>:
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:  <L0>:
+; ARM64-NEXT:    bl <L0>
+; ARM64-NEXT:     R_AARCH64_CALL26 __floattisf
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64-NEXT:    ret
+entry:
+  %r = sitofp i128 %p to float
+  ret float %r
+}
 
 define double @i8tof64(i8 %0) {
 ; X64-LABEL: <i8tof64>:
@@ -183,6 +235,86 @@ entry:
   ret double %1
 }
 
+define double @i123tof64(i123 %p) {
+; X64-LABEL: <i123tof64>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    shl rsi, 0x5
+; X64-NEXT:    sar rsi, 0x5
+; X64-NEXT:    call <L0>
+; X64-NEXT:     R_X86_64_PLT32 __floattidf-0x4
+; X64-NEXT:  <L0>:
+; X64-NEXT:    add rsp, 0x30
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <i123tof64>:
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    sbfx x1, x1, #0, #59
+; ARM64-NEXT:  <L0>:
+; ARM64-NEXT:    bl <L0>
+; ARM64-NEXT:     R_AARCH64_CALL26 __floattidf
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64-NEXT:    ret
+entry:
+  %r = sitofp i123 %p to double
+  ret double %r
+}
+
+define double @i128tof64(i128 %p) {
+; X64-LABEL: <i128tof64>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    call <L0>
+; X64-NEXT:     R_X86_64_PLT32 __floattidf-0x4
+; X64-NEXT:  <L0>:
+; X64-NEXT:    add rsp, 0x30
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <i128tof64>:
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:  <L0>:
+; ARM64-NEXT:    bl <L0>
+; ARM64-NEXT:     R_AARCH64_CALL26 __floattidf
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64-NEXT:    ret
+entry:
+  %r = sitofp i128 %p to double
+  ret double %r
+}
+
+define fp128 @i8tof128(i8 %p) {
+; X64-LABEL: <i8tof128>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    movsx edi, dil
+; X64-NEXT:    call <L0>
+; X64-NEXT:     R_X86_64_PLT32 __floatsitf-0x4
+; X64-NEXT:  <L0>:
+; X64-NEXT:    add rsp, 0x30
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <i8tof128>:
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    sxtb w0, w0
+; ARM64-NEXT:  <L0>:
+; ARM64-NEXT:    bl <L0>
+; ARM64-NEXT:     R_AARCH64_CALL26 __floatsitf
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64-NEXT:    ret
+entry:
+  %r = sitofp i8 %p to fp128
+  ret fp128 %r
+}
+
 define fp128 @i32tof128(i32 %p) {
 ; X64-LABEL: <i32tof128>:
 ; X64:         push rbp
@@ -207,6 +339,34 @@ define fp128 @i32tof128(i32 %p) {
   ret fp128 %r
 }
 
+define fp128 @i37tof128(i37 %p) {
+; X64-LABEL: <i37tof128>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    shl rdi, 0x1b
+; X64-NEXT:    sar rdi, 0x1b
+; X64-NEXT:    call <L0>
+; X64-NEXT:     R_X86_64_PLT32 __floatditf-0x4
+; X64-NEXT:  <L0>:
+; X64-NEXT:    add rsp, 0x30
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <i37tof128>:
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    sbfx x0, x0, #0, #37
+; ARM64-NEXT:  <L0>:
+; ARM64-NEXT:    bl <L0>
+; ARM64-NEXT:     R_AARCH64_CALL26 __floatditf
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64-NEXT:    ret
+entry:
+  %r = sitofp i37 %p to fp128
+  ret fp128 %r
+}
+
 define fp128 @i64tof128(i64 %p) {
 ; X64-LABEL: <i64tof128>:
 ; X64:         push rbp
@@ -228,5 +388,58 @@ define fp128 @i64tof128(i64 %p) {
 ; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
 ; ARM64-NEXT:    ret
   %r = sitofp i64 %p to fp128
+  ret fp128 %r
+}
+
+define fp128 @i123tof128(i123 %p) {
+; X64-LABEL: <i123tof128>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    shl rsi, 0x5
+; X64-NEXT:    sar rsi, 0x5
+; X64-NEXT:    call <L0>
+; X64-NEXT:     R_X86_64_PLT32 __floattitf-0x4
+; X64-NEXT:  <L0>:
+; X64-NEXT:    add rsp, 0x30
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <i123tof128>:
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    sbfx x1, x1, #0, #59
+; ARM64-NEXT:  <L0>:
+; ARM64-NEXT:    bl <L0>
+; ARM64-NEXT:     R_AARCH64_CALL26 __floattitf
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64-NEXT:    ret
+entry:
+  %r = sitofp i123 %p to fp128
+  ret fp128 %r
+}
+
+define fp128 @i128tof128(i128 %p) {
+; X64-LABEL: <i128tof128>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    call <L0>
+; X64-NEXT:     R_X86_64_PLT32 __floattitf-0x4
+; X64-NEXT:  <L0>:
+; X64-NEXT:    add rsp, 0x30
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <i128tof128>:
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:  <L0>:
+; ARM64-NEXT:    bl <L0>
+; ARM64-NEXT:     R_AARCH64_CALL26 __floattitf
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64-NEXT:    ret
+entry:
+  %r = sitofp i128 %p to fp128
   ret fp128 %r
 }

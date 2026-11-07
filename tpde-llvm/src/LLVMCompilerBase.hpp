@@ -250,8 +250,14 @@ struct LLVMCompilerBase : public LLVMCompiler,
     unordtf2,
     floatsitf,
     floatditf,
+    floattisf,
+    floattidf,
+    floattitf,
     floatunditf,
     floatunsitf,
+    floatuntisf,
+    floatuntidf,
+    floatuntitf,
     fixsfti,
     fixdfti,
     fixtfdi,
@@ -1355,8 +1361,14 @@ typename LLVMCompilerBase<Adaptor, Derived, Config>::SymRef
   case LibFunc::unordtf2: name = "__unordtf2"; break;
   case LibFunc::floatsitf: name = "__floatsitf"; break;
   case LibFunc::floatditf: name = "__floatditf"; break;
+  case LibFunc::floattisf: name = "__floattisf"; break;
+  case LibFunc::floattidf: name = "__floattidf"; break;
+  case LibFunc::floattitf: name = "__floattitf"; break;
   case LibFunc::floatunsitf: name = "__floatunsitf"; break;
   case LibFunc::floatunditf: name = "__floatunditf"; break;
+  case LibFunc::floatuntisf: name = "__floatuntisf"; break;
+  case LibFunc::floatuntidf: name = "__floatuntidf"; break;
+  case LibFunc::floatuntitf: name = "__floatuntitf"; break;
   case LibFunc::fixsfti: name = "__fixsfti"; break;
   case LibFunc::fixdfti: name = "__fixdfti"; break;
   case LibFunc::fixtfdi: name = "__fixtfdi"; break;
@@ -2749,35 +2761,60 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_int_to_float(
   }
 
   auto bit_width = src_val->getType()->getIntegerBitWidth();
-  if (bit_width > 64) {
-    return false;
-  }
+  ValueRef src_ref = this->val_ref(src_val);
+  ValueRef res = this->result_ref(inst);
 
-  if (dst_ty->isFP128Ty()) {
+  if (bit_width > 64) {
     LibFunc lf;
-    if (bit_width == 32) {
-      lf = sign ? LibFunc::floatsitf : LibFunc::floatunsitf;
-    } else if (bit_width == 64) {
-      lf = sign ? LibFunc::floatditf : LibFunc::floatunditf;
+    if (val_info.type == LLVMBasicValType::f32) {
+      lf = sign ? LibFunc::floattisf : LibFunc::floatuntisf;
+    } else if (val_info.type == LLVMBasicValType::f64) {
+      lf = sign ? LibFunc::floattidf : LibFunc::floatuntidf;
+    } else if (dst_ty->isFP128Ty()) {
+      lf = sign ? LibFunc::floattitf : LibFunc::floatuntitf;
     } else {
-      // TODO: extend, but create_helper_call currently takes only an IRValueRef
       return false;
     }
 
-    SymRef sym = get_libfunc_sym(lf);
+    u8 int_ext = 0;
+    if (bit_width != 128) {
+      u64 sign_bit = sign * 0x80;
+      int_ext = u8(sign_bit | (bit_width - 64));
+    }
 
-    auto res_vr = this->result_ref(inst);
-    derived()->create_helper_call({&src_val, 1}, &res_vr, sym);
+    auto *cca = derived()->get_ccassigner(llvm::CallingConv::C, nullptr);
+    typename Derived::CallBuilder cb{*derived(), *cca};
+    cb.add_arg(src_ref.part(0), tpde::CCAssignment{.consecutive = 1});
+    cb.add_arg(src_ref.part(1),
+               tpde::CCAssignment{.consecutive = 0, .int_ext = int_ext});
+    cb.call(get_libfunc_sym(lf));
+    cb.add_ret(res);
     return true;
   }
 
-  ValueRef src_ref = this->val_ref(src_val);
   ValuePartRef src_op = src_ref.part(0);
-  ValueRef res = this->result_ref(inst);
 
   if (bit_width != 32 && bit_width != 64) {
     unsigned ext = tpde::util::align_up(bit_width, 32);
     src_op = std::move(src_op).into_extended(sign, bit_width, ext);
+  }
+
+  if (dst_ty->isFP128Ty()) {
+    LibFunc lf;
+    if (bit_width <= 32) {
+      lf = sign ? LibFunc::floatsitf : LibFunc::floatunsitf;
+    } else if (bit_width <= 64) {
+      lf = sign ? LibFunc::floatditf : LibFunc::floatunditf;
+    } else {
+      TPDE_UNREACHABLE("invalid integer width");
+    }
+
+    auto *cca = derived()->get_ccassigner(llvm::CallingConv::C, nullptr);
+    typename Derived::CallBuilder cb{*derived(), *cca};
+    cb.add_arg(std::move(src_op), tpde::CCAssignment{});
+    cb.call(get_libfunc_sym(lf));
+    cb.add_ret(res);
+    return true;
   }
 
   unsigned ty_idx;
