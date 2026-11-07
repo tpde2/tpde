@@ -66,6 +66,55 @@ entry:
   ret i64 %1
 }
 
+define i128 @f32toi128(float %0) {
+; X64-LABEL: <f32toi128>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    call <L0>
+; X64-NEXT:     R_X86_64_PLT32 __fixsfti-0x4
+; X64-NEXT:  <L0>:
+; X64-NEXT:    add rsp, 0x30
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <f32toi128>:
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:  <L0>:
+; ARM64-NEXT:    bl <L0>
+; ARM64-NEXT:     R_AARCH64_CALL26 __fixsfti
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64-NEXT:    ret
+entry:
+  %1 = fptosi float %0 to i128
+  ret i128 %1
+}
+
+define i128 @f32tou128(float %0) {
+; X64-LABEL: <f32tou128>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    call <L0>
+; X64-NEXT:     R_X86_64_PLT32 __fixunssfti-0x4
+; X64-NEXT:  <L0>:
+; X64-NEXT:    add rsp, 0x30
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <f32tou128>:
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:  <L0>:
+; ARM64-NEXT:    bl <L0>
+; ARM64-NEXT:     R_AARCH64_CALL26 __fixunssfti
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64-NEXT:    ret
+entry:
+  %1 = fptoui float %0 to i128
+  ret i128 %1
+}
 
 define i32 @f64toi32(double %0) {
 ; X64-LABEL: <f64toi32>:
@@ -127,6 +176,56 @@ entry:
   ret i64 %1
 }
 
+define i128 @f64toi128(double %0) {
+; X64-LABEL: <f64toi128>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    call <L0>
+; X64-NEXT:     R_X86_64_PLT32 __fixdfti-0x4
+; X64-NEXT:  <L0>:
+; X64-NEXT:    add rsp, 0x30
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <f64toi128>:
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:  <L0>:
+; ARM64-NEXT:    bl <L0>
+; ARM64-NEXT:     R_AARCH64_CALL26 __fixdfti
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64-NEXT:    ret
+entry:
+  %1 = fptosi double %0 to i128
+  ret i128 %1
+}
+
+define i128 @f64tou128(double %0) {
+; X64-LABEL: <f64tou128>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    call <L0>
+; X64-NEXT:     R_X86_64_PLT32 __fixunsdfti-0x4
+; X64-NEXT:  <L0>:
+; X64-NEXT:    add rsp, 0x30
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <f64tou128>:
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:  <L0>:
+; ARM64-NEXT:    bl <L0>
+; ARM64-NEXT:     R_AARCH64_CALL26 __fixunsdfti
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64-NEXT:    ret
+entry:
+  %1 = fptoui double %0 to i128
+  ret i128 %1
+}
+
 define i64 @f128toi64(fp128 %p) {
 ; X64-LABEL: <f128toi64>:
 ; X64:         push rbp
@@ -173,4 +272,54 @@ define i64 @f128tou64(fp128 %p) {
 ; ARM64-NEXT:    ret
   %r = fptoui fp128 %p to i64
   ret i64 %r
+}
+
+define i128 @f128toi128(fp128 %0) {
+; X64-LABEL: <f128toi128>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    call <L0>
+; X64-NEXT:     R_X86_64_PLT32 __fixtfti-0x4
+; X64-NEXT:  <L0>:
+; X64-NEXT:    add rsp, 0x30
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <f128toi128>:
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:  <L0>:
+; ARM64-NEXT:    bl <L0>
+; ARM64-NEXT:     R_AARCH64_CALL26 __fixtfti
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64-NEXT:    ret
+entry:
+  %1 = fptosi fp128 %0 to i128
+  ret i128 %1
+}
+
+define i128 @f128tou128(fp128 %0) {
+; X64-LABEL: <f128tou128>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    call <L0>
+; X64-NEXT:     R_X86_64_PLT32 __fixunstfti-0x4
+; X64-NEXT:  <L0>:
+; X64-NEXT:    add rsp, 0x30
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <f128tou128>:
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:  <L0>:
+; ARM64-NEXT:    bl <L0>
+; ARM64-NEXT:     R_AARCH64_CALL26 __fixunstfti
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64-NEXT:    ret
+entry:
+  %1 = fptoui fp128 %0 to i128
+  ret i128 %1
 }

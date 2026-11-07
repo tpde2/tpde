@@ -252,8 +252,14 @@ struct LLVMCompilerBase : public LLVMCompiler,
     floatditf,
     floatunditf,
     floatunsitf,
+    fixsfti,
+    fixdfti,
     fixtfdi,
+    fixtfti,
+    fixunssfti,
+    fixunsdfti,
     fixunstfdi,
+    fixunstfti,
     addtf3,
     subtf3,
     multf3,
@@ -1351,8 +1357,14 @@ typename LLVMCompilerBase<Adaptor, Derived, Config>::SymRef
   case LibFunc::floatditf: name = "__floatditf"; break;
   case LibFunc::floatunsitf: name = "__floatunsitf"; break;
   case LibFunc::floatunditf: name = "__floatunditf"; break;
+  case LibFunc::fixsfti: name = "__fixsfti"; break;
+  case LibFunc::fixdfti: name = "__fixdfti"; break;
   case LibFunc::fixtfdi: name = "__fixtfdi"; break;
+  case LibFunc::fixtfti: name = "__fixtfti"; break;
+  case LibFunc::fixunssfti: name = "__fixunssfti"; break;
+  case LibFunc::fixunsdfti: name = "__fixunsdfti"; break;
   case LibFunc::fixunstfdi: name = "__fixunstfdi"; break;
+  case LibFunc::fixunstfti: name = "__fixunstfti"; break;
   case LibFunc::addtf3: name = "__addtf3"; break;
   case LibFunc::subtf3: name = "__subtf3"; break;
   case LibFunc::multf3: name = "__multf3"; break;
@@ -2639,8 +2651,28 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_float_to_int(
 
   const auto bit_width = inst->getType()->getIntegerBitWidth();
 
-  if (bit_width > 64) {
+  if (bit_width > 128) {
     return false;
+  } else if (bit_width > 64) {
+    if (saturate) {
+      return false;
+    }
+
+    LibFunc lf;
+    if (src_ty->getTypeID() == llvm::Type::FloatTyID) {
+      lf = sign ? LibFunc::fixsfti : LibFunc::fixunssfti;
+    } else if (src_ty->getTypeID() == llvm::Type::DoubleTyID) {
+      lf = sign ? LibFunc::fixdfti : LibFunc::fixunsdfti;
+    } else if (src_ty->getTypeID() == llvm::Type::FP128TyID) {
+      lf = sign ? LibFunc::fixtfti : LibFunc::fixunstfti;
+    } else {
+      return false;
+    }
+    SymRef sym = get_libfunc_sym(lf);
+
+    auto res_vr = this->result_ref(inst);
+    derived()->create_helper_call({&src_val, 1}, &res_vr, sym);
+    return true;
   }
 
   unsigned ty_idx;
