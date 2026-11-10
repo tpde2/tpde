@@ -54,7 +54,7 @@ struct LLVMCompilerArm64
 
   std::unique_ptr<LLVMAdaptor> adaptor;
 
-  std::variant<std::monostate, tpde::a64::CCAssignerAAPCS> cc_assigners;
+  typename Config::DefaultCCAssigner call_assigner;
 
   static constexpr std::array<AsmReg, 2> LANDING_PAD_RES_REGS = {AsmReg::R0,
                                                                  AsmReg::R1};
@@ -158,9 +158,8 @@ auto LLVMCompilerArm64<Platform>::create_call_builder(const llvm::CallBase *cb)
   case llvm::CallingConv::C:
   case llvm::CallingConv::Fast:
     // On AArch6464, fastcc behaves like the C calling convention.
-    cc_assigners = tpde::a64::CCAssignerAAPCS();
-    return CallBuilder{*this,
-                       std::get<tpde::a64::CCAssignerAAPCS>(cc_assigners)};
+    call_assigner.reset();
+    return CallBuilder{*this, call_assigner};
   default: return std::nullopt;
   }
 }

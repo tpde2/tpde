@@ -158,55 +158,55 @@ constexpr static u64 create_bitmask(const std::array<AsmReg, N> regs) {
   return set;
 }
 
+inline constexpr CCInfo AAPCS_CC_INFO{
+    // we reserve SP,FP,R16 and R17 for our special use cases
+    .allocatable_regs =
+        0xFFFF'FFFF'FFFF'FFFF &
+        ~create_bitmask({AsmReg::SP, AsmReg::FP, AsmReg::R16, AsmReg::R17}),
+    // callee-saved registers
+    .callee_saved_regs = create_bitmask({
+        AsmReg::R19,
+        AsmReg::R20,
+        AsmReg::R21,
+        AsmReg::R22,
+        AsmReg::R23,
+        AsmReg::R24,
+        AsmReg::R25,
+        AsmReg::R26,
+        AsmReg::R27,
+        AsmReg::R28,
+        AsmReg::V8,
+        AsmReg::V9,
+        AsmReg::V10,
+        AsmReg::V11,
+        AsmReg::V12,
+        AsmReg::V13,
+        AsmReg::V14,
+        AsmReg::V15,
+    }),
+    .arg_regs = create_bitmask({
+        AsmReg::R0,
+        AsmReg::R1,
+        AsmReg::R2,
+        AsmReg::R3,
+        AsmReg::R4,
+        AsmReg::R5,
+        AsmReg::R6,
+        AsmReg::R7,
+        AsmReg::R8, // sret register
+        AsmReg::V0,
+        AsmReg::V1,
+        AsmReg::V2,
+        AsmReg::V3,
+        AsmReg::V4,
+        AsmReg::V5,
+        AsmReg::V6,
+        AsmReg::V7,
+    }),
+};
+
 /// AArch64 AAPCS calling convention.
 class CCAssignerAAPCS : public CCAssigner {
-  static constexpr CCInfo Info{
-      // we reserve SP,FP,R16 and R17 for our special use cases
-      .allocatable_regs =
-          0xFFFF'FFFF'FFFF'FFFF &
-          ~create_bitmask({AsmReg::SP, AsmReg::FP, AsmReg::R16, AsmReg::R17}),
-      // callee-saved registers
-      .callee_saved_regs = create_bitmask({
-          AsmReg::R19,
-          AsmReg::R20,
-          AsmReg::R21,
-          AsmReg::R22,
-          AsmReg::R23,
-          AsmReg::R24,
-          AsmReg::R25,
-          AsmReg::R26,
-          AsmReg::R27,
-          AsmReg::R28,
-          AsmReg::V8,
-          AsmReg::V9,
-          AsmReg::V10,
-          AsmReg::V11,
-          AsmReg::V12,
-          AsmReg::V13,
-          AsmReg::V14,
-          AsmReg::V15,
-      }),
-      .arg_regs = create_bitmask({
-          AsmReg::R0,
-          AsmReg::R1,
-          AsmReg::R2,
-          AsmReg::R3,
-          AsmReg::R4,
-          AsmReg::R5,
-          AsmReg::R6,
-          AsmReg::R7,
-          AsmReg::R8, // sret register
-          AsmReg::V0,
-          AsmReg::V1,
-          AsmReg::V2,
-          AsmReg::V3,
-          AsmReg::V4,
-          AsmReg::V5,
-          AsmReg::V6,
-          AsmReg::V7,
-      }),
-  };
-
   // NGRN = Next General-purpose Register Number
   // NSRN = Next SIMD/FP Register Number
   // NSAA = Next Stack Argument Address
@@ -214,7 +214,7 @@ class CCAssignerAAPCS : public CCAssigner {
   u32 ret_ngrn = 0, ret_nsrn = 0;
 
 public:
-  CCAssignerAAPCS() : CCAssigner(Info) {}
+  CCAssignerAAPCS() : CCAssigner(AAPCS_CC_INFO) {}
 
   void reset() override { ngrn = nsrn = nsaa = ret_ngrn = ret_nsrn = 0; }
 
