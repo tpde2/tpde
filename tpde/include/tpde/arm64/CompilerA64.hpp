@@ -158,55 +158,55 @@ constexpr static u64 create_bitmask(const std::array<AsmReg, N> regs) {
   return set;
 }
 
+inline constexpr CCInfo AAPCS_CC_INFO{
+    // we reserve SP,FP,R16 and R17 for our special use cases
+    .allocatable_regs =
+        0xFFFF'FFFF'FFFF'FFFF &
+        ~create_bitmask({AsmReg::SP, AsmReg::FP, AsmReg::R16, AsmReg::R17}),
+    // callee-saved registers
+    .callee_saved_regs = create_bitmask({
+        AsmReg::R19,
+        AsmReg::R20,
+        AsmReg::R21,
+        AsmReg::R22,
+        AsmReg::R23,
+        AsmReg::R24,
+        AsmReg::R25,
+        AsmReg::R26,
+        AsmReg::R27,
+        AsmReg::R28,
+        AsmReg::V8,
+        AsmReg::V9,
+        AsmReg::V10,
+        AsmReg::V11,
+        AsmReg::V12,
+        AsmReg::V13,
+        AsmReg::V14,
+        AsmReg::V15,
+    }),
+    .arg_regs = create_bitmask({
+        AsmReg::R0,
+        AsmReg::R1,
+        AsmReg::R2,
+        AsmReg::R3,
+        AsmReg::R4,
+        AsmReg::R5,
+        AsmReg::R6,
+        AsmReg::R7,
+        AsmReg::R8, // sret register
+        AsmReg::V0,
+        AsmReg::V1,
+        AsmReg::V2,
+        AsmReg::V3,
+        AsmReg::V4,
+        AsmReg::V5,
+        AsmReg::V6,
+        AsmReg::V7,
+    }),
+};
+
 /// AArch64 AAPCS calling convention.
 class CCAssignerAAPCS : public CCAssigner {
-  static constexpr CCInfo Info{
-      // we reserve SP,FP,R16 and R17 for our special use cases
-      .allocatable_regs =
-          0xFFFF'FFFF'FFFF'FFFF &
-          ~create_bitmask({AsmReg::SP, AsmReg::FP, AsmReg::R16, AsmReg::R17}),
-      // callee-saved registers
-      .callee_saved_regs = create_bitmask({
-          AsmReg::R19,
-          AsmReg::R20,
-          AsmReg::R21,
-          AsmReg::R22,
-          AsmReg::R23,
-          AsmReg::R24,
-          AsmReg::R25,
-          AsmReg::R26,
-          AsmReg::R27,
-          AsmReg::R28,
-          AsmReg::V8,
-          AsmReg::V9,
-          AsmReg::V10,
-          AsmReg::V11,
-          AsmReg::V12,
-          AsmReg::V13,
-          AsmReg::V14,
-          AsmReg::V15,
-      }),
-      .arg_regs = create_bitmask({
-          AsmReg::R0,
-          AsmReg::R1,
-          AsmReg::R2,
-          AsmReg::R3,
-          AsmReg::R4,
-          AsmReg::R5,
-          AsmReg::R6,
-          AsmReg::R7,
-          AsmReg::R8, // sret register
-          AsmReg::V0,
-          AsmReg::V1,
-          AsmReg::V2,
-          AsmReg::V3,
-          AsmReg::V4,
-          AsmReg::V5,
-          AsmReg::V6,
-          AsmReg::V7,
-      }),
-  };
-
   // NGRN = Next General-purpose Register Number
   // NSRN = Next SIMD/FP Register Number
   // NSAA = Next Stack Argument Address
@@ -214,7 +214,7 @@ class CCAssignerAAPCS : public CCAssigner {
   u32 ret_ngrn = 0, ret_nsrn = 0;
 
 public:
-  CCAssignerAAPCS() : CCAssigner(Info) {}
+  CCAssignerAAPCS() : CCAssigner(AAPCS_CC_INFO) {}
 
   void reset() override { ngrn = nsrn = nsaa = ret_ngrn = ret_nsrn = 0; }
 
@@ -294,6 +294,8 @@ struct PlatformConfig : CompilerConfigDefault {
   static constexpr bool FRAME_INDEXING_NEGATIVE = false;
   static constexpr u32 PLATFORM_POINTER_SIZE = 8;
   static constexpr u32 NUM_BANKS = 2;
+  /// Bytes reserved for the variadic argument register save area.
+  static constexpr u32 VARARG_REG_SAVE_SIZE = 8 * 8 + 8 * 16;
 };
 
 /// Compiler mixin for targeting AArch64.
@@ -684,7 +686,7 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::CallBuilder::call_impl(
   if (auto *sym = std::get_if<SymRef>(&target)) {
     ASMC(&this->compiler, BL, 0);
     this->compiler.reloc_text(
-        *sym, elf::R_AARCH64_CALL26, this->compiler.text_writer.offset() - 4);
+        *sym, Config::Assembler::RELOC_CALL, this->compiler.text_writer.offset() - 4);
   } else {
     ValuePart &tvp = std::get<ValuePart>(target);
     if (tvp.can_salvage()) {
@@ -744,7 +746,7 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::prologue_begin(
     // We additionally store a pointer to the stack area, which we can't compute
     // with a constant offset from the frame pointer. Add 16 bytes to maintain
     // alignment.
-    this->stack.frame_size += 8 * 8 + 8 * 16 + 16;
+    this->stack.frame_size += Config::VARARG_REG_SAVE_SIZE + 16;
     this->text_writer.ensure_space(4 * 8);
     ASMNC(STPx, DA_GP(0), DA_GP(1), DA_SP, reg_save_frame_off);
     ASMNC(STPx, DA_GP(2), DA_GP(3), DA_SP, reg_save_frame_off + 16);
@@ -805,34 +807,30 @@ template <IRAdaptor Adaptor,
           typename Config>
 void CompilerA64<Adaptor, Derived, BaseTy, Config>::prologue_end(
     CCAssigner *cc_assigner) {
-  // Hack: we don't know the frame size, so for a va_start(), we cannot easily
-  // compute the offset from the frame pointer. But we have a stack_reg here,
-  // so use it for var args.
-  if (this->adaptor->cur_is_vararg()) [[unlikely]] {
-    this->stack.frame_used = true;
-    AsmReg stack_reg = AsmReg::R17;
-    // TODO: allocate an actual scratch register for this.
-    assert(!(this->register_file.allocatable & (u64{1} << stack_reg.id())) &&
-           "x17 must not be allocatable");
-    if (this->func_arg_stack_add_off == ~0u) {
-      this->func_arg_stack_add_off = this->text_writer.offset();
-      this->func_arg_stack_add_reg = stack_reg;
-      // Fixed in finish_func when frame size is known
-      ASMC(this, ADDxi, stack_reg, DA_SP, 0);
-    }
-    ASM(ADDxi, stack_reg, stack_reg, cc_assigner->get_stack_size());
-    ASM(STRxu, stack_reg, DA_GP(29), this->reg_save_frame_off + 192);
-
-    // TODO: extract ngrn/nsrn from CCAssigner
-    // TODO: this isn't quite accurate, e.g. for (i128, i128, i128, i64, i128),
-    // this should be 8 but will end up with 7.
-    const CCInfo &cc_info = cc_assigner->get_ccinfo();
-    auto arg_regs = this->register_file.allocatable & cc_info.arg_regs;
-    u32 ngrn = 8 - util::cnt_lz<u16>((arg_regs & 0xff) << 8 | 0x80);
-    u32 nsrn = 8 - util::cnt_lz<u16>(((arg_regs >> 32) & 0xff) << 8 | 0x80);
-    this->scalar_arg_count = ngrn;
-    this->vec_arg_count = nsrn;
+  if (!this->adaptor->cur_is_vararg()) {
+    return;
   }
+  // The frame size is patched in finish_func. Save the pointer now so
+  // va_start can recover it independently of subsequent stack adjustments.
+  AsmReg stack_reg = AsmReg::R17;
+  assert(!(this->register_file.allocatable & (u64{1} << stack_reg.id())));
+  if (this->func_arg_stack_add_off == ~0u) {
+    this->func_arg_stack_add_off = this->text_writer.offset();
+    this->func_arg_stack_add_reg = stack_reg;
+    ASM(ADDxi, stack_reg, DA_SP, 0);
+  }
+  ASM(ADDxi, stack_reg, stack_reg, cc_assigner->get_stack_size());
+  ASM(STRxu, stack_reg, DA_GP(29),
+      reg_save_frame_off + Config::VARARG_REG_SAVE_SIZE);
+  // TODO: extract ngrn/nsrn from CCAssigner
+  // TODO: this isn't quite accurate, e.g. for (i128, i128, i128, i64,
+  // i128), this should be 8 but will end up with 7.
+  const CCInfo &cc_info = cc_assigner->get_ccinfo();
+  auto arg_regs = this->register_file.allocatable & cc_info.arg_regs;
+  u32 ngrn = 8 - util::cnt_lz<u16>((arg_regs & 0xff) << 8 | 0x80);
+  u32 nsrn = 8 - util::cnt_lz<u16>(((arg_regs >> 32) & 0xff) << 8 | 0x80);
+  this->scalar_arg_count = ngrn;
+  this->vec_arg_count = nsrn;
 }
 
 template <IRAdaptor Adaptor,
@@ -1463,10 +1461,10 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::materialize_constant(
         rodata, "", raw_data, 16, Assembler::SymBinding::LOCAL);
     this->text_writer.ensure_space(8); // ensure contiguous instructions
     this->reloc_text(
-        sym, elf::R_AARCH64_ADR_PREL_PG_HI21, this->text_writer.offset(), 0);
+        sym, Config::Assembler::RELOC_PAGE21, this->text_writer.offset(), 0);
     ASMNC(ADRP, permanent_scratch_reg, 0, 0);
     this->reloc_text(
-        sym, elf::R_AARCH64_LDST128_ABS_LO12_NC, this->text_writer.offset(), 0);
+        sym, Config::Assembler::RELOC_PAGEOFF12_LDST128, this->text_writer.offset(), 0);
     ASMNC(LDRqu, dst, permanent_scratch_reg, 0);
     return;
   }

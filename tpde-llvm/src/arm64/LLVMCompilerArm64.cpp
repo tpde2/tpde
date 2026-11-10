@@ -16,22 +16,33 @@
 
 namespace tpde_llvm::arm64 {
 
-struct CompilerConfig : tpde::a64::PlatformConfig {
+template <typename Platform>
+struct CompilerConfig : Platform {
   static constexpr bool DEFAULT_VAR_REF_HANDLING = false;
 };
 
-struct LLVMCompilerArm64 : tpde::a64::CompilerA64<LLVMAdaptor,
-                                                  LLVMCompilerArm64,
-                                                  LLVMCompilerBase,
-                                                  CompilerConfig>,
-                           tpde_encodegen::EncodeCompiler<LLVMAdaptor,
-                                                          LLVMCompilerArm64,
-                                                          LLVMCompilerBase,
-                                                          CompilerConfig> {
-  using Base = tpde::a64::CompilerA64<LLVMAdaptor,
-                                      LLVMCompilerArm64,
-                                      LLVMCompilerBase,
-                                      CompilerConfig>;
+template <typename Platform>
+struct LLVMCompilerArm64
+    : tpde::a64::CompilerA64<LLVMAdaptor,
+                             LLVMCompilerArm64<Platform>,
+                             LLVMCompilerBase,
+                             CompilerConfig<Platform>>,
+      tpde_encodegen::EncodeCompiler<LLVMAdaptor,
+                                     LLVMCompilerArm64<Platform>,
+                                     LLVMCompilerBase,
+                                     CompilerConfig<Platform>> {
+  using Config = CompilerConfig<Platform>;
+  using Base = tpde::a64::
+      CompilerA64<LLVMAdaptor, LLVMCompilerArm64, LLVMCompilerBase, Config>;
+
+  using LLVMBase = LLVMCompilerBase<LLVMAdaptor, LLVMCompilerArm64, Config>;
+  using SymRef = tpde::SymRef;
+  using IRValueRef = typename Base::IRValueRef;
+  using CallBuilder = typename Base::CallBuilder;
+  using ValInfo = typename Base::ValInfo;
+  using OverflowOp = typename Base::OverflowOp;
+  using CallArg = typename Base::CallArg;
+  using Jump = typename Base::Jump;
 
   using ScratchReg = typename Base::ScratchReg;
   using ValuePartRef = typename Base::ValuePartRef;
@@ -43,20 +54,23 @@ struct LLVMCompilerArm64 : tpde::a64::CompilerA64<LLVMAdaptor,
 
   std::unique_ptr<LLVMAdaptor> adaptor;
 
-  std::variant<std::monostate, tpde::a64::CCAssignerAAPCS> cc_assigners;
+  typename Config::DefaultCCAssigner call_assigner;
 
   static constexpr std::array<AsmReg, 2> LANDING_PAD_RES_REGS = {AsmReg::R0,
                                                                  AsmReg::R1};
 
   explicit LLVMCompilerArm64(std::unique_ptr<LLVMAdaptor> &&adaptor)
       : Base{adaptor.get()}, adaptor(std::move(adaptor)) {
-    static_assert(tpde::Compiler<LLVMCompilerArm64, tpde::a64::PlatformConfig>);
+    static_assert(tpde::Compiler<LLVMCompilerArm64, Platform>);
   }
 
   void reset() {
     // TODO: move to LLVMCompilerBase
     Base::reset();
-    EncodeCompiler::reset();
+    tpde_encodegen::EncodeCompiler<LLVMAdaptor,
+                                   LLVMCompilerArm64,
+                                   LLVMCompilerBase,
+                                   Config>::reset();
   }
 
   bool arg_allow_split_reg_stack_passing(IRValueRef value) const {
@@ -102,10 +116,11 @@ struct LLVMCompilerArm64 : tpde::a64::CompilerA64<LLVMAdaptor,
                                   ValuePart &&res_of);
 };
 
-void LLVMCompilerArm64::load_address_of_var_reference(
+template <typename Platform>
+void LLVMCompilerArm64<Platform>::load_address_of_var_reference(
     AsmReg dst, tpde::AssignmentPartRef ap) {
   auto *global = this->adaptor->global_list[ap.variable_ref_data()];
-  const auto sym = global_sym(global);
+  const auto sym = this->global_sym(global);
   assert(sym.valid());
   if (global->isThreadLocal()) {
     // See LLVMCompilerX64 for a discussion on not supporting this case.
@@ -113,27 +128,25 @@ void LLVMCompilerArm64::load_address_of_var_reference(
   }
   // These pairs must be contiguous, avoid possible veneers in between.
   this->text_writer.ensure_space(8);
-  if (!use_local_access(global)) {
+  using A = typename Config::Assembler;
+  if (!this->use_local_access(global)) {
     // mov the ptr from the GOT
-    reloc_text(
-        sym, tpde::elf::R_AARCH64_ADR_GOT_PAGE, this->text_writer.offset());
+    this->reloc_text(sym, A::RELOC_GOT_PAGE21, this->text_writer.offset());
     ASMNC(ADRP, dst, 0, 0);
-    reloc_text(
-        sym, tpde::elf::R_AARCH64_LD64_GOT_LO12_NC, this->text_writer.offset());
+    this->reloc_text(sym, A::RELOC_GOT_PAGEOFF12, this->text_writer.offset());
     ASMNC(LDRxu, dst, dst, 0);
   } else {
     // emit lea with relocation
-    reloc_text(
-        sym, tpde::elf::R_AARCH64_ADR_PREL_PG_HI21, this->text_writer.offset());
+    this->reloc_text(sym, A::RELOC_PAGE21, this->text_writer.offset());
     ASMNC(ADRP, dst, 0, 0);
-    reloc_text(
-        sym, tpde::elf::R_AARCH64_ADD_ABS_LO12_NC, this->text_writer.offset());
+    this->reloc_text(sym, A::RELOC_PAGEOFF12_ADD, this->text_writer.offset());
     ASMNC(ADDxi, dst, dst, 0);
   }
 }
 
-std::optional<LLVMCompilerArm64::CallBuilder>
-    LLVMCompilerArm64::create_call_builder(const llvm::CallBase *cb) {
+template <typename Platform>
+auto LLVMCompilerArm64<Platform>::create_call_builder(const llvm::CallBase *cb)
+    -> std::optional<CallBuilder> {
   llvm::CallingConv::ID cc = llvm::CallingConv::C;
   if (cb) {
     cc = cb->getCallingConv();
@@ -142,27 +155,27 @@ std::optional<LLVMCompilerArm64::CallBuilder>
   case llvm::CallingConv::C:
   case llvm::CallingConv::Fast:
     // On AArch6464, fastcc behaves like the C calling convention.
-    cc_assigners = tpde::a64::CCAssignerAAPCS();
-    return CallBuilder{*this,
-                       std::get<tpde::a64::CCAssignerAAPCS>(cc_assigners)};
+    call_assigner.reset();
+    return CallBuilder{*this, call_assigner};
   default: return std::nullopt;
   }
 }
 
-void LLVMCompilerArm64::extract_element(ValueRef &vec_vr,
-                                        unsigned idx,
-                                        LLVMBasicValType ty,
-                                        ValuePart &out) {
+template <typename Platform>
+void LLVMCompilerArm64<Platform>::extract_element(ValueRef &vec_vr,
+                                                  unsigned idx,
+                                                  LLVMBasicValType ty,
+                                                  ValuePart &out) {
   if (!vec_vr.has_assignment()) {
     // Constant handling is target-independent.
-    return LLVMCompilerBase::extract_element(vec_vr, idx, ty, out);
+    return LLVMBase::extract_element(vec_vr, idx, ty, out);
   }
 
   tpde::ValueAssignment *va = vec_vr.assignment();
   u32 elem_sz = this->adaptor->basic_ty_part_size(ty);
   if (elem_sz == va->max_part_size) {
     // We can't handle the scalarized case better than the generic impl.
-    return LLVMCompilerBase::extract_element(vec_vr, idx, ty, out);
+    return LLVMBase::extract_element(vec_vr, idx, ty, out);
   }
 
   assert(va->max_part_size % elem_sz == 0);
@@ -173,7 +186,7 @@ void LLVMCompilerArm64::extract_element(ValueRef &vec_vr,
   assert(part < va->part_count);
 
   auto vec_ref = vec_vr.part(part);
-  assert(vec_ref.bank() == CompilerConfig::FP_BANK);
+  assert(vec_ref.bank() == Config::FP_BANK);
   AsmReg vec_reg = vec_ref.load_to_reg();
   // TODO: reuse vec_reg if possible
   AsmReg dst_reg = out.alloc_reg(this);
@@ -190,15 +203,16 @@ void LLVMCompilerArm64::extract_element(ValueRef &vec_vr,
   }
 }
 
-void LLVMCompilerArm64::insert_element(ValueRef &vec_vr,
-                                       unsigned idx,
-                                       LLVMBasicValType ty,
-                                       GenericValuePart el) {
+template <typename Platform>
+void LLVMCompilerArm64<Platform>::insert_element(ValueRef &vec_vr,
+                                                 unsigned idx,
+                                                 LLVMBasicValType ty,
+                                                 GenericValuePart el) {
   tpde::ValueAssignment *va = vec_vr.assignment();
   u32 elem_sz = this->adaptor->basic_ty_part_size(ty);
   if (ty == LLVMBasicValType::i1 || elem_sz == va->max_part_size) {
     // We can't handle the scalarized or i1 case better than the generic impl.
-    return LLVMCompilerBase::insert_element(vec_vr, idx, ty, std::move(el));
+    return LLVMBase::insert_element(vec_vr, idx, ty, std::move(el));
   }
 
   assert(va->max_part_size % elem_sz == 0);
@@ -209,7 +223,7 @@ void LLVMCompilerArm64::insert_element(ValueRef &vec_vr,
   assert(part < va->part_count);
 
   auto vec_ref = vec_vr.part_unowned(part);
-  assert(vec_ref.bank() == CompilerConfig::FP_BANK);
+  assert(vec_ref.bank() == Config::FP_BANK);
   if (vec_ref.assignment().stack_valid() ||
       vec_ref.assignment().register_valid()) {
     vec_ref.load_to_reg();
@@ -233,9 +247,10 @@ void LLVMCompilerArm64::insert_element(ValueRef &vec_vr,
   vec_ref.set_modified();
 }
 
-bool LLVMCompilerArm64::compile_cond_br(const llvm::Instruction *inst,
-                                        const ValInfo &,
-                                        u64) {
+template <typename Platform>
+bool LLVMCompilerArm64<Platform>::compile_cond_br(const llvm::Instruction *inst,
+                                                  const ValInfo &,
+                                                  u64) {
 #if LLVM_VERSION_MAJOR >= 23
   const auto *br = llvm::cast<llvm::CondBrInst>(inst);
 #else
@@ -251,12 +266,14 @@ bool LLVMCompilerArm64::compile_cond_br(const llvm::Instruction *inst,
     ASM(TSTwi, cond_reg, 1);
   }
 
-  generate_cond_branch(Jump::Jne, true_block, false_block);
+  this->generate_cond_branch(Jump::Jne, true_block, false_block);
 
   return true;
 }
 
-bool LLVMCompilerArm64::compile_inline_asm(const llvm::CallBase *call) {
+template <typename Platform>
+bool LLVMCompilerArm64<Platform>::compile_inline_asm(
+    const llvm::CallBase *call) {
   auto inline_asm = llvm::cast<llvm::InlineAsm>(call->getCalledOperand());
   // TODO: handle inline assembly that actually does something
   if (!inline_asm->getAsmString().empty() || inline_asm->isAlignStack() ||
@@ -279,13 +296,14 @@ bool LLVMCompilerArm64::compile_inline_asm(const llvm::CallBase *call) {
   return true;
 }
 
-bool LLVMCompilerArm64::compile_icmp(const llvm::Instruction *inst,
-                                     const ValInfo &val_info,
-                                     u64) {
+template <typename Platform>
+bool LLVMCompilerArm64<Platform>::compile_icmp(const llvm::Instruction *inst,
+                                               const ValInfo &val_info,
+                                               u64) {
   const auto *cmp = llvm::cast<llvm::ICmpInst>(inst);
   auto *cmp_ty = cmp->getOperand(0)->getType();
   if (cmp_ty->isVectorTy()) {
-    return LLVMCompilerBase::compile_icmp_vector(inst, val_info, 0);
+    return LLVMBase::compile_icmp_vector(inst, val_info, 0);
   }
   assert(cmp_ty->isIntegerTy() || cmp_ty->isPointerTy());
   u32 int_width = 64;
@@ -293,7 +311,7 @@ bool LLVMCompilerArm64::compile_icmp(const llvm::Instruction *inst,
     int_width = cmp_ty->getIntegerBitWidth();
   }
 
-  Jump::Kind jump;
+  typename Jump::Kind jump;
   bool is_signed = false;
   switch (cmp->getPredicate()) {
     using enum llvm::CmpInst::Predicate;
@@ -372,7 +390,7 @@ bool LLVMCompilerArm64::compile_icmp(const llvm::Instruction *inst,
     } else if (jump == Jump::Jhi || jump == Jump::Jls || jump == Jump::Jle ||
                jump == Jump::Jgt) {
       // gt and le need inverse operand order for comparison.
-      jump = swap_jump(jump).kind;
+      jump = this->swap_jump(jump).kind;
       ASM(CMPx, rhs_reg_lo, lhs_reg_lo);
       ASM(SBCSx, DA_ZR, rhs_reg_hi, lhs_reg_hi);
     } else {
@@ -385,7 +403,7 @@ bool LLVMCompilerArm64::compile_icmp(const llvm::Instruction *inst,
 
     if (lhs_op.is_const() && !rhs_op.is_const()) {
       std::swap(lhs_op, rhs_op);
-      jump = swap_jump(jump).kind;
+      jump = this->swap_jump(jump).kind;
     }
 
     if (int_width != 32 && int_width != 64) {
@@ -423,20 +441,20 @@ bool LLVMCompilerArm64::compile_icmp(const llvm::Instruction *inst,
         Jump cbz{jump_kind, lhs_reg, int_width <= 32};
         auto true_block = adaptor->block_lookup_idx(fuse_br->getSuccessor(0));
         auto false_block = adaptor->block_lookup_idx(fuse_br->getSuccessor(1));
-        generate_cond_branch(cbz, true_block, false_block);
+        this->generate_cond_branch(cbz, true_block, false_block);
         this->adaptor->inst_set_fused(fuse_br, true);
         return true;
       }
 
-      AsmReg tmp = permanent_scratch_reg;
+      AsmReg tmp = this->permanent_scratch_reg;
       if (int_width <= 32) {
         if (!ASMIF(CMPwi, lhs_reg, imm)) {
-          this->materialize_constant(imm, CompilerConfig::GP_BANK, 4, tmp);
+          this->materialize_constant(imm, Config::GP_BANK, 4, tmp);
           ASM(CMPw, lhs_reg, tmp);
         }
       } else {
         if (!ASMIF(CMPxi, lhs_reg, imm)) {
-          this->materialize_constant(imm, CompilerConfig::GP_BANK, 4, tmp);
+          this->materialize_constant(imm, Config::GP_BANK, 4, tmp);
           ASM(CMPx, lhs_reg, tmp);
         }
       }
@@ -457,31 +475,32 @@ bool LLVMCompilerArm64::compile_icmp(const llvm::Instruction *inst,
 
   if (fuse_br) {
     if (!single_use) {
-      (void)result_ref(cmp); // ref-count for branch
-      generate_raw_set(jump, result_ref(cmp).part(0).alloc_reg());
+      (void)this->result_ref(cmp); // ref-count for branch
+      this->generate_raw_set(jump, this->result_ref(cmp).part(0).alloc_reg());
     }
     auto true_block = adaptor->block_lookup_idx(fuse_br->getSuccessor(0));
     auto false_block = adaptor->block_lookup_idx(fuse_br->getSuccessor(1));
-    generate_cond_branch(jump, true_block, false_block);
+    this->generate_cond_branch(jump, true_block, false_block);
     this->adaptor->inst_set_fused(fuse_br, true);
   } else if (fuse_ext) {
     auto [_, res_ref] = this->result_ref_single(fuse_ext);
     if (llvm::isa<llvm::ZExtInst>(fuse_ext)) {
-      generate_raw_set(jump, res_ref.alloc_reg());
+      this->generate_raw_set(jump, res_ref.alloc_reg());
     } else {
-      generate_raw_mask(jump, res_ref.alloc_reg());
+      this->generate_raw_mask(jump, res_ref.alloc_reg());
     }
     this->adaptor->inst_set_fused(fuse_ext, true);
   } else {
     auto [_, res_ref] = this->result_ref_single(cmp);
-    generate_raw_set(jump, res_ref.alloc_reg());
+    this->generate_raw_set(jump, res_ref.alloc_reg());
   }
 
   return true;
 }
 
-void LLVMCompilerArm64::compile_i32_cmp_zero(AsmReg reg,
-                                             llvm::CmpInst::Predicate pred) {
+template <typename Platform>
+void LLVMCompilerArm64<Platform>::compile_i32_cmp_zero(
+    AsmReg reg, llvm::CmpInst::Predicate pred) {
   Da64Cond cond = DA_AL;
   switch (pred) {
   case llvm::CmpInst::ICMP_EQ: cond = DA_EQ; break;
@@ -500,49 +519,53 @@ void LLVMCompilerArm64::compile_i32_cmp_zero(AsmReg reg,
   ASM(CSETw, reg, cond);
 }
 
-LLVMCompilerArm64::GenericValuePart
-    LLVMCompilerArm64::create_addr_for_alloca(tpde::AssignmentPartRef ap) {
-  return GenericValuePart::Expr{AsmReg::R29, ap.variable_stack_off()};
+template <typename Platform>
+auto LLVMCompilerArm64<Platform>::create_addr_for_alloca(
+    tpde::AssignmentPartRef ap) -> GenericValuePart {
+  return typename GenericValuePart::Expr{AsmReg::R29, ap.variable_stack_off()};
 }
 
-void LLVMCompilerArm64::create_helper_call(std::span<IRValueRef> args,
-                                           ValueRef *result,
-                                           SymRef sym) {
+template <typename Platform>
+void LLVMCompilerArm64<Platform>::create_helper_call(std::span<IRValueRef> args,
+                                                     ValueRef *result,
+                                                     SymRef sym) {
   tpde::util::SmallVector<CallArg, 8> arg_vec{};
   for (auto arg : args) {
     arg_vec.push_back(CallArg{arg});
   }
 
-  generate_call(sym, arg_vec, result);
+  this->generate_call(sym, arg_vec, result);
 }
 
-bool LLVMCompilerArm64::handle_intrin(const llvm::IntrinsicInst *inst) {
+template <typename Platform>
+bool LLVMCompilerArm64<Platform>::handle_intrin(
+    const llvm::IntrinsicInst *inst) {
   const auto intrin_id = inst->getIntrinsicID();
   switch (intrin_id) {
   case llvm::Intrinsic::vastart: {
     auto [_, list_ref] = this->val_ref_single(inst->getOperand(0));
     auto list_reg = list_ref.load_to_reg();
-    auto tmp_reg = permanent_scratch_reg;
+    auto tmp_reg = this->permanent_scratch_reg;
 
     // next stack param
-    ASM(LDRxu, tmp_reg, DA_GP(29), reg_save_frame_off + 192);
+    ASM(LDRxu, tmp_reg, DA_GP(29), this->reg_save_frame_off + Config::VARARG_REG_SAVE_SIZE);
     ASM(STRxu, tmp_reg, list_reg, 0);
     // gr_top = end of GP arg reg save area
-    ASM(ADDxi, tmp_reg, DA_GP(29), reg_save_frame_off + 64);
+    ASM(ADDxi, tmp_reg, DA_GP(29), this->reg_save_frame_off + 64);
     ASM(STRxu, tmp_reg, list_reg, 8);
     // vr_top = end of VR arg reg save area
-    if (reg_save_frame_off + 64 + 128 == 0) {
+    if (this->reg_save_frame_off + 64 + 128 == 0) {
       ASM(STRxu, DA_GP(29), list_reg, 16);
     } else {
-      ASM(ADDxi, tmp_reg, DA_GP(29), reg_save_frame_off + 64 + 128);
+      ASM(ADDxi, tmp_reg, DA_GP(29), this->reg_save_frame_off + 64 + 128);
       ASM(STRxu, tmp_reg, list_reg, 16);
     }
 
-    uint32_t gr_offs = 0 - ((8 - scalar_arg_count) * 8);
-    uint32_t vr_offs = 0 - ((8 - vec_arg_count) * 16);
-    materialize_constant(gr_offs, CompilerConfig::GP_BANK, 4, tmp_reg);
+    uint32_t gr_offs = 0 - ((8 - this->scalar_arg_count) * 8);
+    uint32_t vr_offs = 0 - ((8 - this->vec_arg_count) * 16);
+    this->materialize_constant(gr_offs, Config::GP_BANK, 4, tmp_reg);
     ASM(STRwu, tmp_reg, list_reg, 24);
-    materialize_constant(vr_offs, CompilerConfig::GP_BANK, 4, tmp_reg);
+    this->materialize_constant(vr_offs, Config::GP_BANK, 4, tmp_reg);
     ASM(STRwu, tmp_reg, list_reg, 28);
     return true;
   }
@@ -554,8 +577,8 @@ bool LLVMCompilerArm64::handle_intrin(const llvm::IntrinsicInst *inst) {
     const auto src_reg = src_ref.load_to_reg();
     const auto dst_reg = dst_ref.load_to_reg();
 
-    const auto tmp_reg1 = scratch1.alloc(CompilerConfig::FP_BANK);
-    const auto tmp_reg2 = scratch2.alloc(CompilerConfig::FP_BANK);
+    const auto tmp_reg1 = scratch1.alloc(Config::FP_BANK);
+    const auto tmp_reg2 = scratch2.alloc(Config::FP_BANK);
     ASM(LDPq, tmp_reg1, tmp_reg2, src_reg, 0);
     ASM(STPq, tmp_reg1, tmp_reg2, dst_reg, 0);
     return true;
@@ -622,22 +645,24 @@ bool LLVMCompilerArm64::handle_intrin(const llvm::IntrinsicInst *inst) {
   }
 }
 
-bool LLVMCompilerArm64::handle_overflow_intrin_128(OverflowOp op,
-                                                   GenericValuePart &&lhs_lo,
-                                                   GenericValuePart &&lhs_hi,
-                                                   GenericValuePart &&rhs_lo,
-                                                   GenericValuePart &&rhs_hi,
-                                                   ValuePart &&res_lo,
-                                                   ValuePart &&res_hi,
-                                                   ValuePart &&res_of) {
+template <typename Platform>
+bool LLVMCompilerArm64<Platform>::handle_overflow_intrin_128(
+    OverflowOp op,
+    GenericValuePart &&lhs_lo,
+    GenericValuePart &&lhs_hi,
+    GenericValuePart &&rhs_lo,
+    GenericValuePart &&rhs_hi,
+    ValuePart &&res_lo,
+    ValuePart &&res_hi,
+    ValuePart &&res_of) {
   switch (op) {
   case OverflowOp::uadd: {
-    AsmReg lhs_lo_reg = gval_as_reg(lhs_lo); // TODO: reuse reg
-    AsmReg rhs_lo_reg = gval_as_reg(rhs_lo); // TODO: reuse reg
+    AsmReg lhs_lo_reg = this->gval_as_reg(lhs_lo); // TODO: reuse reg
+    AsmReg rhs_lo_reg = this->gval_as_reg(rhs_lo); // TODO: reuse reg
     AsmReg res_lo_reg = res_lo.alloc_reg(this);
     ASM(ADDSx, res_lo_reg, lhs_lo_reg, rhs_lo_reg);
-    AsmReg lhs_hi_reg = gval_as_reg(lhs_hi); // TODO: reuse reg
-    AsmReg rhs_hi_reg = gval_as_reg(rhs_hi); // TODO: reuse reg
+    AsmReg lhs_hi_reg = this->gval_as_reg(lhs_hi); // TODO: reuse reg
+    AsmReg rhs_hi_reg = this->gval_as_reg(rhs_hi); // TODO: reuse reg
     AsmReg res_hi_reg = res_hi.alloc_reg(this);
     ASM(ADCSx, res_hi_reg, lhs_hi_reg, rhs_hi_reg);
     AsmReg res_of_reg = res_of.alloc_reg(this);
@@ -645,12 +670,12 @@ bool LLVMCompilerArm64::handle_overflow_intrin_128(OverflowOp op,
     return true;
   }
   case OverflowOp::sadd: {
-    AsmReg lhs_lo_reg = gval_as_reg(lhs_lo); // TODO: reuse reg
-    AsmReg rhs_lo_reg = gval_as_reg(rhs_lo); // TODO: reuse reg
+    AsmReg lhs_lo_reg = this->gval_as_reg(lhs_lo); // TODO: reuse reg
+    AsmReg rhs_lo_reg = this->gval_as_reg(rhs_lo); // TODO: reuse reg
     AsmReg res_lo_reg = res_lo.alloc_reg(this);
     ASM(ADDSx, res_lo_reg, lhs_lo_reg, rhs_lo_reg);
-    AsmReg lhs_hi_reg = gval_as_reg(lhs_hi); // TODO: reuse reg
-    AsmReg rhs_hi_reg = gval_as_reg(rhs_hi); // TODO: reuse reg
+    AsmReg lhs_hi_reg = this->gval_as_reg(lhs_hi); // TODO: reuse reg
+    AsmReg rhs_hi_reg = this->gval_as_reg(rhs_hi); // TODO: reuse reg
     AsmReg res_hi_reg = res_hi.alloc_reg(this);
     ASM(ADCSx, res_hi_reg, lhs_hi_reg, rhs_hi_reg);
     AsmReg res_of_reg = res_of.alloc_reg(this);
@@ -659,12 +684,12 @@ bool LLVMCompilerArm64::handle_overflow_intrin_128(OverflowOp op,
   }
 
   case OverflowOp::usub: {
-    AsmReg lhs_lo_reg = gval_as_reg(lhs_lo); // TODO: reuse reg
-    AsmReg rhs_lo_reg = gval_as_reg(rhs_lo); // TODO: reuse reg
+    AsmReg lhs_lo_reg = this->gval_as_reg(lhs_lo); // TODO: reuse reg
+    AsmReg rhs_lo_reg = this->gval_as_reg(rhs_lo); // TODO: reuse reg
     AsmReg res_lo_reg = res_lo.alloc_reg(this);
     ASM(SUBSx, res_lo_reg, lhs_lo_reg, rhs_lo_reg);
-    AsmReg lhs_hi_reg = gval_as_reg(lhs_hi); // TODO: reuse reg
-    AsmReg rhs_hi_reg = gval_as_reg(rhs_hi); // TODO: reuse reg
+    AsmReg lhs_hi_reg = this->gval_as_reg(lhs_hi); // TODO: reuse reg
+    AsmReg rhs_hi_reg = this->gval_as_reg(rhs_hi); // TODO: reuse reg
     AsmReg res_hi_reg = res_hi.alloc_reg(this);
     ASM(SBCSx, res_hi_reg, lhs_hi_reg, rhs_hi_reg);
     AsmReg res_of_reg = res_of.alloc_reg(this);
@@ -672,12 +697,12 @@ bool LLVMCompilerArm64::handle_overflow_intrin_128(OverflowOp op,
     return true;
   }
   case OverflowOp::ssub: {
-    AsmReg lhs_lo_reg = gval_as_reg(lhs_lo); // TODO: reuse reg
-    AsmReg rhs_lo_reg = gval_as_reg(rhs_lo); // TODO: reuse reg
+    AsmReg lhs_lo_reg = this->gval_as_reg(lhs_lo); // TODO: reuse reg
+    AsmReg rhs_lo_reg = this->gval_as_reg(rhs_lo); // TODO: reuse reg
     AsmReg res_lo_reg = res_lo.alloc_reg(this);
     ASM(SUBSx, res_lo_reg, lhs_lo_reg, rhs_lo_reg);
-    AsmReg lhs_hi_reg = gval_as_reg(lhs_hi); // TODO: reuse reg
-    AsmReg rhs_hi_reg = gval_as_reg(rhs_hi); // TODO: reuse reg
+    AsmReg lhs_hi_reg = this->gval_as_reg(lhs_hi); // TODO: reuse reg
+    AsmReg rhs_hi_reg = this->gval_as_reg(rhs_hi); // TODO: reuse reg
     AsmReg res_hi_reg = res_hi.alloc_reg(this);
     ASM(SBCSx, res_hi_reg, lhs_hi_reg, rhs_hi_reg);
     AsmReg res_of_reg = res_of.alloc_reg(this);
@@ -692,7 +717,7 @@ bool LLVMCompilerArm64::handle_overflow_intrin_128(OverflowOp op,
         ScratchReg scratch{this};
         AsmReg tmp = scratch.alloc_gp();
         if (!ASMIF(ADDxi, tmp, DA_GP(29), frame_off)) {
-            materialize_constant(frame_off, 0, 4, tmp);
+            this->materialize_constant(frame_off, 0, 4, tmp);
             ASM(ADDx, tmp, DA_GP(29), tmp);
         }
         // TODO: generate call
@@ -713,7 +738,8 @@ std::unique_ptr<LLVMCompiler> create_compiler(const llvm::Triple &triple) {
   llvm::StringRef dl_str = "e-m:e-p270:32:32-p271:32:32-p272:64:64-"
                            "i8:8:32-i16:16:32-i64:64-i128:128-n32:64-S128-Fn32";
   auto adaptor = std::make_unique<LLVMAdaptor>(llvm::DataLayout(dl_str));
-  return std::make_unique<LLVMCompilerArm64>(std::move(adaptor));
+  return std::make_unique<LLVMCompilerArm64<tpde::a64::PlatformConfig>>(
+      std::move(adaptor));
 }
 
 } // namespace tpde_llvm::arm64
