@@ -48,9 +48,9 @@ jobs:
       with:
         submodules: recursive
     - name: Install dependencies
-      run: sudo apt install -y ninja-build cmake clang-22 libclang-22-dev llvm-22-dev 
+      run: sudo apt install -y ninja-build cmake clang-22 llvm-22-dev
     - name: Configure
-      run: cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DLIT=/usr/bin/lit-22 -DCMAKE_CXX_COMPILER=g++ -DCMAKE_C_COMPILER=gcc -DLLVM_DIR=/usr/lib/llvm-22/lib/cmake/llvm
+      run: cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DLIT=/usr/bin/lit-22 -DCMAKE_CXX_COMPILER=g++ -DCMAKE_C_COMPILER=gcc -DLLVM_DIR=/usr/lib/llvm-22/lib/cmake/llvm
     - name: Build
       run: ninja -v -C build
     - name: Test
