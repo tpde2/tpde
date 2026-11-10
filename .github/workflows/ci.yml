@@ -6,30 +6,15 @@ name: CI
 on: [push]
 
 jobs:
-  build-llvm19:
+  build-llvm22:
     runs-on: ubuntu-latest
+    container: t0b1fox/tpde:f45
     steps:
-    - uses: actions/checkout@v4
-      with:
-        submodules: recursive
-    - name: Install dependencies
-      run: sudo apt install -y ninja-build cmake clang-19 libclang-19-dev llvm-19-dev doxygen
-    - name: Configure
-      run: CC=clang CXX=clang++ cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DTPDE_BUILD_DOCS=ON -DLIT=/usr/lib/llvm-19/build/utils/lit/lit.py
-    - name: Build
-      run: ninja -v -C build
-    - name: Test
-      run: ninja -v -C build check-tpde
-
-  build-llvm20:
-    runs-on: ubuntu-latest
-    container: t0b1fox/tpde
-    steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
       with:
         submodules: recursive
     - name: Configure
-      run: CC=clang-20 CXX=clang++-20 cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DTPDE_BUILD_DOCS=ON -DLIT=/usr/bin/lit 
+      run: cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DTPDE_BUILD_DOCS=ON -DLIT=/usr/bin/lit -DCMAKE_CXX_COMPILER=clang++-22 -DCMAKE_C_COMPILER=clang-22 -DLLVM_DIR=/usr/lib64/llvm22/lib64/cmake/llvm
     - name: Build
       run: ninja -v -C build
     - name: Test
@@ -37,14 +22,44 @@ jobs:
     - name: Upload docs as artifact
       if: github.ref == 'refs/heads/master'
       id: deployment
-      uses: actions/upload-pages-artifact@v3
+      uses: actions/upload-pages-artifact@v5
       with:
         path: build/docs/html/
+
+  build-llvm23:
+    runs-on: ubuntu-latest
+    container: t0b1fox/tpde:f45
+    steps:
+    - uses: actions/checkout@v7
+      with:
+        submodules: recursive
+    - name: Configure
+      run: cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DLIT=/usr/bin/lit -DCMAKE_CXX_COMPILER=clang++-23 -DCMAKE_C_COMPILER=clang-23 -DLLVM_DIR=/usr/lib64/llvm23/lib64/cmake/llvm
+    - name: Build
+      run: ninja -v -C build
+    - name: Test
+      run: ninja -v -C build check-tpde
+
+  build-ubuntu:
+    # Uses LLVM 22
+    runs-on: ubuntu-26.04
+    steps:
+    - uses: actions/checkout@v7
+      with:
+        submodules: recursive
+    - name: Install dependencies
+      run: sudo apt install -y ninja-build cmake clang-22 libclang-22-dev llvm-22-dev 
+    - name: Configure
+      run: cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DLIT=/usr/bin/lit-22 -DCMAKE_CXX_COMPILER=g++ -DCMAKE_C_COMPILER=gcc -DLLVM_DIR=/usr/lib/llvm-22/lib/cmake/llvm
+    - name: Build
+      run: ninja -v -C build
+    - name: Test
+      run: ninja -v -C build check-tpde
 
   deploy-docs:
     if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
-    needs: build-llvm20
+    needs: build-llvm22
     permissions:
       pages: write
       id-token: write
@@ -54,12 +69,12 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
 
   license-check:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
     - name: Install dependencies
       run: pip3 install --user reuse
     - name: Check

@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2025 Contributors to TPDE <https://tpde.org>
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-FROM fedora:42
+FROM fedora:45
 
 # install dependencies
-RUN dnf install -y clang-devel gcc gcc-c++ clang-tools-extra python3-lit cmake ninja-build git python3 doxygen && dnf clean all
+RUN dnf install -y clang-devel clang22-devel gcc gcc-c++ clang-tools-extra clang22-tools-extra python3-lit cmake ninja-build git python3 doxygen && dnf clean all
