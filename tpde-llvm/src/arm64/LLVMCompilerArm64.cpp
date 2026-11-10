@@ -548,7 +548,7 @@ bool LLVMCompilerArm64<Platform>::handle_intrin(
     auto tmp_reg = this->permanent_scratch_reg;
 
     // next stack param
-    ASM(LDRxu, tmp_reg, DA_GP(29), this->reg_save_frame_off + 192);
+    ASM(LDRxu, tmp_reg, DA_GP(29), this->reg_save_frame_off + Config::VARARG_REG_SAVE_SIZE);
     ASM(STRxu, tmp_reg, list_reg, 0);
     // gr_top = end of GP arg reg save area
     ASM(ADDxi, tmp_reg, DA_GP(29), this->reg_save_frame_off + 64);

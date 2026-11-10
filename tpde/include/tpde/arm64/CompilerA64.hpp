@@ -294,6 +294,8 @@ struct PlatformConfig : CompilerConfigDefault {
   static constexpr bool FRAME_INDEXING_NEGATIVE = false;
   static constexpr u32 PLATFORM_POINTER_SIZE = 8;
   static constexpr u32 NUM_BANKS = 2;
+  /// Bytes reserved for the variadic argument register save area.
+  static constexpr u32 VARARG_REG_SAVE_SIZE = 8 * 8 + 8 * 16;
 };
 
 /// Compiler mixin for targeting AArch64.
@@ -744,7 +746,7 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::prologue_begin(
     // We additionally store a pointer to the stack area, which we can't compute
     // with a constant offset from the frame pointer. Add 16 bytes to maintain
     // alignment.
-    this->stack.frame_size += 8 * 8 + 8 * 16 + 16;
+    this->stack.frame_size += Config::VARARG_REG_SAVE_SIZE + 16;
     this->text_writer.ensure_space(4 * 8);
     ASMNC(STPx, DA_GP(0), DA_GP(1), DA_SP, reg_save_frame_off);
     ASMNC(STPx, DA_GP(2), DA_GP(3), DA_SP, reg_save_frame_off + 16);
@@ -805,34 +807,30 @@ template <IRAdaptor Adaptor,
           typename Config>
 void CompilerA64<Adaptor, Derived, BaseTy, Config>::prologue_end(
     CCAssigner *cc_assigner) {
-  // Hack: we don't know the frame size, so for a va_start(), we cannot easily
-  // compute the offset from the frame pointer. But we have a stack_reg here,
-  // so use it for var args.
-  if (this->adaptor->cur_is_vararg()) [[unlikely]] {
-    this->stack.frame_used = true;
-    AsmReg stack_reg = AsmReg::R17;
-    // TODO: allocate an actual scratch register for this.
-    assert(!(this->register_file.allocatable & (u64{1} << stack_reg.id())) &&
-           "x17 must not be allocatable");
-    if (this->func_arg_stack_add_off == ~0u) {
-      this->func_arg_stack_add_off = this->text_writer.offset();
-      this->func_arg_stack_add_reg = stack_reg;
-      // Fixed in finish_func when frame size is known
-      ASMC(this, ADDxi, stack_reg, DA_SP, 0);
-    }
-    ASM(ADDxi, stack_reg, stack_reg, cc_assigner->get_stack_size());
-    ASM(STRxu, stack_reg, DA_GP(29), this->reg_save_frame_off + 192);
-
-    // TODO: extract ngrn/nsrn from CCAssigner
-    // TODO: this isn't quite accurate, e.g. for (i128, i128, i128, i64, i128),
-    // this should be 8 but will end up with 7.
-    const CCInfo &cc_info = cc_assigner->get_ccinfo();
-    auto arg_regs = this->register_file.allocatable & cc_info.arg_regs;
-    u32 ngrn = 8 - util::cnt_lz<u16>((arg_regs & 0xff) << 8 | 0x80);
-    u32 nsrn = 8 - util::cnt_lz<u16>(((arg_regs >> 32) & 0xff) << 8 | 0x80);
-    this->scalar_arg_count = ngrn;
-    this->vec_arg_count = nsrn;
+  if (!this->adaptor->cur_is_vararg()) {
+    return;
   }
+  // The frame size is patched in finish_func. Save the pointer now so
+  // va_start can recover it independently of subsequent stack adjustments.
+  AsmReg stack_reg = AsmReg::R17;
+  assert(!(this->register_file.allocatable & (u64{1} << stack_reg.id())));
+  if (this->func_arg_stack_add_off == ~0u) {
+    this->func_arg_stack_add_off = this->text_writer.offset();
+    this->func_arg_stack_add_reg = stack_reg;
+    ASM(ADDxi, stack_reg, DA_SP, 0);
+  }
+  ASM(ADDxi, stack_reg, stack_reg, cc_assigner->get_stack_size());
+  ASM(STRxu, stack_reg, DA_GP(29),
+      reg_save_frame_off + Config::VARARG_REG_SAVE_SIZE);
+  // TODO: extract ngrn/nsrn from CCAssigner
+  // TODO: this isn't quite accurate, e.g. for (i128, i128, i128, i64,
+  // i128), this should be 8 but will end up with 7.
+  const CCInfo &cc_info = cc_assigner->get_ccinfo();
+  auto arg_regs = this->register_file.allocatable & cc_info.arg_regs;
+  u32 ngrn = 8 - util::cnt_lz<u16>((arg_regs & 0xff) << 8 | 0x80);
+  u32 nsrn = 8 - util::cnt_lz<u16>(((arg_regs >> 32) & 0xff) << 8 | 0x80);
+  this->scalar_arg_count = ngrn;
+  this->vec_arg_count = nsrn;
 }
 
 template <IRAdaptor Adaptor,
