@@ -820,7 +820,11 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::prologue_end(
       // Fixed in finish_func when frame size is known
       ASMC(this, ADDxi, stack_reg, DA_SP, 0);
     }
-    ASM(ADDxi, stack_reg, stack_reg, cc_assigner->get_stack_size());
+    u32 named_size = cc_assigner->get_stack_size();
+    if (named_size && !ASMIF(ADDxi, stack_reg, stack_reg, named_size)) {
+      materialize_constant(named_size, Config::GP_BANK, 8, permanent_scratch_reg);
+      ASM(ADDx, stack_reg, stack_reg, permanent_scratch_reg);
+    }
     ASM(STRxu, stack_reg, DA_GP(29), this->reg_save_frame_off + 192);
 
     // TODO: extract ngrn/nsrn from CCAssigner
