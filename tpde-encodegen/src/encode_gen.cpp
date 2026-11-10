@@ -246,6 +246,14 @@ bool generate_inst(std::string &buf,
     auto &dst_op = inst->getOperand(move_ops->first);
     auto src_id = state.target->reg_id_from_mc_reg(src_op.getReg());
     auto dst_id = state.target->reg_id_from_mc_reg(dst_op.getReg());
+    // The prepass redirects this result to the source register. Preserve
+    // its operand reference instead of propagating it to the dead destination.
+    if (src_op.isKill() && state.ret_defs.lookup(dst_id) == inst) {
+      state.fmt_line(buf, 4, "// move to returned register optimized out");
+      llvm::raw_string_ostream os(buf);
+      state.kill_reg(os, dst_id);
+      return true;
+    }
     if (auto it = state.asm_operand_refs.find(src_id);
         it != state.asm_operand_refs.end()) {
       state.operand_ref_counts[it->second]++;
@@ -254,12 +262,6 @@ bool generate_inst(std::string &buf,
         llvm::raw_string_ostream os(buf);
         state.kill_reg(os, src_id);
       }
-      return true;
-    }
-    if (src_op.isKill() && state.ret_defs.lookup(dst_id) == inst) {
-      state.fmt_line(buf, 4, "// move to returned register optimized out");
-      llvm::raw_string_ostream os(buf);
-      state.kill_reg(os, dst_id);
       return true;
     }
   }
@@ -1274,19 +1276,28 @@ bool create_encode_function(llvm::MachineFunction *func,
   // backups
   for (unsigned idx = 0; idx < state.num_ret_regs; ++idx) {
     const auto reg = state.return_regs[idx];
+    auto name = state.target->reg_name_lower(reg);
+    if (auto it = state.asm_operand_refs.find(reg);
+        it != state.asm_operand_refs.end()) {
+      // Only the last alias may consume the parameter. Earlier results copy
+      // from a borrowed register so subsequent results can still use it.
+      auto source = it->second;
+      if (--state.operand_ref_counts[source] != 0) {
+        os << "  GenericValuePart result_source_" << idx
+           << "{typename GenericValuePart::Expr{derived()->gval_as_reg("
+           << source << ")}};\n";
+        source = std::format("result_source_{}", idx);
+      }
+      os << "  try_salvage_or_materialize(" << source << ", scratch_" << name
+         << ", " << state.target->reg_bank(reg) << ", "
+         << "result_" << idx << ".part_size());\n";
+      state.asm_operand_refs.erase(it);
+    }
+
     if (state.used_regs[reg] > 0) {
       os << "  if (result_" << idx << ".has_assignment())\n";
       os << "    result_" << idx << ".unlock(derived());\n";
       continue;
-    }
-    auto name = state.target->reg_name_lower(reg);
-
-    if (auto it = state.asm_operand_refs.find(reg);
-        it != state.asm_operand_refs.end()) {
-      os << "  try_salvage_or_materialize(" << it->second << ", scratch_"
-         << name << ", " << state.target->reg_bank(reg) << ", "
-         << reg_size_bytes(func, reg) << ");\n";
-      state.asm_operand_refs.erase(it);
     }
 
     os << "  result_" << idx << ".set_value(derived(), std::move(scratch_"
