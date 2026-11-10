@@ -128,21 +128,18 @@ void LLVMCompilerArm64<Platform>::load_address_of_var_reference(
   }
   // These pairs must be contiguous, avoid possible veneers in between.
   this->text_writer.ensure_space(8);
+  using A = typename Config::Assembler;
   if (!this->use_local_access(global)) {
     // mov the ptr from the GOT
-    this->reloc_text(
-        sym, tpde::elf::R_AARCH64_ADR_GOT_PAGE, this->text_writer.offset());
+    this->reloc_text(sym, A::RELOC_GOT_PAGE21, this->text_writer.offset());
     ASMNC(ADRP, dst, 0, 0);
-    this->reloc_text(
-        sym, tpde::elf::R_AARCH64_LD64_GOT_LO12_NC, this->text_writer.offset());
+    this->reloc_text(sym, A::RELOC_GOT_PAGEOFF12, this->text_writer.offset());
     ASMNC(LDRxu, dst, dst, 0);
   } else {
     // emit lea with relocation
-    this->reloc_text(
-        sym, tpde::elf::R_AARCH64_ADR_PREL_PG_HI21, this->text_writer.offset());
+    this->reloc_text(sym, A::RELOC_PAGE21, this->text_writer.offset());
     ASMNC(ADRP, dst, 0, 0);
-    this->reloc_text(
-        sym, tpde::elf::R_AARCH64_ADD_ABS_LO12_NC, this->text_writer.offset());
+    this->reloc_text(sym, A::RELOC_PAGEOFF12_ADD, this->text_writer.offset());
     ASMNC(ADDxi, dst, dst, 0);
   }
 }

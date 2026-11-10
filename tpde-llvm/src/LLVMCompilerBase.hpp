@@ -835,8 +835,7 @@ LLVMCompilerBase<Adaptor, Derived, Config>::SecRef
   }
 
   if (retain) {
-    // TODO: ELF only
-    this->assembler.get_section(sec).flags |= tpde::elf::SHF_GNU_RETAIN;
+    this->assembler.set_section_retain(sec);
   }
 
   return sec;

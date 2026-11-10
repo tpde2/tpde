@@ -130,6 +130,10 @@ public:
     // TODO: handle fixups?
   }
 
+  void set_section_retain(SecRef sec) {
+    get_section(sec).flags |= SHF_GNU_RETAIN;
+  }
+
   void sym_set_visibility(SymRef sym, SymVisibility visibility) {
     sym_ptr(sym)->st_other = static_cast<u8>(visibility);
   }
@@ -186,6 +190,14 @@ class AssemblerElfA64 final : public AssemblerElf {
   static const TargetInfoElf TARGET_INFO;
 
 public:
+  // Relocation operations used by shared AArch64 code generation.
+  static constexpr u32 RELOC_CALL = R_AARCH64_CALL26;
+  static constexpr u32 RELOC_PAGE21 = R_AARCH64_ADR_PREL_PG_HI21;
+  static constexpr u32 RELOC_PAGEOFF12_ADD = R_AARCH64_ADD_ABS_LO12_NC;
+  static constexpr u32 RELOC_PAGEOFF12_LDST128 = R_AARCH64_LDST128_ABS_LO12_NC;
+  static constexpr u32 RELOC_GOT_PAGE21 = R_AARCH64_ADR_GOT_PAGE;
+  static constexpr u32 RELOC_GOT_PAGEOFF12 = R_AARCH64_LD64_GOT_LO12_NC;
+
   explicit AssemblerElfA64() : AssemblerElf(TARGET_INFO) {}
 };
 
