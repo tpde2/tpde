@@ -155,8 +155,12 @@ int main(int argc, char *argv[]) {
 
   if (perf_control_fd != -1) {
     char buf[16];
-    write(perf_control_fd, "enable\n", 7);
-    read(perf_control_ack_fd, buf, 5);
+    // glibc defines read() and write() with __attribute__((warn_unused_result))
+    // when _FORTIFY_SOURCE is set. GCC insists on not silencing the warning
+    // when casting to void, so we use an unused variable instead.
+    // See also: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66425
+    [[maybe_unused]] ssize_t res = write(perf_control_fd, "enable\n", 7);
+    res = read(perf_control_ack_fd, buf, 5);
   }
 
 #if LLVM_VERSION_MAJOR >= 21
@@ -187,8 +191,8 @@ int main(int argc, char *argv[]) {
 
   if (perf_control_fd != -1) {
     char buf[16];
-    write(perf_control_fd, "disable\n", 8);
-    read(perf_control_ack_fd, buf, 5);
+    [[maybe_unused]] ssize_t res = write(perf_control_fd, "disable\n", 8);
+    res = read(perf_control_ack_fd, buf, 5);
   }
 
   unsigned exit_code = EXIT_SUCCESS;
