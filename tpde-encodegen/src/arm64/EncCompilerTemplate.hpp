@@ -133,7 +133,8 @@ std::optional<std::pair<typename EncodeCompiler<Adaptor, Derived, BaseTy, Config
         return std::nullopt;
     }
 
-    u64 res_off = expr->disp + off;
+    u64 disp = expr->disp;
+    u64 res_off = disp + off;
     if (res_off >= (u64{0x1000} << shift) || (res_off & ((1 << shift) - 1))) {
         return std::nullopt;
     }
@@ -163,7 +164,7 @@ std::optional<std::pair<typename EncodeCompiler<Adaptor, Derived, BaseTy, Config
     AsmReg dst = scratch.cur_reg();
     ASMD(ADDx_lsl, dst, base_reg, index_reg, scale_shift);
     expr->reset(derived());
-    *expr = typename GenericValuePart::Expr(std::move(scratch));
+    *expr = typename GenericValuePart::Expr(std::move(scratch), disp);
 
     return std::make_pair(dst, res_off);
 }

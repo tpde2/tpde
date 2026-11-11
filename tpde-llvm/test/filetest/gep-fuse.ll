@@ -172,3 +172,34 @@ define void @store_i32_gep6(i32 %v, ptr %a) {
   ret void
 }
 
+define i64 @store_alloca_dyn_gep_i40(i64 %idx, i40 %v) {
+; X64-LABEL: <store_alloca_dyn_gep_i40>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    mov qword ptr [rbp - 0x30], 0x0
+; X64-NEXT:    mov dword ptr [rbp + rdi - 0x30], esi
+; X64-NEXT:    shr rsi, 0x20
+; X64-NEXT:    mov byte ptr [rbp + rdi - 0x2c], sil
+; X64-NEXT:    mov rax, qword ptr [rbp - 0x30]
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <store_alloca_dyn_gep_i40>:
+; ARM64:         stp x29, x30, [sp, #-0xb0]!
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    mov w2, #0x0 // =0
+; ARM64-NEXT:    str x2, [x29, #0xa0]
+; ARM64-NEXT:    lsr x2, x1, #32
+; ARM64-NEXT:    add x0, x29, x0
+; ARM64-NEXT:    str w1, [x0, #0xa0]
+; ARM64-NEXT:    strb w2, [x0, #0xa4]
+; ARM64-NEXT:    ldr x0, [x29, #0xa0]
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
+; ARM64-NEXT:    ret
+  %retval = alloca [8 x i8], align 8
+  store i64 0, ptr %retval
+  %gep = getelementptr i8, ptr %retval, i64 %idx
+  store i40 %v, ptr %gep
+  %r = load i64, ptr %retval
+  ret i64 %r
+}
