@@ -20,7 +20,6 @@ define void @f0(...) {
 ; ARM64-NEXT:    stp q4, q5, [sp, #0x120]
 ; ARM64-NEXT:    stp q6, q7, [sp, #0x140]
 ; ARM64-NEXT:    add x17, sp, #0x190
-; ARM64-NEXT:    add x17, x17, #0x0
 ; ARM64-NEXT:    str x17, [x29, #0x160]
 ; ARM64-NEXT:    add x0, x29, #0x170
 ; ARM64-NEXT:    ldr x16, [x29, #0x160]
