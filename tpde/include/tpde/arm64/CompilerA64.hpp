@@ -253,10 +253,15 @@ public:
         nsrn += 1;
       } else {
         nsrn = 8;
-        u32 size = util::align_up(arg.size, 8);
-        nsaa = util::align_up(nsaa, size);
+        // The members of an HFA/HVA are stored without padding in between,
+        // only the size of the entire argument is rounded up to 8 bytes.
+        // NSAA is always a multiple of 8 before the first member.
+        nsaa = util::align_up(nsaa, arg.size);
         arg.stack_off = nsaa;
-        nsaa += size;
+        nsaa += arg.size;
+        if (arg.consecutive == 0) {
+          nsaa = util::align_up(nsaa, 8);
+        }
       }
     }
   }

@@ -1078,6 +1078,158 @@ define void @call_v_a3f64_a3f64_a3f64(ptr %p, ptr %q, ptr %s, ptr %d) {
   ret void
 }
 
+; On AArch64, %c and %e are passed on the stack. Their elements are stored
+; without padding, only the size of the entire array is rounded up to 8 bytes.
+define void @fn_v_a3f64_a3f64_a4f32_a3f32_f32(ptr %d, [3 x double] %a, [3 x double] %b, [4 x float] %c, [3 x float] %e, float %f) {
+; X64-LABEL: <fn_v_a3f64_a3f64_a4f32_a3f32_f32>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    movd xmm0, dword ptr [rbp + 0x10]
+; X64-NEXT:    movd xmm1, dword ptr [rbp + 0x18]
+; X64-NEXT:    movd xmm2, dword ptr [rbp + 0x20]
+; X64-NEXT:    movd xmm3, dword ptr [rbp + 0x28]
+; X64-NEXT:    movd xmm4, dword ptr [rbp + 0x30]
+; X64-NEXT:    movss dword ptr [rdi], xmm6
+; X64-NEXT:    movss dword ptr [rdi + 0x4], xmm7
+; X64-NEXT:    movss dword ptr [rdi + 0x8], xmm0
+; X64-NEXT:    movss dword ptr [rdi + 0xc], xmm1
+; X64-NEXT:    movss dword ptr [rdi], xmm2
+; X64-NEXT:    movss dword ptr [rdi + 0x4], xmm3
+; X64-NEXT:    movss dword ptr [rdi + 0x8], xmm4
+; X64-NEXT:    movd xmm0, dword ptr [rbp + 0x38]
+; X64-NEXT:    movss dword ptr [rdi], xmm0
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <fn_v_a3f64_a3f64_a4f32_a3f32_f32>:
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    stp d8, d9, [sp, #0x10]
+; ARM64-NEXT:    add x17, sp, #0xa0
+; ARM64-NEXT:    ldr s0, [x17]
+; ARM64-NEXT:    ldr s1, [x17, #0x4]
+; ARM64-NEXT:    ldr s2, [x17, #0x8]
+; ARM64-NEXT:    ldr s3, [x17, #0xc]
+; ARM64-NEXT:    ldr s4, [x17, #0x10]
+; ARM64-NEXT:    ldr s5, [x17, #0x14]
+; ARM64-NEXT:    ldr s8, [x17, #0x18]
+; ARM64-NEXT:    ldr s9, [x17, #0x20]
+; ARM64-NEXT:    str s0, [x0]
+; ARM64-NEXT:    str s1, [x0, #0x4]
+; ARM64-NEXT:    str s2, [x0, #0x8]
+; ARM64-NEXT:    str s3, [x0, #0xc]
+; ARM64-NEXT:    str s4, [x0]
+; ARM64-NEXT:    str s5, [x0, #0x4]
+; ARM64-NEXT:    str s8, [x0, #0x8]
+; ARM64-NEXT:    str s9, [x0]
+; ARM64-NEXT:    ldp d8, d9, [sp, #0x10]
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64-NEXT:    ret
+  store volatile [4 x float] %c, ptr %d
+  store volatile [3 x float] %e, ptr %d
+  store volatile float %f, ptr %d
+  ret void
+}
+define void @call_v_a3f64_a3f64_a4f32_a3f32_f32(ptr %p, ptr %q, ptr %d) {
+; X64-LABEL: <call_v_a3f64_a3f64_a4f32_a3f32_f32>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    sub rsp, 0xa0
+; X64-NEXT:    movsd xmm0, qword ptr [rdi]
+; X64-NEXT:    movsd xmm1, qword ptr [rdi + 0x8]
+; X64-NEXT:    movsd xmm2, qword ptr [rdi + 0x10]
+; X64-NEXT:    movss xmm3, dword ptr [rsi]
+; X64-NEXT:    movss xmm4, dword ptr [rsi + 0x4]
+; X64-NEXT:    movss xmm5, dword ptr [rsi + 0x8]
+; X64-NEXT:    movss xmm6, dword ptr [rsi + 0xc]
+; X64-NEXT:    movss xmm7, dword ptr [rsi]
+; X64-NEXT:    movss xmm8, dword ptr [rsi + 0x4]
+; X64-NEXT:    movss xmm9, dword ptr [rsi + 0x8]
+; X64-NEXT:    movss xmm10, dword ptr [rsi]
+; X64-NEXT:    mov rdi, rdx
+; X64-NEXT:    movq qword ptr [rbp - 0x50], xmm0
+; X64-NEXT:    movq qword ptr [rbp - 0x48], xmm1
+; X64-NEXT:    movq qword ptr [rbp - 0x40], xmm2
+; X64-NEXT:    movd dword ptr [rbp - 0x60], xmm3
+; X64-NEXT:    movq xmm3, qword ptr [rbp - 0x50]
+; X64-NEXT:    movd dword ptr [rbp - 0x5c], xmm4
+; X64-NEXT:    movq xmm4, qword ptr [rbp - 0x48]
+; X64-NEXT:    movd dword ptr [rbp - 0x58], xmm5
+; X64-NEXT:    movq xmm5, qword ptr [rbp - 0x40]
+; X64-NEXT:    movd dword ptr [rbp - 0x54], xmm6
+; X64-NEXT:    movd xmm6, dword ptr [rbp - 0x60]
+; X64-NEXT:    movd dword ptr [rbp - 0x70], xmm7
+; X64-NEXT:    movd xmm7, dword ptr [rbp - 0x5c]
+; X64-NEXT:    movd xmm11, dword ptr [rbp - 0x58]
+; X64-NEXT:    movss dword ptr [rsp], xmm11
+; X64-NEXT:    movd xmm11, dword ptr [rbp - 0x54]
+; X64-NEXT:    movss dword ptr [rsp + 0x8], xmm11
+; X64-NEXT:    movd xmm11, dword ptr [rbp - 0x70]
+; X64-NEXT:    movss dword ptr [rsp + 0x10], xmm11
+; X64-NEXT:    movss dword ptr [rsp + 0x18], xmm8
+; X64-NEXT:    movss dword ptr [rsp + 0x20], xmm9
+; X64-NEXT:    movss dword ptr [rsp + 0x28], xmm10
+; X64-NEXT:    call <L0>
+; X64-NEXT:     R_X86_64_PLT32 fn_v_a3f64_a3f64_a4f32_a3f32_f32-0x4
+; X64-NEXT:  <L0>:
+; X64-NEXT:    add rsp, 0xa0
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <call_v_a3f64_a3f64_a4f32_a3f32_f32>:
+; ARM64:         stp x29, x30, [sp, #-0xd0]!
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    stp d8, d9, [sp, #0x10]
+; ARM64-NEXT:    stp d10, d11, [sp, #0x20]
+; ARM64-NEXT:    ldr d0, [x0]
+; ARM64-NEXT:    ldr d1, [x0, #0x8]
+; ARM64-NEXT:    ldr d2, [x0, #0x10]
+; ARM64-NEXT:    ldr s3, [x1]
+; ARM64-NEXT:    ldr s4, [x1, #0x4]
+; ARM64-NEXT:    ldr s5, [x1, #0x8]
+; ARM64-NEXT:    ldr s6, [x1, #0xc]
+; ARM64-NEXT:    ldr s7, [x1]
+; ARM64-NEXT:    ldr s8, [x1, #0x4]
+; ARM64-NEXT:    ldr s9, [x1, #0x8]
+; ARM64-NEXT:    ldr s10, [x1]
+; ARM64-NEXT:    mov x0, x2
+; ARM64-NEXT:    str d0, [x29, #0xa0]
+; ARM64-NEXT:    str d1, [x29, #0xa8]
+; ARM64-NEXT:    str d2, [x29, #0xb0]
+; ARM64-NEXT:    str s3, [x29, #0xc0]
+; ARM64-NEXT:    ldr d3, [x29, #0xa0]
+; ARM64-NEXT:    str s4, [x29, #0xc4]
+; ARM64-NEXT:    ldr d4, [x29, #0xa8]
+; ARM64-NEXT:    str s5, [x29, #0xc8]
+; ARM64-NEXT:    ldr d5, [x29, #0xb0]
+; ARM64-NEXT:    sub sp, sp, #0x30
+; ARM64-NEXT:    ldr s11, [x29, #0xc0]
+; ARM64-NEXT:    str s11, [sp]
+; ARM64-NEXT:    ldr s11, [x29, #0xc4]
+; ARM64-NEXT:    str s11, [sp, #0x4]
+; ARM64-NEXT:    ldr s11, [x29, #0xc8]
+; ARM64-NEXT:    str s11, [sp, #0x8]
+; ARM64-NEXT:    str s6, [sp, #0xc]
+; ARM64-NEXT:    str s7, [sp, #0x10]
+; ARM64-NEXT:    str s8, [sp, #0x14]
+; ARM64-NEXT:    str s9, [sp, #0x18]
+; ARM64-NEXT:    str s10, [sp, #0x20]
+; ARM64-NEXT:  <L0>:
+; ARM64-NEXT:    bl <L0>
+; ARM64-NEXT:     R_AARCH64_CALL26 fn_v_a3f64_a3f64_a4f32_a3f32_f32
+; ARM64-NEXT:    add sp, sp, #0x30
+; ARM64-NEXT:    ldp d8, d9, [sp, #0x10]
+; ARM64-NEXT:    ldp d10, d11, [sp, #0x20]
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xd0
+; ARM64-NEXT:    ret
+  %a1 = load [3 x double], ptr %p
+  %a2 = load [4 x float], ptr %q
+  %a3 = load [3 x float], ptr %q
+  %f = load float, ptr %q
+  call void @fn_v_a3f64_a3f64_a4f32_a3f32_f32(ptr %d, [3 x double] %a1, [3 x double] %a1, [4 x float] %a2, [3 x float] %a3, float %f)
+  ret void
+}
+
 declare i32 @fn_i64_i64_i64_i64_i64_i64_i64_2xi64(i64, i64, i64, i64, i64, i64, i64, [2 x i64]);
 define i32 @call_i64_i64_i64_i64_i64_i64_i64_2xi64(i64 %0, [2 x i64] %1) {
 ; X64-LABEL: <call_i64_i64_i64_i64_i64_i64_i64_2xi64>:
