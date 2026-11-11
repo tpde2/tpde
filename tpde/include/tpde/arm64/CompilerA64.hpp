@@ -225,7 +225,7 @@ public:
     if (arg.byval) [[unlikely]] {
       nsaa = util::align_up(nsaa, arg.align < 8 ? 8 : arg.align);
       arg.stack_off = nsaa;
-      nsaa += arg.size;
+      nsaa += util::align_up(arg.size, 8);
       return;
     }
 

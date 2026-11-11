@@ -418,3 +418,69 @@ define void @call_byval7(ptr %a) {
   call void @fn_byval7(ptr %a)
   ret void
 }
+
+; The stack slot of a byval argument is padded to a multiple of 8 bytes,
+; variadic arguments start after the padding.
+declare void @llvm.va_start.p0(ptr)
+define void @fn_byval8(ptr %ap, ptr byval([17 x i8]) %a, ...) {
+; X64-LABEL: <fn_byval8>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    sub rsp, 0xe0
+; X64-NEXT:    mov qword ptr [rbp - 0xd8], rdi
+; X64-NEXT:    mov qword ptr [rbp - 0xd0], rsi
+; X64-NEXT:    mov qword ptr [rbp - 0xc8], rdx
+; X64-NEXT:    mov qword ptr [rbp - 0xc0], rcx
+; X64-NEXT:    mov qword ptr [rbp - 0xb8], r8
+; X64-NEXT:    mov qword ptr [rbp - 0xb0], r9
+; X64-NEXT:    test al, al
+; X64-NEXT:    je <L0>
+; X64-NEXT:    movdqu xmmword ptr [rbp - 0xa8], xmm0
+; X64-NEXT:    movdqu xmmword ptr [rbp - 0x98], xmm1
+; X64-NEXT:    movdqu xmmword ptr [rbp - 0x88], xmm2
+; X64-NEXT:    movdqu xmmword ptr [rbp - 0x78], xmm3
+; X64-NEXT:    movdqu xmmword ptr [rbp - 0x68], xmm4
+; X64-NEXT:    movdqu xmmword ptr [rbp - 0x58], xmm5
+; X64-NEXT:    movdqu xmmword ptr [rbp - 0x48], xmm6
+; X64-NEXT:    movdqu xmmword ptr [rbp - 0x38], xmm7
+; X64-NEXT:  <L0>:
+; X64-NEXT:    movabs rax, 0x3000000008
+; X64-NEXT:    mov qword ptr [rdi], rax
+; X64-NEXT:    lea rax, [rbp - 0xd8]
+; X64-NEXT:    mov qword ptr [rdi + 0x10], rax
+; X64-NEXT:    lea rax, [rbp + 0x28]
+; X64-NEXT:    mov qword ptr [rdi + 0x8], rax
+; X64-NEXT:    add rsp, 0xe0
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <fn_byval8>:
+; ARM64:         stp x29, x30, [sp, #-0x170]!
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    stp x0, x1, [sp, #0xa0]
+; ARM64-NEXT:    stp x2, x3, [sp, #0xb0]
+; ARM64-NEXT:    stp x4, x5, [sp, #0xc0]
+; ARM64-NEXT:    stp x6, x7, [sp, #0xd0]
+; ARM64-NEXT:    stp q0, q1, [sp, #0xe0]
+; ARM64-NEXT:    stp q2, q3, [sp, #0x100]
+; ARM64-NEXT:    stp q4, q5, [sp, #0x120]
+; ARM64-NEXT:    stp q6, q7, [sp, #0x140]
+; ARM64-NEXT:    add x17, sp, #0x170
+; ARM64-NEXT:    add x9, x17, #0x0
+; ARM64-NEXT:    add x17, x17, #0x18
+; ARM64-NEXT:    str x17, [x29, #0x160]
+; ARM64-NEXT:    ldr x16, [x29, #0x160]
+; ARM64-NEXT:    str x16, [x0]
+; ARM64-NEXT:    add x16, x29, #0xe0
+; ARM64-NEXT:    str x16, [x0, #0x8]
+; ARM64-NEXT:    add x16, x29, #0x160
+; ARM64-NEXT:    str x16, [x0, #0x10]
+; ARM64-NEXT:    mov w16, #-0x38 // =-56
+; ARM64-NEXT:    str w16, [x0, #0x18]
+; ARM64-NEXT:    mov x16, #0xffffff80 // =4294967168
+; ARM64-NEXT:    str w16, [x0, #0x1c]
+; ARM64-NEXT:    ldp x29, x30, [sp], #0x170
+; ARM64-NEXT:    ret
+  call void @llvm.va_start.p0(ptr %ap)
+  ret void
+}

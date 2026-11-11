@@ -169,7 +169,7 @@ public:
     if (arg.byval) {
       stack = util::align_up(stack, arg.align < 8 ? 8 : arg.align);
       arg.stack_off = stack;
-      stack += arg.size;
+      stack += util::align_up(arg.size, 8);
       return;
     }
 
