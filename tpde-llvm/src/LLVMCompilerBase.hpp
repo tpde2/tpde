@@ -3147,7 +3147,13 @@ void LLVMCompilerBase<Adaptor, Derived, Config>::extract_element(
     auto *cst = llvm::cast<llvm::Constant>(vec_vr.state.s.value);
     assert(cst->getType()->isVectorTy());
     auto *elem = cst->getAggregateElement(idx);
-    out.set_value(this, val_ref_constant(elem, 0));
+    if (!out.has_assignment()) {
+      // If out is a temporary value, we can store the constant there and don't
+      // need to materialize it into a register.
+      out = val_ref_constant(elem, 0);
+    } else {
+      out.set_value(this, val_ref_constant(elem, 0));
+    }
     return;
   }
 

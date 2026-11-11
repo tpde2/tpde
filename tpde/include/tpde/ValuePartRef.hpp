@@ -601,16 +601,6 @@ void CompilerBase<Adaptor, Derived, Config>::ValuePart::set_value(
   if (!has_assignment()) {
     assert(!is_const()); // probably don't want to allow mutating constants
 
-    // This is a temporary, which might currently have a register. We want to
-    // have a temporary register that holds the value at the end.
-    if (!other.has_assignment()) {
-      // When other is a temporary/constant, just take the value and drop our
-      // own register (if we have any).
-      reset(compiler);
-      *this = std::move(other);
-      return;
-    }
-
     if (!other.can_salvage()) {
       // We cannot take the register of other, so copy the value
       AsmReg cur_reg = alloc_reg(compiler);
