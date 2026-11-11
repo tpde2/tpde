@@ -5,8 +5,40 @@
 
 ; RUN: tpde-llc --target=aarch64 %s | %objdump | FileCheck %s -check-prefixes=ARM64
 
-declare void @llvm.va_start.p0(ptr) #2
 %struct.__va_list = type { ptr, ptr, ptr, i32, i32 }
+
+define void @f0(...) {
+; ARM64-LABEL: <f0>:
+; ARM64:         stp x29, x30, [sp, #-0x190]!
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    stp x0, x1, [sp, #0xa0]
+; ARM64-NEXT:    stp x2, x3, [sp, #0xb0]
+; ARM64-NEXT:    stp x4, x5, [sp, #0xc0]
+; ARM64-NEXT:    stp x6, x7, [sp, #0xd0]
+; ARM64-NEXT:    stp q0, q1, [sp, #0xe0]
+; ARM64-NEXT:    stp q2, q3, [sp, #0x100]
+; ARM64-NEXT:    stp q4, q5, [sp, #0x120]
+; ARM64-NEXT:    stp q6, q7, [sp, #0x140]
+; ARM64-NEXT:    add x17, sp, #0x190
+; ARM64-NEXT:    add x17, x17, #0x0
+; ARM64-NEXT:    str x17, [x29, #0x160]
+; ARM64-NEXT:    add x0, x29, #0x170
+; ARM64-NEXT:    ldr x16, [x29, #0x160]
+; ARM64-NEXT:    str x16, [x0]
+; ARM64-NEXT:    add x16, x29, #0xe0
+; ARM64-NEXT:    str x16, [x0, #0x8]
+; ARM64-NEXT:    add x16, x29, #0x160
+; ARM64-NEXT:    str x16, [x0, #0x10]
+; ARM64-NEXT:    mov x16, #0xffffffc0 // =4294967232
+; ARM64-NEXT:    str w16, [x0, #0x18]
+; ARM64-NEXT:    mov x16, #0xffffff80 // =4294967168
+; ARM64-NEXT:    str w16, [x0, #0x1c]
+; ARM64-NEXT:    ldp x29, x30, [sp], #0x190
+; ARM64-NEXT:    ret
+  %va = alloca %struct.__va_list, align 8
+  call void @llvm.va_start.p0(ptr nonnull %va)
+  ret void
+}
 
 define void @f(i64 %0, i64 %1, i64 %2, i64 %3, i64 %4, i64 %5, i64 %6, i64 %7, i64 %8, ...) {
 ; ARM64-LABEL: <f>:
