@@ -306,3 +306,49 @@ define i128 @bitcast_f128_v2i64(<2 x i64> %a) {
   %r = bitcast <2 x i64> %a to i128
   ret i128 %r
 }
+
+define i32 @bitcast_v4i8_i32_fixed() {
+; X64-LABEL: <bitcast_v4i8_i32_fixed>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    push rbx
+; X64-NEXT:    xor eax, eax
+; X64-NEXT:    mov byte ptr [rbp - 0x2c], al
+; X64-NEXT:    xor eax, eax
+; X64-NEXT:    mov byte ptr [rbp - 0x2b], al
+; X64-NEXT:    xor eax, eax
+; X64-NEXT:    mov byte ptr [rbp - 0x2a], al
+; X64-NEXT:    xor eax, eax
+; X64-NEXT:    mov byte ptr [rbp - 0x29], al
+; X64-NEXT:    mov eax, dword ptr [rbp - 0x2c]
+; X64-NEXT:    mov ecx, eax
+; X64-NEXT:    and ecx, 0x0
+; X64-NEXT:    pop rbx
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <bitcast_v4i8_i32_fixed>:
+; ARM64:         stp x29, x30, [sp, #-0xb0]!
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    str x19, [sp, #0x10]
+; ARM64-NEXT:    mov w0, #0x0 // =0
+; ARM64-NEXT:    strb w0, [x29, #0xa0]
+; ARM64-NEXT:    mov w0, #0x0 // =0
+; ARM64-NEXT:    strb w0, [x29, #0xa1]
+; ARM64-NEXT:    mov w0, #0x0 // =0
+; ARM64-NEXT:    strb w0, [x29, #0xa2]
+; ARM64-NEXT:    mov w0, #0x0 // =0
+; ARM64-NEXT:    strb w0, [x29, #0xa3]
+; ARM64-NEXT:    mov w0, #0x0 // =0
+; ARM64-NEXT:    ldr w1, [x29, #0xa0]
+; ARM64-NEXT:    and w0, w0, w1
+; ARM64-NEXT:    mov w0, w1
+; ARM64-NEXT:    ldr x19, [sp, #0x10]
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
+; ARM64-NEXT:    ret
+  %c = bitcast <4 x i8> zeroinitializer to i32
+  br label %ret
+ret:
+  %r = and i32 %c, 0
+  ret i32 %c
+}

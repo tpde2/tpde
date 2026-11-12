@@ -3072,6 +3072,11 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_bitcast(
   this->allocate_spill_slot(tpde::AssignmentPartRef{res_ref.assignment(), 0});
   for (u32 i = 0; i != dst_part_count; ++i) {
     tpde::AssignmentPartRef ap{res_ref.assignment(), i};
+    if (ap.fixed_assignment()) {
+      this->unfix(ap, /*free_reg=*/true);
+    }
+    assert(!ap.register_valid());
+    assert(!ap.stack_valid());
     ap.set_stack_valid();
   }
 
@@ -3240,12 +3245,18 @@ void LLVMCompilerBase<Adaptor, Derived, Config>::insert_element(
 
   tpde::AssignmentPartRef ap{va, part};
   if (ap.register_valid()) {
+    if (ap.fixed_assignment()) {
+      // There might be already other elements in the value.
+      this->unfix(ap, /*free_reg=*/false);
+    }
     this->evict(ap);
   } else if (!ap.stack_valid()) {
     // Value part is uninitialized
     this->allocate_spill_slot(ap);
     ap.set_stack_valid();
   }
+  assert(!ap.register_valid());
+  assert(ap.stack_valid());
 
   GenericValuePart addr = derived()->val_spill_slot(ap);
   auto &expr = std::get<typename GenericValuePart::Expr>(addr.state);
@@ -4980,6 +4991,10 @@ bool LLVMCompilerBase<Adaptor, Derived, Config>::compile_intrin(
     ValueRef res = this->result_ref(inst);
     assert(res.assignment()->part_count == 2);
     tpde::AssignmentPartRef int_part{res.assignment(), 1};
+    if (int_part.fixed_assignment()) {
+      this->unfix(int_part, /*free_reg=*/true);
+    }
+    assert(!int_part.register_valid());
     this->allocate_spill_slot(int_part);
     int_part.set_stack_valid();
 

@@ -471,6 +471,11 @@ public:
   /// Ensure the value is spilled in its stack slot (except variable refs).
   void spill(AssignmentPartRef ap);
 
+  /// Transform a fixed assignment into a non-fixed assignment and possibly also
+  /// release the associated register. Only works during the definition of the
+  /// value(i.e., immediately after result_ref).
+  void unfix(AssignmentPartRef ap, bool free_reg);
+
   /// Evict the value from its register, spilling if needed, and free register.
   void evict(AssignmentPartRef ap);
 
@@ -1514,9 +1519,31 @@ void CompilerBase<Adaptor, Derived, Config>::spill(AssignmentPartRef ap) {
 }
 
 template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>
+void CompilerBase<Adaptor, Derived, Config>::unfix(AssignmentPartRef ap,
+                                                   bool free_reg) {
+  assert(ap.fixed_assignment());
+  assert(ap.register_valid());
+  const auto reg = ap.get_reg();
+  [[maybe_unused]] ValLocalIdx local_idx = register_file.reg_local_idx(reg);
+  // Only inside the defining block, we can still unfix an assignment.
+  assert(analyzer.liveness_info(local_idx).first == cur_block_idx &&
+         "cannot evict fixed assignment after defining block");
+
+  --assignments.cur_fixed_assignment_count[ap.bank().id()];
+  register_file.dec_lock_count_must_zero(reg); // release lock for fixed reg
+  ap.set_fixed_assignment(false);
+
+  if (free_reg) {
+    ap.set_register_valid(false);
+    register_file.unmark_used(ap.get_reg());
+  }
+}
+
+template <IRAdaptor Adaptor, typename Derived, CompilerConfig Config>
 void CompilerBase<Adaptor, Derived, Config>::evict(AssignmentPartRef ap) {
   assert(may_change_value_state());
   assert(ap.register_valid());
+  assert(!ap.fixed_assignment());
   derived()->spill(ap);
   ap.set_register_valid(false);
   register_file.unmark_used(ap.get_reg());

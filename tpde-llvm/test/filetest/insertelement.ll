@@ -866,3 +866,41 @@ loop:
   %ie = insertelement <2 x float> %v, float 0.0, i64 0
   br label %loop
 }
+
+define void @ins_i32_v1i32_fixed(ptr %p) {
+; X64-LABEL: <ins_i32_v1i32_fixed>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    push rbx
+; X64-NEXT:    push r12
+; X64-NEXT:    mov rbx, rdi
+; X64-NEXT:    xor r12d, r12d
+; X64-NEXT:    mov dword ptr [rbp - 0x2c], r12d
+; X64-NEXT:    mov dword ptr [rbp - 0x2c], 0x0
+; X64-NEXT:    mov eax, dword ptr [rbp - 0x2c]
+; X64-NEXT:    mov dword ptr [rbx], eax
+; X64-NEXT:    pop r12
+; X64-NEXT:    pop rbx
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <ins_i32_v1i32_fixed>:
+; ARM64:         stp x29, x30, [sp, #-0xb0]!
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    stp x19, x20, [sp, #0x10]
+; ARM64-NEXT:    mov x19, x0
+; ARM64-NEXT:    mov w20, #0x0 // =0
+; ARM64-NEXT:    str w20, [x29, #0xa0]
+; ARM64-NEXT:    mov w0, #0x0 // =0
+; ARM64-NEXT:    str w0, [x29, #0xa0]
+; ARM64-NEXT:    ldr w0, [x29, #0xa0]
+; ARM64-NEXT:    str w0, [x19]
+; ARM64-NEXT:    ldp x19, x20, [sp, #0x10]
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xb0
+; ARM64-NEXT:    ret
+  %c = insertelement <1 x i32> poison, i32 0, i32 0
+  br label %ret
+ret:
+  store <1 x i32> %c, ptr %p
+  ret void
+}
