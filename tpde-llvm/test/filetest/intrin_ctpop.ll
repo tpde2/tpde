@@ -130,8 +130,8 @@ define i32 @ctpop_i32(i32 %0) {
 
 define i37 @ctpop_i37(i37 %0) {
 ; X64-LABEL: <ctpop_i37>:
-; X64:         movabs rax, 0x1fffffffff
-; X64-NEXT:    and rdi, rax
+; X64:         shl rdi, 0x1b
+; X64-NEXT:    shr rdi, 0x1b
 ; X64-NEXT:    mov rax, rdi
 ; X64-NEXT:    shr rax
 ; X64-NEXT:    movabs rcx, 0x5555555555555555

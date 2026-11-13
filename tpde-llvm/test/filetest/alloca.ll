@@ -349,8 +349,8 @@ define void @dyn_alloca_dyn_i32_cnt_i37(i37 %0) {
 ; X64-NEXT:    push rbx
 ; X64-NEXT:    sub rsp, 0x28
 ; X64-NEXT:    mov rbx, rdi
-; X64-NEXT:    movabs rax, 0x1fffffffff
-; X64-NEXT:    and rbx, rax
+; X64-NEXT:    shl rbx, 0x1b
+; X64-NEXT:    shr rbx, 0x1b
 ; X64-NEXT:    lea rbx, [4*rbx]
 ; X64-NEXT:    sub rsp, rbx
 ; X64-NEXT:    and rsp, -0x10

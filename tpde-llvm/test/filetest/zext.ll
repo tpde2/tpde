@@ -375,8 +375,8 @@ entry:
 
 define i64 @zext_i37_to_i64(i37 %0) {
 ; X64-LABEL: <zext_i37_to_i64>:
-; X64:         movabs rax, 0x1fffffffff
-; X64-NEXT:    and rdi, rax
+; X64:         shl rdi, 0x1b
+; X64-NEXT:    shr rdi, 0x1b
 ; X64-NEXT:    mov rax, rdi
 ; X64-NEXT:    ret
 ;
@@ -392,8 +392,8 @@ define i80 @zext_i37_to_i80(i37 %0) {
 ; X64-LABEL: <zext_i37_to_i80>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movabs rax, 0x1fffffffff
-; X64-NEXT:    and rdi, rax
+; X64-NEXT:    shl rdi, 0x1b
+; X64-NEXT:    shr rdi, 0x1b
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov qword ptr [rbp - 0x38], rax
 ; X64-NEXT:    mov rax, rdi
@@ -414,8 +414,8 @@ define i128 @zext_i37_to_i128(i37 %0) {
 ; X64-LABEL: <zext_i37_to_i128>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movabs rax, 0x1fffffffff
-; X64-NEXT:    and rdi, rax
+; X64-NEXT:    shl rdi, 0x1b
+; X64-NEXT:    shr rdi, 0x1b
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov qword ptr [rbp - 0x38], rax
 ; X64-NEXT:    mov rax, rdi

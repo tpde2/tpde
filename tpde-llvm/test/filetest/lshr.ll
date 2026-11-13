@@ -124,8 +124,8 @@ entry:
 
 define void @lshr_i37_3(i37 %0) {
 ; X64-LABEL: <lshr_i37_3>:
-; X64:         movabs rax, 0x1fffffffff
-; X64-NEXT:    and rdi, rax
+; X64:         shl rdi, 0x1b
+; X64-NEXT:    shr rdi, 0x1b
 ; X64-NEXT:    shr rdi, 0x3
 ; X64-NEXT:    ret
 ;
@@ -171,8 +171,8 @@ entry:
 
 define void @lshr_i37_i37(i37 %0, i37 %1) {
 ; X64-LABEL: <lshr_i37_i37>:
-; X64:         movabs rax, 0x1fffffffff
-; X64-NEXT:    and rdi, rax
+; X64:         shl rdi, 0x1b
+; X64-NEXT:    shr rdi, 0x1b
 ; X64-NEXT:    mov ecx, esi
 ; X64-NEXT:    shr rdi, cl
 ; X64-NEXT:    ret
@@ -449,8 +449,8 @@ define void @lshr_i37_no_salvage_imm(i37 %0) {
 ; X64:         movabs rax, 0x1fffffffff
 ; X64-NEXT:    and rax, rdi
 ; X64-NEXT:    shr rax, 0x3
-; X64-NEXT:    movabs rcx, 0x1fffffffff
-; X64-NEXT:    and rdi, rcx
+; X64-NEXT:    shl rdi, 0x1b
+; X64-NEXT:    shr rdi, 0x1b
 ; X64-NEXT:    mov ecx, eax
 ; X64-NEXT:    shr rdi, cl
 ; X64-NEXT:    ret
@@ -473,8 +473,8 @@ define void @lshr_i37_no_salvage_reg(i37 %0, i37 %1) {
 ; X64-NEXT:    and rax, rdi
 ; X64-NEXT:    mov ecx, esi
 ; X64-NEXT:    shr rax, cl
-; X64-NEXT:    movabs rcx, 0x1fffffffff
-; X64-NEXT:    and rdi, rcx
+; X64-NEXT:    shl rdi, 0x1b
+; X64-NEXT:    shr rdi, 0x1b
 ; X64-NEXT:    mov ecx, eax
 ; X64-NEXT:    shr rdi, cl
 ; X64-NEXT:    ret

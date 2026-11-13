@@ -70,8 +70,8 @@ entry:
 
 define float @i37tof32(i37 %0) {
 ; X64-LABEL: <i37tof32>:
-; X64:         movabs rax, 0x1fffffffff
-; X64-NEXT:    and rdi, rax
+; X64:         shl rdi, 0x1b
+; X64-NEXT:    shr rdi, 0x1b
 ; X64-NEXT:    test rdi, rdi
 ; X64-NEXT:    js <L0>
 ; X64-NEXT:    cvtsi2ss xmm0, rdi
@@ -124,8 +124,8 @@ define float @i123tof32(i123 %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:    movabs rax, 0x7ffffffffffffff
-; X64-NEXT:    and rsi, rax
+; X64-NEXT:    shl rsi, 0x5
+; X64-NEXT:    shr rsi, 0x5
 ; X64-NEXT:    call <L0>
 ; X64-NEXT:     R_X86_64_PLT32 __floatuntisf-0x4
 ; X64-NEXT:  <L0>:
@@ -236,12 +236,12 @@ entry:
 
 define double @i37tof64(i37 %0) {
 ; X64-LABEL: <i37tof64>:
-; X64:         movabs rax, 0x1fffffffff
-; X64-NEXT:    and rdi, rax
+; X64:         shl rdi, 0x1b
+; X64-NEXT:    shr rdi, 0x1b
 ; X64-NEXT:    movq xmm0, rdi
 ; X64-NEXT:    punpckldq {{.*#+}} xmm0 = xmm0[0],mem[0],xmm0[1],mem[1]
 ; X64-NEXT:     R_X86_64_PC32 -0x4
-; X64-NEXT:    subpd xmm0, xmmword ptr <i37tof64+0x1a>
+; X64-NEXT:    subpd xmm0, xmmword ptr <i37tof64+0x15>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    movapd xmm1, xmm0
 ; X64-NEXT:    unpckhpd {{.*#+}} xmm1 = xmm1[1],xmm0[1]
@@ -284,8 +284,8 @@ define double @i123tof64(i123 %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:    movabs rax, 0x7ffffffffffffff
-; X64-NEXT:    and rsi, rax
+; X64-NEXT:    shl rsi, 0x5
+; X64-NEXT:    shr rsi, 0x5
 ; X64-NEXT:    call <L0>
 ; X64-NEXT:     R_X86_64_PLT32 __floatuntidf-0x4
 ; X64-NEXT:  <L0>:
@@ -388,8 +388,8 @@ define fp128 @i37tof128(i37 %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:    movabs rax, 0x1fffffffff
-; X64-NEXT:    and rdi, rax
+; X64-NEXT:    shl rdi, 0x1b
+; X64-NEXT:    shr rdi, 0x1b
 ; X64-NEXT:    call <L0>
 ; X64-NEXT:     R_X86_64_PLT32 __floatunditf-0x4
 ; X64-NEXT:  <L0>:
@@ -440,8 +440,8 @@ define fp128 @i123tof128(i123 %p) {
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
 ; X64-NEXT:    sub rsp, 0x30
-; X64-NEXT:    movabs rax, 0x7ffffffffffffff
-; X64-NEXT:    and rsi, rax
+; X64-NEXT:    shl rsi, 0x5
+; X64-NEXT:    shr rsi, 0x5
 ; X64-NEXT:    call <L0>
 ; X64-NEXT:     R_X86_64_PLT32 __floatuntitf-0x4
 ; X64-NEXT:  <L0>:

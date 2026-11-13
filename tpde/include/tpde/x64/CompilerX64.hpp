@@ -481,8 +481,7 @@ struct CompilerX64 : BaseTy<Adaptor, Derived, Config> {
   /// Move src into dst if cc is true, otherwise do nothing
   void generate_raw_cmov(Jump cc, AsmReg dst, AsmReg src, bool is_64);
 
-  /// Integer extension. Might need a temporary register, src is not modified,
-  /// might clobber flags.
+  /// Integer extension. src is not modified, might clobber flags.
   void generate_raw_intext(AsmReg dst, AsmReg src, bool sign, u32 from, u32 to);
 
   /// Bitfield insert. Needs a temporary register, src is not modified.
@@ -1534,10 +1533,8 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::generate_raw_intext(
         ASM(MOV64ri, dst, (uint64_t{1} << from) - 1);
         ASM(AND64rr, dst, src);
       } else {
-        ScratchReg tmp{this};
-        AsmReg tmp_reg = tmp.alloc_gp();
-        ASM(MOV64ri, tmp_reg, (uint64_t{1} << from) - 1);
-        ASM(AND64rr, dst, tmp_reg);
+        ASM(SHL64ri, dst, 64 - from);
+        ASM(SHR64ri, dst, 64 - from);
       }
     }
   } else if (to <= 32) {

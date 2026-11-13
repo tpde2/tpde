@@ -581,8 +581,8 @@ define i37 @load_i33_zext_i37(ptr %a) {
 ; X64-NEXT:    movzx edi, byte ptr [rdi + 0x4]
 ; X64-NEXT:    shl rdi, 0x20
 ; X64-NEXT:    or rdi, rax
-; X64-NEXT:    movabs rax, 0x1ffffffff
-; X64-NEXT:    and rdi, rax
+; X64-NEXT:    shl rdi, 0x1f
+; X64-NEXT:    shr rdi, 0x1f
 ; X64-NEXT:    mov rax, rdi
 ; X64-NEXT:    ret
 ;
@@ -627,8 +627,8 @@ define i64 @load_i33_zext_i64(ptr %a) {
 ; X64-NEXT:    movzx edi, byte ptr [rdi + 0x4]
 ; X64-NEXT:    shl rdi, 0x20
 ; X64-NEXT:    or rdi, rax
-; X64-NEXT:    movabs rax, 0x1ffffffff
-; X64-NEXT:    and rdi, rax
+; X64-NEXT:    shl rdi, 0x1f
+; X64-NEXT:    shr rdi, 0x1f
 ; X64-NEXT:    mov rax, rdi
 ; X64-NEXT:    ret
 ;
@@ -675,8 +675,8 @@ define i128 @load_i33_zext_i128(ptr %a) {
 ; X64-NEXT:    movzx edi, byte ptr [rdi + 0x4]
 ; X64-NEXT:    shl rdi, 0x20
 ; X64-NEXT:    or rdi, rax
-; X64-NEXT:    movabs rax, 0x1ffffffff
-; X64-NEXT:    and rdi, rax
+; X64-NEXT:    shl rdi, 0x1f
+; X64-NEXT:    shr rdi, 0x1f
 ; X64-NEXT:    xor eax, eax
 ; X64-NEXT:    mov qword ptr [rbp - 0x38], rax
 ; X64-NEXT:    mov rax, rdi

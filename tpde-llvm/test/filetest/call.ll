@@ -1646,8 +1646,8 @@ define void @call_fn_v_i1z_i1s_i37z_i37s(i1 %a, i1 %b, i37 %c, i37 %d) {
 ; X64-NEXT:    and edi, 0x1
 ; X64-NEXT:    and esi, 0x1
 ; X64-NEXT:    neg rsi
-; X64-NEXT:    movabs rax, 0x1fffffffff
-; X64-NEXT:    and rdx, rax
+; X64-NEXT:    shl rdx, 0x1b
+; X64-NEXT:    shr rdx, 0x1b
 ; X64-NEXT:    shl rcx, 0x1b
 ; X64-NEXT:    sar rcx, 0x1b
 ; X64-NEXT:    call <L0>
@@ -1771,8 +1771,7 @@ define void @call_fn_v_stack_i1z_i1s_i37z_i37s(i1 %a, i1 %b, i37 %c, i37 %d) {
 ; X64-LABEL: <call_fn_v_stack_i1z_i1s_i37z_i37s>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    push rbx
-; X64-NEXT:    sub rsp, 0x68
+; X64-NEXT:    sub rsp, 0x70
 ; X64-NEXT:    mov byte ptr [rbp - 0x29], dil
 ; X64-NEXT:    xor edi, edi
 ; X64-NEXT:    mov byte ptr [rbp - 0x2a], sil
@@ -1795,8 +1794,8 @@ define void @call_fn_v_stack_i1z_i1s_i37z_i37s(i1 %a, i1 %b, i37 %c, i37 %d) {
 ; X64-NEXT:    neg rax
 ; X64-NEXT:    mov qword ptr [rsp + 0x18], rax
 ; X64-NEXT:    mov rax, qword ptr [rbp - 0x38]
-; X64-NEXT:    movabs rbx, 0x1fffffffff
-; X64-NEXT:    and rax, rbx
+; X64-NEXT:    shl rax, 0x1b
+; X64-NEXT:    shr rax, 0x1b
 ; X64-NEXT:    mov qword ptr [rsp + 0x20], rax
 ; X64-NEXT:    mov rax, qword ptr [rbp - 0x40]
 ; X64-NEXT:    shl rax, 0x1b
@@ -1805,8 +1804,7 @@ define void @call_fn_v_stack_i1z_i1s_i37z_i37s(i1 %a, i1 %b, i37 %c, i37 %d) {
 ; X64-NEXT:    call <L0>
 ; X64-NEXT:     R_X86_64_PLT32 fn_v_stack_i1z_i1s_i37z_i37s-0x4
 ; X64-NEXT:  <L0>:
-; X64-NEXT:    add rsp, 0x68
-; X64-NEXT:    pop rbx
+; X64-NEXT:    add rsp, 0x70
 ; X64-NEXT:    pop rbp
 ; X64-NEXT:    ret
 ;

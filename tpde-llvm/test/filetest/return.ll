@@ -460,8 +460,8 @@ entry:
 
 define zeroext i41 @ret_i41_zext(i41 %a) {
 ; X64-LABEL: <ret_i41_zext>:
-; X64:         movabs rax, 0x1ffffffffff
-; X64-NEXT:    and rdi, rax
+; X64:         shl rdi, 0x17
+; X64-NEXT:    shr rdi, 0x17
 ; X64-NEXT:    mov eax, edi
 ; X64-NEXT:    ret
 ;

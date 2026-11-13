@@ -41,10 +41,10 @@ define i32 @umaxi32(i32 %0, i32 %1) {
 
 define i37 @umaxi37(i37 %0, i37 %1) {
 ; X64-LABEL: <umaxi37>:
-; X64:         movabs rax, 0x1fffffffff
-; X64-NEXT:    and rdi, rax
-; X64-NEXT:    movabs rax, 0x1fffffffff
-; X64-NEXT:    and rsi, rax
+; X64:         shl rdi, 0x1b
+; X64-NEXT:    shr rdi, 0x1b
+; X64-NEXT:    shl rsi, 0x1b
+; X64-NEXT:    shr rsi, 0x1b
 ; X64-NEXT:    cmp rdi, rsi
 ; X64-NEXT:    cmova rsi, rdi
 ; X64-NEXT:    mov rax, rsi

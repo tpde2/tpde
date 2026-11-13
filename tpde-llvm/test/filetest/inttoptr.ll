@@ -64,8 +64,8 @@ entry:
 
 define ptr @i37_to_ptr(i37 %0) {
 ; X64-LABEL: <i37_to_ptr>:
-; X64:         movabs rax, 0x1fffffffff
-; X64-NEXT:    and rdi, rax
+; X64:         shl rdi, 0x1b
+; X64-NEXT:    shr rdi, 0x1b
 ; X64-NEXT:    mov rax, rdi
 ; X64-NEXT:    ret
 ;

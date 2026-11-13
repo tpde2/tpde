@@ -1018,8 +1018,8 @@ define void @icmp_sle_i64_1(i64 %0) {
 
 define void @icmp_eq_i37_0(i37 %0) {
 ; X64-LABEL: <icmp_eq_i37_0>:
-; X64:         movabs rax, 0x1fffffffff
-; X64-NEXT:    and rdi, rax
+; X64:         shl rdi, 0x1b
+; X64-NEXT:    shr rdi, 0x1b
 ; X64-NEXT:    test rdi, rdi
 ; X64-NEXT:    sete al
 ; X64-NEXT:    ret
@@ -1036,8 +1036,8 @@ define void @icmp_eq_i37_0(i37 %0) {
 
 define void @icmp_ne_i37_0(i37 %0) {
 ; X64-LABEL: <icmp_ne_i37_0>:
-; X64:         movabs rax, 0x1fffffffff
-; X64-NEXT:    and rdi, rax
+; X64:         shl rdi, 0x1b
+; X64-NEXT:    shr rdi, 0x1b
 ; X64-NEXT:    test rdi, rdi
 ; X64-NEXT:    setne al
 ; X64-NEXT:    ret
@@ -1054,8 +1054,8 @@ define void @icmp_ne_i37_0(i37 %0) {
 
 define void @icmp_eq_i37_1(i37 %0) {
 ; X64-LABEL: <icmp_eq_i37_1>:
-; X64:         movabs rax, 0x1fffffffff
-; X64-NEXT:    and rdi, rax
+; X64:         shl rdi, 0x1b
+; X64-NEXT:    shr rdi, 0x1b
 ; X64-NEXT:    cmp rdi, 0x1
 ; X64-NEXT:    sete al
 ; X64-NEXT:    ret
@@ -1072,8 +1072,8 @@ define void @icmp_eq_i37_1(i37 %0) {
 
 define void @icmp_eq_i37_-1(i37 %0) {
 ; X64-LABEL: <icmp_eq_i37_-1>:
-; X64:         movabs rax, 0x1fffffffff
-; X64-NEXT:    and rdi, rax
+; X64:         shl rdi, 0x1b
+; X64-NEXT:    shr rdi, 0x1b
 ; X64-NEXT:    movabs rax, 0x1fffffffff
 ; X64-NEXT:    cmp rdi, rax
 ; X64-NEXT:    sete al
@@ -1092,8 +1092,8 @@ define void @icmp_eq_i37_-1(i37 %0) {
 
 define void @icmp_eq_i37_f000(i37 %0) {
 ; X64-LABEL: <icmp_eq_i37_f000>:
-; X64:         movabs rax, 0x1fffffffff
-; X64-NEXT:    and rdi, rax
+; X64:         shl rdi, 0x1b
+; X64-NEXT:    shr rdi, 0x1b
 ; X64-NEXT:    cmp rdi, 0xf000
 ; X64-NEXT:    sete al
 ; X64-NEXT:    ret
@@ -1110,8 +1110,8 @@ define void @icmp_eq_i37_f000(i37 %0) {
 
 define void @icmp_eq_i37_1001(i37 %0) {
 ; X64-LABEL: <icmp_eq_i37_1001>:
-; X64:         movabs rax, 0x1fffffffff
-; X64-NEXT:    and rdi, rax
+; X64:         shl rdi, 0x1b
+; X64-NEXT:    shr rdi, 0x1b
 ; X64-NEXT:    cmp rdi, 0x1001
 ; X64-NEXT:    sete al
 ; X64-NEXT:    ret
@@ -1129,10 +1129,10 @@ define void @icmp_eq_i37_1001(i37 %0) {
 
 define void @icmp_eq_i37_i37(i37 %0, i37 %1) {
 ; X64-LABEL: <icmp_eq_i37_i37>:
-; X64:         movabs rax, 0x1fffffffff
-; X64-NEXT:    and rdi, rax
-; X64-NEXT:    movabs rax, 0x1fffffffff
-; X64-NEXT:    and rsi, rax
+; X64:         shl rdi, 0x1b
+; X64-NEXT:    shr rdi, 0x1b
+; X64-NEXT:    shl rsi, 0x1b
+; X64-NEXT:    shr rsi, 0x1b
 ; X64-NEXT:    cmp rdi, rsi
 ; X64-NEXT:    sete al
 ; X64-NEXT:    ret
@@ -1171,8 +1171,8 @@ define void @icmp_sgt_i37_i37(i37 %0, i37 %1) {
 
 define void @icmp_ugt_i37_1(i37 %0) {
 ; X64-LABEL: <icmp_ugt_i37_1>:
-; X64:         movabs rax, 0x1fffffffff
-; X64-NEXT:    and rdi, rax
+; X64:         shl rdi, 0x1b
+; X64-NEXT:    shr rdi, 0x1b
 ; X64-NEXT:    cmp rdi, 0x1
 ; X64-NEXT:    seta al
 ; X64-NEXT:    ret
@@ -1189,8 +1189,8 @@ define void @icmp_ugt_i37_1(i37 %0) {
 
 define void @icmp_uge_i37_1(i37 %0) {
 ; X64-LABEL: <icmp_uge_i37_1>:
-; X64:         movabs rax, 0x1fffffffff
-; X64-NEXT:    and rdi, rax
+; X64:         shl rdi, 0x1b
+; X64-NEXT:    shr rdi, 0x1b
 ; X64-NEXT:    cmp rdi, 0x1
 ; X64-NEXT:    setae al
 ; X64-NEXT:    ret
@@ -1207,8 +1207,8 @@ define void @icmp_uge_i37_1(i37 %0) {
 
 define void @icmp_ult_i37_1(i37 %0) {
 ; X64-LABEL: <icmp_ult_i37_1>:
-; X64:         movabs rax, 0x1fffffffff
-; X64-NEXT:    and rdi, rax
+; X64:         shl rdi, 0x1b
+; X64-NEXT:    shr rdi, 0x1b
 ; X64-NEXT:    cmp rdi, 0x1
 ; X64-NEXT:    setb al
 ; X64-NEXT:    ret
@@ -1225,8 +1225,8 @@ define void @icmp_ult_i37_1(i37 %0) {
 
 define void @icmp_ule_i37_1(i37 %0) {
 ; X64-LABEL: <icmp_ule_i37_1>:
-; X64:         movabs rax, 0x1fffffffff
-; X64-NEXT:    and rdi, rax
+; X64:         shl rdi, 0x1b
+; X64-NEXT:    shr rdi, 0x1b
 ; X64-NEXT:    cmp rdi, 0x1
 ; X64-NEXT:    setbe al
 ; X64-NEXT:    ret

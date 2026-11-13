@@ -283,12 +283,12 @@ define x86_fp80 @uitofp_37(i37 %v) {
 ; X64-LABEL: <uitofp_37>:
 ; X64:         push rbp
 ; X64-NEXT:    mov rbp, rsp
-; X64-NEXT:    movabs rax, 0x1fffffffff
-; X64-NEXT:    and rdi, rax
+; X64-NEXT:    shl rdi, 0x1b
+; X64-NEXT:    shr rdi, 0x1b
 ; X64-NEXT:    mov qword ptr [rbp - 0x40], rdi
 ; X64-NEXT:    fild qword ptr [rbp - 0x40]
 ; X64-NEXT:    shr rdi, 0x3f
-; X64-NEXT:    lea rax, <uitofp_37+0x1b>
+; X64-NEXT:    lea rax, <uitofp_37+0x16>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    fadd dword ptr [rax + 4*rdi]
 ; X64-NEXT:    fstp tbyte ptr [rbp - 0x40]
@@ -372,12 +372,12 @@ define x86_fp80 @uitofp_37_twice(i37 %v) {
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    fadd dword ptr [rcx + 4*rax]
 ; X64-NEXT:    fstp tbyte ptr [rbp - 0x40]
-; X64-NEXT:    movabs rax, 0x1fffffffff
-; X64-NEXT:    and rdi, rax
+; X64-NEXT:    shl rdi, 0x1b
+; X64-NEXT:    shr rdi, 0x1b
 ; X64-NEXT:    mov qword ptr [rbp - 0x40], rdi
 ; X64-NEXT:    fild qword ptr [rbp - 0x40]
 ; X64-NEXT:    shr rdi, 0x3f
-; X64-NEXT:    lea rax, <uitofp_37_twice+0x40>
+; X64-NEXT:    lea rax, <uitofp_37_twice+0x3b>
 ; X64-NEXT:     R_X86_64_PC32 -0x4
 ; X64-NEXT:    fadd dword ptr [rax + 4*rdi]
 ; X64-NEXT:    fstp tbyte ptr [rbp - 0x40]
