@@ -115,8 +115,8 @@ u8* loadreli64(u8 *ptr, i64 off) { return &ptr[*(i32 *)(ptr + off)]; }
 // stores
 // --------------------------
 
-void TARGET_V1 storei8(u8* ptr, u8 value) { *ptr = value; }
-void TARGET_V1 storei16(u16* ptr, u16 value) { *ptr = value; }
+void TARGET_V1 storei8(u8* ptr, u32 value) { *ptr = (u8)value; }
+void TARGET_V1 storei16(u16* ptr, u32 value) { *ptr = (u16)value; }
 void TARGET_V1 storei32(u32* ptr, u32 value) { *ptr = value; }
 void TARGET_V1 storei64(u64* ptr, u64 value) { *ptr = value; }
 
@@ -224,25 +224,27 @@ u128 TARGET_V1 ashri128_ge64(i128 a, u64 amt) {
 }
 
 // NB: UB if c is a multiple of the shift amount, but code seems ok.
-u8 TARGET_V1 fshli8(u8 a, u8 b, u8 c) { return a << (c%8) | b >> (8 - (c%8)); }
-u16 TARGET_V1 fshli16(u16 a, u16 b, u16 c) { return a << (c%16) | b >> (16 - (c%16)); }
+u8 TARGET_V1 fshli8(u32 a, u32 b, u32 c) { return (u8)a << (c%8) | (u8)b >> (8 - (c%8)); }
+u16 TARGET_V1 fshli16(u32 a, u32 b, u32 c) { return (u16)a << (c%16) | (u16)b >> (16 - (c%16)); }
 u32 TARGET_V1 fshli32(u32 a, u32 b, u32 c) { return a << (c%32) | b >> (32 - (c%32)); }
 u64 TARGET_V1 fshli64(u64 a, u64 b, u64 c) { return a << (c%64) | b >> (64 - (c%64)); }
 
-u8 TARGET_V1 fshri8(u8 a, u8 b, u8 c) { return b >> (c%8) | a << (8 - (c%8)); }
-u16 TARGET_V1 fshri16(u16 a, u16 b, u16 c) { return b >> (c%16) | a << (16 - (c%16)); }
+u8 TARGET_V1 fshri8(u32 a, u32 b, u32 c) { return (u8)b >> (c%8) | (u8)a << (8 - (c%8)); }
+u16 TARGET_V1 fshri16(u32 a, u32 b, u32 c) { return (u16)b >> (c%16) | (u16)a << (16 - (c%16)); }
 u32 TARGET_V1 fshri32(u32 a, u32 b, u32 c) { return b >> (c%32) | a << (32 - (c%32)); }
 u64 TARGET_V1 fshri64(u64 a, u64 b, u64 c) { return b >> (c%64) | a << (64 - (c%64)); }
 
-u8 TARGET_V1 roli8(u8 a, u8 c) { return c ? (a << (c&7) | a >> (8 - (c&7))) : a; }
-u16 TARGET_V1 roli16(u16 a, u16 c) { return c ? (a << (c&15) | a >> (16 - (c&15))) : a; }
-u32 TARGET_V1 roli32(u32 a, u32 c) { return c ? (a << (c&31) | a >> (32 - (c&31))) : a; }
-u64 TARGET_V1 roli64(u64 a, u64 c) { return c ? (a << (c&63) | a >> (64 - (c&63))) : a; }
+// Call funneled shifts, which are simplified before inlining. InstCombine has
+// problems recognizing the funneled shifts after truncations.
+u8 TARGET_V1 roli8(u32 a, u32 c) { return fshli8(a, a, c); }
+u16 TARGET_V1 roli16(u32 a, u32 c) { return fshli16(a, a, c); }
+u32 TARGET_V1 roli32(u32 a, u32 c) { return fshli32(a, a, c); }
+u64 TARGET_V1 roli64(u64 a, u64 c) { return fshli64(a, a, c); }
 
-u8 TARGET_V1 rori8(u8 a, u8 c) { return c ? (a >> (c&7) | a << (8 - (c&7))) : a; }
-u16 TARGET_V1 rori16(u16 a, u16 c) { return c ? (a >> (c&15) | a << (16 - (c&15))) : a; }
-u32 TARGET_V1 rori32(u32 a, u32 c) { return c ? (a >> (c&31) | a << (32 - (c&31))) : a; }
-u64 TARGET_V1 rori64(u64 a, u64 c) { return c ? (a >> (c&63) | a << (64 - (c&63))) : a; }
+u8 TARGET_V1 rori8(u32 a, u32 c) { return fshri8(a, a, c); }
+u16 TARGET_V1 rori16(u32 a, u32 c) { return fshri16(a, a, c); }
+u32 TARGET_V1 rori32(u32 a, u32 c) { return fshri32(a, a, c); }
+u64 TARGET_V1 rori64(u64 a, u64 c) { return fshri64(a, a, c); }
 
 u32 TARGET_V1 smini32(u32 a, u32 b) { return (i32)a < (i32)b ? a : b; }
 u64 TARGET_V1 smini64(u64 a, u64 b) { return (i64)a < (i64)b ? a : b; }
@@ -264,7 +266,7 @@ i64 TARGET_V1 ucmpi64(u64 a, u64 b) { return a < b ? -1 : a > b; }
 i64 TARGET_V1 scmpi128(i128 a, i128 b) { return a < b ? -1 : a > b; }
 i64 TARGET_V1 ucmpi128(u128 a, u128 b) { return a < b ? -1 : a > b; }
 
-u16 TARGET_V1 bswapi16(u16 a) { return __builtin_bswap16(a); }
+u16 TARGET_V1 bswapi16(u32 a) { return __builtin_bswap16(a); }
 u32 TARGET_V1 bswapi32(u32 a) { return __builtin_bswap32(a); }
 u64 TARGET_V1 bswapi48(u64 a) { return __builtin_bswap64(a) >> 16; }
 u64 TARGET_V1 bswapi64(u64 a) { return __builtin_bswap64(a); }
@@ -340,14 +342,14 @@ OF_OPS(64)
 // saturating arithmetic
 // --------------------------
 
-u8 TARGET_V1 sat_add_u8(u8 a, u8 b) { u8 r; return __builtin_add_overflow(a, b, &r) ? UINT8_MAX : r; }
-u8 TARGET_V1 sat_sub_u8(u8 a, u8 b) { u8 r; return __builtin_sub_overflow(a, b, &r) ? 0 : r; }
-i8 TARGET_V1 sat_add_i8(i8 a, i8 b) { i8 r; return __builtin_add_overflow(a, b, &r) ? a < 0 ? INT8_MIN : INT8_MAX : r; }
-i8 TARGET_V1 sat_sub_i8(i8 a, i8 b) { i8 r; return __builtin_sub_overflow(a, b, &r) ? a < 0 ? INT8_MIN : INT8_MAX : r; }
-u16 TARGET_V1 sat_add_u16(u16 a, u16 b) { u16 r; return __builtin_add_overflow(a, b, &r) ? UINT16_MAX : r; }
-u16 TARGET_V1 sat_sub_u16(u16 a, u16 b) { u16 r; return __builtin_sub_overflow(a, b, &r) ? 0 : r; }
-i16 TARGET_V1 sat_add_i16(i16 a, i16 b) { i16 r; return __builtin_add_overflow(a, b, &r) ? a < 0 ? INT16_MIN : INT16_MAX : r; }
-i16 TARGET_V1 sat_sub_i16(i16 a, i16 b) { i16 r; return __builtin_sub_overflow(a, b, &r) ? a < 0 ? INT16_MIN : INT16_MAX : r; }
+u8 TARGET_V1 sat_add_u8(u32 a, u32 b) { u8 r; return __builtin_add_overflow((u8)a, (u8)b, &r) ? UINT8_MAX : r; }
+u8 TARGET_V1 sat_sub_u8(u32 a, u32 b) { u8 r; return __builtin_sub_overflow((u8)a, (u8)b, &r) ? 0 : r; }
+i8 TARGET_V1 sat_add_i8(u32 a, u32 b) { i8 r; return __builtin_add_overflow((i8)a, (i8)b, &r) ? (i8)a < 0 ? INT8_MIN : INT8_MAX : r; }
+i8 TARGET_V1 sat_sub_i8(u32 a, u32 b) { i8 r; return __builtin_sub_overflow((i8)a, (i8)b, &r) ? (i8)a < 0 ? INT8_MIN : INT8_MAX : r; }
+u16 TARGET_V1 sat_add_u16(u32 a, u32 b) { u16 r; return __builtin_add_overflow((u16)a, (u16)b, &r) ? UINT16_MAX : r; }
+u16 TARGET_V1 sat_sub_u16(u32 a, u32 b) { u16 r; return __builtin_sub_overflow((u16)a, (u16)b, &r) ? 0 : r; }
+i16 TARGET_V1 sat_add_i16(u32 a, u32 b) { i16 r; return __builtin_add_overflow((i16)a, (i16)b, &r) ? (i16)a < 0 ? INT16_MIN : INT16_MAX : r; }
+i16 TARGET_V1 sat_sub_i16(u32 a, u32 b) { i16 r; return __builtin_sub_overflow((i16)a, (i16)b, &r) ? (i16)a < 0 ? INT16_MIN : INT16_MAX : r; }
 u32 TARGET_V1 sat_add_u32(u32 a, u32 b) { u32 r; return __builtin_add_overflow(a, b, &r) ? UINT32_MAX : r; }
 u32 TARGET_V1 sat_sub_u32(u32 a, u32 b) { u32 r; return __builtin_sub_overflow(a, b, &r) ? 0 : r; }
 i32 TARGET_V1 sat_add_i32(i32 a, i32 b) { i32 r; return __builtin_add_overflow(a, b, &r) ? a < 0 ? INT32_MIN : INT32_MAX : r; }
@@ -579,22 +581,22 @@ i64 TARGET_V1 f64toi64_sat(double a) { return llvm_fptosi_sat_i64_double(a); }
 u64 TARGET_V1 llvm_fptoui_sat_i64_double(double) __asm__("llvm.fptoui.sat.i64.f64");
 u64 TARGET_V1 f64tou64_sat(double a) { return llvm_fptoui_sat_i64_double(a); }
 
-float TARGET_V1 i8tof32(u8 a) { return (float)(i8)a; }
-float TARGET_V1 i16tof32(u16 a) { return (float)(i16)a; }
+float TARGET_V1 i8tof32(u32 a) { return (float)(i8)a; }
+float TARGET_V1 i16tof32(u32 a) { return (float)(i16)a; }
 float TARGET_V1 i32tof32(u32 a) { return (float)(i32)a; }
 float TARGET_V1 i64tof32(u64 a) { return (float)(i64)a; }
-float TARGET_V1 u8tof32(i8 a) { return (float)(u8)a; }
-float TARGET_V1 u16tof32(i16 a) { return (float)(u16)a; }
-float TARGET_V1 u32tof32(i32 a) { return (float)(u32)a; }
-float TARGET_V1 u64tof32(i64 a) { return (float)(u64)a; }
+float TARGET_V1 u8tof32(u32 a) { return (float)(u8)a; }
+float TARGET_V1 u16tof32(u32 a) { return (float)(u16)a; }
+float TARGET_V1 u32tof32(u32 a) { return (float)(u32)a; }
+float TARGET_V1 u64tof32(u64 a) { return (float)(u64)a; }
 
-double TARGET_V1 i8tof64(u8 a) { return (double)(i8)a; }
-double TARGET_V1 i16tof64(u16 a) { return (double)(i16)a; }
+double TARGET_V1 i8tof64(u32 a) { return (double)(i8)a; }
+double TARGET_V1 i16tof64(u32 a) { return (double)(i16)a; }
 double TARGET_V1 i32tof64(u32 a) { return (double)(i32)a; }
 double TARGET_V1 i64tof64(u64 a) { return (double)(i64)a; }
-double TARGET_V1 u8tof64(i8 a) { return (double)(u8)a; }
-double TARGET_V1 u16tof64(i16 a) { return (double)(u16)a; }
-double TARGET_V1 u32tof64(i32 a) { return (double)(u32)a; }
+double TARGET_V1 u8tof64(u32 a) { return (double)(u8)a; }
+double TARGET_V1 u16tof64(u32 a) { return (double)(u16)a; }
+double TARGET_V1 u32tof64(u32 a) { return (double)(u32)a; }
 double TARGET_V1 u64tof64(i64 a) { return (double)(u64)a; }
 
 // --------------------------
@@ -651,41 +653,41 @@ u32 TARGET_V1 atomic_load_u16_seqcst(u16* ptr) { return __atomic_load_n(ptr, __A
 u32 TARGET_V1 atomic_load_u32_seqcst(u32* ptr) { return __atomic_load_n(ptr, __ATOMIC_SEQ_CST); }
 u64 TARGET_V1 atomic_load_u64_seqcst(u64* ptr) { return __atomic_load_n(ptr, __ATOMIC_SEQ_CST); }
 
-void TARGET_V1 atomic_store_u8_mono(u8* ptr, u8 v) { __atomic_store_n(ptr, v, __ATOMIC_RELAXED); }
-void TARGET_V1 atomic_store_u16_mono(u16* ptr, u16 v) { __atomic_store_n(ptr, v, __ATOMIC_RELAXED); }
+void TARGET_V1 atomic_store_u8_mono(u8* ptr, u32 v) { __atomic_store_n(ptr, (u8)v, __ATOMIC_RELAXED); }
+void TARGET_V1 atomic_store_u16_mono(u16* ptr, u32 v) { __atomic_store_n(ptr, (u16)v, __ATOMIC_RELAXED); }
 void TARGET_V1 atomic_store_u32_mono(u32* ptr, u32 v) { __atomic_store_n(ptr, v, __ATOMIC_RELAXED); }
 void TARGET_V1 atomic_store_u64_mono(u64* ptr, u64 v) { __atomic_store_n(ptr, v, __ATOMIC_RELAXED); }
-void TARGET_V1 atomic_store_u8_rel(u8* ptr, u8 v) { __atomic_store_n(ptr, v, __ATOMIC_RELEASE); }
-void TARGET_V1 atomic_store_u16_rel(u16* ptr, u16 v) { __atomic_store_n(ptr, v, __ATOMIC_RELEASE); }
+void TARGET_V1 atomic_store_u8_rel(u8* ptr, u32 v) { __atomic_store_n(ptr, (u8)v, __ATOMIC_RELEASE); }
+void TARGET_V1 atomic_store_u16_rel(u16* ptr, u32 v) { __atomic_store_n(ptr, (u16)v, __ATOMIC_RELEASE); }
 void TARGET_V1 atomic_store_u32_rel(u32* ptr, u32 v) { __atomic_store_n(ptr, v, __ATOMIC_RELEASE); }
 void TARGET_V1 atomic_store_u64_rel(u64* ptr, u64 v) { __atomic_store_n(ptr, v, __ATOMIC_RELEASE); }
-void TARGET_V1 atomic_store_u8_seqcst(u8* ptr, u8 v) { __atomic_store_n(ptr, v, __ATOMIC_SEQ_CST); }
-void TARGET_V1 atomic_store_u16_seqcst(u16* ptr, u16 v) { __atomic_store_n(ptr, v, __ATOMIC_SEQ_CST); }
+void TARGET_V1 atomic_store_u8_seqcst(u8* ptr, u32 v) { __atomic_store_n(ptr, (u8)v, __ATOMIC_SEQ_CST); }
+void TARGET_V1 atomic_store_u16_seqcst(u16* ptr, u32 v) { __atomic_store_n(ptr, (u16)v, __ATOMIC_SEQ_CST); }
 void TARGET_V1 atomic_store_u32_seqcst(u32* ptr, u32 v) { __atomic_store_n(ptr, v, __ATOMIC_SEQ_CST); }
 void TARGET_V1 atomic_store_u64_seqcst(u64* ptr, u64 v) { __atomic_store_n(ptr, v, __ATOMIC_SEQ_CST); }
 
-u32 TARGET_V1 atomic_xchg_u8_seqcst(u8 *p, u8 v) { return __atomic_exchange_n(p, v, __ATOMIC_SEQ_CST); }
-u32 TARGET_V1 atomic_add_u8_seqcst(u8 *p, u8 v) { return __atomic_fetch_add(p, v, __ATOMIC_SEQ_CST); }
-u32 TARGET_V1 atomic_sub_u8_seqcst(u8 *p, u8 v) { return __atomic_fetch_sub(p, v, __ATOMIC_SEQ_CST); }
-u32 TARGET_V1 atomic_and_u8_seqcst(u8 *p, u8 v) { return __atomic_fetch_and(p, v, __ATOMIC_SEQ_CST); }
-u32 TARGET_V1 atomic_nand_u8_seqcst(u8 *p, u8 v) { return __atomic_fetch_nand(p, v, __ATOMIC_SEQ_CST); }
-u32 TARGET_V1 atomic_or_u8_seqcst(u8 *p, u8 v) { return __atomic_fetch_or(p, v, __ATOMIC_SEQ_CST); }
-u32 TARGET_V1 atomic_xor_u8_seqcst(u8 *p, u8 v) { return __atomic_fetch_xor(p, v, __ATOMIC_SEQ_CST); }
+u32 TARGET_V1 atomic_xchg_u8_seqcst(u8 *p, u32 v) { return __atomic_exchange_n(p, (u8)v, __ATOMIC_SEQ_CST); }
+u32 TARGET_V1 atomic_add_u8_seqcst(u8 *p, u32 v) { return __atomic_fetch_add(p, (u8)v, __ATOMIC_SEQ_CST); }
+u32 TARGET_V1 atomic_sub_u8_seqcst(u8 *p, u32 v) { return __atomic_fetch_sub(p, (u8)v, __ATOMIC_SEQ_CST); }
+u32 TARGET_V1 atomic_and_u8_seqcst(u8 *p, u32 v) { return __atomic_fetch_and(p, (u8)v, __ATOMIC_SEQ_CST); }
+u32 TARGET_V1 atomic_nand_u8_seqcst(u8 *p, u32 v) { return __atomic_fetch_nand(p, (u8)v, __ATOMIC_SEQ_CST); }
+u32 TARGET_V1 atomic_or_u8_seqcst(u8 *p, u32 v) { return __atomic_fetch_or(p, (u8)v, __ATOMIC_SEQ_CST); }
+u32 TARGET_V1 atomic_xor_u8_seqcst(u8 *p, u32 v) { return __atomic_fetch_xor(p, (u8)v, __ATOMIC_SEQ_CST); }
 u32 TARGET_V1 atomic_min_i8_seqcst(i8 *p, i8 v) { return __atomic_fetch_min(p, v, __ATOMIC_SEQ_CST); }
 u32 TARGET_V1 atomic_max_i8_seqcst(i8 *p, i8 v) { return __atomic_fetch_max(p, v, __ATOMIC_SEQ_CST); }
-u32 TARGET_V1 atomic_min_u8_seqcst(u8 *p, u8 v) { return __atomic_fetch_min(p, v, __ATOMIC_SEQ_CST); }
-u32 TARGET_V1 atomic_max_u8_seqcst(u8 *p, u8 v) { return __atomic_fetch_max(p, v, __ATOMIC_SEQ_CST); }
-u32 TARGET_V1 atomic_xchg_u16_seqcst(u16 *p, u16 v) { return __atomic_exchange_n(p, v, __ATOMIC_SEQ_CST); }
-u32 TARGET_V1 atomic_add_u16_seqcst(u16 *p, u16 v) { return __atomic_fetch_add(p, v, __ATOMIC_SEQ_CST); }
-u32 TARGET_V1 atomic_sub_u16_seqcst(u16 *p, u16 v) { return __atomic_fetch_sub(p, v, __ATOMIC_SEQ_CST); }
-u32 TARGET_V1 atomic_and_u16_seqcst(u16 *p, u16 v) { return __atomic_fetch_and(p, v, __ATOMIC_SEQ_CST); }
-u32 TARGET_V1 atomic_nand_u16_seqcst(u16 *p, u16 v) { return __atomic_fetch_nand(p, v, __ATOMIC_SEQ_CST); }
-u32 TARGET_V1 atomic_or_u16_seqcst(u16 *p, u16 v) { return __atomic_fetch_or(p, v, __ATOMIC_SEQ_CST); }
-u32 TARGET_V1 atomic_xor_u16_seqcst(u16 *p, u16 v) { return __atomic_fetch_xor(p, v, __ATOMIC_SEQ_CST); }
+u32 TARGET_V1 atomic_min_u8_seqcst(u8 *p, u32 v) { return __atomic_fetch_min(p, (u8)v, __ATOMIC_SEQ_CST); }
+u32 TARGET_V1 atomic_max_u8_seqcst(u8 *p, u32 v) { return __atomic_fetch_max(p, (u8)v, __ATOMIC_SEQ_CST); }
+u32 TARGET_V1 atomic_xchg_u16_seqcst(u16 *p, u32 v) { return __atomic_exchange_n(p, (u16)v, __ATOMIC_SEQ_CST); }
+u32 TARGET_V1 atomic_add_u16_seqcst(u16 *p, u32 v) { return __atomic_fetch_add(p, (u16)v, __ATOMIC_SEQ_CST); }
+u32 TARGET_V1 atomic_sub_u16_seqcst(u16 *p, u32 v) { return __atomic_fetch_sub(p, (u16)v, __ATOMIC_SEQ_CST); }
+u32 TARGET_V1 atomic_and_u16_seqcst(u16 *p, u32 v) { return __atomic_fetch_and(p, (u16)v, __ATOMIC_SEQ_CST); }
+u32 TARGET_V1 atomic_nand_u16_seqcst(u16 *p, u32 v) { return __atomic_fetch_nand(p, (u16)v, __ATOMIC_SEQ_CST); }
+u32 TARGET_V1 atomic_or_u16_seqcst(u16 *p, u32 v) { return __atomic_fetch_or(p, (u16)v, __ATOMIC_SEQ_CST); }
+u32 TARGET_V1 atomic_xor_u16_seqcst(u16 *p, u32 v) { return __atomic_fetch_xor(p, (u16)v, __ATOMIC_SEQ_CST); }
 u32 TARGET_V1 atomic_min_i16_seqcst(i16 *p, i16 v) { return __atomic_fetch_min(p, v, __ATOMIC_SEQ_CST); }
 u32 TARGET_V1 atomic_max_i16_seqcst(i16 *p, i16 v) { return __atomic_fetch_max(p, v, __ATOMIC_SEQ_CST); }
-u32 TARGET_V1 atomic_min_u16_seqcst(u16 *p, u16 v) { return __atomic_fetch_min(p, v, __ATOMIC_SEQ_CST); }
-u32 TARGET_V1 atomic_max_u16_seqcst(u16 *p, u16 v) { return __atomic_fetch_max(p, v, __ATOMIC_SEQ_CST); }
+u32 TARGET_V1 atomic_min_u16_seqcst(u16 *p, u32 v) { return __atomic_fetch_min(p, (u16)v, __ATOMIC_SEQ_CST); }
+u32 TARGET_V1 atomic_max_u16_seqcst(u16 *p, u32 v) { return __atomic_fetch_max(p, (u16)v, __ATOMIC_SEQ_CST); }
 u32 TARGET_V1 atomic_xchg_u32_seqcst(u32 *p, u32 v) { return __atomic_exchange_n(p, v, __ATOMIC_SEQ_CST); }
 u32 TARGET_V1 atomic_add_u32_seqcst(u32 *p, u32 v) { return __atomic_fetch_add(p, v, __ATOMIC_SEQ_CST); }
 u32 TARGET_V1 atomic_sub_u32_seqcst(u32 *p, u32 v) { return __atomic_fetch_sub(p, v, __ATOMIC_SEQ_CST); }
@@ -732,12 +734,12 @@ void TARGET_V1 fence_seqcst(void) { __atomic_thread_fence(__ATOMIC_SEQ_CST); }
 // select
 // --------------------------
 
-i32 TARGET_V1 select_i32(u8 cond, i32 val1, i32 val2) { return ((cond & 1) ? val1 : val2); }
-i64 TARGET_V1 select_i64(u8 cond, i64 val1, i64 val2) { return ((cond & 1) ? val1 : val2); }
-i128 TARGET_V1 select_i128(u8 cond, i128 val1, i128 val2) { return ((cond & 1) ? val1 : val2); }
-float TARGET_V1 select_f32(u8 cond, float val1, float val2) { return ((cond & 1) ? val1 : val2); }
-double TARGET_V1 select_f64(u8 cond, double val1, double val2) { return ((cond & 1) ? val1 : val2); }
-v2u64 TARGET_V1 select_v2u64(u8 cond, v2u64 val1, v2u64 val2) { return ((cond & 1) ? val1 : val2); }
+i32 TARGET_V1 select_i32(u32 cond, i32 val1, i32 val2) { return ((cond & 1) ? val1 : val2); }
+i64 TARGET_V1 select_i64(u32 cond, i64 val1, i64 val2) { return ((cond & 1) ? val1 : val2); }
+i128 TARGET_V1 select_i128(u32 cond, i128 val1, i128 val2) { return ((cond & 1) ? val1 : val2); }
+float TARGET_V1 select_f32(u32 cond, float val1, float val2) { return ((cond & 1) ? val1 : val2); }
+double TARGET_V1 select_f64(u32 cond, double val1, double val2) { return ((cond & 1) ? val1 : val2); }
+v2u64 TARGET_V1 select_v2u64(u32 cond, v2u64 val1, v2u64 val2) { return ((cond & 1) ? val1 : val2); }
 
 // --------------------------
 // float comparisons
@@ -772,7 +774,7 @@ FOPS(double)
 // is_fpclass
 // --------------------------
 
-#define FOP(ty, name, num) u8 TARGET_V1 is_fpclass_##name##_##ty(u8 c, ty a) { return c | __builtin_isfpclass(a, (num)); }
+#define FOP(ty, name, num) u8 TARGET_V1 is_fpclass_##name##_##ty(u32 c, ty a) { return c | __builtin_isfpclass(a, (num)); }
 #define FOPS(ty) \
     FOP(ty, snan, 1<<0) \
     FOP(ty, qnan, 1<<1) \
@@ -817,6 +819,6 @@ u32 TARGET_V1 getrounding(void) { return __builtin_flt_rounds(); }
 
 #ifdef __x86_64__
 typedef struct { u8 cf; u64 val; } AdcRes;
-AdcRes TARGET_V1 addcarry64(u8 cin, u64 a, u64 b) { unsigned long long res; u8 cf = __builtin_ia32_addcarryx_u64(cin, a, b, &res); return (AdcRes) {cf, res}; }
-AdcRes TARGET_V1 subborrow64(u8 cin, u64 a, u64 b) { unsigned long long res; u8 cf = __builtin_ia32_subborrow_u64(cin, a, b, &res); return (AdcRes) {cf, res}; }
+AdcRes TARGET_V1 addcarry64(u32 cin, u64 a, u64 b) { unsigned long long res; u8 cf = __builtin_ia32_addcarryx_u64(cin, a, b, &res); return (AdcRes) {cf, res}; }
+AdcRes TARGET_V1 subborrow64(u32 cin, u64 a, u64 b) { unsigned long long res; u8 cf = __builtin_ia32_subborrow_u64(cin, a, b, &res); return (AdcRes) {cf, res}; }
 #endif

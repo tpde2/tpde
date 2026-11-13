@@ -7,26 +7,23 @@
 
 define i8 @ssub_sat_i8(i8, i8) {
 ; X64-LABEL: <ssub_sat_i8>:
-; X64:         xor eax, eax
-; X64-NEXT:    cmp dil, sil
-; X64-NEXT:    setns al
-; X64-NEXT:    add eax, 0x7f
+; X64:         mov eax, edi
+; X64-NEXT:    shr al, 0x7
+; X64-NEXT:    add al, 0x7f
 ; X64-NEXT:    sub dil, sil
 ; X64-NEXT:    movzx ecx, dil
-; X64-NEXT:    cmovo ecx, eax
-; X64-NEXT:    mov eax, ecx
+; X64-NEXT:    movzx eax, al
+; X64-NEXT:    cmovno eax, ecx
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ssub_sat_i8>:
-; ARM64:         sxtb w0, w0
-; ARM64-NEXT:    mov w2, #0x7f // =127
-; ARM64-NEXT:    sub w0, w0, w1, sxtb
-; ARM64-NEXT:    cmp w0, #0x7f
-; ARM64-NEXT:    csel w2, w0, w2, lt
-; ARM64-NEXT:    mov w0, #-0x80 // =-128
-; ARM64-NEXT:    cmn w2, #0x80
-; ARM64-NEXT:    csel w1, w2, w0, gt
-; ARM64-NEXT:    mov w0, w1
+; ARM64:         sxtb w2, w0
+; ARM64-NEXT:    mov w3, #0x7f // =127
+; ARM64-NEXT:    tst w0, #0x80
+; ARM64-NEXT:    cinv w3, w3, ne
+; ARM64-NEXT:    sub w2, w2, w1, sxtb
+; ARM64-NEXT:    cmp w2, w2, sxtb
+; ARM64-NEXT:    csel w0, w3, w2, ne
 ; ARM64-NEXT:    ret
   %r = call i8 @llvm.ssub.sat.i8(i8 %0, i8 %1)
   ret i8 %r
@@ -34,24 +31,23 @@ define i8 @ssub_sat_i8(i8, i8) {
 
 define i16 @ssub_sat_i16(i16, i16) {
 ; X64-LABEL: <ssub_sat_i16>:
-; X64:         xor eax, eax
-; X64-NEXT:    cmp di, si
-; X64-NEXT:    setns al
+; X64:         movzx edi, di
+; X64-NEXT:    mov eax, edi
+; X64-NEXT:    shr eax, 0xf
 ; X64-NEXT:    add eax, 0x7fff
 ; X64-NEXT:    sub di, si
-; X64-NEXT:    cmovno eax, edi
+; X64-NEXT:    cmovo edi, eax
+; X64-NEXT:    mov eax, edi
 ; X64-NEXT:    ret
 ;
 ; ARM64-LABEL: <ssub_sat_i16>:
-; ARM64:         sxth w0, w0
-; ARM64-NEXT:    mov w2, #0x7fff // =32767
-; ARM64-NEXT:    sub w0, w0, w1, sxth
-; ARM64-NEXT:    cmp w0, w2
-; ARM64-NEXT:    csel w0, w0, w2, lt
-; ARM64-NEXT:    mov w2, #-0x8000 // =-32768
-; ARM64-NEXT:    cmn w0, #0x8, lsl #12 // =0x8000
-; ARM64-NEXT:    csel w1, w0, w2, gt
-; ARM64-NEXT:    mov w0, w1
+; ARM64:         sxth w2, w0
+; ARM64-NEXT:    mov w3, #0x7fff // =32767
+; ARM64-NEXT:    tst w0, #0x8000
+; ARM64-NEXT:    cinv w3, w3, ne
+; ARM64-NEXT:    sub w2, w2, w1, sxth
+; ARM64-NEXT:    cmp w2, w2, sxth
+; ARM64-NEXT:    csel w0, w3, w2, ne
 ; ARM64-NEXT:    ret
   %r = call i16 @llvm.ssub.sat.i16(i16 %0, i16 %1)
   ret i16 %r

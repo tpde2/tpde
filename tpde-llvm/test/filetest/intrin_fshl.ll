@@ -10,7 +10,8 @@
 define i8 @fshl_i8_3(i8 %a, i8 %b) {
 ; X64-LABEL: <fshl_i8_3>:
 ; X64:         shl edi, 0x8
-; X64-NEXT:    lea esi, [rdi + rsi]
+; X64-NEXT:    movzx esi, sil
+; X64-NEXT:    or esi, edi
 ; X64-NEXT:    mov eax, 0x3
 ; X64-NEXT:    mov ecx, eax
 ; X64-NEXT:    and cl, 0x7
@@ -35,7 +36,8 @@ define i8 @fshl_i8_3(i8 %a, i8 %b) {
 define i8 @fshl_i8_221(i8 %a, i8 %b) {
 ; X64-LABEL: <fshl_i8_221>:
 ; X64:         shl edi, 0x8
-; X64-NEXT:    lea esi, [rdi + rsi]
+; X64-NEXT:    movzx esi, sil
+; X64-NEXT:    or esi, edi
 ; X64-NEXT:    mov eax, 0xdd
 ; X64-NEXT:    mov ecx, eax
 ; X64-NEXT:    and cl, 0x7
@@ -60,7 +62,8 @@ define i8 @fshl_i8_221(i8 %a, i8 %b) {
 define i8 @fshl_i8_dyn(i8 %a, i8 %b, i8 %c) {
 ; X64-LABEL: <fshl_i8_dyn>:
 ; X64:         shl edi, 0x8
-; X64-NEXT:    lea esi, [rdi + rsi]
+; X64-NEXT:    movzx esi, sil
+; X64-NEXT:    or esi, edi
 ; X64-NEXT:    mov ecx, edx
 ; X64-NEXT:    and cl, 0x7
 ; X64-NEXT:    shl esi, cl
@@ -135,7 +138,8 @@ define i8 @fshl_rotate_i8_dyn(i8 %a, i8 %c) {
 define i16 @fshl_i16_3(i16 %a, i16 %b) {
 ; X64-LABEL: <fshl_i16_3>:
 ; X64:         shl edi, 0x10
-; X64-NEXT:    lea esi, [rdi + rsi]
+; X64-NEXT:    movzx esi, si
+; X64-NEXT:    or esi, edi
 ; X64-NEXT:    mov eax, 0x3
 ; X64-NEXT:    mov ecx, eax
 ; X64-NEXT:    and cl, 0xf
@@ -160,7 +164,8 @@ define i16 @fshl_i16_3(i16 %a, i16 %b) {
 define i16 @fshl_i16_221(i16 %a, i16 %b) {
 ; X64-LABEL: <fshl_i16_221>:
 ; X64:         shl edi, 0x10
-; X64-NEXT:    lea esi, [rdi + rsi]
+; X64-NEXT:    movzx esi, si
+; X64-NEXT:    or esi, edi
 ; X64-NEXT:    mov eax, 0xdd
 ; X64-NEXT:    mov ecx, eax
 ; X64-NEXT:    and cl, 0xf
@@ -185,7 +190,8 @@ define i16 @fshl_i16_221(i16 %a, i16 %b) {
 define i16 @fshl_i16_dyn(i16 %a, i16 %b, i16 %c) {
 ; X64-LABEL: <fshl_i16_dyn>:
 ; X64:         shl edi, 0x10
-; X64-NEXT:    lea esi, [rdi + rsi]
+; X64-NEXT:    movzx esi, si
+; X64-NEXT:    or esi, edi
 ; X64-NEXT:    mov ecx, edx
 ; X64-NEXT:    and cl, 0xf
 ; X64-NEXT:    shl esi, cl
