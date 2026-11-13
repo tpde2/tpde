@@ -450,7 +450,7 @@ define @add4(%a, %b) {
 ; EH-NEXT: DW_CFA_offset: RBP -16
 ; EH-NEXT: DW_CFA_advance_loc: 3 to 0x3a4
 ; EH-NEXT: DW_CFA_def_cfa_register: RBP
-; EH-NEXT: DW_CFA_advance_loc: 19 to 0x3b7
+; EH-NEXT: DW_CFA_advance_loc: 26 to 0x3be
 ; EH-NEXT: DW_CFA_restore_state:
 ; EH-EMPTY:
 ; ASM-LABEL: <add4>:

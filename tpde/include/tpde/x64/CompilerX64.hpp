@@ -693,6 +693,7 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::finish_func(u32 func_idx) {
   u32 prologue_size = 0;
   u32 num_saved_regs = 0;
   u32 rsp_adjustment = 0;
+  u32 eh_prologue_adjust = 0;
 
   // NB: code alignment factor 1, data alignment factor -8.
   this->text_writer.eh_begin_fde(this->get_personality_sym());
@@ -777,6 +778,9 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::finish_func(u32 func_idx) {
       assert(prologue_size < 0x44 && "cannot encode too large prologue in CFI");
       this->text_writer.eh_writer.data()[fde_prologue_adv_off] =
           dwarf::DW_CFA_advance_loc | (prologue_size - 4);
+    } else {
+      // Some part of the prologue is moved to the advance_loc to the epilogue.
+      eh_prologue_adjust = prologue_size - 4;
     }
   }
 
@@ -815,7 +819,8 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::finish_func(u32 func_idx) {
       ASMNC(POPr, FE_BP);
 
       u32 body_start = func_start_off + func_prologue_alloc;
-      this->text_writer.eh_advance(this->text_writer.offset() - body_start);
+      this->text_writer.eh_advance(this->text_writer.offset() - body_start +
+                                   eh_prologue_adjust);
       this->text_writer.eh_write_inst(dwarf::DW_CFA_restore_state);
     }
     ASMNC(RET);
