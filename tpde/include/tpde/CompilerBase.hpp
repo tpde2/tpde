@@ -641,6 +641,8 @@ void CompilerBase<Adaptor, Derived, Config>::CallBuilderBase<
   } else if (!cca.reg.valid()) {
     if (needs_ext) {
       auto ext = std::move(vp).into_extended(&compiler, ext_sign, ext_bits, 64);
+      // Adjust size after extension.
+      cca.size = 8;
       derived()->add_arg_stack(ext, cca);
       ext.reset(&compiler);
     } else {

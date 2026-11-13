@@ -1789,11 +1789,11 @@ define void @call_fn_v_stack_i1z_i1s_i37z_i37s(i1 %a, i1 %b, i37 %c, i37 %d) {
 ; X64-NEXT:    mov qword ptr [rsp + 0x8], rax
 ; X64-NEXT:    movzx eax, byte ptr [rbp - 0x29]
 ; X64-NEXT:    and eax, 0x1
-; X64-NEXT:    mov byte ptr [rsp + 0x10], al
+; X64-NEXT:    mov qword ptr [rsp + 0x10], rax
 ; X64-NEXT:    movzx eax, byte ptr [rbp - 0x2a]
 ; X64-NEXT:    and eax, 0x1
 ; X64-NEXT:    neg rax
-; X64-NEXT:    mov byte ptr [rsp + 0x18], al
+; X64-NEXT:    mov qword ptr [rsp + 0x18], rax
 ; X64-NEXT:    mov rax, qword ptr [rbp - 0x38]
 ; X64-NEXT:    movabs rbx, 0x1fffffffff
 ; X64-NEXT:    and rax, rbx
@@ -1828,10 +1828,10 @@ define void @call_fn_v_stack_i1z_i1s_i37z_i37s(i1 %a, i1 %b, i37 %c, i37 %d) {
 ; ARM64-NEXT:    ldrb w8, [x29, #0xa0]
 ; ARM64-NEXT:    ubfx x8, x8, #0, #1
 ; ARM64-NEXT:    sub sp, sp, #0x20
-; ARM64-NEXT:    strb w8, [sp]
+; ARM64-NEXT:    str x8, [sp]
 ; ARM64-NEXT:    ldrb w8, [x29, #0xa1]
 ; ARM64-NEXT:    sbfx x8, x8, #0, #1
-; ARM64-NEXT:    strb w8, [sp, #0x8]
+; ARM64-NEXT:    str x8, [sp, #0x8]
 ; ARM64-NEXT:    ldr x8, [x29, #0xa8]
 ; ARM64-NEXT:    ubfx x8, x8, #0, #37
 ; ARM64-NEXT:    str x8, [sp, #0x10]
