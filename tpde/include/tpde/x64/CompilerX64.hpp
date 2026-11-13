@@ -1191,7 +1191,7 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::alloca_dynamic(
   ASM(SUB64rr, FE_SP, res_reg);
 
   align = align > 16 ? align : 16;
-  if (elem_size & (align - 1)) {
+  if (align > 16 || elem_size & (align - 1)) {
     assert(align < u32{1} << 31 && "alignment >= 2**31 not implemented");
     ASM(AND64ri, FE_SP, ~(align - 1));
   }

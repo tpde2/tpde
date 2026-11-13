@@ -1403,7 +1403,7 @@ void CompilerA64<Adaptor, Derived, BaseTy, Config>::alloca_dynamic(
   }
 
   align = align > 16 ? align : 16;
-  if (elem_size & (align - 1)) {
+  if (align > 16 || elem_size & (align - 1)) {
     ASM(ANDxi, res_reg, res_reg, ~(u64{align} - 1));
   }
 

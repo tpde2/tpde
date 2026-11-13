@@ -1010,6 +1010,88 @@ bb:
     ret void
 }
 
+define ptr @dyn_align16(i64 %n) {
+; X64-LABEL: <dyn_align16>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    shl rdi, 0x5
+; X64-NEXT:    sub rsp, rdi
+; X64-NEXT:    mov rdi, rsp
+; X64-NEXT:    mov rax, rdi
+; X64-NEXT:    mov rsp, rbp
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <dyn_align16>:
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    lsl x0, x0, #5
+; ARM64-NEXT:    sub x0, sp, x0
+; ARM64-NEXT:    mov sp, x0
+; ARM64-NEXT:    mov sp, x29
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64-NEXT:    ret
+  %p = alloca [32 x i8], i64 %n, align 16
+  ret ptr %p
+}
+
+define ptr @dyn_align32(i64 %n) {
+; X64-LABEL: <dyn_align32>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    shl rdi, 0x5
+; X64-NEXT:    sub rsp, rdi
+; X64-NEXT:    and rsp, -0x20
+; X64-NEXT:    mov rdi, rsp
+; X64-NEXT:    mov rax, rdi
+; X64-NEXT:    mov rsp, rbp
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <dyn_align32>:
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    lsl x0, x0, #5
+; ARM64-NEXT:    sub x0, sp, x0
+; ARM64-NEXT:    and x0, x0, #0xffffffffffffffe0
+; ARM64-NEXT:    mov sp, x0
+; ARM64-NEXT:    mov sp, x29
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64-NEXT:    ret
+  %p = alloca [32 x i8], i64 %n, align 32
+  ret ptr %p
+}
+
+define ptr @dyn_align64(i64 %n) {
+; X64-LABEL: <dyn_align64>:
+; X64:         push rbp
+; X64-NEXT:    mov rbp, rsp
+; X64-NEXT:    sub rsp, 0x30
+; X64-NEXT:    shl rdi, 0x6
+; X64-NEXT:    sub rsp, rdi
+; X64-NEXT:    and rsp, -0x40
+; X64-NEXT:    mov rdi, rsp
+; X64-NEXT:    mov rax, rdi
+; X64-NEXT:    mov rsp, rbp
+; X64-NEXT:    pop rbp
+; X64-NEXT:    ret
+;
+; ARM64-LABEL: <dyn_align64>:
+; ARM64:         stp x29, x30, [sp, #-0xa0]!
+; ARM64-NEXT:    mov x29, sp
+; ARM64-NEXT:    lsl x0, x0, #6
+; ARM64-NEXT:    sub x0, sp, x0
+; ARM64-NEXT:    and x0, x0, #0xffffffffffffffc0
+; ARM64-NEXT:    mov sp, x0
+; ARM64-NEXT:    mov sp, x29
+; ARM64-NEXT:    ldp x29, x30, [sp], #0xa0
+; ARM64-NEXT:    ret
+  %p = alloca [64 x i8], i64 %n, align 64
+  ret ptr %p
+}
+
 ; Reduced test case causing register exhaustion during spilling.
 declare void @f1(i32, ...);
 define void @f2(ptr %0, ptr %1, ptr %2, ptr %3, ptr %4, ptr %5, ptr %6, ptr %7, ptr %8, ptr %9, ptr %10, ptr %11, ptr %12, ptr %13, ptr %14, ptr %15, ptr %16, ptr %17, ptr %18, ptr %19, ptr %20, ptr %21, ptr %22, ptr %23) {
