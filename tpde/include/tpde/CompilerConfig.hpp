@@ -22,6 +22,7 @@ concept CompilerConfig = requires {
   { T::PLATFORM_POINTER_SIZE } -> SameBaseAs<u32>;
   { T::NUM_BANKS } -> SameBaseAs<u32>;
   { T::DEFAULT_VAR_REF_HANDLING } -> SameBaseAs<bool>;
+  { T::MIN_INST_WIDTH } -> SameBaseAs<u8>;
 
   typename T::DefaultCCAssigner;
   requires std::derived_from<typename T::DefaultCCAssigner, CCAssigner>;
@@ -33,6 +34,7 @@ concept CompilerConfig = requires {
 
 struct CompilerConfigDefault {
   constexpr static bool DEFAULT_VAR_REF_HANDLING = true;
+  constexpr static u8 MIN_INST_WIDTH = 1;
 };
 
 } // namespace tpde

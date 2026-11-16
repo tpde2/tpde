@@ -39,6 +39,9 @@ constexpr static std::span<const char> SHSTRTAB = {
     ".rela.gcc_except_table\0"
     ".rela.init_array\0"
     ".rela.fini_array\0"
+    ".debug_info\0"
+    ".debug_line\0"
+    ".debug_abbrev\0"
     ".group\0"
     ".symtab_shndx\0"};
 
@@ -522,6 +525,21 @@ static consteval auto get_elf_section_flags() {
                    .name = sec_off(".tbss"),
                    .has_relocs = false,
                    .is_bss = true};
+  section_flags[u8(SectionKind::DebugInfo)] =
+      SectionFlags{.type = SHT_PROGBITS,
+                   .flags = SHF_ALLOC,
+                   .name = sec_off(".debug_info"),
+                   .has_relocs = false};
+  section_flags[u8(SectionKind::DebugLine)] =
+      SectionFlags{.type = SHT_PROGBITS,
+                   .flags = SHF_ALLOC,
+                   .name = sec_off(".debug_line"),
+                   .has_relocs = false};
+  section_flags[u8(SectionKind::DebugAbbrev)] =
+      SectionFlags{.type = SHT_PROGBITS,
+                   .flags = SHF_ALLOC,
+                   .name = sec_off(".debug_abbrev"),
+                   .has_relocs = false};
   return section_flags;
 }
 

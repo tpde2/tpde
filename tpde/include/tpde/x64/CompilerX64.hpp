@@ -828,14 +828,17 @@ void CompilerX64<Adaptor, Derived, BaseTy, Config>::finish_func(u32 func_idx) {
   // Do sym_def at the very end; we shorten the function here again, so only at
   // this point we know the actual size of the function.
   // TODO(ts): honor cur_needs_unwind_info
+  const u32 prologue_shrink_size = func_prologue_alloc - prologue_size;
   this->text_writer.remove_prologue_bytes(func_start_off + prologue_size,
-                                          func_prologue_alloc - prologue_size);
+                                          prologue_shrink_size);
   auto func_size = this->text_writer.offset() - func_start_off;
   auto func_sym = this->func_syms[func_idx];
   auto func_sec = this->text_writer.get_sec_ref();
   this->assembler.sym_def(func_sym, func_sec, func_start_off, func_size);
   this->text_writer.eh_end_fde();
   this->text_writer.except_encode_func();
+
+  this->func_sym_id_to_skew[func_sym.id()] = prologue_shrink_size;
 }
 
 template <IRAdaptor Adaptor,
