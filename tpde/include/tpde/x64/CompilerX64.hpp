@@ -281,10 +281,30 @@ struct CompilerX64 : BaseTy<Adaptor, Derived, Config> {
   using Base::derived;
 
 
+  // Largest number of GP registers any tpde_encodegen encoding function is
+  // known to hold live at once (encode_of_mul_i128; see
+  // test/filetest/intrin_overflow_mul128.ll). Bump if a new encoding
+  // function needs more.
+  static constexpr u32 MAX_ENCODE_FN_GP_REGS = 10;
+
   // TODO(ts): make this dependent on the number of callee-saved regs of the
   // current function or if there is a call in the function?
-  static constexpr u32 NUM_FIXED_ASSIGNMENTS[PlatformConfig::NUM_BANKS] = {5,
+  //
+  // Keep at most 4 GP registers permanently fixed, leaving enough headroom
+  // for MAX_ENCODE_FN_GP_REGS.
+  static constexpr u32 NUM_FIXED_ASSIGNMENTS[PlatformConfig::NUM_BANKS] = {4,
                                                                            6};
+
+  // Catch insufficient headroom at compile time rather than crashing at
+  // runtime with "ran out of registers for scratch registers".
+  static_assert(
+      NUM_FIXED_ASSIGNMENTS[0] + MAX_ENCODE_FN_GP_REGS <=
+          static_cast<u32>(
+              std::popcount(CCAssignerSysV::Info.allocatable_regs &
+                            RegisterFile::bank_regs(PlatformConfig::GP_BANK))),
+      "NUM_FIXED_ASSIGNMENTS[GP_BANK] leaves too few free GP registers for "
+      "register-heavy encoding functions like encode_of_mul_i128 "
+      "(see MAX_ENCODE_FN_GP_REGS)");
 
   static constexpr u32 MaxStaticAllocaSize = 0x10000000;
 
