@@ -376,6 +376,15 @@ void EncodingTargetArm64::get_inst_candidates(
     std::array<std::string_view, 2> mnems{"LDRSWxr_lsl", "LDRSWxr_sxtx"};
     handle_noimm(mnems[sign], std::format(", {}", shift));
   }
+  if (Name == "LDRHHroX") {
+    // The roX operand is a sign-extension flag, not an extension opcode.
+    unsigned sign = mi.getOperand(3).getImm();
+    unsigned scale = mi.getOperand(4).getImm();
+    if (sign <= 1 && scale <= 1) {
+      std::array<std::string_view, 2> mnems{"LDRHr_lsl", "LDRHr_sxtx"};
+      handle_noimm(mnems[sign], std::format(", {}", scale));
+    }
+  }
 
   const auto case_mem_signed = [&](std::string_view mnem_llvm,
                                    std::string_view mnem,
